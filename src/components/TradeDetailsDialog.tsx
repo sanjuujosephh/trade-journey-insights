@@ -46,6 +46,22 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
     return pnl.toFixed(2);
   };
 
+  const getEmbedUrl = (chartLink: string) => {
+    try {
+      // Convert TradingView chart URL to embedded format
+      const url = new URL(chartLink);
+      if (url.hostname === 'www.tradingview.com' || url.hostname === 'tradingview.com') {
+        // Extract chart ID from the path
+        const chartId = url.pathname.split('/').pop();
+        return `https://www.tradingview.com/chart/embedded/${chartId}`;
+      }
+      return chartLink; // Return original link if not a TradingView URL
+    } catch (e) {
+      console.error('Invalid URL:', e);
+      return chartLink;
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
@@ -58,9 +74,11 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
               <h4 className="text-sm font-medium mb-2">Chart</h4>
               <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
                 <iframe
-                  src={trade.chart_link}
+                  src={getEmbedUrl(trade.chart_link)}
                   className="w-full h-full"
                   title="TradingView Chart"
+                  allowFullScreen
+                  frameBorder="0"
                 />
               </div>
             </div>
