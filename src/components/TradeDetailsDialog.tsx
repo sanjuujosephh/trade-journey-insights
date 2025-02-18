@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -36,7 +37,17 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
   if (!trade) return null;
 
   const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+    const date = new Date(dateString);
+    // Adjust for local timezone
+    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+    return localDate.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
   };
 
   const calculatePnL = () => {
@@ -47,16 +58,14 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
 
   const getEmbedUrl = (chartLink: string) => {
     try {
-      // Convert TradingView chart URL to embedded format
       const url = new URL(chartLink);
       if (url.hostname === 'www.tradingview.com' || url.hostname === 'tradingview.com') {
-        // Handle snapshot URL format (e.g., https://www.tradingview.com/x/u6vAiKQ3/)
         if (url.pathname.startsWith('/x/')) {
           const snapshotId = url.pathname.split('/')[2];
           return `https://www.tradingview.com/x/${snapshotId}/`;
         }
       }
-      return chartLink; // Return original link if not a TradingView URL
+      return chartLink;
     } catch (e) {
       console.error('Invalid URL:', e);
       return chartLink;
@@ -72,7 +81,6 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
         <ScrollArea className="h-full max-h-[70vh]">
           {trade.chart_link && (
             <div className="mb-6">
-              <h4 className="text-sm font-medium mb-2">Chart</h4>
               <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
                 <img
                   src={getEmbedUrl(trade.chart_link)}
