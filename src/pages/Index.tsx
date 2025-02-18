@@ -1,14 +1,71 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TradeEntry from "@/components/TradeEntry";
+import Analytics from "@/components/Analytics";
+import LearningCenter from "@/components/LearningCenter";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+export default function Index() {
+  const [activeTab, setActiveTab] = useState("trade-entry");
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background p-6 animate-fade-in">
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold tracking-tight">Trading Journal</h1>
+        <p className="text-muted-foreground mt-2">Track, analyze, and improve your trading performance</p>
+      </header>
+
+      <Card className="w-full max-w-[1400px] mx-auto">
+        <Tabs defaultValue="trade-entry" className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="w-full justify-start border-b rounded-none px-6 bg-card">
+            <TabsTrigger
+              value="trade-entry"
+              className="data-[state=active]:bg-background"
+            >
+              Trade Entry
+            </TabsTrigger>
+            <TabsTrigger
+              value="analytics"
+              className="data-[state=active]:bg-background"
+            >
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger
+              value="learning"
+              className="data-[state=active]:bg-background"
+            >
+              Learning Center
+            </TabsTrigger>
+          </TabsList>
+          
+          <ScrollArea className="h-[calc(100vh-12rem)]">
+            <div className="p-6">
+              <TabsContent
+                value="trade-entry"
+                className="mt-0 space-y-4"
+              >
+                <TradeEntry />
+              </TabsContent>
+
+              <TabsContent
+                value="analytics"
+                className="mt-0 space-y-4"
+              >
+                <Analytics />
+              </TabsContent>
+
+              <TabsContent
+                value="learning"
+                className="mt-0 space-y-4"
+              >
+                <LearningCenter />
+              </TabsContent>
+            </div>
+          </ScrollArea>
+        </Tabs>
+      </Card>
     </div>
   );
-};
-
-export default Index;
+}
