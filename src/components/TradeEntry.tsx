@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,29 +22,31 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Trash2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 interface Trade {
   id: string;
   symbol: string;
-  entryPrice: string;
-  exitPrice: string;
-  quantity: string;
-  tradeType: string;
-  stopLoss: string;
-  target: string;
-  strategy: string;
+  entry_price: number;
+  exit_price?: number;
+  quantity?: number;
+  trade_type: string;
+  stop_loss?: number;
+  target?: number;
+  strategy?: string;
   outcome: string;
-  notes: string;
+  notes?: string;
   timestamp: string;
 }
 
 const emptyFormData = {
   symbol: "",
-  entryPrice: "",
-  exitPrice: "",
+  entry_price: "",
+  exit_price: "",
   quantity: "",
-  tradeType: "intraday",
-  stopLoss: "",
+  trade_type: "intraday",
+  stop_loss: "",
   target: "",
   strategy: "",
   outcome: "profit",
@@ -53,37 +55,104 @@ const emptyFormData = {
 
 export default function TradeEntry() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState(emptyFormData);
-  const [trades, setTrades] = useState<Trade[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (editingId) {
-      // Update existing trade
-      setTrades(trades.map(trade => 
-        trade.id === editingId 
-          ? { ...trade, ...formData, timestamp: trade.timestamp }
-          : trade
-      ));
-      setEditingId(null);
-      toast({
-        title: "Success",
-        description: "Trade updated successfully!"
-      });
-    } else {
-      // Add new trade
-      const newTrade = {
-        ...formData,
-        id: Date.now().toString(),
-        timestamp: new Date().toLocaleString(),
-      };
-      setTrades([newTrade, ...trades]);
+  // Fetch trades
+  const { data: trades = [] } = useQuery({
+    queryKey: ['trades'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trades')
+        .select('*')
+        .order('timestamp', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Add trade mutation
+  const addTrade = useMutation({
+    mutationFn: async (newTrade: Omit<Trade, 'id' | 'timestamp'>) => {
+      const { data, error } = await supabase
+        .from('trades')
+        .insert([newTrade])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trades'] });
       toast({
         title: "Success",
         description: "Trade logged successfully!"
       });
+    },
+  });
+
+  // Update trade mutation
+  const updateTrade = useMutation({
+    mutationFn: async ({ id, ...trade }: Partial<Trade> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('trades')
+        .update(trade)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trades'] });
+      toast({
+        title: "Success",
+        description: "Trade updated successfully!"
+      });
+    },
+  });
+
+  // Delete trade mutation
+  const deleteTrade = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('trades')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trades'] });
+      toast({
+        title: "Success",
+        description: "Trade deleted successfully!"
+      });
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Convert string values to numbers where needed
+    const tradeData = {
+      ...formData,
+      entry_price: parseFloat(formData.entry_price),
+      exit_price: formData.exit_price ? parseFloat(formData.exit_price) : null,
+      quantity: formData.quantity ? parseFloat(formData.quantity) : null,
+      stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
+      target: formData.target ? parseFloat(formData.target) : null,
+    };
+    
+    if (editingId) {
+      await updateTrade.mutateAsync({ id: editingId, ...tradeData });
+      setEditingId(null);
+    } else {
+      await addTrade.mutateAsync(tradeData);
     }
     
     setFormData(emptyFormData);
@@ -101,16 +170,23 @@ export default function TradeEntry() {
   };
 
   const handleEdit = (trade: Trade) => {
-    setFormData(trade);
+    setFormData({
+      symbol: trade.symbol,
+      entry_price: trade.entry_price.toString(),
+      exit_price: trade.exit_price?.toString() ?? "",
+      quantity: trade.quantity?.toString() ?? "",
+      trade_type: trade.trade_type,
+      stop_loss: trade.stop_loss?.toString() ?? "",
+      target: trade.target?.toString() ?? "",
+      strategy: trade.strategy ?? "",
+      outcome: trade.outcome,
+      notes: trade.notes ?? "",
+    });
     setEditingId(trade.id);
   };
 
-  const handleDelete = (id: string) => {
-    setTrades(trades.filter(trade => trade.id !== id));
-    toast({
-      title: "Success",
-      description: "Trade deleted successfully!"
-    });
+  const handleDelete = async (id: string) => {
+    await deleteTrade.mutateAsync(id);
   };
 
   return (
@@ -132,27 +208,27 @@ export default function TradeEntry() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="entryPrice">Entry Price</Label>
+                <Label htmlFor="entry_price">Entry Price</Label>
                 <Input
-                  id="entryPrice"
-                  name="entryPrice"
+                  id="entry_price"
+                  name="entry_price"
                   type="number"
                   step="0.01"
                   placeholder="0.00"
-                  value={formData.entryPrice}
+                  value={formData.entry_price}
                   onChange={handleChange}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exitPrice">Exit Price</Label>
+                <Label htmlFor="exit_price">Exit Price</Label>
                 <Input
-                  id="exitPrice"
-                  name="exitPrice"
+                  id="exit_price"
+                  name="exit_price"
                   type="number"
                   step="0.01"
                   placeholder="0.00"
-                  value={formData.exitPrice}
+                  value={formData.exit_price}
                   onChange={handleChange}
                 />
               </div>
@@ -160,14 +236,14 @@ export default function TradeEntry() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="stopLoss">Stop Loss</Label>
+                <Label htmlFor="stop_loss">Stop Loss</Label>
                 <Input
-                  id="stopLoss"
-                  name="stopLoss"
+                  id="stop_loss"
+                  name="stop_loss"
                   type="number"
                   step="0.01"
                   placeholder="0.00"
-                  value={formData.stopLoss}
+                  value={formData.stop_loss}
                   onChange={handleChange}
                 />
               </div>
@@ -188,11 +264,11 @@ export default function TradeEntry() {
 
           <Card className="p-6 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="tradeType">Trade Type</Label>
+              <Label htmlFor="trade_type">Trade Type</Label>
               <Select
-                name="tradeType"
-                value={formData.tradeType}
-                onValueChange={(value) => handleSelectChange("tradeType", value)}
+                name="trade_type"
+                value={formData.trade_type}
+                onValueChange={(value) => handleSelectChange("trade_type", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select trade type" />
@@ -276,19 +352,19 @@ export default function TradeEntry() {
               <TableBody>
                 {trades.map((trade) => (
                   <TableRow key={trade.id}>
-                    <TableCell>{trade.timestamp}</TableCell>
+                    <TableCell>{new Date(trade.timestamp).toLocaleString()}</TableCell>
                     <TableCell className="font-medium">{trade.symbol}</TableCell>
-                    <TableCell>{trade.tradeType}</TableCell>
-                    <TableCell>₹{trade.entryPrice}</TableCell>
-                    <TableCell>₹{trade.exitPrice}</TableCell>
+                    <TableCell>{trade.trade_type}</TableCell>
+                    <TableCell>₹{trade.entry_price}</TableCell>
+                    <TableCell>₹{trade.exit_price || '-'}</TableCell>
                     <TableCell>
                       <span
                         className={`inline-block px-2 py-1 rounded-full text-xs ${
                           trade.outcome === "profit"
-                            ? "bg-success-DEFAULT/10 text-success-DEFAULT"
+                            ? "bg-green-100 text-green-800"
                             : trade.outcome === "loss"
-                            ? "bg-destructive/10 text-destructive"
-                            : "bg-muted"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
                         }`}
                       >
                         {trade.outcome}
