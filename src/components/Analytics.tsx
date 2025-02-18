@@ -50,14 +50,14 @@ export default function Analytics() {
 
     const avgProfit = profitTrades.length > 0
       ? (profitTrades.reduce((sum, trade) => {
-          const pnl = (trade.exit_price! - trade.entry_price) * trade.quantity!;
+          const pnl = (Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity);
           return sum + pnl;
         }, 0) / profitTrades.length).toFixed(2)
       : "0";
 
     const avgLoss = lossTrades.length > 0
       ? (lossTrades.reduce((sum, trade) => {
-          const pnl = (trade.exit_price! - trade.entry_price) * trade.quantity!;
+          const pnl = (Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity);
           return sum + Math.abs(pnl);
         }, 0) / lossTrades.length).toFixed(2)
       : "0";
@@ -78,7 +78,7 @@ export default function Analytics() {
   const chartData = trades.map(trade => ({
     date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
     pnl: trade.exit_price && trade.quantity
-      ? (trade.exit_price - trade.entry_price) * trade.quantity
+      ? (Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity)
       : 0,
   }));
 

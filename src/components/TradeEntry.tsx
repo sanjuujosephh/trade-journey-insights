@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -248,8 +247,12 @@ export default function TradeEntry() {
       strategy: trade.strategy ?? "",
       outcome: trade.outcome,
       notes: trade.notes ?? "",
-      entry_time: trade.entry_time ?? "",
-      exit_time: trade.exit_time ?? "",
+      entry_time: trade.entry_time 
+        ? new Date(trade.entry_time).toISOString().slice(0, 16)
+        : "",
+      exit_time: trade.exit_time 
+        ? new Date(trade.exit_time).toISOString().slice(0, 16)
+        : "",
     });
     setEditingId(trade.id);
   };
@@ -462,16 +465,34 @@ export default function TradeEntry() {
                   <TableRow key={trade.id}>
                     <TableCell>
                       {trade.entry_time 
-                        ? new Date(trade.entry_time).toLocaleString()
-                        : new Date(trade.timestamp).toLocaleString()}
+                        ? new Date(trade.entry_time).toLocaleDateString()
+                        : new Date(trade.timestamp).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="font-medium">{trade.symbol}</TableCell>
                     <TableCell>{trade.trade_type}</TableCell>
-                    <TableCell>₹{trade.entry_price}</TableCell>
-                    <TableCell>₹{trade.exit_price || '-'}</TableCell>
                     <TableCell>
-                      {calculatePnL(trade.entry_price, trade.exit_price, trade.quantity) 
-                        ? `₹${calculatePnL(trade.entry_price, trade.exit_price, trade.quantity)}`
+                      ₹{trade.entry_price} 
+                      {trade.entry_time && (
+                        <div className="text-xs text-muted-foreground">
+                          {new Date(trade.entry_time).toLocaleTimeString()}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {trade.exit_price ? (
+                        <>
+                          ₹{trade.exit_price}
+                          {trade.exit_time && (
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(trade.exit_time).toLocaleTimeString()}
+                            </div>
+                          )}
+                        </>
+                      ) : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {trade.exit_price && trade.quantity
+                        ? `₹${((trade.exit_price - trade.entry_price) * trade.quantity).toFixed(2)}`
                         : '-'}
                     </TableCell>
                     <TableCell>
