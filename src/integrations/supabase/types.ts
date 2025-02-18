@@ -30,6 +30,54 @@ export type Database = {
         }
         Relationships: []
       }
+      trades: {
+        Row: {
+          entry_price: number
+          exit_price: number | null
+          id: string
+          notes: string | null
+          outcome: string
+          quantity: number | null
+          stop_loss: number | null
+          strategy: string | null
+          symbol: string
+          target: number | null
+          timestamp: string
+          trade_type: string
+          user_id: string
+        }
+        Insert: {
+          entry_price: number
+          exit_price?: number | null
+          id?: string
+          notes?: string | null
+          outcome: string
+          quantity?: number | null
+          stop_loss?: number | null
+          strategy?: string | null
+          symbol: string
+          target?: number | null
+          timestamp?: string
+          trade_type: string
+          user_id: string
+        }
+        Update: {
+          entry_price?: number
+          exit_price?: number | null
+          id?: string
+          notes?: string | null
+          outcome?: string
+          quantity?: number | null
+          stop_loss?: number | null
+          strategy?: string | null
+          symbol?: string
+          target?: number | null
+          timestamp?: string
+          trade_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
