@@ -37,17 +37,25 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
   if (!trade) return null;
 
   const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    // Adjust for local timezone
-    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
-    return localDate.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
+    if (!dateString) return 'N/A';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Kolkata' // Using Indian timezone
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid Date';
+    }
   };
 
   const calculatePnL = () => {
