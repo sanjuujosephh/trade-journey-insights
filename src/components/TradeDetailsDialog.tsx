@@ -52,8 +52,16 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
       const url = new URL(chartLink);
       if (url.hostname === 'www.tradingview.com' || url.hostname === 'tradingview.com') {
         // Extract chart ID from the path
-        const chartId = url.pathname.split('/').pop();
-        return `https://www.tradingview.com/chart/embedded/${chartId}`;
+        const pathParts = url.pathname.split('/');
+        const chartPart = pathParts.find(part => part.startsWith('XXXXX'));
+        if (chartPart) {
+          return `https://tradingview.com/embed/${chartPart}/?hide_side_toolbar=1&hide_legend=1`;
+        }
+        // If we can't find a specific format, try using the last segment
+        const lastSegment = pathParts[pathParts.length - 1];
+        if (lastSegment) {
+          return `https://tradingview.com/embed/${lastSegment}/?hide_side_toolbar=1&hide_legend=1`;
+        }
       }
       return chartLink; // Return original link if not a TradingView URL
     } catch (e) {
@@ -79,6 +87,7 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
                   title="TradingView Chart"
                   allowFullScreen
                   frameBorder="0"
+                  style={{ display: 'block', width: '100%', height: '100%' }}
                 />
               </div>
             </div>
