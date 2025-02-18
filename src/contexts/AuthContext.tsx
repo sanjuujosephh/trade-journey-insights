@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
+import { User, AuthError } from "@supabase/supabase-js";
 
 interface AuthContextType {
   user: User | null;
@@ -19,75 +19,97 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active sessions and sets the user
     const initializeAuth = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('Error getting session:', error);
+          console.error('Session initialization error:', error.message);
         } else {
-          setUser(data.session?.user ?? null);
+          setUser(session?.user ?? null);
         }
-        setLoading(false);
       } catch (error) {
-        console.error('Session initialization error:', error);
+        console.error('Critical auth error:', error);
+      } finally {
         setLoading(false);
       }
     };
 
     initializeAuth();
 
-    // Listen for changes on auth state
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', _event, session?.user?.email);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
       setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    console.log('Attempting sign in for:', email);
-    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      console.error('Sign in error:', error);
-      throw error;
+  const handleAuthError = (error: AuthError, action: string) => {
+    console.error(`${action} error:`, error);
+    if (error.message.includes('network')) {
+      throw new Error('Network error. Please check your internet connection.');
     }
-    console.log('Sign in successful:', data.user?.email);
+    throw error;
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      console.log('Attempting sign in:', email);
+      const { error, data } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      console.log('Sign in successful:', data.user?.email);
+    } catch (error) {
+      handleAuthError(error as AuthError, 'Sign in');
+    }
   };
 
   const signUp = async (email: string, password: string) => {
-    console.log('Attempting sign up for:', email);
-    const { error, data } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      console.error('Sign up error:', error);
-      throw error;
+    try {
+      console.log('Attempting sign up:', email);
+      const { error, data } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      
+      if (error) throw error;
+      console.log('Sign up successful:', data.user?.email);
+    } catch (error) {
+      handleAuthError(error as AuthError, 'Sign up');
     }
-    console.log('Sign up successful:', data.user?.email);
   };
 
   const signOut = async () => {
-    console.log('Attempting sign out');
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Sign out error:', error);
-      throw error;
+    try {
+      console.log('Attempting sign out');
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      console.log('Sign out successful');
+    } catch (error) {
+      handleAuthError(error as AuthError, 'Sign out');
     }
-    console.log('Sign out successful');
   };
 
   const resetPassword = async (email: string) => {
-    console.log('Attempting password reset for:', email);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/reset-password',
-    });
-    if (error) {
-      console.error('Password reset error:', error);
-      throw error;
+    try {
+      console.log('Attempting password reset:', email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) throw error;
+      console.log('Password reset email sent');
+    } catch (error) {
+      handleAuthError(error as AuthError, 'Password reset');
     }
-    console.log('Password reset email sent');
   };
 
   return (

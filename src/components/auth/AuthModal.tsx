@@ -25,11 +25,24 @@ export function AuthModal() {
   const { signIn, signUp, resetPassword } = useAuth();
   const { toast } = useToast();
 
+  const validateInput = () => {
+    if (!email || !password) {
+      throw new Error("Please fill in all fields");
+    }
+    if (password.length < 6) {
+      throw new Error("Password must be at least 6 characters long");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
+      if (mode !== "reset") {
+        validateInput();
+      }
+      
       console.log(`Attempting ${mode} with email: ${email}`);
       
       if (mode === "login") {
@@ -38,27 +51,29 @@ export function AuthModal() {
           title: "Success",
           description: "Logged in successfully!",
         });
+        setIsOpen(false);
       } else if (mode === "signup") {
         await signUp(email, password);
         toast({
           title: "Success",
           description: "Please check your email to confirm your account.",
         });
+        setIsOpen(false);
       } else if (mode === "reset") {
         await resetPassword(email);
         toast({
           title: "Success",
           description: "Password reset instructions sent to your email.",
         });
+        setIsOpen(false);
       }
-      setIsOpen(false);
     } catch (error) {
       console.error('Auth error:', error);
       toast({
         title: "Error",
         description: error instanceof Error 
-          ? `Authentication failed: ${error.message}` 
-          : "Failed to authenticate. Please try again.",
+          ? error.message
+          : "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -108,6 +123,7 @@ export function AuthModal() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
+                minLength={6}
               />
             </div>
           )}
