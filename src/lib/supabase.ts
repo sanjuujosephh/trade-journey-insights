@@ -11,8 +11,8 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     detectSessionInUrl: true
   },
   global: {
-    fetch: (...args) => {
-      return fetch(...args).catch(err => {
+    fetch: (url: string, options: RequestInit) => {
+      return fetch(url, options).catch(err => {
         console.error('Network error during fetch:', err);
         throw new Error('Network connection error. Please check your internet connection and try again.');
       });
