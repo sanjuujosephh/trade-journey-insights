@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   LineChart,
@@ -88,19 +89,19 @@ export default function Analytics() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4 space-y-2">
+        <Card className="p-4 space-y-2 glass">
           <p className="text-sm text-muted-foreground">Win Rate</p>
           <p className="text-2xl font-bold">{stats.winRate}</p>
         </Card>
-        <Card className="p-4 space-y-2">
+        <Card className="p-4 space-y-2 glass">
           <p className="text-sm text-muted-foreground">Avg Profit</p>
           <p className="text-2xl font-bold">{stats.avgProfit}</p>
         </Card>
-        <Card className="p-4 space-y-2">
+        <Card className="p-4 space-y-2 glass">
           <p className="text-sm text-muted-foreground">Avg Loss</p>
           <p className="text-2xl font-bold">{stats.avgLoss}</p>
         </Card>
-        <Card className="p-4 space-y-2">
+        <Card className="p-4 space-y-2 glass">
           <p className="text-sm text-muted-foreground">Risk/Reward</p>
           <p className="text-2xl font-bold">{stats.riskReward}</p>
         </Card>

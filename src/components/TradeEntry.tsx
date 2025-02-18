@@ -229,6 +229,23 @@ export default function TradeEntry() {
     return ((exit - entry) * quantity).toFixed(2);
   };
 
+  const formatToLocalDateTime = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().slice(0, 16);
+  };
+
+  const formatDisplayTime = (dateString: string) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -289,12 +306,8 @@ export default function TradeEntry() {
       strategy: trade.strategy ?? "",
       outcome: trade.outcome,
       notes: trade.notes ?? "",
-      entry_time: trade.entry_time 
-        ? new Date(trade.entry_time).toISOString().slice(0, 16)
-        : "",
-      exit_time: trade.exit_time 
-        ? new Date(trade.exit_time).toISOString().slice(0, 16)
-        : "",
+      entry_time: trade.entry_time ? formatToLocalDateTime(trade.entry_time) : "",
+      exit_time: trade.exit_time ? formatToLocalDateTime(trade.exit_time) : "",
     });
     setEditingId(trade.id);
   };
@@ -304,10 +317,10 @@ export default function TradeEntry() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-6 space-y-4">
+          <Card className="p-6 space-y-4 glass">
             <div className="space-y-2">
               <Label htmlFor="symbol">Symbol</Label>
               <Select
@@ -423,7 +436,7 @@ export default function TradeEntry() {
             </div>
           </Card>
 
-          <Card className="p-6 space-y-4">
+          <Card className="p-6 space-y-4 glass">
             <div className="space-y-2">
               <Label htmlFor="trade_type">Trade Type</Label>
               <Select
@@ -497,14 +510,14 @@ export default function TradeEntry() {
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" className="w-full sm:w-auto">
+          <Button type="submit" className="w-full sm:w-auto glass hover:bg-white/20">
             {editingId ? "Update Trade" : "Log Trade"}
           </Button>
         </div>
       </form>
 
       {trades.length > 0 && (
-        <Card className="p-6">
+        <Card className="p-6 glass">
           <h3 className="text-lg font-medium mb-4">Trade History</h3>
           <div className="overflow-x-auto">
             <Table>
@@ -531,10 +544,10 @@ export default function TradeEntry() {
                     <TableCell className="font-medium">{trade.symbol}</TableCell>
                     <TableCell>{trade.trade_type}</TableCell>
                     <TableCell>
-                      ₹{trade.entry_price} 
+                      ₹{trade.entry_price}
                       {trade.entry_time && (
                         <div className="text-xs text-muted-foreground">
-                          {new Date(trade.entry_time).toLocaleTimeString()}
+                          {formatDisplayTime(trade.entry_time)}
                         </div>
                       )}
                     </TableCell>
@@ -544,7 +557,7 @@ export default function TradeEntry() {
                           ₹{trade.exit_price}
                           {trade.exit_time && (
                             <div className="text-xs text-muted-foreground">
-                              {new Date(trade.exit_time).toLocaleTimeString()}
+                              {formatDisplayTime(trade.exit_time)}
                             </div>
                           )}
                         </>
@@ -552,7 +565,7 @@ export default function TradeEntry() {
                     </TableCell>
                     <TableCell>
                       {trade.exit_price && trade.quantity
-                        ? `₹${((trade.exit_price - trade.entry_price) * trade.quantity).toFixed(2)}`
+                        ? `₹${((Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity)).toFixed(2)}`
                         : '-'}
                     </TableCell>
                     <TableCell>
