@@ -20,9 +20,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Maximize2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { Dialog } from "@/components/ui/dialog";
+import { TradeDetailsDialog } from "./TradeDetailsDialog";
+import { Image } from "lucide-react";
 
 interface Trade {
   id: string;
@@ -83,6 +86,8 @@ export default function TradeEntry() {
   const [formData, setFormData] = useState(emptyFormData);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -600,6 +605,25 @@ export default function TradeEntry() {
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setSelectedTrade(trade);
+                            setIsDialogOpen(true);
+                          }}
+                        >
+                          <Maximize2 className="h-4 w-4" />
+                        </Button>
+                        {trade.chart_link && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => window.open(trade.chart_link, '_blank')}
+                          >
+                            <Image className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -609,6 +633,12 @@ export default function TradeEntry() {
           </div>
         </Card>
       )}
+
+      <TradeDetailsDialog
+        trade={selectedTrade}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+      />
     </div>
   );
 }
