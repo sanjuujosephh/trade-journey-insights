@@ -43,6 +43,7 @@ interface Trade {
   entry_time?: string;
   exit_time?: string;
   user_id?: string;
+  chart_link?: string;
 }
 
 const AVAILABLE_SYMBOLS = ["NIFTY", "BANKNIFTY"];
@@ -78,6 +79,7 @@ const emptyFormData = {
   notes: "",
   entry_time: "",
   exit_time: "",
+  chart_link: "",
 };
 
 export default function TradeEntry() {
@@ -313,6 +315,7 @@ export default function TradeEntry() {
       notes: trade.notes ?? "",
       entry_time: trade.entry_time ? formatToLocalDateTime(trade.entry_time) : "",
       exit_time: trade.exit_time ? formatToLocalDateTime(trade.exit_time) : "",
+      chart_link: trade.chart_link,
     });
     setEditingId(trade.id);
   };
@@ -442,6 +445,18 @@ export default function TradeEntry() {
           </Card>
 
           <Card className="p-6 space-y-4 glass">
+            <div className="space-y-2">
+              <Label htmlFor="chart_link">TradingView Chart Link</Label>
+              <Input
+                id="chart_link"
+                name="chart_link"
+                type="url"
+                placeholder="https://www.tradingview.com/chart/..."
+                value={formData.chart_link}
+                onChange={handleChange}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="trade_type">Trade Type</Label>
               <Select

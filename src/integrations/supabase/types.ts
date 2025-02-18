@@ -32,6 +32,7 @@ export type Database = {
       }
       trades: {
         Row: {
+          chart_link: string | null
           entry_price: number
           entry_time: string | null
           exit_price: number | null
@@ -49,6 +50,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          chart_link?: string | null
           entry_price: number
           entry_time?: string | null
           exit_price?: number | null
@@ -66,6 +68,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          chart_link?: string | null
           entry_price?: number
           entry_time?: string | null
           exit_price?: number | null
