@@ -53,14 +53,7 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
         // Handle snapshot URL format (e.g., https://www.tradingview.com/x/u6vAiKQ3/)
         if (url.pathname.startsWith('/x/')) {
           const snapshotId = url.pathname.split('/')[2];
-          return `https://s3.tradingview.com/snapshots/${snapshotId}_source.png`;
-        }
-        
-        // Handle chart URL format
-        const pathParts = url.pathname.split('/');
-        const lastSegment = pathParts[pathParts.length - 1];
-        if (lastSegment) {
-          return `https://s3.tradingview.com/snapshots/${lastSegment}_source.png`;
+          return `https://www.tradingview.com/x/${snapshotId}/`;
         }
       }
       return chartLink; // Return original link if not a TradingView URL
@@ -85,7 +78,10 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
                   src={getEmbedUrl(trade.chart_link)}
                   alt="TradingView Chart"
                   className="w-full h-full object-contain"
-                  style={{ maxWidth: '100%', maxHeight: '100%' }}
+                  onError={(e) => {
+                    console.error('Error loading image:', e);
+                    e.currentTarget.src = 'https://via.placeholder.com/800x400?text=Chart+Not+Available';
+                  }}
                 />
               </div>
             </div>
