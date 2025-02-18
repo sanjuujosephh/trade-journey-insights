@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,6 +37,7 @@ interface Trade {
   outcome: string;
   notes?: string;
   timestamp: string;
+  user_id?: string;
 }
 
 const emptyFormData = {
@@ -58,8 +58,18 @@ export default function TradeEntry() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState(emptyFormData);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // Fetch trades
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    getUser();
+  }, []);
+
   const { data: trades = [] } = useQuery({
     queryKey: ['trades'],
     queryFn: async () => {
@@ -68,21 +78,26 @@ export default function TradeEntry() {
         .select('*')
         .order('timestamp', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching trades:', error);
+        throw error;
+      }
       return data;
     },
   });
 
-  // Add trade mutation
   const addTrade = useMutation({
     mutationFn: async (newTrade: Omit<Trade, 'id' | 'timestamp'>) => {
       const { data, error } = await supabase
         .from('trades')
-        .insert([newTrade])
+        .insert([{ ...newTrade, user_id: userId }])
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding trade:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -92,19 +107,29 @@ export default function TradeEntry() {
         description: "Trade logged successfully!"
       });
     },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to log trade. Please try again.",
+        variant: "destructive"
+      });
+    }
   });
 
-  // Update trade mutation
   const updateTrade = useMutation({
     mutationFn: async ({ id, ...trade }: Partial<Trade> & { id: string }) => {
       const { data, error } = await supabase
         .from('trades')
-        .update(trade)
+        .update({ ...trade, user_id: userId })
         .eq('id', id)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating trade:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -114,9 +139,16 @@ export default function TradeEntry() {
         description: "Trade updated successfully!"
       });
     },
+    onError: (error) => {
+      console.error('Update error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update trade. Please try again.",
+        variant: "destructive"
+      });
+    }
   });
 
-  // Delete trade mutation
   const deleteTrade = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -124,7 +156,10 @@ export default function TradeEntry() {
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting trade:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trades'] });
@@ -133,12 +168,28 @@ export default function TradeEntry() {
         description: "Trade deleted successfully!"
       });
     },
+    onError: (error) => {
+      console.error('Delete error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete trade. Please try again.",
+        variant: "destructive"
+      });
+    }
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Convert string values to numbers where needed
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to log trades.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const tradeData = {
       ...formData,
       entry_price: parseFloat(formData.entry_price),
@@ -148,14 +199,18 @@ export default function TradeEntry() {
       target: formData.target ? parseFloat(formData.target) : null,
     };
     
-    if (editingId) {
-      await updateTrade.mutateAsync({ id: editingId, ...tradeData });
-      setEditingId(null);
-    } else {
-      await addTrade.mutateAsync(tradeData);
+    try {
+      if (editingId) {
+        await updateTrade.mutateAsync({ id: editingId, ...tradeData });
+        setEditingId(null);
+      } else {
+        await addTrade.mutateAsync(tradeData);
+      }
+      
+      setFormData(emptyFormData);
+    } catch (error) {
+      console.error('Form submission error:', error);
     }
-    
-    setFormData(emptyFormData);
   };
 
   const handleChange = (
