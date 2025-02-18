@@ -9,34 +9,100 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-// Mock data - replace with real data later
-const data = [
-  { date: "Jan", pnl: 4000 },
-  { date: "Feb", pnl: -2000 },
-  { date: "Mar", pnl: 6000 },
-  { date: "Apr", pnl: 8000 },
-  { date: "May", pnl: -3000 },
-  { date: "Jun", pnl: 10000 },
-];
-
-const stats = [
-  { label: "Win Rate", value: "65%", trend: "up" },
-  { label: "Avg Profit", value: "₹2,450", trend: "up" },
-  { label: "Avg Loss", value: "₹1,200", trend: "down" },
-  { label: "Risk/Reward", value: "2.04", trend: "neutral" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 export default function Analytics() {
+  const { data: trades = [] } = useQuery({
+    queryKey: ['trades'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trades')
+        .select('*')
+        .order('timestamp', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching trades:', error);
+        throw error;
+      }
+      return data;
+    },
+  });
+
+  // Calculate statistics
+  const calculateStats = () => {
+    const completedTrades = trades.filter(trade => trade.exit_price && trade.quantity);
+    const totalTrades = completedTrades.length;
+    
+    if (totalTrades === 0) {
+      return {
+        winRate: "0%",
+        avgProfit: "₹0",
+        avgLoss: "₹0",
+        riskReward: "0",
+      };
+    }
+
+    const profitTrades = completedTrades.filter(trade => trade.outcome === "profit");
+    const lossTrades = completedTrades.filter(trade => trade.outcome === "loss");
+
+    const winRate = ((profitTrades.length / totalTrades) * 100).toFixed(1);
+
+    const avgProfit = profitTrades.length > 0
+      ? (profitTrades.reduce((sum, trade) => {
+          const pnl = (trade.exit_price! - trade.entry_price) * trade.quantity!;
+          return sum + pnl;
+        }, 0) / profitTrades.length).toFixed(2)
+      : "0";
+
+    const avgLoss = lossTrades.length > 0
+      ? (lossTrades.reduce((sum, trade) => {
+          const pnl = (trade.exit_price! - trade.entry_price) * trade.quantity!;
+          return sum + Math.abs(pnl);
+        }, 0) / lossTrades.length).toFixed(2)
+      : "0";
+
+    const riskReward = avgLoss !== "0"
+      ? (parseFloat(avgProfit) / parseFloat(avgLoss)).toFixed(2)
+      : "0";
+
+    return {
+      winRate: `${winRate}%`,
+      avgProfit: `₹${avgProfit}`,
+      avgLoss: `₹${avgLoss}`,
+      riskReward,
+    };
+  };
+
+  // Prepare data for the chart
+  const chartData = trades.map(trade => ({
+    date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
+    pnl: trade.exit_price && trade.quantity
+      ? (trade.exit_price - trade.entry_price) * trade.quantity
+      : 0,
+  }));
+
+  const stats = calculateStats();
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="p-4 space-y-2">
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
-            <p className="text-2xl font-bold">{stat.value}</p>
-          </Card>
-        ))}
+        <Card className="p-4 space-y-2">
+          <p className="text-sm text-muted-foreground">Win Rate</p>
+          <p className="text-2xl font-bold">{stats.winRate}</p>
+        </Card>
+        <Card className="p-4 space-y-2">
+          <p className="text-sm text-muted-foreground">Avg Profit</p>
+          <p className="text-2xl font-bold">{stats.avgProfit}</p>
+        </Card>
+        <Card className="p-4 space-y-2">
+          <p className="text-sm text-muted-foreground">Avg Loss</p>
+          <p className="text-2xl font-bold">{stats.avgLoss}</p>
+        </Card>
+        <Card className="p-4 space-y-2">
+          <p className="text-sm text-muted-foreground">Risk/Reward</p>
+          <p className="text-2xl font-bold">{stats.riskReward}</p>
+        </Card>
       </div>
 
       <Card className="p-6">
@@ -44,7 +110,7 @@ export default function Analytics() {
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
-              data={data}
+              data={chartData}
               margin={{
                 top: 5,
                 right: 30,
@@ -72,30 +138,50 @@ export default function Analytics() {
         <Card className="p-6">
           <h3 className="text-lg font-medium mb-4">Top Performing Strategies</h3>
           <div className="space-y-4">
-            {["Breakout", "Reversal", "Gap Fill"].map((strategy) => (
-              <div
-                key={strategy}
-                className="flex items-center justify-between p-4 bg-muted rounded-lg"
-              >
-                <span>{strategy}</span>
-                <span className="text-success-DEFAULT">+65%</span>
-              </div>
-            ))}
+            {Object.entries(
+              trades.reduce((acc: { [key: string]: number }, trade) => {
+                if (!trade.strategy || !trade.exit_price || !trade.quantity) return acc;
+                const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+                acc[trade.strategy] = (acc[trade.strategy] || 0) + pnl;
+                return acc;
+              }, {})
+            )
+              .sort(([, a], [, b]) => b - a)
+              .slice(0, 3)
+              .map(([strategy, pnl]) => (
+                <div
+                  key={strategy}
+                  className="flex items-center justify-between p-4 bg-muted rounded-lg"
+                >
+                  <span>{strategy}</span>
+                  <span className={pnl >= 0 ? "text-green-600" : "text-red-600"}>
+                    ₹{pnl.toFixed(2)}
+                  </span>
+                </div>
+              ))}
           </div>
         </Card>
 
         <Card className="p-6">
           <h3 className="text-lg font-medium mb-4">Trade Distribution</h3>
           <div className="space-y-4">
-            {["Intraday", "Swing", "Options"].map((type) => (
-              <div
-                key={type}
-                className="flex items-center justify-between p-4 bg-muted rounded-lg"
-              >
-                <span>{type}</span>
-                <span>45%</span>
-              </div>
-            ))}
+            {Object.entries(
+              trades.reduce((acc: { [key: string]: number }, trade) => {
+                acc[trade.trade_type] = (acc[trade.trade_type] || 0) + 1;
+                return acc;
+              }, {})
+            ).map(([type, count]) => {
+              const percentage = ((count / trades.length) * 100).toFixed(1);
+              return (
+                <div
+                  key={type}
+                  className="flex items-center justify-between p-4 bg-muted rounded-lg"
+                >
+                  <span>{type}</span>
+                  <span>{percentage}%</span>
+                </div>
+              );
+            })}
           </div>
         </Card>
       </div>

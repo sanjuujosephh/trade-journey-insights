@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,8 @@ interface Trade {
   outcome: string;
   notes?: string;
   timestamp: string;
+  entry_time?: string;
+  exit_time?: string;
   user_id?: string;
 }
 
@@ -51,6 +54,8 @@ const emptyFormData = {
   strategy: "",
   outcome: "profit",
   notes: "",
+  entry_time: "",
+  exit_time: "",
 };
 
 export default function TradeEntry() {
@@ -178,6 +183,11 @@ export default function TradeEntry() {
     }
   });
 
+  const calculatePnL = (entry: number, exit: number | undefined, quantity: number | undefined) => {
+    if (!exit || !quantity) return null;
+    return ((exit - entry) * quantity).toFixed(2);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -197,6 +207,8 @@ export default function TradeEntry() {
       quantity: formData.quantity ? parseFloat(formData.quantity) : null,
       stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
       target: formData.target ? parseFloat(formData.target) : null,
+      entry_time: formData.entry_time || null,
+      exit_time: formData.exit_time || null,
     };
     
     try {
@@ -236,6 +248,8 @@ export default function TradeEntry() {
       strategy: trade.strategy ?? "",
       outcome: trade.outcome,
       notes: trade.notes ?? "",
+      entry_time: trade.entry_time ?? "",
+      exit_time: trade.exit_time ?? "",
     });
     setEditingId(trade.id);
   };
@@ -284,6 +298,44 @@ export default function TradeEntry() {
                   step="0.01"
                   placeholder="0.00"
                   value={formData.exit_price}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="entry_time">Entry Time</Label>
+                <Input
+                  id="entry_time"
+                  name="entry_time"
+                  type="datetime-local"
+                  value={formData.entry_time}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exit_time">Exit Time</Label>
+                <Input
+                  id="exit_time"
+                  name="exit_time"
+                  type="datetime-local"
+                  value={formData.exit_time}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantity</Label>
+                <Input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  step="1"
+                  placeholder="0"
+                  value={formData.quantity}
                   onChange={handleChange}
                 />
               </div>
@@ -400,6 +452,7 @@ export default function TradeEntry() {
                   <TableHead>Type</TableHead>
                   <TableHead>Entry</TableHead>
                   <TableHead>Exit</TableHead>
+                  <TableHead>P/L</TableHead>
                   <TableHead>Outcome</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -407,11 +460,20 @@ export default function TradeEntry() {
               <TableBody>
                 {trades.map((trade) => (
                   <TableRow key={trade.id}>
-                    <TableCell>{new Date(trade.timestamp).toLocaleString()}</TableCell>
+                    <TableCell>
+                      {trade.entry_time 
+                        ? new Date(trade.entry_time).toLocaleString()
+                        : new Date(trade.timestamp).toLocaleString()}
+                    </TableCell>
                     <TableCell className="font-medium">{trade.symbol}</TableCell>
                     <TableCell>{trade.trade_type}</TableCell>
                     <TableCell>₹{trade.entry_price}</TableCell>
                     <TableCell>₹{trade.exit_price || '-'}</TableCell>
+                    <TableCell>
+                      {calculatePnL(trade.entry_price, trade.exit_price, trade.quantity) 
+                        ? `₹${calculatePnL(trade.entry_price, trade.exit_price, trade.quantity)}`
+                        : '-'}
+                    </TableCell>
                     <TableCell>
                       <span
                         className={`inline-block px-2 py-1 rounded-full text-xs ${

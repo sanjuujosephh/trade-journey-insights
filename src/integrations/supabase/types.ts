@@ -33,7 +33,9 @@ export type Database = {
       trades: {
         Row: {
           entry_price: number
+          entry_time: string | null
           exit_price: number | null
+          exit_time: string | null
           id: string
           notes: string | null
           outcome: string
@@ -48,7 +50,9 @@ export type Database = {
         }
         Insert: {
           entry_price: number
+          entry_time?: string | null
           exit_price?: number | null
+          exit_time?: string | null
           id?: string
           notes?: string | null
           outcome: string
@@ -63,7 +67,9 @@ export type Database = {
         }
         Update: {
           entry_price?: number
+          entry_time?: string | null
           exit_price?: number | null
+          exit_time?: string | null
           id?: string
           notes?: string | null
           outcome?: string

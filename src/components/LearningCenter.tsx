@@ -8,51 +8,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-// Mock data - replace with real data later
-const mistakes = [
-  {
-    id: 1,
-    date: "2024-02-20",
-    mistake: "Ignored stop loss",
-    impact: "High",
-    lesson: "Always stick to predefined stop loss levels",
-  },
-  {
-    id: 2,
-    date: "2024-02-19",
-    mistake: "FOMO trade",
-    impact: "Medium",
-    lesson: "Wait for proper setup before entering",
-  },
-  {
-    id: 3,
-    date: "2024-02-18",
-    mistake: "Overtrading",
-    impact: "High",
-    lesson: "Stick to daily trade limits",
-  },
-];
-
-const patterns = [
-  {
-    pattern: "Early Exit",
-    frequency: "High",
-    suggestion: "Let profits run with trailing stop loss",
-  },
-  {
-    pattern: "Averaging Down",
-    frequency: "Medium",
-    suggestion: "Avoid adding to losing positions",
-  },
-  {
-    pattern: "Emotional Trading",
-    frequency: "High",
-    suggestion: "Follow trading plan strictly",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 export default function LearningCenter() {
+  const { data: trades = [] } = useQuery({
+    queryKey: ['trades'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trades')
+        .select('*')
+        .order('timestamp', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching trades:', error);
+        throw error;
+      }
+      return data;
+    },
+  });
+
+  // Analyze losing trades to identify patterns
+  const losingTrades = trades.filter(trade => 
+    trade.outcome === "loss" && trade.exit_price && trade.quantity
+  );
+
+  const patterns = [
+    {
+      pattern: "Early Exit in Profit",
+      frequency: trades.filter(t => 
+        t.exit_price && t.target && t.exit_price < t.target && t.outcome === "profit"
+      ).length,
+      suggestion: "Consider letting profits run with trailing stop loss"
+    },
+    {
+      pattern: "Stop Loss Hit",
+      frequency: trades.filter(t => 
+        t.exit_price && t.stop_loss && t.exit_price <= t.stop_loss && t.outcome === "loss"
+      ).length,
+      suggestion: "Review stop loss placement strategy"
+    },
+    {
+      pattern: "No Stop Loss",
+      frequency: trades.filter(t => !t.stop_loss).length,
+      suggestion: "Always use a stop loss to manage risk"
+    }
+  ];
+
+  // Format losing trades for display
+  const recentMistakes = losingTrades.slice(0, 3).map(trade => ({
+    id: trade.id,
+    date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
+    mistake: trade.notes || "No notes provided",
+    impact: "High",
+    lesson: `Loss of ₹${((trade.entry_price - (trade.exit_price || 0)) * (trade.quantity || 0)).toFixed(2)}`
+  }));
+
   return (
     <div className="space-y-6 animate-fade-in">
       <Card className="p-6">
@@ -62,24 +73,18 @@ export default function LearningCenter() {
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
-                <TableHead>Mistake</TableHead>
+                <TableHead>Notes</TableHead>
                 <TableHead>Impact</TableHead>
-                <TableHead>Lesson Learned</TableHead>
+                <TableHead>Loss Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mistakes.map((mistake) => (
+              {recentMistakes.map((mistake) => (
                 <TableRow key={mistake.id}>
                   <TableCell>{mistake.date}</TableCell>
                   <TableCell>{mistake.mistake}</TableCell>
                   <TableCell>
-                    <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs ${
-                        mistake.impact === "High"
-                          ? "bg-destructive/10 text-destructive"
-                          : "bg-warning/10 text-warning"
-                      }`}
-                    >
+                    <span className="inline-block px-2 py-1 rounded-full text-xs bg-destructive/10 text-destructive">
                       {mistake.impact}
                     </span>
                   </TableCell>
@@ -104,12 +109,12 @@ export default function LearningCenter() {
                   <span className="font-medium">{item.pattern}</span>
                   <span
                     className={`text-sm ${
-                      item.frequency === "High"
+                      item.frequency > 0
                         ? "text-destructive"
-                        : "text-warning"
+                        : "text-muted-foreground"
                     }`}
                   >
-                    {item.frequency} Frequency
+                    {item.frequency} Occurrences
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -128,7 +133,7 @@ export default function LearningCenter() {
               "Always use stop loss orders",
               "No trading during first 15 minutes",
               "Follow your trading plan",
-              "Document every trade",
+              "Document every trade with detailed notes",
             ].map((rule, index) => (
               <div
                 key={index}
