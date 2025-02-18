@@ -42,8 +42,28 @@ interface Trade {
   user_id?: string;
 }
 
+const AVAILABLE_SYMBOLS = ["NIFTY", "BANKNIFTY"];
+const AVAILABLE_STRATEGIES = [
+  "Trendline Breakout",
+  "Trendline Breakdown",
+  "Trendline Support",
+  "Trendline Resistance",
+  "Volume Area",
+  "Fibonacci Retracement",
+  "Channel Trading",
+  "Support and Resistance Zones",
+  "VWAP Reversion",
+  "Breakout and Retest",
+  "Volume Profile Analysis",
+  "Price Action Trading",
+  "Trend Following Strategy",
+  "Liquidity Grab Strategy",
+  "Fair Value Gap Strategy",
+  "Breakout Fakeout Strategy"
+];
+
 const emptyFormData = {
-  symbol: "",
+  symbol: AVAILABLE_SYMBOLS[0],
   entry_price: "",
   exit_price: "",
   quantity: "",
@@ -82,26 +102,49 @@ export default function TradeEntry() {
         .select('*')
         .order('timestamp', { ascending: false });
       
-      if (error) {
-        console.error('Error fetching trades:', error);
-        throw error;
-      }
+      if (error) throw error;
       return data;
     },
   });
 
+  const checkTradeLimit = async (date: string) => {
+    if (editingId) return true; // Allow editing existing trades
+    
+    const dayStart = new Date(date);
+    dayStart.setHours(0, 0, 0, 0);
+    
+    const dayEnd = new Date(date);
+    dayEnd.setHours(23, 59, 59, 999);
+    
+    const { data: existingTrades, error } = await supabase
+      .from('trades')
+      .select('id')
+      .gte('entry_time', dayStart.toISOString())
+      .lte('entry_time', dayEnd.toISOString())
+      .eq('user_id', userId);
+    
+    if (error) {
+      console.error('Error checking trade limit:', error);
+      return false;
+    }
+    
+    return (existingTrades?.length || 0) < 2;
+  };
+
   const addTrade = useMutation({
     mutationFn: async (newTrade: Omit<Trade, 'id' | 'timestamp'>) => {
+      const canAddTrade = await checkTradeLimit(newTrade.entry_time || new Date().toISOString());
+      if (!canAddTrade) {
+        throw new Error("Daily trade limit reached (2 trades per day)");
+      }
+
       const { data, error } = await supabase
         .from('trades')
         .insert([{ ...newTrade, user_id: userId }])
         .select()
         .single();
       
-      if (error) {
-        console.error('Error adding trade:', error);
-        throw error;
-      }
+      if (error) throw error;
       return data;
     },
     onSuccess: () => {
@@ -112,10 +155,9 @@ export default function TradeEntry() {
       });
     },
     onError: (error) => {
-      console.error('Mutation error:', error);
       toast({
         title: "Error",
-        description: "Failed to log trade. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to log trade. Please try again.",
         variant: "destructive"
       });
     }
@@ -268,14 +310,22 @@ export default function TradeEntry() {
           <Card className="p-6 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="symbol">Symbol</Label>
-              <Input
-                id="symbol"
+              <Select
                 name="symbol"
-                placeholder="Enter stock symbol (e.g., RELIANCE)"
                 value={formData.symbol}
-                onChange={handleChange}
-                required
-              />
+                onValueChange={(value) => handleSelectChange("symbol", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select symbol" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AVAILABLE_SYMBOLS.map((symbol) => (
+                    <SelectItem key={symbol} value={symbol}>
+                      {symbol}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -315,6 +365,7 @@ export default function TradeEntry() {
                   type="datetime-local"
                   value={formData.entry_time}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <div className="space-y-2">
@@ -395,13 +446,22 @@ export default function TradeEntry() {
 
             <div className="space-y-2">
               <Label htmlFor="strategy">Strategy</Label>
-              <Input
-                id="strategy"
+              <Select
                 name="strategy"
-                placeholder="Enter trading strategy"
                 value={formData.strategy}
-                onChange={handleChange}
-              />
+                onValueChange={(value) => handleSelectChange("strategy", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select strategy" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AVAILABLE_STRATEGIES.map((strategy) => (
+                    <SelectItem key={strategy} value={strategy}>
+                      {strategy}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
