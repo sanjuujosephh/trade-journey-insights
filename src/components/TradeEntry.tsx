@@ -12,9 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TradeEntry() {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     symbol: "",
     entryPrice: "",
@@ -31,7 +32,10 @@ export default function TradeEntry() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement trade submission logic
-    toast.success("Trade logged successfully!");
+    toast({
+      title: "Success",
+      description: "Trade logged successfully!"
+    });
     console.log("Trade data:", formData);
   };
 
