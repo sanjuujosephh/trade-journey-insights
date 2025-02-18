@@ -2,9 +2,9 @@
 import { createClient } from "@supabase/supabase-js";
 
 // Project URL from your Supabase dashboard
-const supabaseUrl = 'https://xgzordqukuahsmlhjvog.supabase.co';
+const supabaseUrl = 'https://fyiyuqpcxjwxingjgpiu.supabase.co';
 // Project anon/public key from your Supabase dashboard
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhnem9yZHF1a3VhaHNtbGhqdm9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA1NTc5NjUsImV4cCI6MjAyNjEzMzk2NX0.8ZlPE5L9-Ie0R4L-H8gMecxScZOmatfVTNELMJsgT6o';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5aXl1cXBjeGp3eGluZ2pncGl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk4NzMwNDYsImV4cCI6MjA1NTQ0OTA0Nn0.oaOKB7e6oSTTYIgQHGSsM2N6L1kdVdf3_jT7MXVfSUo';
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase URL or Key');
