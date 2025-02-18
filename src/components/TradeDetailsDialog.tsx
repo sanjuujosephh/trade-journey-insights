@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -51,16 +50,17 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
       // Convert TradingView chart URL to embedded format
       const url = new URL(chartLink);
       if (url.hostname === 'www.tradingview.com' || url.hostname === 'tradingview.com') {
-        // Extract chart ID from the path
-        const pathParts = url.pathname.split('/');
-        const chartPart = pathParts.find(part => part.startsWith('XXXXX'));
-        if (chartPart) {
-          return `https://tradingview.com/embed/${chartPart}/?hide_side_toolbar=1&hide_legend=1`;
+        // Handle snapshot URL format (e.g., https://www.tradingview.com/x/u6vAiKQ3/)
+        if (url.pathname.startsWith('/x/')) {
+          const snapshotId = url.pathname.split('/')[2];
+          return `https://s3.tradingview.com/snapshots/${snapshotId}_source.png`;
         }
-        // If we can't find a specific format, try using the last segment
+        
+        // Handle chart URL format
+        const pathParts = url.pathname.split('/');
         const lastSegment = pathParts[pathParts.length - 1];
         if (lastSegment) {
-          return `https://tradingview.com/embed/${lastSegment}/?hide_side_toolbar=1&hide_legend=1`;
+          return `https://s3.tradingview.com/snapshots/${lastSegment}_source.png`;
         }
       }
       return chartLink; // Return original link if not a TradingView URL
@@ -81,13 +81,11 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
             <div className="mb-6">
               <h4 className="text-sm font-medium mb-2">Chart</h4>
               <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
-                <iframe
+                <img
                   src={getEmbedUrl(trade.chart_link)}
-                  className="w-full h-full"
-                  title="TradingView Chart"
-                  allowFullScreen
-                  frameBorder="0"
-                  style={{ display: 'block', width: '100%', height: '100%' }}
+                  alt="TradingView Chart"
+                  className="w-full h-full object-contain"
+                  style={{ maxWidth: '100%', maxHeight: '100%' }}
                 />
               </div>
             </div>
