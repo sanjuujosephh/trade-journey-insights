@@ -21,12 +21,17 @@ export function AuthModal() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, resetPassword } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    
     try {
+      console.log(`Attempting ${mode} with email: ${email}`);
+      
       if (mode === "login") {
         await signIn(email, password);
         toast({
@@ -48,11 +53,16 @@ export function AuthModal() {
       }
       setIsOpen(false);
     } catch (error) {
+      console.error('Auth error:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "An error occurred",
+        description: error instanceof Error 
+          ? `Authentication failed: ${error.message}` 
+          : "Failed to authenticate. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,6 +94,7 @@ export function AuthModal() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           {mode !== "reset" && (
@@ -96,12 +107,13 @@ export function AuthModal() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
           )}
           <div className="space-y-2">
-            <Button type="submit" className="w-full">
-              {mode === "login" ? "Login" : mode === "signup" ? "Sign Up" : "Reset Password"}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Please wait..." : mode === "login" ? "Login" : mode === "signup" ? "Sign Up" : "Reset Password"}
             </Button>
             <div className="flex gap-2 text-sm">
               {mode === "login" ? (
@@ -110,6 +122,7 @@ export function AuthModal() {
                     type="button"
                     onClick={() => setMode("signup")}
                     className="text-primary hover:underline"
+                    disabled={isLoading}
                   >
                     Don't have an account?
                   </button>
@@ -118,6 +131,7 @@ export function AuthModal() {
                     type="button"
                     onClick={() => setMode("reset")}
                     className="text-primary hover:underline"
+                    disabled={isLoading}
                   >
                     Forgot password?
                   </button>
@@ -127,6 +141,7 @@ export function AuthModal() {
                   type="button"
                   onClick={() => setMode("login")}
                   className="text-primary hover:underline"
+                  disabled={isLoading}
                 >
                   Already have an account?
                 </button>
