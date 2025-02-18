@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   LineChart,
@@ -11,8 +12,20 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 
+interface Trade {
+  id: string;
+  entry_price: number;
+  exit_price: number | null;
+  quantity: number | null;
+  outcome: "profit" | "loss" | "breakeven";
+  strategy: string | null;
+  trade_type: string;
+  entry_time: string | null;
+  timestamp: string;
+}
+
 export default function Analytics() {
-  const { data: trades = [] } = useQuery({
+  const { data: trades = [] } = useQuery<Trade[]>({
     queryKey: ['trades'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -28,9 +41,8 @@ export default function Analytics() {
     },
   });
 
-  // Calculate statistics
   const calculateStats = () => {
-    const completedTrades = trades.filter(trade => trade.exit_price && trade.quantity);
+    const completedTrades = trades.filter(trade => trade.exit_price !== null && trade.quantity !== null);
     const totalTrades = completedTrades.length;
     
     if (totalTrades === 0) {
@@ -49,15 +61,17 @@ export default function Analytics() {
 
     const avgProfit = profitTrades.length > 0
       ? (profitTrades.reduce((sum, trade) => {
-          const pnl = (parseFloat(trade.exit_price || "0") - parseFloat(trade.entry_price.toString())) * parseFloat(trade.quantity?.toString() || "0");
-          return sum + (isNaN(pnl) ? 0 : pnl);
+          if (!trade.exit_price || !trade.quantity) return sum;
+          const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+          return sum + pnl;
         }, 0) / profitTrades.length).toFixed(2)
       : "0";
 
     const avgLoss = lossTrades.length > 0
       ? (lossTrades.reduce((sum, trade) => {
-          const pnl = (parseFloat(trade.exit_price || "0") - parseFloat(trade.entry_price.toString())) * parseFloat(trade.quantity?.toString() || "0");
-          return sum + (isNaN(pnl) ? 0 : Math.abs(pnl));
+          if (!trade.exit_price || !trade.quantity) return sum;
+          const pnl = Math.abs((trade.exit_price - trade.entry_price) * trade.quantity);
+          return sum + pnl;
         }, 0) / lossTrades.length).toFixed(2)
       : "0";
 
@@ -73,11 +87,10 @@ export default function Analytics() {
     };
   };
 
-  // Prepare data for the chart
   const chartData = trades.map(trade => ({
     date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
     pnl: trade.exit_price && trade.quantity
-      ? (parseFloat(trade.exit_price) - parseFloat(trade.entry_price.toString())) * parseFloat(trade.quantity.toString())
+      ? (trade.exit_price - trade.entry_price) * trade.quantity
       : 0,
   }));
 
@@ -140,7 +153,7 @@ export default function Analytics() {
             {Object.entries(
               trades.reduce((acc: { [key: string]: number }, trade) => {
                 if (!trade.strategy || !trade.exit_price || !trade.quantity) return acc;
-                const pnl = (parseFloat(trade.exit_price || "0") - parseFloat(trade.entry_price.toString())) * parseFloat(trade.quantity?.toString() || "0");
+                const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
                 if (!isNaN(pnl)) {
                   acc[trade.strategy] = (acc[trade.strategy] || 0) + pnl;
                 }
