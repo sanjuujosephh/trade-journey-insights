@@ -510,7 +510,10 @@ export default function TradeEntry() {
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" className="w-full sm:w-auto glass hover:bg-white/20">
+          <Button 
+            type="submit" 
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
             {editingId ? "Update Trade" : "Log Trade"}
           </Button>
         </div>

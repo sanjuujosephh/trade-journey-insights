@@ -11,7 +11,7 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
 
   return (
-    <div className="min-h-screen bg-background p-6 animate-fade-in">
+    <div className="min-h-screen bg-background p-6">
       <header className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight">Trading Journal</h1>
         <p className="text-muted-foreground mt-2">Track, analyze, and improve your trading performance</p>
@@ -40,30 +40,28 @@ export default function Index() {
             </TabsTrigger>
           </TabsList>
           
-          <ScrollArea className="h-[calc(100vh-12rem)]">
-            <div className="p-6">
-              <TabsContent
-                value="trade-entry"
-                className="mt-0 space-y-4"
-              >
-                <TradeEntry />
-              </TabsContent>
+          <div className="p-6 max-h-[calc(100vh-16rem)] overflow-y-auto">
+            <TabsContent
+              value="trade-entry"
+              className="mt-0 space-y-4"
+            >
+              <TradeEntry />
+            </TabsContent>
 
-              <TabsContent
-                value="analytics"
-                className="mt-0 space-y-4"
-              >
-                <Analytics />
-              </TabsContent>
+            <TabsContent
+              value="analytics"
+              className="mt-0 space-y-4"
+            >
+              <Analytics />
+            </TabsContent>
 
-              <TabsContent
-                value="learning"
-                className="mt-0 space-y-4"
-              >
-                <LearningCenter />
-              </TabsContent>
-            </div>
-          </ScrollArea>
+            <TabsContent
+              value="learning"
+              className="mt-0 space-y-4"
+            >
+              <LearningCenter />
+            </TabsContent>
+          </div>
         </Tabs>
       </Card>
     </div>

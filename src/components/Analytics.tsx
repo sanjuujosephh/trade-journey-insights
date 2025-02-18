@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   LineChart,
@@ -50,16 +49,14 @@ export default function Analytics() {
 
     const avgProfit = profitTrades.length > 0
       ? (profitTrades.reduce((sum, trade) => {
-          if (!trade.exit_price || !trade.quantity) return sum;
-          const pnl = (Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity);
+          const pnl = (parseFloat(trade.exit_price || "0") - parseFloat(trade.entry_price.toString())) * parseFloat(trade.quantity?.toString() || "0");
           return sum + (isNaN(pnl) ? 0 : pnl);
         }, 0) / profitTrades.length).toFixed(2)
       : "0";
 
     const avgLoss = lossTrades.length > 0
       ? (lossTrades.reduce((sum, trade) => {
-          if (!trade.exit_price || !trade.quantity) return sum;
-          const pnl = (Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity);
+          const pnl = (parseFloat(trade.exit_price || "0") - parseFloat(trade.entry_price.toString())) * parseFloat(trade.quantity?.toString() || "0");
           return sum + (isNaN(pnl) ? 0 : Math.abs(pnl));
         }, 0) / lossTrades.length).toFixed(2)
       : "0";
@@ -80,7 +77,7 @@ export default function Analytics() {
   const chartData = trades.map(trade => ({
     date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
     pnl: trade.exit_price && trade.quantity
-      ? (Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity)
+      ? (parseFloat(trade.exit_price) - parseFloat(trade.entry_price.toString())) * parseFloat(trade.quantity.toString())
       : 0,
   }));
 
@@ -143,7 +140,7 @@ export default function Analytics() {
             {Object.entries(
               trades.reduce((acc: { [key: string]: number }, trade) => {
                 if (!trade.strategy || !trade.exit_price || !trade.quantity) return acc;
-                const pnl = (Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity);
+                const pnl = (parseFloat(trade.exit_price || "0") - parseFloat(trade.entry_price.toString())) * parseFloat(trade.quantity?.toString() || "0");
                 if (!isNaN(pnl)) {
                   acc[trade.strategy] = (acc[trade.strategy] || 0) + pnl;
                 }
