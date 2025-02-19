@@ -29,63 +29,63 @@ export const calculateExpectancy = (trades: Trade[]) => {
 };
 
 export const calculateEquityCurve = (trades: Trade[]) => {
-  return trades.reduce((acc: { date: string; balance: number }[], trade) => {
-    const lastBalance = acc.length > 0 ? acc[acc.length - 1].balance : 0;
-    if (trade.exit_price && trade.quantity) {
-      const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
-      acc.push({
+  let balance = 0;
+  return trades
+    .filter(trade => trade.exit_price && trade.quantity)
+    .map(trade => {
+      const pnl = (trade.exit_price! - trade.entry_price) * trade.quantity!;
+      balance += pnl;
+      return {
         date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
-        balance: lastBalance + pnl
-      });
-    }
-    return acc;
-  }, []);
+        balance: parseFloat(balance.toFixed(2))
+      };
+    });
 };
 
 export const calculateDrawdowns = (trades: Trade[]) => {
   let peak = 0;
-  let drawdowns = [];
   let balance = 0;
-
-  for (const trade of trades) {
-    if (!trade.exit_price || !trade.quantity) continue;
-    const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
-    balance += pnl;
-    
-    if (balance > peak) {
-      peak = balance;
-    }
-    
-    const drawdown = ((peak - balance) / peak) * 100;
-    drawdowns.push({
-      date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
-      drawdown: drawdown
+  return trades
+    .filter(trade => trade.exit_price && trade.quantity)
+    .map(trade => {
+      const pnl = (trade.exit_price! - trade.entry_price) * trade.quantity!;
+      balance += pnl;
+      
+      if (balance > peak) {
+        peak = balance;
+      }
+      
+      const drawdown = peak > 0 ? ((peak - balance) / peak) * 100 : 0;
+      return {
+        date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
+        drawdown: parseFloat(drawdown.toFixed(2))
+      };
     });
-  }
-  return drawdowns;
 };
 
 export const calculateStreaks = (trades: Trade[]) => {
   let currentStreak = 0;
+  let currentType = '';
   const streaks = [];
   
-  for (let i = 0; i < trades.length; i++) {
-    if (trades[i].outcome === trades[i-1]?.outcome) {
+  for (const trade of trades) {
+    if (trade.outcome === currentType) {
       currentStreak++;
     } else {
       if (currentStreak > 0) {
         streaks.push({
-          type: trades[i-1].outcome,
+          type: currentType,
           length: currentStreak
         });
       }
+      currentType = trade.outcome;
       currentStreak = 1;
     }
   }
   
   if (currentStreak > 0) {
     streaks.push({
-      type: trades[trades.length - 1].outcome,
+      type: currentType,
       length: currentStreak
     });
   }
@@ -94,41 +94,42 @@ export const calculateStreaks = (trades: Trade[]) => {
 };
 
 export const calculateTradeDurationStats = (trades: Trade[]) => {
-  const durationData = trades
-    .filter(t => t.entry_time && t.exit_time)
-    .map(trade => {
-      const duration = new Date(trade.exit_time!).getTime() - new Date(trade.entry_time!).getTime();
-      return {
-        duration: duration / (1000 * 60), // Convert to minutes
-        pnl: trade.exit_price && trade.quantity ? 
-          (trade.exit_price - trade.entry_price) * trade.quantity : 0
-      };
-    });
+  const validTrades = trades.filter(t => t.entry_time && t.exit_time && t.exit_price && t.quantity);
+  
+  const durationData = validTrades.map(trade => {
+    const duration = (new Date(trade.exit_time!).getTime() - new Date(trade.entry_time!).getTime()) / (1000 * 60); // Convert to minutes
+    const pnl = (trade.exit_price! - trade.entry_price) * trade.quantity!;
+    return { duration, pnl };
+  });
 
-  return durationData.reduce((acc: any[], data) => {
-    const durationRange = Math.floor(data.duration / 30) * 30; // Group by 30-minute intervals
+  // Group by 30-minute intervals
+  const groupedData = durationData.reduce((acc: any[], data) => {
+    const durationRange = Math.floor(data.duration / 30) * 30;
     const existing = acc.find(item => item.duration === durationRange);
     
     if (existing) {
       existing.trades++;
-      existing.avgPnL = (existing.avgPnL * (existing.trades - 1) + data.pnl) / existing.trades;
+      existing.totalPnL += data.pnl;
+      existing.avgPnL = existing.totalPnL / existing.trades;
     } else {
       acc.push({
         duration: durationRange,
         trades: 1,
+        totalPnL: data.pnl,
         avgPnL: data.pnl
       });
     }
     
     return acc;
-  }, []).sort((a: any, b: any) => a.duration - b.duration);
+  }, []);
+
+  return groupedData.sort((a, b) => a.duration - b.duration);
 };
 
 export const calculateStats = (trades: Trade[]) => {
   const completedTrades = trades.filter(trade => trade.exit_price !== null && trade.quantity !== null);
-  const totalTrades = completedTrades.length;
   
-  if (totalTrades === 0) {
+  if (completedTrades.length === 0) {
     return {
       winRate: "0%",
       avgProfit: "₹0",
@@ -142,21 +143,17 @@ export const calculateStats = (trades: Trade[]) => {
   const profitTrades = completedTrades.filter(trade => trade.outcome === "profit");
   const lossTrades = completedTrades.filter(trade => trade.outcome === "loss");
 
-  const winRate = ((profitTrades.length / totalTrades) * 100).toFixed(1);
+  const winRate = ((profitTrades.length / completedTrades.length) * 100).toFixed(1);
 
   const avgProfit = profitTrades.length > 0
     ? (profitTrades.reduce((sum, trade) => {
-        if (!trade.exit_price || !trade.quantity) return sum;
-        const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
-        return sum + pnl;
+        return sum + ((trade.exit_price! - trade.entry_price) * trade.quantity!);
       }, 0) / profitTrades.length).toFixed(2)
     : "0";
 
   const avgLoss = lossTrades.length > 0
-    ? (lossTrades.reduce((sum, trade) => {
-        if (!trade.exit_price || !trade.quantity) return sum;
-        const pnl = Math.abs((trade.exit_price - trade.entry_price) * trade.quantity);
-        return sum + pnl;
+    ? Math.abs(lossTrades.reduce((sum, trade) => {
+        return sum + ((trade.exit_price! - trade.entry_price) * trade.quantity!);
       }, 0) / lossTrades.length).toFixed(2)
     : "0";
 
@@ -164,9 +161,10 @@ export const calculateStats = (trades: Trade[]) => {
     ? (parseFloat(avgProfit) / parseFloat(avgLoss)).toFixed(2)
     : "0";
 
-  const maxDrawdown = calculateDrawdowns(completedTrades);
-  const maxDrawdownValue = maxDrawdown.length > 0 ? 
-    Math.max(...maxDrawdown.map(d => d.drawdown)).toFixed(1) : "0";
+  const drawdowns = calculateDrawdowns(completedTrades);
+  const maxDrawdown = drawdowns.length > 0
+    ? Math.max(...drawdowns.map(d => d.drawdown)).toFixed(1)
+    : "0";
 
   const consistencyScore = calculateConsistencyScore(completedTrades);
 
@@ -175,26 +173,30 @@ export const calculateStats = (trades: Trade[]) => {
     avgProfit: `₹${avgProfit}`,
     avgLoss: `₹${avgLoss}`,
     riskReward,
-    maxDrawdown: `${maxDrawdownValue}%`,
+    maxDrawdown: `${maxDrawdown}%`,
     consistencyScore: `${consistencyScore}%`,
   };
 };
 
 export const calculateConsistencyScore = (trades: Trade[]) => {
+  if (trades.length === 0) return "0";
+  
   let score = 100;
   
+  // Penalize for trades without stop loss
   const tradesWithoutStopLoss = trades.filter(t => !t.stop_loss).length;
   score -= (tradesWithoutStopLoss / trades.length) * 30;
 
-  const overtradingDays = new Set(
-    trades.filter(t => {
-      const dayTrades = trades.filter(trade => 
-        new Date(trade.timestamp).toDateString() === new Date(t.timestamp).toDateString()
-      );
-      return dayTrades.length > 2;
-    }).map(t => new Date(t.timestamp).toDateString())
-  ).size;
-  score -= (overtradingDays / Math.ceil(trades.length / 2)) * 20;
+  // Penalize for overtrading (more than 3 trades per day)
+  const tradeDates = trades.map(t => new Date(t.timestamp).toDateString());
+  const uniqueDates = new Set(tradeDates);
+  const overtradingDays = Array.from(uniqueDates).filter(date => 
+    tradeDates.filter(d => d === date).length > 3
+  ).length;
+  
+  if (uniqueDates.size > 0) {
+    score -= (overtradingDays / uniqueDates.size) * 20;
+  }
 
   return Math.max(0, Math.min(100, score)).toFixed(1);
 };
