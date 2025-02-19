@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
@@ -57,7 +56,7 @@
     @apply border-border;
   }
   html, body {
-    @apply h-full overflow-hidden;
+    @apply h-full;
   }
   body {
     @apply bg-background text-foreground;
@@ -88,10 +87,8 @@
 [role="tabpanel"] {
   height: 100%;
   padding: 1.5rem;
-  overflow: hidden;
 }
 
 .chart-container {
   @apply h-[300px] w-full;
 }
-

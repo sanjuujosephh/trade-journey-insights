@@ -223,7 +223,7 @@ export default function Analytics() {
   const COLORS = ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'];
 
   return (
-    <div className="h-full overflow-hidden p-6">
+    <div className="h-full p-6">
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
           <Card className="p-4 space-y-2 glass">

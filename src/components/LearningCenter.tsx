@@ -145,7 +145,7 @@ export default function LearningCenter() {
   const consistencyScore = calculateConsistencyScore();
 
   return (
-    <div className="h-full overflow-hidden p-6">
+    <div className="h-full p-6">
       <div className="space-y-4">
         <Card className="p-4">
           <h3 className="text-lg font-medium mb-2">Trading Psychology Analysis</h3>
