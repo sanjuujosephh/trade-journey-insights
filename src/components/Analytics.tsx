@@ -4,26 +4,16 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trade } from "@/types/trade";
-import { EquityCurveChart } from "./analytics/EquityCurveChart";
-import { DrawdownChart } from "./analytics/DrawdownChart";
-import { StreakChart } from "./analytics/StreakChart";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AIAnalysisPanel } from "./AIAnalysisPanel";
-import { DailyPerformanceTable } from "./analytics/DailyPerformanceTable";
 import { TimePerformanceHeatmap } from "./analytics/TimePerformanceHeatmap";
 import { IntradayRiskMetrics } from "./analytics/IntradayRiskMetrics";
+import { TradeFlowChart } from "./analytics/TradeFlowChart";
+import { FOTradeTable } from "./analytics/FOTradeTable";
 import { useState } from "react";
-import {
-  calculateStats,
-  calculateEquityCurve,
-  calculateDrawdowns,
-  calculateStreaks,
-  calculateSharpeRatio,
-  calculateExpectancy,
-  calculateTradeDurationStats,
-} from "@/utils/tradeCalculations";
+import { calculateStats } from "@/utils/tradeCalculations";
 
 interface AIAnalysisResponse {
   analysis: string;
@@ -79,10 +69,6 @@ export default function Analytics() {
   });
 
   const stats = calculateStats(trades);
-  const equityCurveData = calculateEquityCurve(trades);
-  const drawdowns = calculateDrawdowns(trades);
-  const streaks = calculateStreaks(trades);
-  const durationStats = calculateTradeDurationStats(trades);
 
   return (
     <>
@@ -90,9 +76,9 @@ export default function Analytics() {
         <Tabs defaultValue="performance" className="h-full space-y-6">
           <div className="flex items-center justify-between">
             <TabsList>
-              <TabsTrigger value="performance">Performance Metrics</TabsTrigger>
-              <TabsTrigger value="risk">Risk Analysis</TabsTrigger>
-              <TabsTrigger value="patterns">Trading Patterns</TabsTrigger>
+              <TabsTrigger value="performance">Trade Performance</TabsTrigger>
+              <TabsTrigger value="analysis">Trade Analysis</TabsTrigger>
+              <TabsTrigger value="history">Trade History</TabsTrigger>
             </TabsList>
             
             <Button
@@ -117,11 +103,11 @@ export default function Analytics() {
                 <p className="text-2xl font-bold">{stats.winRate}</p>
               </Card>
               <Card className="p-4 space-y-2">
-                <p className="text-sm text-muted-foreground">Avg Daily Profit</p>
+                <p className="text-sm text-muted-foreground">Avg Trade Profit</p>
                 <p className="text-2xl font-bold">{stats.avgProfit}</p>
               </Card>
               <Card className="p-4 space-y-2">
-                <p className="text-sm text-muted-foreground">Avg Daily Loss</p>
+                <p className="text-sm text-muted-foreground">Avg Trade Loss</p>
                 <p className="text-2xl font-bold">{stats.avgLoss}</p>
               </Card>
               <Card className="p-4 space-y-2">
@@ -129,7 +115,7 @@ export default function Analytics() {
                 <p className="text-2xl font-bold">{stats.riskReward}</p>
               </Card>
               <Card className="p-4 space-y-2">
-                <p className="text-sm text-muted-foreground">Max Daily Loss</p>
+                <p className="text-sm text-muted-foreground">Max Trade Loss</p>
                 <p className="text-2xl font-bold text-red-600">
                   {stats.maxDrawdown}
                 </p>
@@ -140,24 +126,23 @@ export default function Analytics() {
               </Card>
             </div>
 
-            <DailyPerformanceTable trades={trades} />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <EquityCurveChart data={equityCurveData} />
-              <DrawdownChart data={drawdowns} />
-            </div>
-
+            <TradeFlowChart trades={trades} />
             <TimePerformanceHeatmap trades={trades} />
           </TabsContent>
 
-          <TabsContent value="risk" className="space-y-6">
+          <TabsContent value="analysis" className="space-y-6">
             <IntradayRiskMetrics trades={trades} />
-            <StreakChart data={streaks} />
+            <TimePerformanceHeatmap trades={trades} />
           </TabsContent>
 
-          <TabsContent value="patterns" className="space-y-6">
-            <TimePerformanceHeatmap trades={trades} />
-            <DailyPerformanceTable trades={trades} />
+          <TabsContent value="history" className="space-y-6">
+            <FOTradeTable 
+              trades={trades} 
+              onReplayTrade={(trade) => {
+                // Implement trade replay functionality
+                console.log("Replaying trade:", trade);
+              }} 
+            />
           </TabsContent>
         </Tabs>
       </div>
