@@ -1,15 +1,6 @@
 import { Card } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, TrendingDown, TrendingUp, Clock, Brain } from "lucide-react";
 
@@ -51,7 +42,6 @@ export default function LearningCenter() {
     },
   });
 
-  // Behavioral Analysis
   const behavioralPatterns = [
     {
       pattern: "Revenge Trading",
@@ -89,7 +79,6 @@ export default function LearningCenter() {
     }
   ];
 
-  // Strategy Analysis with proper typing
   const strategyAnalysis = trades.reduce<Record<string, StrategyStats>>((acc, trade) => {
     const strategy = trade.strategy || 'Unspecified';
     if (!acc[strategy]) {
@@ -109,7 +98,6 @@ export default function LearningCenter() {
     return acc;
   }, {});
 
-  // Emotional Analysis from Notes
   const emotionalKeywords = {
     negative: ['frustrated', 'angry', 'fear', 'worried', 'revenge', 'fomo', 'regret'],
     positive: ['patient', 'disciplined', 'confident', 'calm', 'focused', 'planned'],
@@ -133,17 +121,14 @@ export default function LearningCenter() {
     lesson: trade.notes || "No notes provided",
   }));
 
-  // Calculate consistency metrics
   const calculateConsistencyScore = () => {
     if (trades.length === 0) return 0;
     
     let score = 100;
     
-    // Check stop loss usage
     const tradesWithoutStopLoss = trades.filter(t => !t.stop_loss).length;
     score -= (tradesWithoutStopLoss / trades.length) * 30;
     
-    // Check overtrading
     const overtradingDays = new Set(
       trades.filter(t => {
         const dayTrades = trades.filter(trade => 
@@ -160,7 +145,7 @@ export default function LearningCenter() {
   const consistencyScore = calculateConsistencyScore();
 
   return (
-    <ScrollArea className="h-full p-6">
+    <div className="h-full">
       <div className="space-y-6">
         <Card className="p-6">
           <h3 className="text-lg font-medium mb-4">Trading Psychology Analysis</h3>
@@ -293,6 +278,6 @@ export default function LearningCenter() {
           </div>
         </Card>
       </div>
-    </ScrollArea>
+    </div>
   );
 }

@@ -15,7 +15,6 @@ import {
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Trade {
   id: string;
@@ -224,7 +223,7 @@ export default function Analytics() {
   const COLORS = ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'];
 
   return (
-    <ScrollArea className="h-full p-6">
+    <div className="h-full">
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <Card className="p-4 space-y-2 glass">
@@ -333,6 +332,6 @@ export default function Analytics() {
           </Card>
         </div>
       </div>
-    </ScrollArea>
+    </div>
   );
 }
