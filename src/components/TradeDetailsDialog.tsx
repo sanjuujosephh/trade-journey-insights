@@ -16,7 +16,6 @@ interface Trade {
   quantity?: number;
   trade_type: string;
   stop_loss?: number;
-  target?: number;
   strategy?: string;
   outcome: string;
   notes?: string;
@@ -144,6 +143,10 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
                   <p>{trade.quantity || 'N/A'}</p>
                 </div>
                 <div>
+                  <span className="text-sm text-muted-foreground">Stop Loss:</span>
+                  <p>{trade.stop_loss ? `₹${trade.stop_loss}` : 'N/A'}</p>
+                </div>
+                <div>
                   <span className="text-sm text-muted-foreground">Strategy:</span>
                   <p>{trade.strategy || 'N/A'}</p>
                 </div>
@@ -151,20 +154,6 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
             </div>
 
             <div>
-              <h4 className="text-sm font-medium">Risk Management</h4>
-              <div className="space-y-2 mt-2">
-                <div>
-                  <span className="text-sm text-muted-foreground">Stop Loss:</span>
-                  <p>{trade.stop_loss ? `₹${trade.stop_loss}` : 'N/A'}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Target:</span>
-                  <p>{trade.target ? `₹${trade.target}` : 'N/A'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-span-2">
               <h4 className="text-sm font-medium">Results</h4>
               <div className="space-y-2 mt-2">
                 <div>
