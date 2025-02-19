@@ -10,7 +10,7 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] bg-background">
+    <div className="h-[calc(100vh-4rem)] bg-background">
       <div className="container h-full py-4">
         <header className="mb-2">
           <h1 className="text-3xl font-bold tracking-tight">Trading Journal</h1>
@@ -40,24 +40,24 @@ export default function Index() {
               </TabsTrigger>
             </TabsList>
             
-            <div className="h-[calc(100%-3rem)]">
+            <div className="h-[calc(100%-3rem)] overflow-y-auto">
               <TabsContent
                 value="trade-entry"
-                className="mt-0 h-full overflow-y-auto"
+                className="mt-0 h-full"
               >
                 <TradeEntry />
               </TabsContent>
 
               <TabsContent
                 value="analytics"
-                className="mt-0 h-full overflow-y-auto"
+                className="mt-0 h-full"
               >
                 <Analytics />
               </TabsContent>
 
               <TabsContent
                 value="learning"
-                className="mt-0 h-full overflow-y-auto"
+                className="mt-0 h-full"
               >
                 <LearningCenter />
               </TabsContent>
