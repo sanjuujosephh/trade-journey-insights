@@ -29,6 +29,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+interface AIAnalysisResponse {
+  analysis: string;
+}
+
 export default function Analytics() {
   const { toast } = useToast();
 
@@ -45,8 +49,8 @@ export default function Analytics() {
     },
   });
 
-  const { mutate: analyzeTradesWithAI, isLoading: isAnalyzing } = useMutation({
-    mutationFn: async () => {
+  const { mutate: analyzeTradesWithAI, isPending: isAnalyzing } = useMutation({
+    mutationFn: async (): Promise<AIAnalysisResponse> => {
       const response = await fetch('/functions/v1/analyze-trades', {
         method: 'POST',
         headers: {
