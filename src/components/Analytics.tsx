@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -51,19 +50,15 @@ export default function Analytics() {
 
   const { mutate: analyzeTradesWithAI, isPending: isAnalyzing } = useMutation({
     mutationFn: async (): Promise<AIAnalysisResponse> => {
-      const response = await fetch('/functions/v1/analyze-trades', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ trades }),
+      const response = await supabase.functions.invoke('analyze-trades', {
+        body: { trades }
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to analyze trades');
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to analyze trades');
       }
       
-      return response.json();
+      return response.data;
     },
     onSuccess: (data) => {
       toast({
@@ -78,6 +73,7 @@ export default function Analytics() {
         description: "Could not complete the AI analysis. Please try again.",
         variant: "destructive",
       });
+      console.error('AI Analysis error:', error);
     },
   });
 
