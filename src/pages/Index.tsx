@@ -9,10 +9,29 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { Leaderboard } from "@/components/Leaderboard";
 import { ProfileSettings } from "@/components/ProfileSettings";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
   const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
 
   if (!user) {
     return (
@@ -34,9 +53,17 @@ export default function Index() {
   return (
     <div className="h-[calc(100vh-4rem)] bg-background">
       <div className="container h-full py-4">
-        <header className="mb-2">
-          <h1 className="text-3xl font-bold tracking-tight">Trading Journal</h1>
-          <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
+        <header className="mb-2 flex items-center gap-4">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={profile?.avatar_url} alt={profile?.username || 'User avatar'} />
+            <AvatarFallback>
+              {(profile?.username?.[0] || user.email?.[0] || '?').toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Trading Journal</h1>
+            <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
+          </div>
         </header>
 
         <Card className="h-[calc(100%-4.5rem)]">
