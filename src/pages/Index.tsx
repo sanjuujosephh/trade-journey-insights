@@ -54,7 +54,7 @@ export default function Index() {
     <div className="h-[calc(100vh-4rem)] bg-background">
       <div className="container h-full py-4">
         <header className="mb-2 flex items-center gap-4">
-          <Avatar className="h-28 w-28">
+          <Avatar className="h-28 w-28 [&_*]:scale-x-[-1]">
             <AvatarImage src={profile?.avatar_url} alt={profile?.username || 'User avatar'} />
             <AvatarFallback>
               {(profile?.username?.[0] || user.email?.[0] || '?').toUpperCase()}
