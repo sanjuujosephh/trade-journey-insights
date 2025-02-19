@@ -10,14 +10,14 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
 
   return (
-    <div className="h-[calc(100vh-4rem)] bg-background overflow-hidden">
-      <div className="container h-full py-6">
-        <header className="mb-4">
-          <h1 className="text-4xl font-bold tracking-tight">Trading Journal</h1>
-          <p className="text-muted-foreground mt-2">Track, analyze, and improve your trading performance</p>
+    <div className="h-[calc(100vh-4rem)] bg-background">
+      <div className="container h-full py-4">
+        <header className="mb-2">
+          <h1 className="text-3xl font-bold tracking-tight">Trading Journal</h1>
+          <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
         </header>
 
-        <Card className="h-[calc(100%-5.5rem)] overflow-hidden">
+        <Card className="h-[calc(100%-4.5rem)]">
           <Tabs defaultValue="trade-entry" className="h-full" onValueChange={setActiveTab}>
             <TabsList className="w-full justify-start border-b rounded-none px-6 bg-card">
               <TabsTrigger
@@ -40,24 +40,24 @@ export default function Index() {
               </TabsTrigger>
             </TabsList>
             
-            <div className="h-[calc(100%-3rem)] overflow-hidden">
+            <div className="h-[calc(100%-3rem)]">
               <TabsContent
                 value="trade-entry"
-                className="mt-0 h-full data-[state=active]:animate-fade-in"
+                className="mt-0 h-full"
               >
                 <TradeEntry />
               </TabsContent>
 
               <TabsContent
                 value="analytics"
-                className="mt-0 h-full data-[state=active]:animate-fade-in"
+                className="mt-0 h-full"
               >
                 <Analytics />
               </TabsContent>
 
               <TabsContent
                 value="learning"
-                className="mt-0 h-full data-[state=active]:animate-fade-in"
+                className="mt-0 h-full"
               >
                 <LearningCenter />
               </TabsContent>

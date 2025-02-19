@@ -57,11 +57,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground overflow-hidden;
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   #root {
-    @apply h-screen overflow-hidden;
+    @apply h-screen;
   }
 }
 
@@ -84,6 +84,5 @@
 
 [role="tabpanel"] {
   height: 100%;
-  overflow-y: auto;
   padding: 1.5rem;
 }
