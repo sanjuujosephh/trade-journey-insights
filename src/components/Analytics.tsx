@@ -1,12 +1,15 @@
 
 import { Card } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trade } from "@/types/trade";
 import { EquityCurveChart } from "./analytics/EquityCurveChart";
 import { DrawdownChart } from "./analytics/DrawdownChart";
 import { StreakChart } from "./analytics/StreakChart";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import {
   calculateStats,
   calculateEquityCurve,
@@ -16,7 +19,6 @@ import {
   calculateExpectancy,
   calculateTradeDurationStats,
 } from "@/utils/tradeCalculations";
-import { Cell } from "recharts";
 import {
   BarChart,
   Bar,
@@ -28,6 +30,8 @@ import {
 } from "recharts";
 
 export default function Analytics() {
+  const { toast } = useToast();
+
   const { data: trades = [] } = useQuery<Trade[]>({
     queryKey: ['trades'],
     queryFn: async () => {
@@ -41,6 +45,39 @@ export default function Analytics() {
     },
   });
 
+  const { mutate: analyzeTradesWithAI, isLoading: isAnalyzing } = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/functions/v1/analyze-trades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ trades }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to analyze trades');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "AI Analysis Complete",
+        description: data.analysis,
+        duration: 10000,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Analysis Failed",
+        description: "Could not complete the AI analysis. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const stats = calculateStats(trades);
   const equityCurveData = calculateEquityCurve(trades);
   const drawdowns = calculateDrawdowns(trades);
@@ -50,11 +87,27 @@ export default function Analytics() {
   return (
     <div className="h-full p-6">
       <Tabs defaultValue="performance" className="h-full">
-        <TabsList>
-          <TabsTrigger value="performance">Performance Metrics</TabsTrigger>
-          <TabsTrigger value="risk">Risk Analysis</TabsTrigger>
-          <TabsTrigger value="patterns">Trading Patterns</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between mb-4">
+          <TabsList>
+            <TabsTrigger value="performance">Performance Metrics</TabsTrigger>
+            <TabsTrigger value="risk">Risk Analysis</TabsTrigger>
+            <TabsTrigger value="patterns">Trading Patterns</TabsTrigger>
+          </TabsList>
+          
+          <Button
+            onClick={() => analyzeTradesWithAI()}
+            disabled={isAnalyzing || trades.length === 0}
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              'Analyze with AI'
+            )}
+          </Button>
+        </div>
 
         <TabsContent value="performance" className="h-full space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
