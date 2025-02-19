@@ -20,12 +20,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil, Trash2, Maximize2 } from "lucide-react";
+import { Pencil, Trash2, Maximize2, Image } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Dialog } from "@/components/ui/dialog";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
-import { Image } from "lucide-react";
 
 interface Trade {
   id: string;
@@ -35,7 +33,6 @@ interface Trade {
   quantity?: number;
   trade_type: string;
   stop_loss?: number;
-  target?: number;
   strategy?: string;
   outcome: string;
   notes?: string;
@@ -73,7 +70,6 @@ const emptyFormData = {
   quantity: "",
   trade_type: "intraday",
   stop_loss: "",
-  target: "",
   strategy: "",
   outcome: "profit",
   notes: "",
@@ -271,7 +267,6 @@ export default function TradeEntry() {
       exit_price: formData.exit_price ? parseFloat(formData.exit_price) : null,
       quantity: formData.quantity ? parseFloat(formData.quantity) : null,
       stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
-      target: formData.target ? parseFloat(formData.target) : null,
       entry_time: formData.entry_time || null,
       exit_time: formData.exit_time || null,
     };
@@ -309,13 +304,12 @@ export default function TradeEntry() {
       quantity: trade.quantity?.toString() ?? "",
       trade_type: trade.trade_type,
       stop_loss: trade.stop_loss?.toString() ?? "",
-      target: trade.target?.toString() ?? "",
       strategy: trade.strategy ?? "",
       outcome: trade.outcome,
       notes: trade.notes ?? "",
       entry_time: trade.entry_time ? formatToLocalDateTime(trade.entry_time) : "",
       exit_time: trade.exit_time ? formatToLocalDateTime(trade.exit_time) : "",
-      chart_link: trade.chart_link,
+      chart_link: trade.chart_link ?? "",
     });
     setEditingId(trade.id);
   };
@@ -414,9 +408,6 @@ export default function TradeEntry() {
                   onChange={handleChange}
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="stop_loss">Stop Loss</Label>
                 <Input
@@ -426,18 +417,6 @@ export default function TradeEntry() {
                   step="0.01"
                   placeholder="0.00"
                   value={formData.stop_loss}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="target">Target</Label>
-                <Input
-                  id="target"
-                  name="target"
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={formData.target}
                   onChange={handleChange}
                 />
               </div>
