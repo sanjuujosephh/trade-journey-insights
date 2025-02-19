@@ -145,11 +145,11 @@ export default function LearningCenter() {
   const consistencyScore = calculateConsistencyScore();
 
   return (
-    <div className="h-full">
-      <div className="space-y-6">
-        <Card className="p-6">
-          <h3 className="text-lg font-medium mb-4">Trading Psychology Analysis</h3>
-          <div className="space-y-4">
+    <div className="h-full overflow-hidden p-6">
+      <div className="space-y-4">
+        <Card className="p-4">
+          <h3 className="text-lg font-medium mb-2">Trading Psychology Analysis</h3>
+          <div className="space-y-3">
             {behavioralPatterns.map((pattern) => (
               <Alert key={pattern.pattern} className={pattern.detection > 0 ? "border-destructive" : ""}>
                 <AlertTriangle className="h-4 w-4" />
@@ -171,9 +171,9 @@ export default function LearningCenter() {
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Strategy Performance Review</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-medium mb-2">Strategy Performance Review</h3>
             <div className="space-y-4">
               {Object.entries(strategyAnalysis).map(([strategy, data]) => {
                 const totalTrades = data.wins + data.losses;
@@ -201,8 +201,8 @@ export default function LearningCenter() {
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Recent Trades Analysis</h3>
+          <Card className="p-4">
+            <h3 className="text-lg font-medium mb-2">Recent Trades Analysis</h3>
             <div className="space-y-4">
               {recentTradesAnalysis.map((trade) => (
                 <div
@@ -231,8 +231,8 @@ export default function LearningCenter() {
           </Card>
         </div>
 
-        <Card className="p-6">
-          <h3 className="text-lg font-medium mb-4">Trading Rules & Consistency</h3>
+        <Card className="p-4">
+          <h3 className="text-lg font-medium mb-2">Trading Rules & Consistency</h3>
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <span>Consistency Score</span>

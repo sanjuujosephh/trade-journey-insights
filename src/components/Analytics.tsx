@@ -223,9 +223,9 @@ export default function Analytics() {
   const COLORS = ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'];
 
   return (
-    <div className="h-full">
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div className="h-full overflow-hidden p-6">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
           <Card className="p-4 space-y-2 glass">
             <p className="text-sm text-muted-foreground">Win Rate</p>
             <p className="text-2xl font-bold">{stats.winRate}</p>
@@ -252,10 +252,10 @@ export default function Analytics() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">P/L Over Time</h3>
-            <div className="h-[300px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-medium mb-2">P/L Over Time</h3>
+            <div className="chart-container">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -274,9 +274,9 @@ export default function Analytics() {
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Strategy Performance</h3>
-            <div className="h-[300px]">
+          <Card className="p-4">
+            <h3 className="text-lg font-medium mb-2">Strategy Performance</h3>
+            <div className="chart-container">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={strategyPerformance}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -290,10 +290,10 @@ export default function Analytics() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Time-Based Performance</h3>
-            <div className="h-[300px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-medium mb-2">Time-Based Performance</h3>
+            <div className="chart-container">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={timePerformanceData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -306,9 +306,9 @@ export default function Analytics() {
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Top Performing Strategies</h3>
-            <div className="h-[300px]">
+          <Card className="p-4">
+            <h3 className="text-lg font-medium mb-2">Top Performing Strategies</h3>
+            <div className="chart-container">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie

@@ -10,14 +10,14 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
 
   return (
-    <div className="h-[calc(100vh-4rem)] bg-background">
+    <div className="min-h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] bg-background overflow-hidden">
       <div className="container h-full py-4">
         <header className="mb-2">
           <h1 className="text-3xl font-bold tracking-tight">Trading Journal</h1>
           <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
         </header>
 
-        <Card className="h-[calc(100%-4.5rem)]">
+        <Card className="h-[calc(100%-4.5rem)] overflow-hidden">
           <Tabs defaultValue="trade-entry" className="h-full" onValueChange={setActiveTab}>
             <TabsList className="w-full justify-start border-b rounded-none px-6 bg-card">
               <TabsTrigger
@@ -40,24 +40,24 @@ export default function Index() {
               </TabsTrigger>
             </TabsList>
             
-            <div className="h-[calc(100%-3rem)]">
+            <div className="h-[calc(100%-3rem)] overflow-hidden">
               <TabsContent
                 value="trade-entry"
-                className="mt-0 h-full"
+                className="mt-0 h-full overflow-hidden"
               >
                 <TradeEntry />
               </TabsContent>
 
               <TabsContent
                 value="analytics"
-                className="mt-0 h-full"
+                className="mt-0 h-full overflow-hidden"
               >
                 <Analytics />
               </TabsContent>
 
               <TabsContent
                 value="learning"
-                className="mt-0 h-full"
+                className="mt-0 h-full overflow-hidden"
               >
                 <LearningCenter />
               </TabsContent>
