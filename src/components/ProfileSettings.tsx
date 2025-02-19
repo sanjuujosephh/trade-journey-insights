@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 
@@ -85,73 +84,9 @@ export function ProfileSettings() {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user?.id) return;
-
-    try {
-      // Upload image
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
-
-      // Update profile
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: publicUrl })
-        .eq("id", user.id);
-
-      if (updateError) throw updateError;
-
-      await refetch();
-      
-      toast({
-        title: "Success",
-        description: "Avatar updated successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update avatar",
-        variant: "destructive",
-      });
-      console.error("Error updating avatar:", error);
-    }
-  };
-
   return (
     <div className="max-w-2xl mx-auto">
       <Card className="p-6">
-        <div className="flex items-center gap-6 mb-6">
-          <Avatar className="h-20 w-20">
-            <AvatarImage src={profile.avatar_url || ''} />
-            <AvatarFallback>{profile.username?.[0]?.toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <div>
-            <Label htmlFor="avatar" className="cursor-pointer">
-              <Button variant="outline" className="mb-2">
-                Change Avatar
-              </Button>
-            </Label>
-            <Input
-              id="avatar"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </div>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>

@@ -71,7 +71,6 @@ export function Leaderboard() {
           acc[userId].winning_trades++;
         }
         
-        // Calculate P/L if we have all required values
         if (trade.exit_price && trade.entry_price && trade.quantity) {
           acc[userId].profit_loss += (trade.exit_price - trade.entry_price) * trade.quantity;
         }
@@ -79,7 +78,6 @@ export function Leaderboard() {
         return acc;
       }, {});
 
-      // Convert to array and calculate win rates
       return Object.values(userStats)
         .map((stats: any): LeaderboardEntry => ({
           username: stats.username,
@@ -110,7 +108,6 @@ export function Leaderboard() {
           <TableRow key={entry.username}>
             <TableCell className="flex items-center gap-2">
               <Avatar className="h-6 w-6">
-                <AvatarImage src={entry.avatar_url || ''} />
                 <AvatarFallback>{entry.username[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>
               {entry.username}
