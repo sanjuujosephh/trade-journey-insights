@@ -5,22 +5,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function AuthForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
+  const { signIn, signUp, resetPassword } = useAuth();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent, mode: "login" | "signup") => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      if (mode === "login") {
+      if (mode === "reset") {
+        await resetPassword(email);
+        toast({
+          title: "Success",
+          description: "Check your email for password reset instructions",
+        });
+        setMode("login");
+      } else if (mode === "login") {
         await signIn(email, password);
         toast({ title: "Success", description: "Logged in successfully!" });
       } else {
@@ -41,14 +48,49 @@ export function AuthForm() {
     }
   };
 
+  if (mode === "reset") {
+    return (
+      <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email-reset">Email</Label>
+            <Input
+              id="email-reset"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Sending..." : "Send Reset Instructions"}
+          </Button>
+        </form>
+        <Button
+          variant="link"
+          className="px-0"
+          onClick={() => setMode("login")}
+        >
+          Back to Login
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <Tabs defaultValue="login" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="login">Login</TabsTrigger>
-        <TabsTrigger value="signup">Sign Up</TabsTrigger>
+        <TabsTrigger value="login" onClick={() => setMode("login")}>
+          Login
+        </TabsTrigger>
+        <TabsTrigger value="signup" onClick={() => setMode("signup")}>
+          Sign Up
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="login">
-        <form onSubmit={(e) => handleSubmit(e, "login")} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email-login">Email</Label>
             <Input
@@ -76,10 +118,18 @@ export function AuthForm() {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Please wait..." : "Login"}
           </Button>
+          <Button
+            type="button"
+            variant="link"
+            className="px-0"
+            onClick={() => setMode("reset")}
+          >
+            Forgot password?
+          </Button>
         </form>
       </TabsContent>
       <TabsContent value="signup">
-        <form onSubmit={(e) => handleSubmit(e, "signup")} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email-signup">Email</Label>
             <Input

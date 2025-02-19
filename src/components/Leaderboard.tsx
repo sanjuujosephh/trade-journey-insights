@@ -54,7 +54,7 @@ export function Leaderboard() {
       if (!data) return [];
 
       // Group trades by user and calculate statistics
-      const userStats = (data as TradeWithProfile[]).reduce((acc: { [key: string]: any }, trade) => {
+      const userStats = data.reduce((acc: { [key: string]: any }, trade: any) => {
         const userId = trade.user_id;
         if (!acc[userId]) {
           acc[userId] = {

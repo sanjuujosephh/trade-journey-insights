@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
 
 type Profile = {
   username: string | null;
@@ -27,26 +28,27 @@ export function ProfileSettings() {
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  const { data: profileData, refetch } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username, twitter_id, telegram_id, avatar_url")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
   useEffect(() => {
-    async function loadProfile() {
-      if (!user?.id) return;
-
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("username, twitter_id, telegram_id, avatar_url")
-          .eq("id", user.id)
-          .single();
-
-        if (error) throw error;
-        if (data) setProfile(data);
-      } catch (error) {
-        console.error("Error loading profile:", error);
-      }
+    if (profileData) {
+      setProfile(profileData);
     }
-
-    loadProfile();
-  }, [user?.id]);
+  }, [profileData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +67,8 @@ export function ProfileSettings() {
 
       if (error) throw error;
 
+      await refetch();
+      
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -75,6 +79,7 @@ export function ProfileSettings() {
         description: "Failed to update profile",
         variant: "destructive",
       });
+      console.error("Error updating profile:", error);
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +93,7 @@ export function ProfileSettings() {
       // Upload image
       const fileExt = file.name.split(".").pop();
       const fileName = `${user.id}.${fileExt}`;
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(fileName, file, { upsert: true });
 
@@ -107,7 +112,8 @@ export function ProfileSettings() {
 
       if (updateError) throw updateError;
 
-      setProfile(prev => ({ ...prev, avatar_url: publicUrl }));
+      await refetch();
+      
       toast({
         title: "Success",
         description: "Avatar updated successfully",
@@ -118,6 +124,7 @@ export function ProfileSettings() {
         description: "Failed to update avatar",
         variant: "destructive",
       });
+      console.error("Error updating avatar:", error);
     }
   };
 
