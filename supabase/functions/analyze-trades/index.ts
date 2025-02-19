@@ -27,6 +27,8 @@ serve(async (req) => {
       strategy: trade.strategy,
       stopLoss: trade.stop_loss,
       notes: trade.notes,
+      entryTime: trade.entry_time,
+      exitTime: trade.exit_time,
     }));
 
     const prompt = `Analyze these trading patterns and provide insights:
@@ -59,6 +61,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
+    console.error('Error in analyze-trades function:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
