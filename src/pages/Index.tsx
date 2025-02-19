@@ -5,9 +5,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TradeEntry from "@/components/TradeEntry";
 import Analytics from "@/components/Analytics";
 import LearningCenter from "@/components/LearningCenter";
+import { useAuth } from "@/contexts/AuthContext";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { Leaderboard } from "@/components/Leaderboard";
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
+  const { user } = useAuth();
+
+  if (!user) {
+    return (
+      <div className="container h-[calc(100vh-4rem)] py-4">
+        <div className="grid h-full gap-4 md:grid-cols-2">
+          <Card className="p-6">
+            <h2 className="mb-6 text-2xl font-bold">Welcome to Trading Journal</h2>
+            <AuthForm />
+          </Card>
+          <Card className="p-6">
+            <h2 className="mb-6 text-2xl font-bold">Top Performers</h2>
+            <Leaderboard />
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[calc(100vh-4rem)] bg-background">
