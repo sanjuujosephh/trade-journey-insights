@@ -28,7 +28,7 @@ function Navigation() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-screen bg-background overflow-hidden">
+    <div className="h-screen overflow-hidden">
       <Navigation />
       <main className="h-[calc(100vh-4rem)]">
         {children}

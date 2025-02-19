@@ -10,14 +10,14 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
 
   return (
-    <div className="h-[calc(100vh-4rem)] bg-background">
-      <div className="container h-full px-4 py-6">
+    <div className="h-[calc(100vh-4rem)] bg-background overflow-hidden">
+      <div className="container h-full py-6">
         <header className="mb-4">
           <h1 className="text-4xl font-bold tracking-tight">Trading Journal</h1>
           <p className="text-muted-foreground mt-2">Track, analyze, and improve your trading performance</p>
         </header>
 
-        <Card className="h-[calc(100%-7rem)]">
+        <Card className="h-[calc(100%-5.5rem)] overflow-hidden">
           <Tabs defaultValue="trade-entry" className="h-full" onValueChange={setActiveTab}>
             <TabsList className="w-full justify-start border-b rounded-none px-6 bg-card">
               <TabsTrigger
