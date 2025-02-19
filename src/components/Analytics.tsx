@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   LineChart,
@@ -16,22 +15,22 @@ import {
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Trade {
   id: string;
   entry_price: number;
-  exit_price: number | null;
-  quantity: number | null;
-  outcome: "profit" | "loss" | "breakeven";
-  strategy: string | null;
+  exit_price?: number | null;
+  quantity?: number | null;
+  outcome: 'profit' | 'loss' | 'breakeven';
+  strategy?: string | null;
   trade_type: string;
-  entry_time: string | null;
+  entry_time?: string | null;
+  exit_time?: string | null;
   timestamp: string;
-  stop_loss: number | null;
+  stop_loss?: number | null;
   symbol: string;
-  notes: string | null;
+  notes?: string | null;
 }
 
 export default function Analytics() {
@@ -91,10 +90,8 @@ export default function Analytics() {
       ? (parseFloat(avgProfit) / parseFloat(avgLoss)).toFixed(2)
       : "0";
 
-    // Calculate maximum drawdown
     const maxDrawdown = calculateMaxDrawdown(completedTrades);
 
-    // Calculate consistency score
     const consistencyScore = calculateConsistencyScore(completedTrades);
 
     return {
@@ -133,11 +130,9 @@ export default function Analytics() {
   const calculateConsistencyScore = (trades: Trade[]) => {
     let score = 100;
     
-    // Deduct points for trades without stop loss
     const tradesWithoutStopLoss = trades.filter(t => !t.stop_loss).length;
     score -= (tradesWithoutStopLoss / trades.length) * 30;
 
-    // Deduct points for overtrading (more than 2 trades per day)
     const overtradingDays = new Set(
       trades.filter(t => {
         const dayTrades = trades.filter(trade => 
@@ -148,11 +143,9 @@ export default function Analytics() {
     ).size;
     score -= (overtradingDays / Math.ceil(trades.length / 2)) * 20;
 
-    // Ensure score doesn't go below 0
     return Math.max(0, Math.min(100, score)).toFixed(1);
   };
 
-  // Sort trades by date for the chart
   const chartData = trades
     .sort((a, b) => {
       const dateA = new Date(a.entry_time || a.timestamp).getTime();
@@ -166,9 +159,14 @@ export default function Analytics() {
         : 0,
     }));
 
-  // Strategy Performance Analysis
-  const strategyPerformance = Object.entries(
-    trades.reduce((acc: { [key: string]: { wins: number; losses: number; pnl: number } }, trade) => {
+  interface StrategyPerformance {
+    name: string;
+    winRate: string;
+    pnl: string;
+  }
+
+  const strategyPerformance: StrategyPerformance[] = Object.entries(
+    trades.reduce<Record<string, { wins: number; losses: number; pnl: number }>>((acc, trade) => {
       const strategy = trade.strategy || 'Unspecified';
       if (!acc[strategy]) {
         acc[strategy] = { wins: 0, losses: 0, pnl: 0 };
@@ -190,11 +188,10 @@ export default function Analytics() {
     name: strategy,
     winRate: data.wins + data.losses > 0 
       ? ((data.wins / (data.wins + data.losses)) * 100).toFixed(1)
-      : 0,
+      : '0',
     pnl: data.pnl.toFixed(2),
   }));
 
-  // Time Analysis
   const timeAnalysis = trades.reduce((acc: { [key: string]: number }, trade) => {
     if (!trade.entry_time) return acc;
     const hour = new Date(trade.entry_time).getHours();

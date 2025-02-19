@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -14,8 +13,29 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, TrendingDown, TrendingUp, Clock, Brain } from "lucide-react";
 
+interface Trade {
+  id: string;
+  entry_price: number;
+  exit_price?: number | null;
+  quantity?: number | null;
+  outcome: 'profit' | 'loss' | 'breakeven';
+  strategy?: string | null;
+  trade_type: string;
+  entry_time?: string | null;
+  exit_time?: string | null;
+  timestamp: string;
+  stop_loss?: number | null;
+  notes?: string | null;
+}
+
+interface StrategyStats {
+  wins: number;
+  losses: number;
+  totalPnL: number;
+}
+
 export default function LearningCenter() {
-  const { data: trades = [] } = useQuery({
+  const { data: trades = [] } = useQuery<Trade[]>({
     queryKey: ['trades'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -69,10 +89,8 @@ export default function LearningCenter() {
     }
   ];
 
-  // Strategy Analysis
-  const strategyAnalysis = trades.reduce((acc: { 
-    [key: string]: { wins: number; losses: number; totalPnL: number } 
-  }, trade) => {
+  // Strategy Analysis with proper typing
+  const strategyAnalysis = trades.reduce<Record<string, StrategyStats>>((acc, trade) => {
     const strategy = trade.strategy || 'Unspecified';
     if (!acc[strategy]) {
       acc[strategy] = { wins: 0, losses: 0, totalPnL: 0 };
