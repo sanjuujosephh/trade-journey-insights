@@ -12,9 +12,12 @@ import {
   PieChart,
   Pie,
   Cell,
+  Area,
+  AreaChart,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Trade {
   id: string;
@@ -41,10 +44,7 @@ export default function Analytics() {
         .select('*')
         .order('timestamp', { ascending: true });
       
-      if (error) {
-        console.error('Error fetching trades:', error);
-        throw error;
-      }
+      if (error) throw error;
       return data;
     },
   });
@@ -145,193 +145,250 @@ export default function Analytics() {
     return Math.max(0, Math.min(100, score)).toFixed(1);
   };
 
-  const chartData = trades
-    .sort((a, b) => {
-      const dateA = new Date(a.entry_time || a.timestamp).getTime();
-      const dateB = new Date(b.entry_time || b.timestamp).getTime();
-      return dateA - dateB;
-    })
-    .map(trade => ({
-      date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
-      pnl: trade.exit_price && trade.quantity
-        ? (trade.exit_price - trade.entry_price) * trade.quantity
-        : 0,
-    }));
+  // Calculate equity curve data
+  const equityCurveData = trades.reduce((acc: any[], trade) => {
+    const lastBalance = acc.length > 0 ? acc[acc.length - 1].balance : 0;
+    if (trade.exit_price && trade.quantity) {
+      const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+      acc.push({
+        date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
+        balance: lastBalance + pnl
+      });
+    }
+    return acc;
+  }, []);
 
-  interface StrategyPerformance {
-    name: string;
-    winRate: string;
-    pnl: string;
-  }
+  // Calculate drawdown data
+  const calculateDrawdowns = () => {
+    let peak = 0;
+    let drawdowns = [];
+    let balance = 0;
 
-  const strategyPerformance: StrategyPerformance[] = Object.entries(
-    trades.reduce<Record<string, { wins: number; losses: number; pnl: number }>>((acc, trade) => {
-      const strategy = trade.strategy || 'Unspecified';
-      if (!acc[strategy]) {
-        acc[strategy] = { wins: 0, losses: 0, pnl: 0 };
+    for (const trade of trades) {
+      if (!trade.exit_price || !trade.quantity) continue;
+      const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+      balance += pnl;
+      
+      if (balance > peak) {
+        peak = balance;
       }
       
-      if (trade.outcome === 'profit') {
-        acc[strategy].wins++;
-      } else if (trade.outcome === 'loss') {
-        acc[strategy].losses++;
-      }
+      const drawdown = ((peak - balance) / peak) * 100;
+      drawdowns.push({
+        date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
+        drawdown: drawdown
+      });
+    }
+    return drawdowns;
+  };
 
-      if (trade.exit_price && trade.quantity) {
-        acc[strategy].pnl += (trade.exit_price - trade.entry_price) * trade.quantity;
-      }
-
-      return acc;
-    }, {})
-  ).map(([strategy, data]) => ({
-    name: strategy,
-    winRate: data.wins + data.losses > 0 
-      ? ((data.wins / (data.wins + data.losses)) * 100).toFixed(1)
-      : '0',
-    pnl: data.pnl.toFixed(2),
-  }));
-
-  const timeAnalysis = trades.reduce((acc: { [key: string]: number }, trade) => {
-    if (!trade.entry_time) return acc;
-    const hour = new Date(trade.entry_time).getHours();
-    const timeSlot = `${hour.toString().padStart(2, '0')}:00`;
+  // Calculate winning/losing streaks
+  const calculateStreaks = () => {
+    let currentStreak = 0;
+    const streaks = [];
     
-    if (!acc[timeSlot]) {
-      acc[timeSlot] = 0;
+    for (let i = 0; i < trades.length; i++) {
+      if (trades[i].outcome === trades[i-1]?.outcome) {
+        currentStreak++;
+      } else {
+        if (currentStreak > 0) {
+          streaks.push({
+            type: trades[i-1].outcome,
+            length: currentStreak
+          });
+        }
+        currentStreak = 1;
+      }
+    }
+    
+    if (currentStreak > 0) {
+      streaks.push({
+        type: trades[trades.length - 1].outcome,
+        length: currentStreak
+      });
     }
 
-    if (trade.exit_price && trade.quantity) {
-      acc[timeSlot] += (trade.exit_price - trade.entry_price) * trade.quantity;
-    }
+    return streaks;
+  };
 
-    return acc;
-  }, {});
+  // Calculate trade duration statistics
+  const calculateTradeDurationStats = () => {
+    const durationData = trades
+      .filter(t => t.entry_time && t.exit_time)
+      .map(trade => {
+        const duration = new Date(trade.exit_time!).getTime() - new Date(trade.entry_time!).getTime();
+        return {
+          duration: duration / (1000 * 60), // Convert to minutes
+          pnl: trade.exit_price && trade.quantity ? 
+            (trade.exit_price - trade.entry_price) * trade.quantity : 0
+        };
+      });
 
-  const timePerformanceData = Object.entries(timeAnalysis)
-    .map(([time, pnl]) => ({
-      time,
-      pnl: Number(pnl.toFixed(2)),
-    }))
-    .sort((a, b) => {
-      const timeA = parseInt(a.time.split(':')[0]);
-      const timeB = parseInt(b.time.split(':')[0]);
-      return timeA - timeB;
-    });
+    return durationData.reduce((acc: any[], data) => {
+      const durationRange = Math.floor(data.duration / 30) * 30; // Group by 30-minute intervals
+      const existing = acc.find(item => item.duration === durationRange);
+      
+      if (existing) {
+        existing.trades++;
+        existing.avgPnL = (existing.avgPnL * (existing.trades - 1) + data.pnl) / existing.trades;
+      } else {
+        acc.push({
+          duration: durationRange,
+          trades: 1,
+          avgPnL: data.pnl
+        });
+      }
+      
+      return acc;
+    }, []).sort((a: any, b: any) => a.duration - b.duration);
+  };
 
   const stats = calculateStats();
-
-  const COLORS = ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'];
+  const drawdowns = calculateDrawdowns();
+  const streaks = calculateStreaks();
+  const durationStats = calculateTradeDurationStats();
 
   return (
     <div className="h-full p-6">
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-          <Card className="p-4 space-y-2 glass">
-            <p className="text-sm text-muted-foreground">Win Rate</p>
-            <p className="text-2xl font-bold">{stats.winRate}</p>
-          </Card>
-          <Card className="p-4 space-y-2 glass">
-            <p className="text-sm text-muted-foreground">Avg Profit</p>
-            <p className="text-2xl font-bold">{stats.avgProfit}</p>
-          </Card>
-          <Card className="p-4 space-y-2 glass">
-            <p className="text-sm text-muted-foreground">Avg Loss</p>
-            <p className="text-2xl font-bold">{stats.avgLoss}</p>
-          </Card>
-          <Card className="p-4 space-y-2 glass">
-            <p className="text-sm text-muted-foreground">Risk/Reward</p>
-            <p className="text-2xl font-bold">{stats.riskReward}</p>
-          </Card>
-          <Card className="p-4 space-y-2 glass">
-            <p className="text-sm text-muted-foreground">Max Drawdown</p>
-            <p className="text-2xl font-bold">{stats.maxDrawdown}</p>
-          </Card>
-          <Card className="p-4 space-y-2 glass">
-            <p className="text-sm text-muted-foreground">Consistency Score</p>
-            <p className="text-2xl font-bold">{stats.consistencyScore}</p>
-          </Card>
-        </div>
+      <Tabs defaultValue="performance" className="h-full">
+        <TabsList>
+          <TabsTrigger value="performance">Performance Metrics</TabsTrigger>
+          <TabsTrigger value="risk">Risk Analysis</TabsTrigger>
+          <TabsTrigger value="patterns">Trading Patterns</TabsTrigger>
+        </TabsList>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <TabsContent value="performance" className="h-full space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+            <Card className="p-4 space-y-2 glass">
+              <p className="text-sm text-muted-foreground">Win Rate</p>
+              <p className="text-2xl font-bold">{stats.winRate}</p>
+            </Card>
+            <Card className="p-4 space-y-2 glass">
+              <p className="text-sm text-muted-foreground">Avg Profit</p>
+              <p className="text-2xl font-bold">{stats.avgProfit}</p>
+            </Card>
+            <Card className="p-4 space-y-2 glass">
+              <p className="text-sm text-muted-foreground">Avg Loss</p>
+              <p className="text-2xl font-bold">{stats.avgLoss}</p>
+            </Card>
+            <Card className="p-4 space-y-2 glass">
+              <p className="text-sm text-muted-foreground">Risk/Reward</p>
+              <p className="text-2xl font-bold">{stats.riskReward}</p>
+            </Card>
+            <Card className="p-4 space-y-2 glass">
+              <p className="text-sm text-muted-foreground">Max Drawdown</p>
+              <p className="text-2xl font-bold">{stats.maxDrawdown}</p>
+            </Card>
+            <Card className="p-4 space-y-2 glass">
+              <p className="text-sm text-muted-foreground">Consistency Score</p>
+              <p className="text-2xl font-bold">{stats.consistencyScore}</p>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="p-4">
+              <h3 className="text-lg font-medium mb-2">Equity Curve</h3>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={equityCurveData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area 
+                      type="monotone" 
+                      dataKey="balance" 
+                      stroke="#3B82F6" 
+                      fill="#3B82F6" 
+                      fillOpacity={0.1}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <h3 className="text-lg font-medium mb-2">Drawdown Analysis</h3>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={drawdowns}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="drawdown"
+                      stroke="#EF4444"
+                      fill="#EF4444"
+                      fillOpacity={0.1}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="risk" className="h-full space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="p-4">
+              <h3 className="text-lg font-medium mb-2">Sharpe Ratio</h3>
+              <p className="text-3xl font-bold">
+                {calculateSharpeRatio(trades
+                  .filter(t => t.exit_price && t.quantity)
+                  .map(t => ((t.exit_price! - t.entry_price) * t.quantity!) / t.entry_price)
+                ).toFixed(2)}
+              </p>
+            </Card>
+
+            <Card className="p-4">
+              <h3 className="text-lg font-medium mb-2">Trade Expectancy</h3>
+              <p className="text-3xl font-bold">₹{calculateExpectancy(trades).toFixed(2)}</p>
+            </Card>
+
+            <Card className="p-4">
+              <h3 className="text-lg font-medium mb-2">Max Drawdown</h3>
+              <p className="text-3xl font-bold">{Math.max(...drawdowns.map(d => d.drawdown)).toFixed(2)}%</p>
+            </Card>
+          </div>
+
           <Card className="p-4">
-            <h3 className="text-lg font-medium mb-2">P/L Over Time</h3>
-            <div className="chart-container">
+            <h3 className="text-lg font-medium mb-2">Trade Duration Analysis</h3>
+            <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
+                <BarChart data={durationStats}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
+                  <XAxis dataKey="duration" label={{ value: 'Duration (minutes)', position: 'bottom' }} />
+                  <YAxis label={{ value: 'Average P/L', angle: -90, position: 'left' }} />
+                  <Tooltip />
+                  <Bar dataKey="avgPnL" fill="#3B82F6" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="patterns" className="h-full space-y-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-medium mb-2">Win/Loss Streaks</h3>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={streaks}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="length" />
                   <YAxis />
                   <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="pnl"
-                    stroke="#3B82F6"
-                    dot={false}
-                    strokeWidth={2}
+                  <Bar
+                    dataKey="length"
+                    fill={(entry) => entry.type === 'profit' ? '#10B981' : '#EF4444'}
                   />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <h3 className="text-lg font-medium mb-2">Strategy Performance</h3>
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={strategyPerformance}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="winRate" fill="#3B82F6" name="Win Rate (%)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card className="p-4">
-            <h3 className="text-lg font-medium mb-2">Time-Based Performance</h3>
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={timePerformanceData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="pnl" fill="#10B981" name="P/L" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <h3 className="text-lg font-medium mb-2">Top Performing Strategies</h3>
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={strategyPerformance.filter(s => parseFloat(s.pnl) > 0)}
-                    dataKey="pnl"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    label
-                  >
-                    {strategyPerformance.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
