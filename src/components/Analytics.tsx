@@ -35,6 +35,33 @@ interface Trade {
   notes?: string | null;
 }
 
+const calculateSharpeRatio = (returns: number[]) => {
+  if (returns.length === 0) return 0;
+  const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const variance = returns.reduce((a, b) => a + Math.pow(b - avgReturn, 2), 0) / returns.length;
+  const stdDev = Math.sqrt(variance);
+  return stdDev === 0 ? 0 : (avgReturn / stdDev) * Math.sqrt(252); // Annualized
+};
+
+const calculateExpectancy = (trades: Trade[]) => {
+  const completedTrades = trades.filter(t => t.exit_price && t.quantity);
+  if (completedTrades.length === 0) return 0;
+
+  const winningTrades = completedTrades.filter(t => t.outcome === 'profit');
+  const losingTrades = completedTrades.filter(t => t.outcome === 'loss');
+
+  const avgWin = winningTrades.reduce((sum, t) => {
+    return sum + ((t.exit_price! - t.entry_price) * t.quantity!);
+  }, 0) / (winningTrades.length || 1);
+
+  const avgLoss = losingTrades.reduce((sum, t) => {
+    return sum + Math.abs((t.exit_price! - t.entry_price) * t.quantity!);
+  }, 0) / (losingTrades.length || 1);
+
+  const winRate = winningTrades.length / completedTrades.length;
+  return (winRate * avgWin) - ((1 - winRate) * avgLoss);
+};
+
 export default function Analytics() {
   const { data: trades = [] } = useQuery<Trade[]>({
     queryKey: ['trades'],
@@ -145,7 +172,6 @@ export default function Analytics() {
     return Math.max(0, Math.min(100, score)).toFixed(1);
   };
 
-  // Calculate equity curve data
   const equityCurveData = trades.reduce((acc: any[], trade) => {
     const lastBalance = acc.length > 0 ? acc[acc.length - 1].balance : 0;
     if (trade.exit_price && trade.quantity) {
@@ -158,7 +184,6 @@ export default function Analytics() {
     return acc;
   }, []);
 
-  // Calculate drawdown data
   const calculateDrawdowns = () => {
     let peak = 0;
     let drawdowns = [];
@@ -182,7 +207,6 @@ export default function Analytics() {
     return drawdowns;
   };
 
-  // Calculate winning/losing streaks
   const calculateStreaks = () => {
     let currentStreak = 0;
     const streaks = [];
@@ -211,7 +235,6 @@ export default function Analytics() {
     return streaks;
   };
 
-  // Calculate trade duration statistics
   const calculateTradeDurationStats = () => {
     const durationData = trades
       .filter(t => t.entry_time && t.exit_time)
@@ -381,7 +404,8 @@ export default function Analytics() {
                   <Tooltip />
                   <Bar
                     dataKey="length"
-                    fill={(entry) => entry.type === 'profit' ? '#10B981' : '#EF4444'}
+                    fill={(entry: any) => entry.type === 'profit' ? '#10B981' : '#EF4444'}
+                    name="Streak Length"
                   />
                 </BarChart>
               </ResponsiveContainer>
