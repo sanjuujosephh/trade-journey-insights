@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   LineChart,
@@ -87,17 +86,24 @@ export default function Analytics() {
     };
   };
 
-  const chartData = trades.map(trade => ({
-    date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
-    pnl: trade.exit_price && trade.quantity
-      ? (trade.exit_price - trade.entry_price) * trade.quantity
-      : 0,
-  }));
+  // Sort trades by date for the chart
+  const chartData = trades
+    .sort((a, b) => {
+      const dateA = new Date(a.entry_time || a.timestamp).getTime();
+      const dateB = new Date(b.entry_time || b.timestamp).getTime();
+      return dateA - dateB;
+    })
+    .map(trade => ({
+      date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
+      pnl: trade.exit_price && trade.quantity
+        ? (trade.exit_price - trade.entry_price) * trade.quantity
+        : 0,
+    }));
 
   const stats = calculateStats();
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 h-full overflow-y-auto pb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 space-y-2 glass">
           <p className="text-sm text-muted-foreground">Win Rate</p>

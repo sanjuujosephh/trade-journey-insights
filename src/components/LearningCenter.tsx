@@ -37,7 +37,7 @@ export default function LearningCenter() {
     {
       pattern: "Early Exit in Profit",
       frequency: trades.filter(t => 
-        t.exit_price && t.target && t.exit_price < t.target && t.outcome === "profit"
+        t.exit_price && t.stop_loss && t.exit_price < t.stop_loss && t.outcome === "profit"
       ).length,
       suggestion: "Consider letting profits run with trailing stop loss"
     },
@@ -52,6 +52,15 @@ export default function LearningCenter() {
       pattern: "No Stop Loss",
       frequency: trades.filter(t => !t.stop_loss).length,
       suggestion: "Always use a stop loss to manage risk"
+    },
+    {
+      pattern: "Overtrading",
+      frequency: trades.filter(t => 
+        trades.filter(trade => 
+          new Date(trade.timestamp).toDateString() === new Date(t.timestamp).toDateString()
+        ).length > 2
+      ).length,
+      suggestion: "Limit daily trades to avoid overtrading"
     }
   ];
 
@@ -60,12 +69,20 @@ export default function LearningCenter() {
     id: trade.id,
     date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
     mistake: trade.notes || "No notes provided",
-    impact: "High",
+    impact: calculateImpact(trade),
     lesson: `Loss of ₹${((trade.entry_price - (trade.exit_price || 0)) * (trade.quantity || 0)).toFixed(2)}`
   }));
 
+  function calculateImpact(trade: any) {
+    if (!trade.exit_price || !trade.quantity) return "Low";
+    const loss = (trade.entry_price - trade.exit_price) * trade.quantity;
+    if (loss > 1000) return "High";
+    if (loss > 500) return "Medium";
+    return "Low";
+  }
+
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 h-full overflow-y-auto pb-6">
       <Card className="p-6">
         <h3 className="text-lg font-medium mb-4">Recent Trading Mistakes</h3>
         <div className="overflow-x-auto">
@@ -84,7 +101,13 @@ export default function LearningCenter() {
                   <TableCell>{mistake.date}</TableCell>
                   <TableCell>{mistake.mistake}</TableCell>
                   <TableCell>
-                    <span className="inline-block px-2 py-1 rounded-full text-xs bg-destructive/10 text-destructive">
+                    <span className={`inline-block px-2 py-1 rounded-full text-xs ${
+                      mistake.impact === "High" 
+                        ? "bg-destructive/10 text-destructive"
+                        : mistake.impact === "Medium"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}>
                       {mistake.impact}
                     </span>
                   </TableCell>
@@ -134,6 +157,9 @@ export default function LearningCenter() {
               "No trading during first 15 minutes",
               "Follow your trading plan",
               "Document every trade with detailed notes",
+              "Maximum 2 trades per day",
+              "No revenge trading",
+              "No averaging down on losses",
             ].map((rule, index) => (
               <div
                 key={index}

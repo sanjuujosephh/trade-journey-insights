@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
@@ -99,4 +98,21 @@
 * {
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* Allow scrolling within tab content */
+.h-full {
+  height: 100%;
+}
+
+[role="tabpanel"] {
+  height: 100%;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+/* Hide scrollbars but allow scrolling */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
 }
