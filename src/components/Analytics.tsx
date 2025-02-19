@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -10,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AIAnalysisPanel } from "./AIAnalysisPanel";
+import { DailyPerformanceTable } from "./analytics/DailyPerformanceTable";
+import { TimePerformanceHeatmap } from "./analytics/TimePerformanceHeatmap";
+import { IntradayRiskMetrics } from "./analytics/IntradayRiskMetrics";
 import { useState } from "react";
 import {
   calculateStats,
@@ -20,15 +24,6 @@ import {
   calculateExpectancy,
   calculateTradeDurationStats,
 } from "@/utils/tradeCalculations";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 
 interface AIAnalysisResponse {
   analysis: string;
@@ -92,8 +87,8 @@ export default function Analytics() {
   return (
     <>
       <div className="h-full p-6">
-        <Tabs defaultValue="performance" className="h-full">
-          <div className="flex items-center justify-between mb-4">
+        <Tabs defaultValue="performance" className="h-full space-y-6">
+          <div className="flex items-center justify-between">
             <TabsList>
               <TabsTrigger value="performance">Performance Metrics</TabsTrigger>
               <TabsTrigger value="risk">Risk Analysis</TabsTrigger>
@@ -107,26 +102,26 @@ export default function Analytics() {
               {isAnalyzing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
+                  Analyzing Today's Trades...
                 </>
               ) : (
-                'Analyze with AI'
+                "Analyze Today's Trades"
               )}
             </Button>
           </div>
 
-          <TabsContent value="performance" className="h-full space-y-4">
+          <TabsContent value="performance" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
               <Card className="p-4 space-y-2">
-                <p className="text-sm text-muted-foreground">Win Rate</p>
+                <p className="text-sm text-muted-foreground">Today's Win Rate</p>
                 <p className="text-2xl font-bold">{stats.winRate}</p>
               </Card>
               <Card className="p-4 space-y-2">
-                <p className="text-sm text-muted-foreground">Avg Profit</p>
+                <p className="text-sm text-muted-foreground">Avg Daily Profit</p>
                 <p className="text-2xl font-bold">{stats.avgProfit}</p>
               </Card>
               <Card className="p-4 space-y-2">
-                <p className="text-sm text-muted-foreground">Avg Loss</p>
+                <p className="text-sm text-muted-foreground">Avg Daily Loss</p>
                 <p className="text-2xl font-bold">{stats.avgLoss}</p>
               </Card>
               <Card className="p-4 space-y-2">
@@ -134,8 +129,10 @@ export default function Analytics() {
                 <p className="text-2xl font-bold">{stats.riskReward}</p>
               </Card>
               <Card className="p-4 space-y-2">
-                <p className="text-sm text-muted-foreground">Max Drawdown</p>
-                <p className="text-2xl font-bold">{stats.maxDrawdown}</p>
+                <p className="text-sm text-muted-foreground">Max Daily Loss</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {stats.maxDrawdown}
+                </p>
               </Card>
               <Card className="p-4 space-y-2">
                 <p className="text-sm text-muted-foreground">Consistency Score</p>
@@ -143,53 +140,24 @@ export default function Analytics() {
               </Card>
             </div>
 
+            <DailyPerformanceTable trades={trades} />
+            
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <EquityCurveChart data={equityCurveData} />
               <DrawdownChart data={drawdowns} />
             </div>
+
+            <TimePerformanceHeatmap trades={trades} />
           </TabsContent>
 
-          <TabsContent value="risk" className="h-full space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="p-4">
-                <h3 className="text-lg font-medium mb-2">Sharpe Ratio</h3>
-                <p className="text-3xl font-bold">
-                  {calculateSharpeRatio(trades
-                    .filter(t => t.exit_price && t.quantity)
-                    .map(t => ((t.exit_price! - t.entry_price) * t.quantity!) / t.entry_price)
-                  ).toFixed(2)}
-                </p>
-              </Card>
-
-              <Card className="p-4">
-                <h3 className="text-lg font-medium mb-2">Trade Expectancy</h3>
-                <p className="text-3xl font-bold">₹{calculateExpectancy(trades).toFixed(2)}</p>
-              </Card>
-
-              <Card className="p-4">
-                <h3 className="text-lg font-medium mb-2">Max Drawdown</h3>
-                <p className="text-3xl font-bold">{stats.maxDrawdown}</p>
-              </Card>
-            </div>
-
-            <Card className="p-4">
-              <h3 className="text-lg font-medium mb-2">Trade Duration Analysis</h3>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={durationStats}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="duration" label={{ value: 'Duration (minutes)', position: 'bottom' }} />
-                    <YAxis label={{ value: 'Average P/L', angle: -90, position: 'left' }} />
-                    <Tooltip />
-                    <Bar dataKey="avgPnL" fill="#3B82F6" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="patterns" className="h-full space-y-4">
+          <TabsContent value="risk" className="space-y-6">
+            <IntradayRiskMetrics trades={trades} />
             <StreakChart data={streaks} />
+          </TabsContent>
+
+          <TabsContent value="patterns" className="space-y-6">
+            <TimePerformanceHeatmap trades={trades} />
+            <DailyPerformanceTable trades={trades} />
           </TabsContent>
         </Tabs>
       </div>
