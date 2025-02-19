@@ -8,6 +8,7 @@ import LearningCenter from "@/components/LearningCenter";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { Leaderboard } from "@/components/Leaderboard";
+import { ProfileSettings } from "@/components/ProfileSettings";
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
@@ -59,6 +60,12 @@ export default function Index() {
               >
                 Learning Center
               </TabsTrigger>
+              <TabsTrigger
+                value="profile"
+                className="data-[state=active]:bg-background"
+              >
+                Profile
+              </TabsTrigger>
             </TabsList>
             
             <div className="h-[calc(100%-3rem)] overflow-y-auto">
@@ -81,6 +88,13 @@ export default function Index() {
                 className="mt-0 h-full"
               >
                 <LearningCenter />
+              </TabsContent>
+
+              <TabsContent
+                value="profile"
+                className="mt-0 h-full p-6"
+              >
+                <ProfileSettings />
               </TabsContent>
             </div>
           </Tabs>

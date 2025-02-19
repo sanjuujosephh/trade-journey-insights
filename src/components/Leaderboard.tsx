@@ -18,6 +18,18 @@ type LeaderboardEntry = {
   avatar_url: string | null;
 };
 
+type TradeWithProfile = {
+  user_id: string;
+  profiles: {
+    username: string;
+    avatar_url: string | null;
+  } | null;
+  exit_price: number | null;
+  entry_price: number;
+  quantity: number;
+  outcome: string;
+};
+
 export function Leaderboard() {
   const { data: leaderboard, isLoading } = useQuery({
     queryKey: ["leaderboard"],
@@ -30,7 +42,11 @@ export function Leaderboard() {
         .from("trades")
         .select(`
           user_id,
-          profiles:profiles(username, avatar_url)
+          profiles:profiles(username, avatar_url),
+          exit_price,
+          entry_price,
+          quantity,
+          outcome
         `)
         .gte("timestamp", startOfMonth.toISOString())
         .throwOnError();
@@ -38,7 +54,7 @@ export function Leaderboard() {
       if (!data) return [];
 
       // Group trades by user and calculate statistics
-      const userStats = data.reduce((acc: { [key: string]: any }, trade) => {
+      const userStats = (data as TradeWithProfile[]).reduce((acc: { [key: string]: any }, trade) => {
         const userId = trade.user_id;
         if (!acc[userId]) {
           acc[userId] = {
@@ -49,13 +65,23 @@ export function Leaderboard() {
             profit_loss: 0,
           };
         }
+        
         acc[userId].total_trades++;
+        if (trade.outcome === 'win') {
+          acc[userId].winning_trades++;
+        }
+        
+        // Calculate P/L if we have all required values
+        if (trade.exit_price && trade.entry_price && trade.quantity) {
+          acc[userId].profit_loss += (trade.exit_price - trade.entry_price) * trade.quantity;
+        }
+        
         return acc;
       }, {});
 
       // Convert to array and calculate win rates
       return Object.values(userStats)
-        .map((stats: any) => ({
+        .map((stats: any): LeaderboardEntry => ({
           username: stats.username,
           win_rate: (stats.winning_trades / stats.total_trades) * 100 || 0,
           profit_loss: stats.profit_loss,
