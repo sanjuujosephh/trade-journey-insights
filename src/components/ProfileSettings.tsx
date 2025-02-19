@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -178,7 +177,7 @@ export function ProfileSettings() {
     <div className="max-w-2xl mx-auto">
       <Card className="p-6">
         <div className="mb-6 flex flex-col items-center gap-4">
-          <Avatar className="h-24 w-24">
+          <Avatar className="h-28 w-28">
             <AvatarImage src={profile.avatar_url || ""} alt={profile.username || "User avatar"} />
             <AvatarFallback>
               {(profile.username?.[0] || user?.email?.[0] || "?").toUpperCase()}
