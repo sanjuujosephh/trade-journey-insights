@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { RefreshCw } from "lucide-react";
 
 type Profile = {
   username: string | null;
@@ -15,6 +18,15 @@ type Profile = {
   telegram_id: string | null;
   avatar_url: string | null;
 };
+
+const AVATAR_STYLES = [
+  { value: "avataaars", label: "Default" },
+  { value: "bottts", label: "Robots" },
+  { value: "pixel-art", label: "Pixel Art" },
+  { value: "lorelei", label: "Lorelei" },
+  { value: "adventurer", label: "Adventurer" },
+  { value: "fun-emoji", label: "Fun Emoji" },
+];
 
 export function ProfileSettings() {
   const { user } = useAuth();
@@ -25,6 +37,7 @@ export function ProfileSettings() {
     telegram_id: "",
     avatar_url: null,
   });
+  const [avatarStyle, setAvatarStyle] = useState("avataaars");
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: profileData, refetch } = useQuery({
@@ -46,8 +59,51 @@ export function ProfileSettings() {
   useEffect(() => {
     if (profileData) {
       setProfile(profileData);
+      // Try to extract current avatar style from URL
+      const currentUrl = profileData.avatar_url || "";
+      const styleMatch = currentUrl.match(/\/([^/]+)\/svg/);
+      if (styleMatch && AVATAR_STYLES.some(s => s.value === styleMatch[1])) {
+        setAvatarStyle(styleMatch[1]);
+      }
     }
   }, [profileData]);
+
+  const generateNewAvatar = () => {
+    const seed = Math.random().toString(36).substring(2, 15);
+    return `https://api.dicebear.com/7.x/${avatarStyle}/svg?seed=${seed}`;
+  };
+
+  const handleAvatarRefresh = async () => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    try {
+      const newAvatarUrl = generateNewAvatar();
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: newAvatarUrl })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      setProfile(prev => ({ ...prev, avatar_url: newAvatarUrl }));
+      await refetch();
+      
+      toast({
+        title: "Success",
+        description: "Avatar updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update avatar",
+        variant: "destructive",
+      });
+      console.error("Error updating avatar:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,9 +140,76 @@ export function ProfileSettings() {
     }
   };
 
+  const handleAvatarStyleChange = async (newStyle: string) => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    try {
+      setAvatarStyle(newStyle);
+      const newAvatarUrl = `https://api.dicebear.com/7.x/${newStyle}/svg?seed=${Math.random().toString(36).substring(2, 15)}`;
+      
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: newAvatarUrl })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      setProfile(prev => ({ ...prev, avatar_url: newAvatarUrl }));
+      await refetch();
+      
+      toast({
+        title: "Success",
+        description: "Avatar style updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update avatar style",
+        variant: "destructive",
+      });
+      console.error("Error updating avatar style:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto">
       <Card className="p-6">
+        <div className="mb-6 flex flex-col items-center gap-4">
+          <Avatar className="h-24 w-24">
+            <AvatarImage src={profile.avatar_url || ""} alt={profile.username || "User avatar"} />
+            <AvatarFallback>
+              {(profile.username?.[0] || user?.email?.[0] || "?").toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div className="flex items-center gap-4 w-full max-w-xs">
+            <Select value={avatarStyle} onValueChange={handleAvatarStyleChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select avatar style" />
+              </SelectTrigger>
+              <SelectContent>
+                {AVATAR_STYLES.map((style) => (
+                  <SelectItem key={style.value} value={style.value}>
+                    {style.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleAvatarRefresh}
+              disabled={isLoading}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
