@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 
 interface BehavioralAnalysisProps {
   formData: any;
@@ -11,9 +10,5 @@ export function BehavioralAnalysis({
   handleChange,
   handleSelectChange,
 }: BehavioralAnalysisProps) {
-  return (
-    <Card className="p-6 space-y-4">
-      {/* This component is now empty as its fields have been moved to BasicTradeInfo */}
-    </Card>
-  );
+  return null;
 }
