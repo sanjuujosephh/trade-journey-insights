@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { AVAILABLE_SYMBOLS } from "@/components/TradeEntry";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
 
 interface BasicTradeInfoProps {
   formData: any;
@@ -20,53 +21,60 @@ interface BasicTradeInfoProps {
 
 export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: BasicTradeInfoProps) {
   const { toast } = useToast();
+  const [entryDate, setEntryDate] = useState("");
+  const [entryTime, setEntryTime] = useState("");
+  const [exitDate, setExitDate] = useState("");
+  const [exitTime, setExitTime] = useState("");
 
-  const getDateString = (dateTimeStr: string | undefined) => {
-    if (!dateTimeStr) {
-      const today = new Date();
-      return today.toISOString().split('T')[0];
+  useEffect(() => {
+    if (formData.entry_time) {
+      const date = new Date(formData.entry_time);
+      setEntryDate(date.toLocaleDateString('en-US'));
+      setEntryTime(date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }));
     }
-    return dateTimeStr.split('T')[0];
+    if (formData.exit_time) {
+      const date = new Date(formData.exit_time);
+      setExitDate(date.toLocaleDateString('en-US'));
+      setExitTime(date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }));
+    }
+  }, [formData.entry_time, formData.exit_time]);
+
+  const validateTime = (timeStr: string) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const timeInMinutes = hours * 60 + minutes;
+    const marketOpenTime = 9 * 60 + 15;  // 9:15 AM
+    const marketCloseTime = 15 * 60 + 25; // 3:25 PM
+
+    if (timeInMinutes < marketOpenTime) {
+      return "09:15";
+    } else if (timeInMinutes > marketCloseTime) {
+      return "15:25";
+    }
+    return timeStr;
   };
 
-  const formatTimeForInput = (hours: number, minutes: number) => {
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  };
-
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const [datePart, timePart] = value.split('T');
+  const handleTimeInputChange = (e: React.ChangeEvent<HTMLInputElement>, isEntry: boolean) => {
+    const { value } = e.target;
+    const [dateStr, timeStr] = value.split('T');
     
-    if (timePart) {
-      const [hours, minutes] = timePart.split(':').map(Number);
-      const timeInMinutes = hours * 60 + minutes;
-      const marketOpenTime = 9 * 60 + 15;  // 9:15 AM
-      const marketCloseTime = 15 * 60 + 25; // 3:25 PM
-      
-      let adjustedTime = value;
-      if (timeInMinutes < marketOpenTime) {
-        adjustedTime = `${datePart}T${formatTimeForInput(9, 15)}`;
+    if (timeStr) {
+      const validatedTime = validateTime(timeStr);
+      if (validatedTime !== timeStr) {
         toast({
-          description: "Time adjusted to market opening hours (9:15 AM)",
-        });
-      } else if (timeInMinutes > marketCloseTime) {
-        adjustedTime = `${datePart}T${formatTimeForInput(15, 25)}`;
-        toast({
-          description: "Time adjusted to market closing hours (3:25 PM)",
+          description: `Time adjusted to market ${timeStr < "09:15" ? "opening" : "closing"} hours`,
         });
       }
       
+      const newDateTime = `${dateStr}T${validatedTime}`;
       const syntheticEvent = {
-        target: { name, value: adjustedTime }
+        target: {
+          name: isEntry ? "entry_time" : "exit_time",
+          value: newDateTime
+        }
       } as React.ChangeEvent<HTMLInputElement>;
       handleChange(syntheticEvent);
-      return;
     }
-    
-    handleChange(e);
   };
-
-  const timeStep = 60; // 60 seconds = 1 minute
 
   return (
     <Card className="p-6 space-y-4 glass">
@@ -194,12 +202,10 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             id="entry_time"
             name="entry_time"
             type="datetime-local"
-            min={`${getDateString(formData.entry_time)}T09:15`}
-            max={`${getDateString(formData.entry_time)}T15:25`}
-            step={timeStep}
             value={formData.entry_time}
-            onChange={handleTimeChange}
-            onKeyDown={(e) => e.preventDefault()}
+            onChange={(e) => handleTimeInputChange(e, true)}
+            min={`${formData.entry_time?.split('T')[0] || new Date().toISOString().split('T')[0]}T09:15`}
+            max={`${formData.entry_time?.split('T')[0] || new Date().toISOString().split('T')[0]}T15:25`}
             required
           />
         </div>
@@ -209,12 +215,10 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             id="exit_time"
             name="exit_time"
             type="datetime-local"
-            min={`${getDateString(formData.exit_time)}T09:15`}
-            max={`${getDateString(formData.exit_time)}T15:25`}
-            step={timeStep}
             value={formData.exit_time}
-            onChange={handleTimeChange}
-            onKeyDown={(e) => e.preventDefault()}
+            onChange={(e) => handleTimeInputChange(e, false)}
+            min={`${formData.exit_time?.split('T')[0] || new Date().toISOString().split('T')[0]}T09:15`}
+            max={`${formData.exit_time?.split('T')[0] || new Date().toISOString().split('T')[0]}T15:25`}
           />
         </div>
       </div>
