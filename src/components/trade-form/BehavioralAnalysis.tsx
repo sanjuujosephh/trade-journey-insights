@@ -25,30 +25,41 @@ export function BehavioralAnalysis({
 }: BehavioralAnalysisProps) {
   return (
     <Card className="p-6 space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label htmlFor="trade_notes">Trade Notes</Label>
+        <Input
+          id="trade_notes"
+          name="trade_notes"
+          placeholder="Enter your trade notes here"
+          value={formData.trade_notes}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="space-y-2">
         <OptionPricePosition 
           formData={formData} 
           handleSelectChange={handleSelectChange} 
         />
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="exit_reason">Exit Reason</Label>
-          <Select
-            name="exit_reason"
-            value={formData.exit_reason}
-            onValueChange={(value) => handleSelectChange("exit_reason", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select exit reason" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="stop_loss">Stop Loss</SelectItem>
-              <SelectItem value="target">Target</SelectItem>
-              <SelectItem value="manual">Manual</SelectItem>
-              <SelectItem value="time_based">Time Based</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="exit_reason">Exit Reason</Label>
+        <Select
+          name="exit_reason"
+          value={formData.exit_reason}
+          onValueChange={(value) => handleSelectChange("exit_reason", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select exit reason" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="stop_loss">Stop Loss</SelectItem>
+            <SelectItem value="target">Target</SelectItem>
+            <SelectItem value="manual">Manual</SelectItem>
+            <SelectItem value="time_based">Time Based</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
