@@ -75,12 +75,12 @@ export function TradingCalendar() {
   };
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">
-          Trading Calendar - {format(currentDate, "MMMM yyyy")}
+    <div className="p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">
+          {format(currentDate, "MMMM yyyy")}
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="outline"
             size="icon"
@@ -117,7 +117,7 @@ export function TradingCalendar() {
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
           <div
             key={day}
-            className="text-center py-2 text-sm font-semibold text-gray-600"
+            className="text-center py-1 text-xs font-medium text-muted-foreground"
           >
             {day}
           </div>
@@ -135,10 +135,10 @@ export function TradingCalendar() {
                   <button
                     onClick={() => setSelectedDate(isSelected ? null : day)}
                     className={cn(
-                      "aspect-square p-2 rounded-md text-sm transition-colors",
+                      "p-1 rounded-md text-xs transition-colors",
                       !isSameMonth(day, currentDate) && "opacity-50",
-                      isToday(day) && "ring-2 ring-primary",
-                      isSelected && "ring-2 ring-primary ring-offset-2",
+                      isToday(day) && "ring-1 ring-primary",
+                      isSelected && "ring-1 ring-primary ring-offset-2",
                       dayStats
                         ? getPnLColor(dayStats.totalPnL)
                         : "bg-gray-100 hover:bg-gray-200 text-gray-600"
@@ -146,7 +146,7 @@ export function TradingCalendar() {
                   >
                     <div className="font-medium">{format(day, "d")}</div>
                     {dayStats && (
-                      <div className="text-xs font-medium">
+                      <div className="text-[10px] font-medium">
                         {formatPnL(dayStats.totalPnL)}
                       </div>
                     )}
