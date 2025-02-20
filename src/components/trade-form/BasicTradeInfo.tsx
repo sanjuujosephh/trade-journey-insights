@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +10,6 @@ import {
 } from "@/components/ui/select";
 import { AVAILABLE_SYMBOLS } from "@/components/TradeEntry";
 import { useToast } from "@/hooks/use-toast";
-import { OptionPricePosition } from "./behavioral/OptionPricePosition";
 
 interface BasicTradeInfoProps {
   formData: any;
@@ -80,24 +78,6 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="trade_notes">Trade Notes</Label>
-        <Input
-          id="trade_notes"
-          name="trade_notes"
-          placeholder="Enter your trade notes here"
-          value={formData.trade_notes}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <OptionPricePosition 
-          formData={formData} 
-          handleSelectChange={handleSelectChange} 
-        />
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="trade_type">Trade Type</Label>
@@ -133,80 +113,6 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
           </Select>
         </div>
       </div>
-
-      {formData.trade_type === "options" && (
-        <>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="strike_price">Strike Price</Label>
-              <Input
-                id="strike_price"
-                name="strike_price"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={formData.strike_price}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="option_type">Option Type</Label>
-              <Select
-                name="option_type"
-                value={formData.option_type}
-                onValueChange={(value) => handleSelectChange("option_type", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="call">Call</SelectItem>
-                  <SelectItem value="put">Put</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="vix">VIX</Label>
-              <Input
-                id="vix"
-                name="vix"
-                type="number"
-                step="0.01"
-                placeholder="VIX Value"
-                value={formData.vix}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="call_iv">Call IV</Label>
-              <Input
-                id="call_iv"
-                name="call_iv"
-                type="number"
-                step="0.01"
-                placeholder="Call IV %"
-                value={formData.call_iv}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="put_iv">Put IV</Label>
-              <Input
-                id="put_iv"
-                name="put_iv"
-                type="number"
-                step="0.01"
-                placeholder="Put IV %"
-                value={formData.put_iv}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-        </>
-      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
