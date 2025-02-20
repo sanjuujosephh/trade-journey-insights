@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, CopyCheck, LineChart, Share2 } from "lucide-react";
+import { BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2 } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { Leaderboard } from "@/components/Leaderboard";
 
@@ -24,7 +24,7 @@ export function LandingPage() {
   return (
     <div className="w-full overflow-auto">
       <div className="container py-8">
-        <div className="mx-auto max-w-5xl text-center mb-16">
+        <div className="mx-auto max-w-5xl text-center mb-8">
           <h1 className="text-4xl font-bold tracking-tight mb-6">
             Your Complete Trading Journal & Analytics Platform
           </h1>
@@ -39,7 +39,32 @@ export function LandingPage() {
           </div>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-16">
+        <div className="grid gap-8 md:grid-cols-2 mb-8">
+          <Card className="p-6">
+            <h2 className="text-2xl font-bold mb-6">Start Your Journey</h2>
+            <AuthForm />
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Top Performers</h2>
+              <BarChart3 className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <Leaderboard />
+          </Card>
+        </div>
+
+        <Card className="p-6 mb-16">
+          <h2 className="text-2xl font-bold mb-6">Experience Our Powerful Dashboard</h2>
+          <div className="rounded-lg overflow-hidden border shadow-lg">
+            <img 
+              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
+              alt="Trading Journal Dashboard" 
+              className="w-full object-cover"
+            />
+          </div>
+        </Card>
+
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
             icon={<LineChart className="h-8 w-8" />}
             title="Advanced Analytics"
@@ -70,41 +95,6 @@ export function LandingPage() {
             title="Community Insights"
             description="Learn from top performers and share your success with the trading community."
           />
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-2">
-          <Card className="p-6">
-            <h2 className="text-2xl font-bold mb-6">Start Your Journey</h2>
-            <AuthForm />
-          </Card>
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Top Performers</h2>
-              <BarChart3 className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <Leaderboard />
-          </Card>
-        </div>
-
-        <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold mb-4">Why Choose Our Platform?</h2>
-          <div className="grid gap-4 md:grid-cols-3 mt-8">
-            <div className="flex flex-col items-center p-4">
-              <CopyCheck className="h-12 w-12 text-primary mb-4" />
-              <h3 className="font-semibold mb-2">Easy to Use</h3>
-              <p className="text-muted-foreground">Intuitive interface designed for both beginners and professionals</p>
-            </div>
-            <div className="flex flex-col items-center p-4">
-              <LineChart className="h-12 w-12 text-primary mb-4" />
-              <h3 className="font-semibold mb-2">Data-Driven</h3>
-              <p className="text-muted-foreground">Make informed decisions based on your historical performance</p>
-            </div>
-            <div className="flex flex-col items-center p-4">
-              <BrainCircuit className="h-12 w-12 text-primary mb-4" />
-              <h3 className="font-semibold mb-2">AI-Enhanced</h3>
-              <p className="text-muted-foreground">Get personalized insights powered by artificial intelligence</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
