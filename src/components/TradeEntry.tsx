@@ -212,18 +212,15 @@ export default function TradeEntry() {
       timeframe: formData.timeframe || null,
       trade_direction: formData.trade_direction || null,
       exit_reason: formData.exit_reason || null,
-      slippage: formData.slippage || null,
-      post_exit_price: formData.post_exit_price || null,
-      exit_efficiency: formData.exit_efficiency || null,
-      confidence_level: formData.confidence_level || null,
       entry_emotion: formData.entry_emotion || null,
       exit_emotion: formData.exit_emotion || null,
+      strategy: formData.strategy || null,
+      notes: formData.notes || null,
+      chart_link: formData.chart_link || null,
       followed_plan: formData.followed_plan,
       is_fomo_trade: formData.is_fomo_trade,
       is_impulsive_exit: formData.is_impulsive_exit,
-      strategy: formData.strategy || null,
-      notes: formData.notes || null,
-      chart_link: formData.chart_link || null
+      plan_deviation_reason: formData.plan_deviation_reason || null
     } as Omit<Trade, 'id' | 'timestamp'>;
     
     try {

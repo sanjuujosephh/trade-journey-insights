@@ -52,6 +52,7 @@ export interface Trade {
   plan_deviation_reason?: string | null;
   is_fomo_trade?: boolean;
   is_impulsive_exit?: boolean;
+  user_id?: string;
   
   // AI Analysis Fields
   ai_feedback?: string | null;
