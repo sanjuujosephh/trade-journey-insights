@@ -19,7 +19,7 @@ export function OptionPricePosition({
 }: OptionPricePositionProps) {
   return (
     <div className="space-y-2">
-      <Label>Was Option Price</Label>
+      <Label>Option Price Was</Label>
       <div className="space-y-2">
         <Select
           name="vwap_position"
