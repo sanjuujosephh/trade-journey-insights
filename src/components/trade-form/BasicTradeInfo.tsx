@@ -18,6 +18,38 @@ interface BasicTradeInfoProps {
 }
 
 export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: BasicTradeInfoProps) {
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const [datePart, timePart] = value.split('T');
+    
+    if (timePart) {
+      const [hours, minutes] = timePart.split(':');
+      const timeInMinutes = parseInt(hours) * 60 + parseInt(minutes);
+      const marketOpenTime = 9 * 60 + 15;  // 9:15 AM
+      const marketCloseTime = 15 * 60 + 25; // 3:25 PM
+      
+      if (timeInMinutes < marketOpenTime) {
+        const newTime = `${datePart}T09:15`;
+        const syntheticEvent = {
+          target: { name, value: newTime }
+        } as React.ChangeEvent<HTMLInputElement>;
+        handleChange(syntheticEvent);
+        return;
+      }
+      
+      if (timeInMinutes > marketCloseTime) {
+        const newTime = `${datePart}T15:25`;
+        const syntheticEvent = {
+          target: { name, value: newTime }
+        } as React.ChangeEvent<HTMLInputElement>;
+        handleChange(syntheticEvent);
+        return;
+      }
+    }
+    
+    handleChange(e);
+  };
+
   return (
     <Card className="p-6 space-y-4 glass">
       <div className="space-y-2">
@@ -145,8 +177,10 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             id="entry_time"
             name="entry_time"
             type="datetime-local"
+            min={`${formData.entry_time?.split('T')[0]}T09:15`}
+            max={`${formData.entry_time?.split('T')[0]}T15:25`}
             value={formData.entry_time}
-            onChange={handleChange}
+            onChange={handleTimeChange}
             required
           />
         </div>
@@ -156,8 +190,10 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             id="exit_time"
             name="exit_time"
             type="datetime-local"
+            min={`${formData.exit_time?.split('T')[0]}T09:15`}
+            max={`${formData.exit_time?.split('T')[0]}T15:25`}
             value={formData.exit_time}
-            onChange={handleChange}
+            onChange={handleTimeChange}
           />
         </div>
       </div>
