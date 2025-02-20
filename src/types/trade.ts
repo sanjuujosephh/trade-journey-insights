@@ -15,6 +15,11 @@ export interface Trade {
   notes?: string | null;
   chart_link?: string | null;
   
+  // New fields for VIX and IV
+  vix?: number | null;
+  call_iv?: number | null;
+  put_iv?: number | null;
+  
   // Trade Execution Details
   strike_price?: number | null;
   option_type?: 'call' | 'put' | null;
@@ -62,6 +67,12 @@ export interface FormData {
   entry_time: string;
   exit_time: string;
   chart_link: string;
+  
+  // New fields for VIX and IV
+  vix: string;
+  call_iv: string;
+  put_iv: string;
+  
   strike_price: string;
   option_type: 'call' | 'put' | '';
   market_condition: 'trending' | 'ranging' | 'news_driven' | 'volatile' | '';

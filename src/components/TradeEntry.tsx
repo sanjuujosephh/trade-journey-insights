@@ -46,6 +46,9 @@ interface FormData {
   entry_time: string;
   exit_time: string;
   chart_link: string;
+  vix: string;
+  call_iv: string;
+  put_iv: string;
   strike_price: string;
   option_type: 'call' | 'put' | '';
   market_condition: 'trending' | 'ranging' | 'news_driven' | 'volatile' | '';
@@ -80,6 +83,9 @@ const emptyFormData: FormData = {
   entry_time: "",
   exit_time: "",
   chart_link: "",
+  vix: "",
+  call_iv: "",
+  put_iv: "",
   strike_price: "",
   option_type: "",
   market_condition: "",
@@ -277,6 +283,10 @@ export default function TradeEntry() {
       timeframe: formData.timeframe || null,
       trade_direction: formData.trade_direction || null,
       exit_reason: formData.exit_reason || null,
+      slippage: formData.slippage || null,
+      post_exit_price: formData.post_exit_price || null,
+      exit_efficiency: formData.exit_efficiency || null,
+      confidence_level: formData.confidence_level || null,
       entry_emotion: formData.entry_emotion || null,
       exit_emotion: formData.exit_emotion || null,
       followed_plan: formData.followed_plan,
@@ -329,6 +339,9 @@ export default function TradeEntry() {
       entry_time: trade.entry_time ? formatToLocalDateTime(trade.entry_time) : "",
       exit_time: trade.exit_time ? formatToLocalDateTime(trade.exit_time) : "",
       chart_link: trade.chart_link ?? "",
+      vix: trade.vix ?? "",
+      call_iv: trade.call_iv ?? "",
+      put_iv: trade.put_iv ?? "",
       strike_price: trade.strike_price?.toString() ?? "",
       option_type: trade.option_type ?? "",
       market_condition: trade.market_condition ?? "",
