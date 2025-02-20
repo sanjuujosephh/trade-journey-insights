@@ -145,138 +145,136 @@ export default function LearningCenter() {
   const consistencyScore = calculateConsistencyScore();
 
   return (
-    <div className="h-full p-6">
-      <div className="space-y-4">
-        <Card className="p-4">
-          <h3 className="text-lg font-medium mb-2">Trading Psychology Analysis</h3>
-          <div className="space-y-3">
-            {behavioralPatterns.map((pattern) => (
-              <Alert key={pattern.pattern} className={pattern.detection > 0 ? "border-destructive" : ""}>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>{pattern.pattern}</AlertTitle>
-                <AlertDescription className="mt-2">
-                  <div className="flex justify-between items-center">
-                    <span>
-                      Detected {pattern.detection} times in your trading history
-                    </span>
-                    <span className={`text-sm ${
-                      pattern.detection > 0 ? "text-destructive" : "text-muted-foreground"
-                    }`}>
-                      {pattern.suggestion}
-                    </span>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            ))}
-          </div>
-        </Card>
+    <div className="p-6 space-y-6">
+      <div className="space-y-3">
+        <h3 className="text-lg font-medium">Trading Psychology Analysis</h3>
+        <div className="space-y-3">
+          {behavioralPatterns.map((pattern) => (
+            <Alert key={pattern.pattern} className={pattern.detection > 0 ? "border-destructive" : ""}>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>{pattern.pattern}</AlertTitle>
+              <AlertDescription className="mt-2">
+                <div className="flex justify-between items-center">
+                  <span>
+                    Detected {pattern.detection} times in your trading history
+                  </span>
+                  <span className={`text-sm ${
+                    pattern.detection > 0 ? "text-destructive" : "text-muted-foreground"
+                  }`}>
+                    {pattern.suggestion}
+                  </span>
+                </div>
+              </AlertDescription>
+            </Alert>
+          ))}
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="p-4">
-            <h3 className="text-lg font-medium mb-2">Strategy Performance Review</h3>
-            <div className="space-y-4">
-              {Object.entries(strategyAnalysis).map(([strategy, data]) => {
-                const totalTrades = data.wins + data.losses;
-                const winRate = totalTrades > 0 ? (data.wins / totalTrades) * 100 : 0;
-                
-                return (
-                  <div
-                    key={strategy}
-                    className="p-4 bg-muted rounded-lg space-y-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{strategy}</span>
-                      <span className={`text-sm ${
-                        winRate > 50 ? "text-green-600" : "text-red-600"
-                      }`}>
-                        {winRate.toFixed(1)}% Win Rate
-                      </span>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Total P/L: ₹{data.totalPnL.toFixed(2)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <h3 className="text-lg font-medium mb-2">Recent Trades Analysis</h3>
-            <div className="space-y-4">
-              {recentTradesAnalysis.map((trade) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h3 className="text-lg font-medium mb-3">Strategy Performance Review</h3>
+          <div className="space-y-4">
+            {Object.entries(strategyAnalysis).map(([strategy, data]) => {
+              const totalTrades = data.wins + data.losses;
+              const winRate = totalTrades > 0 ? (data.wins / totalTrades) * 100 : 0;
+              
+              return (
                 <div
-                  key={trade.id}
+                  key={strategy}
                   className="p-4 bg-muted rounded-lg space-y-2"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">{trade.date}</span>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                      trade.sentiment === 'positive'
-                        ? "bg-green-100 text-green-800"
-                        : trade.sentiment === 'negative'
-                        ? "bg-red-100 text-red-800"
-                        : "bg-gray-100 text-gray-800"
+                    <span className="font-medium">{strategy}</span>
+                    <span className={`text-sm ${
+                      winRate > 50 ? "text-green-600" : "text-red-600"
                     }`}>
-                      {trade.sentiment === 'positive' ? <TrendingUp className="w-3 h-3 mr-1" /> :
-                       trade.sentiment === 'negative' ? <TrendingDown className="w-3 h-3 mr-1" /> :
-                       <Brain className="w-3 h-3 mr-1" />}
-                      {trade.sentiment}
+                      {winRate.toFixed(1)}% Win Rate
                     </span>
                   </div>
-                  <p className="text-sm">{trade.lesson}</p>
+                  <div className="text-sm text-muted-foreground">
+                    Total P/L: ₹{data.totalPnL.toFixed(2)}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </Card>
+              );
+            })}
+          </div>
         </div>
 
-        <Card className="p-4">
-          <h3 className="text-lg font-medium mb-2">Trading Rules & Consistency</h3>
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span>Consistency Score</span>
-              <span className={`text-lg font-semibold ${
-                consistencyScore > 70 ? "text-green-600" :
-                consistencyScore > 40 ? "text-yellow-600" :
-                "text-red-600"
-              }`}>
-                {consistencyScore.toFixed(1)}%
-              </span>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div
-                className={`h-full rounded-full ${
-                  consistencyScore > 70 ? "bg-green-600" :
-                  consistencyScore > 40 ? "bg-yellow-600" :
-                  "bg-red-600"
-                }`}
-                style={{ width: `${consistencyScore}%` }}
-              />
-            </div>
-          </div>
-          
+        <div>
+          <h3 className="text-lg font-medium mb-3">Recent Trades Analysis</h3>
           <div className="space-y-4">
-            {[
-              "Never risk more than 1% per trade",
-              "Always use stop loss orders",
-              "No trading during first 15 minutes",
-              "Follow your trading plan",
-              "Document every trade with detailed notes",
-              "Maximum 2 trades per day",
-              "No revenge trading",
-              "No averaging down on losses",
-            ].map((rule, index) => (
+            {recentTradesAnalysis.map((trade) => (
               <div
-                key={index}
-                className="flex items-center p-4 bg-muted rounded-lg"
+                key={trade.id}
+                className="p-4 bg-muted rounded-lg space-y-2"
               >
-                <span className="mr-2 font-mono text-sm">{index + 1}.</span>
-                {rule}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">{trade.date}</span>
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
+                    trade.sentiment === 'positive'
+                      ? "bg-green-100 text-green-800"
+                      : trade.sentiment === 'negative'
+                      ? "bg-red-100 text-red-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}>
+                    {trade.sentiment === 'positive' ? <TrendingUp className="w-3 h-3 mr-1" /> :
+                     trade.sentiment === 'negative' ? <TrendingDown className="w-3 h-3 mr-1" /> :
+                     <Brain className="w-3 h-3 mr-1" />}
+                    {trade.sentiment}
+                  </span>
+                </div>
+                <p className="text-sm">{trade.lesson}</p>
               </div>
             ))}
           </div>
-        </Card>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-medium mb-3">Trading Rules & Consistency</h3>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span>Consistency Score</span>
+            <span className={`text-lg font-semibold ${
+              consistencyScore > 70 ? "text-green-600" :
+              consistencyScore > 40 ? "text-yellow-600" :
+              "text-red-600"
+            }`}>
+              {consistencyScore.toFixed(1)}%
+            </span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div
+              className={`h-full rounded-full ${
+                consistencyScore > 70 ? "bg-green-600" :
+                consistencyScore > 40 ? "bg-yellow-600" :
+                "bg-red-600"
+              }`}
+              style={{ width: `${consistencyScore}%` }}
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          {[
+            "Never risk more than 1% per trade",
+            "Always use stop loss orders",
+            "No trading during first 15 minutes",
+            "Follow your trading plan",
+            "Document every trade with detailed notes",
+            "Maximum 2 trades per day",
+            "No revenge trading",
+            "No averaging down on losses",
+          ].map((rule, index) => (
+            <div
+              key={index}
+              className="flex items-center p-4 bg-muted rounded-lg"
+            >
+              <span className="mr-2 font-mono text-sm">{index + 1}.</span>
+              {rule}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

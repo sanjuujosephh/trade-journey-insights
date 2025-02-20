@@ -75,7 +75,7 @@ export function TradingCalendar() {
   };
 
   return (
-    <div className="p-4 space-y-3">
+    <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">
           {format(currentDate, "MMMM yyyy")}
@@ -113,11 +113,11 @@ export function TradingCalendar() {
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-2">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
           <div
             key={day}
-            className="text-center py-1 text-xs font-medium text-muted-foreground"
+            className="text-center py-2 text-xs font-medium text-muted-foreground"
           >
             {day}
           </div>
@@ -135,7 +135,7 @@ export function TradingCalendar() {
                   <button
                     onClick={() => setSelectedDate(isSelected ? null : day)}
                     className={cn(
-                      "p-1 rounded-md text-xs transition-colors",
+                      "py-2 px-1 rounded-md text-xs transition-colors min-h-[60px]",
                       !isSameMonth(day, currentDate) && "opacity-50",
                       isToday(day) && "ring-1 ring-primary",
                       isSelected && "ring-1 ring-primary ring-offset-2",
@@ -144,7 +144,7 @@ export function TradingCalendar() {
                         : "bg-gray-100 hover:bg-gray-200 text-gray-600"
                     )}
                   >
-                    <div className="font-medium">{format(day, "d")}</div>
+                    <div className="font-medium mb-1">{format(day, "d")}</div>
                     {dayStats && (
                       <div className="text-[10px] font-medium">
                         {formatPnL(dayStats.totalPnL)}
