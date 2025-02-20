@@ -38,7 +38,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 const App = () => (
-  <QueryClientProvider client="{queryClient}">
+  <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
         <Toaster />

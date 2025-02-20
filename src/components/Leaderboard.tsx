@@ -51,8 +51,7 @@ export function Leaderboard() {
           entry_price,
           quantity,
           outcome
-        `)
-        .throwOnError();
+        `) as { data: TradeWithProfile[] | null, error: any };
 
       if (!trades) return [];
 
@@ -61,8 +60,8 @@ export function Leaderboard() {
         const userId = trade.user_id;
         if (!acc[userId]) {
           acc[userId] = {
-            username: trade.profiles?.username || "Anonymous",
-            avatar_url: trade.profiles?.avatar_url,
+            username: trade.profiles.username || "Anonymous",
+            avatar_url: trade.profiles.avatar_url,
             total_trades: 0,
             winning_trades: 0,
             profit_loss: 0,
