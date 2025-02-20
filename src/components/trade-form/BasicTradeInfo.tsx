@@ -36,7 +36,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
         value: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
         label: timeString
       });
-      currentTime += 1; // Add 1 minute
+      currentTime += 5; // Increment by 5 minutes instead of 1
     }
     return options;
   };
@@ -196,12 +196,16 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
               value={formData.entry_time?.split('T')[1] || ''}
               onValueChange={(value) => handleDateTimeChange('entry', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
-              <SelectContent className="h-[200px] overflow-y-auto">
+              <SelectContent>
                 {timeOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem 
+                    key={option.value} 
+                    value={option.value}
+                    className="cursor-pointer hover:bg-accent"
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
@@ -227,12 +231,16 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
               value={formData.exit_time?.split('T')[1] || ''}
               onValueChange={(value) => handleDateTimeChange('exit', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
-              <SelectContent className="h-[200px] overflow-y-auto">
+              <SelectContent>
                 {timeOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem 
+                    key={option.value} 
+                    value={option.value}
+                    className="cursor-pointer hover:bg-accent"
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
