@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AVAILABLE_SYMBOLS } from "@/components/TradeEntry";
+import { useToast } from "@/hooks/use-toast";
 
 interface BasicTradeInfoProps {
   formData: any;
@@ -17,6 +18,8 @@ interface BasicTradeInfoProps {
 }
 
 export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: BasicTradeInfoProps) {
+  const { toast } = useToast();
+
   const getDateString = (dateTimeStr: string | undefined) => {
     if (!dateTimeStr) {
       const today = new Date();
@@ -25,37 +28,44 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
     return dateTimeStr.split('T')[0];
   };
 
+  const formatTimeForInput = (hours: number, minutes: number) => {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  };
+
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const [datePart, timePart] = value.split('T');
     
     if (timePart) {
-      const [hours, minutes] = timePart.split(':');
-      const timeInMinutes = parseInt(hours) * 60 + parseInt(minutes);
+      const [hours, minutes] = timePart.split(':').map(Number);
+      const timeInMinutes = hours * 60 + minutes;
       const marketOpenTime = 9 * 60 + 15;  // 9:15 AM
       const marketCloseTime = 15 * 60 + 25; // 3:25 PM
       
+      let adjustedTime = value;
       if (timeInMinutes < marketOpenTime) {
-        const newTime = `${datePart}T09:15`;
-        const syntheticEvent = {
-          target: { name, value: newTime }
-        } as React.ChangeEvent<HTMLInputElement>;
-        handleChange(syntheticEvent);
-        return;
+        adjustedTime = `${datePart}T${formatTimeForInput(9, 15)}`;
+        toast({
+          description: "Time adjusted to market opening hours (9:15 AM)",
+        });
+      } else if (timeInMinutes > marketCloseTime) {
+        adjustedTime = `${datePart}T${formatTimeForInput(15, 25)}`;
+        toast({
+          description: "Time adjusted to market closing hours (3:25 PM)",
+        });
       }
       
-      if (timeInMinutes > marketCloseTime) {
-        const newTime = `${datePart}T15:25`;
-        const syntheticEvent = {
-          target: { name, value: newTime }
-        } as React.ChangeEvent<HTMLInputElement>;
-        handleChange(syntheticEvent);
-        return;
-      }
+      const syntheticEvent = {
+        target: { name, value: adjustedTime }
+      } as React.ChangeEvent<HTMLInputElement>;
+      handleChange(syntheticEvent);
+      return;
     }
     
     handleChange(e);
   };
+
+  const timeStep = 60; // 60 seconds = 1 minute
 
   return (
     <Card className="p-6 space-y-4 glass">
@@ -185,8 +195,10 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             type="datetime-local"
             min={`${getDateString(formData.entry_time)}T09:15`}
             max={`${getDateString(formData.entry_time)}T15:25`}
+            step={timeStep}
             value={formData.entry_time}
             onChange={handleTimeChange}
+            onKeyDown={(e) => e.preventDefault()}
             required
           />
         </div>
@@ -198,8 +210,10 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             type="datetime-local"
             min={`${getDateString(formData.exit_time)}T09:15`}
             max={`${getDateString(formData.exit_time)}T15:25`}
+            step={timeStep}
             value={formData.exit_time}
             onChange={handleTimeChange}
+            onKeyDown={(e) => e.preventDefault()}
           />
         </div>
       </div>
