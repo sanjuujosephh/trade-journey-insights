@@ -43,6 +43,7 @@ export type Database = {
         Row: {
           actual_risk_reward: number | null
           ai_feedback: string | null
+          call_iv: number | null
           chart_link: string | null
           confidence_level: number | null
           entry_emotion: string | null
@@ -65,6 +66,7 @@ export type Database = {
           planned_risk_reward: number | null
           planned_target: number | null
           post_exit_price: number | null
+          put_iv: number | null
           quantity: number | null
           slippage: number | null
           stop_loss: number | null
@@ -77,11 +79,13 @@ export type Database = {
           trade_direction: string | null
           trade_type: string
           user_id: string
+          vix: number | null
           what_if_analysis: Json | null
         }
         Insert: {
           actual_risk_reward?: number | null
           ai_feedback?: string | null
+          call_iv?: number | null
           chart_link?: string | null
           confidence_level?: number | null
           entry_emotion?: string | null
@@ -104,6 +108,7 @@ export type Database = {
           planned_risk_reward?: number | null
           planned_target?: number | null
           post_exit_price?: number | null
+          put_iv?: number | null
           quantity?: number | null
           slippage?: number | null
           stop_loss?: number | null
@@ -116,11 +121,13 @@ export type Database = {
           trade_direction?: string | null
           trade_type: string
           user_id: string
+          vix?: number | null
           what_if_analysis?: Json | null
         }
         Update: {
           actual_risk_reward?: number | null
           ai_feedback?: string | null
+          call_iv?: number | null
           chart_link?: string | null
           confidence_level?: number | null
           entry_emotion?: string | null
@@ -143,6 +150,7 @@ export type Database = {
           planned_risk_reward?: number | null
           planned_target?: number | null
           post_exit_price?: number | null
+          put_iv?: number | null
           quantity?: number | null
           slippage?: number | null
           stop_loss?: number | null
@@ -155,6 +163,7 @@ export type Database = {
           trade_direction?: string | null
           trade_type?: string
           user_id?: string
+          vix?: number | null
           what_if_analysis?: Json | null
         }
         Relationships: []
