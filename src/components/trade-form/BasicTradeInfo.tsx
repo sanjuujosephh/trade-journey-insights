@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { AVAILABLE_SYMBOLS } from "@/components/TradeEntry";
 import { useToast } from "@/hooks/use-toast";
+import { OptionsFields } from "./basic-info/OptionsFields";
+import { TimeFields } from "./basic-info/TimeFields";
 
 interface BasicTradeInfoProps {
   formData: any;
@@ -116,77 +118,11 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
       </div>
 
       {formData.trade_type === "options" && (
-        <>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="strike_price">Strike Price</Label>
-              <Input
-                id="strike_price"
-                name="strike_price"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={formData.strike_price}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="option_type">Option Type</Label>
-              <Select
-                name="option_type"
-                value={formData.option_type}
-                onValueChange={(value) => handleSelectChange("option_type", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="call">Call</SelectItem>
-                  <SelectItem value="put">Put</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="vix">VIX</Label>
-              <Input
-                id="vix"
-                name="vix"
-                type="number"
-                step="0.01"
-                placeholder="VIX Value"
-                value={formData.vix}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="call_iv">Call IV</Label>
-              <Input
-                id="call_iv"
-                name="call_iv"
-                type="number"
-                step="0.01"
-                placeholder="Call IV %"
-                value={formData.call_iv}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="put_iv">Put IV</Label>
-              <Input
-                id="put_iv"
-                name="put_iv"
-                type="number"
-                step="0.01"
-                placeholder="Put IV %"
-                value={formData.put_iv}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-        </>
+        <OptionsFields
+          formData={formData}
+          handleChange={handleChange}
+          handleSelectChange={handleSelectChange}
+        />
       )}
 
       <div className="grid grid-cols-2 gap-4">
@@ -217,79 +153,12 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="entry_time">Entry Time</Label>
-          <div className="flex gap-4">
-            <Input
-              type="date"
-              value={formData.entry_time?.split('T')[0] || ''}
-              onChange={(e) => {
-                const timeStr = formData.entry_time?.split('T')[1] || '09:15';
-                const newDateTime = `${e.target.value}T${timeStr}`;
-                handleChange({
-                  target: { name: 'entry_time', value: newDateTime }
-                } as React.ChangeEvent<HTMLInputElement>);
-              }}
-              required
-            />
-            <Select
-              value={formData.entry_time?.split('T')[1] || ''}
-              onValueChange={(value) => handleDateTimeChange('entry', value)}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Select time" />
-              </SelectTrigger>
-              <SelectContent>
-                {timeOptions.map((option) => (
-                  <SelectItem 
-                    key={option.value} 
-                    value={option.value}
-                    className="cursor-pointer hover:bg-accent"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="exit_time">Exit Time</Label>
-          <div className="flex gap-4">
-            <Input
-              type="date"
-              value={formData.exit_time?.split('T')[0] || ''}
-              onChange={(e) => {
-                const timeStr = formData.exit_time?.split('T')[1] || '09:15';
-                const newDateTime = `${e.target.value}T${timeStr}`;
-                handleChange({
-                  target: { name: 'exit_time', value: newDateTime }
-                } as React.ChangeEvent<HTMLInputElement>);
-              }}
-            />
-            <Select
-              value={formData.exit_time?.split('T')[1] || ''}
-              onValueChange={(value) => handleDateTimeChange('exit', value)}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Select time" />
-              </SelectTrigger>
-              <SelectContent>
-                {timeOptions.map((option) => (
-                  <SelectItem 
-                    key={option.value} 
-                    value={option.value}
-                    className="cursor-pointer hover:bg-accent"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
+      <TimeFields
+        formData={formData}
+        handleChange={handleChange}
+        handleDateTimeChange={handleDateTimeChange}
+        timeOptions={timeOptions}
+      />
     </Card>
   );
 }
