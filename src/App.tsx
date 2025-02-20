@@ -9,8 +9,29 @@ import { UserMenu } from "./components/auth/UserMenu";
 import { useAuth } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { Button } from "./components/ui/button";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "./contexts/ThemeProvider";
 
 const queryClient = new QueryClient();
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+    >
+      {theme === "light" ? (
+        <Moon className="h-5 w-5" />
+      ) : (
+        <Sun className="h-5 w-5" />
+      )}
+    </Button>
+  );
+}
 
 function Navigation() {
   const { user } = useAuth();
@@ -19,6 +40,7 @@ function Navigation() {
     <div className="h-16 border-b bg-background sticky top-0 z-10">
       <div className="flex h-full items-center px-4 container mx-auto">
         <div className="ml-auto flex items-center space-x-4">
+          <ThemeToggle />
           {user ? <UserMenu /> : <AuthModal />}
         </div>
       </div>

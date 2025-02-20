@@ -49,7 +49,7 @@ export function FOTradeTable({ trades, onReplayTrade }: FOTradeTableProps) {
                 <TableRow key={trade.id}>
                   <TableCell>{format(new Date(trade.entry_time || trade.timestamp), 'HH:mm:ss')}</TableCell>
                   <TableCell>{trade.symbol}</TableCell>
-                  <TableCell>{trade.trade_type}</TableCell>
+                  <TableCell>{trade.trade_type === 'intraday' ? '' : trade.trade_type}</TableCell>
                   <TableCell>{trade.quantity}</TableCell>
                   <TableCell>{trade.entry_price}</TableCell>
                   <TableCell>{trade.exit_price}</TableCell>
