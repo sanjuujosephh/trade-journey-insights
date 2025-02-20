@@ -149,8 +149,10 @@ export function DashboardTabs({
             <LearningCenter />
           </TabsContent>
 
-          <TabsContent value="profile" className="mt-0 h-full p-6">
-            <ProfileSettings />
+          <TabsContent value="profile" className="mt-0 h-full">
+            <div className="p-6">
+              <ProfileSettings />
+            </div>
           </TabsContent>
         </div>
       </Tabs>
