@@ -30,6 +30,14 @@ type TradeWithProfile = {
   outcome: string;
 };
 
+type UserStats = {
+  username: string;
+  avatar_url: string | null;
+  total_trades: number;
+  winning_trades: number;
+  profit_loss: number;
+};
+
 export function Leaderboard() {
   const { data: leaderboard, isLoading } = useQuery({
     queryKey: ["leaderboard"],
@@ -49,7 +57,7 @@ export function Leaderboard() {
       if (!trades) return [];
 
       // Group trades by user and calculate statistics
-      const userStats = trades.reduce<Record<string, any>>((acc, trade) => {
+      const userStats = trades.reduce<Record<string, UserStats>>((acc, trade) => {
         const userId = trade.user_id;
         if (!acc[userId]) {
           acc[userId] = {
