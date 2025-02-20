@@ -36,7 +36,6 @@ export default function Index() {
   const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [trades, setTrades] = useState([]);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -54,30 +53,20 @@ export default function Index() {
     enabled: !!user?.id
   });
 
-  const fetchTrades = async (days?: number) => {
-    setIsAnalyzing(true);
-    try {
-      let query = supabase
+  const { data: trades = [], isLoading } = useQuery({
+    queryKey: ['trades'],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
         .from('trades')
         .select('*')
-        .order('timestamp', { ascending: true });
-
-      if (days) {
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - days);
-        query = query.gte('timestamp', startDate.toISOString());
-      }
-
-      const { data, error } = await query;
-
+        .order('entry_time', { ascending: false });
+      
       if (error) throw error;
-      setTrades(data);
-    } catch (error) {
-      console.error('Error fetching trades:', error);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
+      return data || [];
+    },
+    enabled: !!user?.id
+  });
 
   const analyzeTradesWithAI = async (options: { days?: number }) => {
     setIsAnalyzing(true);

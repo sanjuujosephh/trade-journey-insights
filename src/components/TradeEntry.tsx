@@ -272,7 +272,6 @@ export default function TradeEntry() {
   return (
     <ErrorBoundary>
       <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
-        <ImportTrades />
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <BasicTradeInfo
@@ -368,6 +367,8 @@ export default function TradeEntry() {
             onViewDetails={setSelectedTrade}
           />
         )}
+
+        <ImportTrades />
 
         <TradeDetailsDialog
           trade={selectedTrade}
