@@ -22,7 +22,27 @@ interface Trade {
   timestamp: string;
   entry_time?: string;
   exit_time?: string;
-  user_id?: string;
+  strike_price?: number;
+  option_type?: string;
+  market_condition?: string;
+  timeframe?: string;
+  trade_direction?: string;
+  planned_risk_reward?: number;
+  actual_risk_reward?: number;
+  planned_target?: number;
+  exit_reason?: string;
+  slippage?: number;
+  post_exit_price?: number;
+  exit_efficiency?: number;
+  confidence_level?: number;
+  entry_emotion?: string;
+  exit_emotion?: string;
+  followed_plan?: boolean;
+  plan_deviation_reason?: string;
+  is_fomo_trade?: boolean;
+  is_impulsive_exit?: boolean;
+  ai_feedback?: string;
+  what_if_analysis?: Record<string, any>;
   chart_link?: string;
 }
 
@@ -49,7 +69,7 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
-        timeZone: 'Asia/Kolkata' // Using Indian timezone
+        timeZone: 'Asia/Kolkata'
       });
     } catch (error) {
       console.error('Error formatting date:', error);
@@ -63,22 +83,6 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
     return pnl.toFixed(2);
   };
 
-  const getEmbedUrl = (chartLink: string) => {
-    try {
-      const url = new URL(chartLink);
-      if (url.hostname === 'www.tradingview.com' || url.hostname === 'tradingview.com') {
-        if (url.pathname.startsWith('/x/')) {
-          const snapshotId = url.pathname.split('/')[2];
-          return `https://www.tradingview.com/x/${snapshotId}/`;
-        }
-      }
-      return chartLink;
-    } catch (e) {
-      console.error('Invalid URL:', e);
-      return chartLink;
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
@@ -86,22 +90,6 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
           <DialogTitle>Trade Details - {trade.symbol}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-full max-h-[70vh]">
-          {trade.chart_link && (
-            <div className="mb-6">
-              <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
-                <img
-                  src={getEmbedUrl(trade.chart_link)}
-                  alt="TradingView Chart"
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    console.error('Error loading image:', e);
-                    e.currentTarget.src = 'https://via.placeholder.com/800x400?text=Chart+Not+Available';
-                  }}
-                />
-              </div>
-            </div>
-          )}
-          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <h4 className="text-sm font-medium">Entry Details</h4>
@@ -114,6 +102,24 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
                   <span className="text-sm text-muted-foreground">Time:</span>
                   <p>{trade.entry_time ? formatDateTime(trade.entry_time) : 'N/A'}</p>
                 </div>
+                {trade.strike_price && (
+                  <div>
+                    <span className="text-sm text-muted-foreground">Strike Price:</span>
+                    <p>₹{trade.strike_price}</p>
+                  </div>
+                )}
+                {trade.option_type && (
+                  <div>
+                    <span className="text-sm text-muted-foreground">Option Type:</span>
+                    <p className="capitalize">{trade.option_type}</p>
+                  </div>
+                )}
+                {trade.entry_emotion && (
+                  <div>
+                    <span className="text-sm text-muted-foreground">Entry Emotion:</span>
+                    <p className="capitalize">{trade.entry_emotion}</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -128,55 +134,124 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
                   <span className="text-sm text-muted-foreground">Time:</span>
                   <p>{trade.exit_time ? formatDateTime(trade.exit_time) : 'N/A'}</p>
                 </div>
+                {trade.exit_reason && (
+                  <div>
+                    <span className="text-sm text-muted-foreground">Exit Reason:</span>
+                    <p className="capitalize">{trade.exit_reason.replace('_', ' ')}</p>
+                  </div>
+                )}
+                {trade.exit_emotion && (
+                  <div>
+                    <span className="text-sm text-muted-foreground">Exit Emotion:</span>
+                    <p className="capitalize">{trade.exit_emotion}</p>
+                  </div>
+                )}
               </div>
             </div>
 
             <div>
-              <h4 className="text-sm font-medium">Trade Information</h4>
+              <h4 className="text-sm font-medium">Trade Context</h4>
               <div className="space-y-2 mt-2">
                 <div>
-                  <span className="text-sm text-muted-foreground">Type:</span>
-                  <p>{trade.trade_type}</p>
+                  <span className="text-sm text-muted-foreground">Market Condition:</span>
+                  <p className="capitalize">{trade.market_condition?.replace('_', ' ') || 'N/A'}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-muted-foreground">Quantity:</span>
-                  <p>{trade.quantity || 'N/A'}</p>
+                  <span className="text-sm text-muted-foreground">Timeframe:</span>
+                  <p>{trade.timeframe || 'N/A'}</p>
                 </div>
+                <div>
+                  <span className="text-sm text-muted-foreground">Direction:</span>
+                  <p className="capitalize">{trade.trade_direction || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-muted-foreground">Confidence Level:</span>
+                  <p>{trade.confidence_level ? `${trade.confidence_level}/5` : 'N/A'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium">Risk Management</h4>
+              <div className="space-y-2 mt-2">
                 <div>
                   <span className="text-sm text-muted-foreground">Stop Loss:</span>
                   <p>{trade.stop_loss ? `₹${trade.stop_loss}` : 'N/A'}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-muted-foreground">Strategy:</span>
-                  <p>{trade.strategy || 'N/A'}</p>
+                  <span className="text-sm text-muted-foreground">Target:</span>
+                  <p>{trade.planned_target ? `₹${trade.planned_target}` : 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-muted-foreground">Risk/Reward:</span>
+                  <p>{trade.planned_risk_reward ? `${trade.planned_risk_reward}:1` : 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-muted-foreground">Actual R/R:</span>
+                  <p>{trade.actual_risk_reward ? `${trade.actual_risk_reward}:1` : 'N/A'}</p>
                 </div>
               </div>
             </div>
 
-            <div>
-              <h4 className="text-sm font-medium">Results</h4>
-              <div className="space-y-2 mt-2">
-                <div>
-                  <span className="text-sm text-muted-foreground">Outcome:</span>
-                  <p className={`inline-flex px-2 py-1 rounded-full text-xs ${
-                    trade.outcome === "profit"
-                      ? "bg-green-100 text-green-800"
-                      : trade.outcome === "loss"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}>
-                    {trade.outcome}
-                  </p>
-                </div>
+            {/* Performance Metrics */}
+            <div className="col-span-2">
+              <h4 className="text-sm font-medium">Performance Metrics</h4>
+              <div className="grid grid-cols-3 gap-4 mt-2">
                 <div>
                   <span className="text-sm text-muted-foreground">P/L:</span>
-                  <p className={calculatePnL() && parseFloat(calculatePnL()!) > 0 ? "text-green-600" : "text-red-600"}>
+                  <p className={`font-medium ${
+                    calculatePnL() && parseFloat(calculatePnL()!) > 0 ? "text-green-600" : "text-red-600"
+                  }`}>
                     {calculatePnL() ? `₹${calculatePnL()}` : 'N/A'}
                   </p>
                 </div>
+                <div>
+                  <span className="text-sm text-muted-foreground">Slippage:</span>
+                  <p className="text-red-600">{trade.slippage ? `₹${trade.slippage}` : 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-muted-foreground">Exit Efficiency:</span>
+                  <p>{trade.exit_efficiency ? `${(trade.exit_efficiency * 100).toFixed(1)}%` : 'N/A'}</p>
+                </div>
               </div>
             </div>
 
+            {/* Behavioral Analysis */}
+            <div className="col-span-2">
+              <h4 className="text-sm font-medium">Behavioral Analysis</h4>
+              <div className="space-y-2 mt-2">
+                <div>
+                  <span className="text-sm text-muted-foreground">Followed Plan:</span>
+                  <p>{trade.followed_plan ? 'Yes' : 'No'}</p>
+                </div>
+                {!trade.followed_plan && trade.plan_deviation_reason && (
+                  <div>
+                    <span className="text-sm text-muted-foreground">Deviation Reason:</span>
+                    <p>{trade.plan_deviation_reason}</p>
+                  </div>
+                )}
+                <div className="flex gap-4">
+                  <div>
+                    <span className="text-sm text-muted-foreground">FOMO Trade:</span>
+                    <p>{trade.is_fomo_trade ? 'Yes' : 'No'}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-muted-foreground">Impulsive Exit:</span>
+                    <p>{trade.is_impulsive_exit ? 'Yes' : 'No'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Feedback */}
+            {trade.ai_feedback && (
+              <div className="col-span-2">
+                <h4 className="text-sm font-medium">AI Feedback</h4>
+                <p className="mt-2 text-sm whitespace-pre-wrap">{trade.ai_feedback}</p>
+              </div>
+            )}
+
+            {/* Notes */}
             {trade.notes && (
               <div className="col-span-2">
                 <h4 className="text-sm font-medium">Notes</h4>

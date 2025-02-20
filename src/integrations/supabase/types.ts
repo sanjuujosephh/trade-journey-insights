@@ -41,58 +41,121 @@ export type Database = {
       }
       trades: {
         Row: {
+          actual_risk_reward: number | null
+          ai_feedback: string | null
           chart_link: string | null
+          confidence_level: number | null
+          entry_emotion: string | null
           entry_price: number
           entry_time: string | null
+          exit_efficiency: number | null
+          exit_emotion: string | null
           exit_price: number | null
+          exit_reason: string | null
           exit_time: string | null
+          followed_plan: boolean | null
           id: string
+          is_fomo_trade: boolean | null
+          is_impulsive_exit: boolean | null
+          market_condition: string | null
           notes: string | null
+          option_type: string | null
           outcome: string
+          plan_deviation_reason: string | null
+          planned_risk_reward: number | null
+          planned_target: number | null
+          post_exit_price: number | null
           quantity: number | null
+          slippage: number | null
           stop_loss: number | null
           strategy: string | null
+          strike_price: number | null
           symbol: string
           target: number | null
+          timeframe: string | null
           timestamp: string
+          trade_direction: string | null
           trade_type: string
           user_id: string
+          what_if_analysis: Json | null
         }
         Insert: {
+          actual_risk_reward?: number | null
+          ai_feedback?: string | null
           chart_link?: string | null
+          confidence_level?: number | null
+          entry_emotion?: string | null
           entry_price: number
           entry_time?: string | null
+          exit_efficiency?: number | null
+          exit_emotion?: string | null
           exit_price?: number | null
+          exit_reason?: string | null
           exit_time?: string | null
+          followed_plan?: boolean | null
           id?: string
+          is_fomo_trade?: boolean | null
+          is_impulsive_exit?: boolean | null
+          market_condition?: string | null
           notes?: string | null
+          option_type?: string | null
           outcome: string
+          plan_deviation_reason?: string | null
+          planned_risk_reward?: number | null
+          planned_target?: number | null
+          post_exit_price?: number | null
           quantity?: number | null
+          slippage?: number | null
           stop_loss?: number | null
           strategy?: string | null
+          strike_price?: number | null
           symbol: string
           target?: number | null
+          timeframe?: string | null
           timestamp?: string
+          trade_direction?: string | null
           trade_type: string
           user_id: string
+          what_if_analysis?: Json | null
         }
         Update: {
+          actual_risk_reward?: number | null
+          ai_feedback?: string | null
           chart_link?: string | null
+          confidence_level?: number | null
+          entry_emotion?: string | null
           entry_price?: number
           entry_time?: string | null
+          exit_efficiency?: number | null
+          exit_emotion?: string | null
           exit_price?: number | null
+          exit_reason?: string | null
           exit_time?: string | null
+          followed_plan?: boolean | null
           id?: string
+          is_fomo_trade?: boolean | null
+          is_impulsive_exit?: boolean | null
+          market_condition?: string | null
           notes?: string | null
+          option_type?: string | null
           outcome?: string
+          plan_deviation_reason?: string | null
+          planned_risk_reward?: number | null
+          planned_target?: number | null
+          post_exit_price?: number | null
           quantity?: number | null
+          slippage?: number | null
           stop_loss?: number | null
           strategy?: string | null
+          strike_price?: number | null
           symbol?: string
           target?: number | null
+          timeframe?: string | null
           timestamp?: string
+          trade_direction?: string | null
           trade_type?: string
           user_id?: string
+          what_if_analysis?: Json | null
         }
         Relationships: []
       }
