@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trade } from "@/types/trade";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertCircle, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react"; // Changed this import
 import { useToast } from "@/hooks/use-toast";
 import { AIAnalysisPanel } from "./AIAnalysisPanel";
 import { TimePerformanceHeatmap } from "./analytics/TimePerformanceHeatmap";

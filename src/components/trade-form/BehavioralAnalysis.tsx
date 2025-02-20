@@ -1,12 +1,13 @@
 
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input"; // Added this import
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface BehavioralAnalysisProps {
   formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: boolean) => void;
 }
 

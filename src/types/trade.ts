@@ -48,3 +48,37 @@ export interface Trade {
   ai_feedback?: string | null;
   what_if_analysis?: Record<string, any> | null;
 }
+
+export interface FormData {
+  symbol: string;
+  entry_price: string;
+  exit_price: string;
+  quantity: string;
+  trade_type: string;
+  stop_loss: string;
+  strategy: string;
+  outcome: 'profit' | 'loss' | 'breakeven';
+  notes: string;
+  entry_time: string;
+  exit_time: string;
+  chart_link: string;
+  strike_price: string;
+  option_type: 'call' | 'put' | '';
+  market_condition: 'trending' | 'ranging' | 'news_driven' | 'volatile' | '';
+  timeframe: '1min' | '5min' | '15min' | '1hr' | '';
+  trade_direction: 'long' | 'short' | '';
+  planned_risk_reward: string;
+  actual_risk_reward: string;
+  planned_target: string;
+  exit_reason: 'stop_loss' | 'target' | 'manual' | 'time_based' | '';
+  slippage: string;
+  post_exit_price: string;
+  exit_efficiency: string;
+  confidence_level: string;
+  entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
+  exit_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
+  followed_plan: boolean;
+  plan_deviation_reason: string;
+  is_fomo_trade: boolean;
+  is_impulsive_exit: boolean;
+}
