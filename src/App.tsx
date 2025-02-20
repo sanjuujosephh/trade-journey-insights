@@ -40,7 +40,11 @@ function Navigation() {
   return (
     <div className="h-16 border-b bg-background sticky top-0 z-10">
       <div className="flex h-full items-center px-4 container mx-auto">
-        <div className="ml-auto flex items-center space-x-4">
+        <div className="flex-1" />
+        <div className="flex-1 flex justify-center">
+          <h1 className="text-xl font-bold">OneTradeJournal</h1>
+        </div>
+        <div className="flex-1 flex justify-end items-center space-x-4">
           <ThemeToggle />
           {user ? <UserMenu /> : <AuthModal />}
         </div>
