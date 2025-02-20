@@ -1,4 +1,6 @@
 
+import { Card } from "@/components/ui/card";
+
 interface BehavioralAnalysisProps {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -10,5 +12,9 @@ export function BehavioralAnalysis({
   handleChange,
   handleSelectChange,
 }: BehavioralAnalysisProps) {
-  return null;
+  return (
+    <Card className="p-6 space-y-4">
+      {/* This component is now empty as its fields have been moved to BasicTradeInfo */}
+    </Card>
+  );
 }
