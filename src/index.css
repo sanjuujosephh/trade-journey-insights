@@ -90,3 +90,8 @@
 .chart-container {
   @apply h-[300px] w-full;
 }
+
+/* Auth tabs specific styles */
+.auth-tabs [role="tab"][data-state="active"] {
+  @apply bg-background shadow-sm;
+}

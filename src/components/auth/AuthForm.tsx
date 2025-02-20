@@ -80,7 +80,7 @@ export function AuthForm() {
   }
 
   return (
-    <Tabs defaultValue="login" className="w-full">
+    <Tabs defaultValue="login" className="w-full auth-tabs">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="login" onClick={() => setMode("login")}>
           Login
