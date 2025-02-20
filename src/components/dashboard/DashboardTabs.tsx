@@ -12,6 +12,7 @@ import { TradingCalendar } from "@/components/analytics/TradingCalendar";
 import LearningCenter from "@/components/LearningCenter";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { Trade } from "@/types/trade";
+import { cn } from "@/lib/utils";
 
 interface DashboardTabsProps {
   trades: Trade[];
@@ -21,6 +22,18 @@ interface DashboardTabsProps {
   currentAnalysis: string;
   analyzeTradesWithAI: (options: { days?: number }) => void;
 }
+
+// Define tab background colors
+const tabColors = {
+  "trade-entry": "bg-[#D3E4FD]", // Soft Blue
+  "performance": "bg-[#E5DEFF]", // Soft Purple
+  "calendar": "bg-[#FFDEE2]", // Soft Pink
+  "analysis": "bg-[#F2FCE2]", // Soft Green
+  "ai-analysis": "bg-[#FEF7CD]", // Soft Yellow
+  "learning": "bg-[#FEC6A1]", // Soft Orange
+  "history": "bg-[#FDE1D3]", // Soft Peach
+  "profile": "bg-[#F1F0FB]", // Soft Gray
+};
 
 export function DashboardTabs({
   trades,
@@ -34,14 +47,27 @@ export function DashboardTabs({
     <Card>
       <Tabs defaultValue="trade-entry" className="h-[calc(100%-4.5rem)]" onValueChange={setActiveTab}>
         <TabsList className="w-full justify-start border-b rounded-none px-6 bg-background">
-          <TabsTrigger value="trade-entry">Trade Entry</TabsTrigger>
-          <TabsTrigger value="performance">Trade Performance</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-          <TabsTrigger value="analysis">Trade Analysis</TabsTrigger>
-          <TabsTrigger value="ai-analysis">AI Analysis</TabsTrigger>
-          <TabsTrigger value="learning">Learning Center</TabsTrigger>
-          <TabsTrigger value="history">Trade History</TabsTrigger>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
+          {Object.entries({
+            "trade-entry": "Trade Entry",
+            "performance": "Trade Performance",
+            "calendar": "Calendar View",
+            "analysis": "Trade Analysis",
+            "ai-analysis": "AI Analysis",
+            "learning": "Learning Center",
+            "history": "Trade History",
+            "profile": "Profile"
+          }).map(([value, label]) => (
+            <TabsTrigger
+              key={value}
+              value={value}
+              className={cn(
+                "transition-colors duration-200",
+                activeTab === value && tabColors[value as keyof typeof tabColors]
+              )}
+            >
+              {label}
+            </TabsTrigger>
+          ))}
         </TabsList>
         
         <div className="h-[calc(100%-3rem)] overflow-y-auto">
