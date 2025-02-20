@@ -34,10 +34,6 @@ export function Leaderboard() {
   const { data: leaderboard, isLoading } = useQuery({
     queryKey: ["leaderboard"],
     queryFn: async () => {
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-
       const { data, error } = await supabase
         .from("trades")
         .select(`
@@ -48,13 +44,12 @@ export function Leaderboard() {
           quantity,
           outcome
         `)
-        .gte("timestamp", startOfMonth.toISOString())
         .throwOnError();
 
       if (!data) return [];
 
       // Group trades by user and calculate statistics
-      const userStats = data.reduce((acc: { [key: string]: any }, trade: any) => {
+      const userStats = data.reduce((acc: { [key: string]: any }, trade: TradeWithProfile) => {
         const userId = trade.user_id;
         if (!acc[userId]) {
           acc[userId] = {
@@ -85,13 +80,16 @@ export function Leaderboard() {
           profit_loss: stats.profit_loss,
           avatar_url: stats.avatar_url,
         }))
-        .sort((a, b) => b.profit_loss - a.profit_loss)
-        .slice(0, 10);
+        .sort((a, b) => b.profit_loss - a.profit_loss);
     },
   });
 
   if (isLoading) {
     return <div>Loading leaderboard...</div>;
+  }
+
+  if (!leaderboard?.length) {
+    return <div className="text-center text-muted-foreground">No trades recorded yet</div>;
   }
 
   return (
@@ -108,6 +106,7 @@ export function Leaderboard() {
           <TableRow key={entry.username}>
             <TableCell className="flex items-center gap-2">
               <Avatar className="h-6 w-6">
+                <AvatarImage src={entry.avatar_url || undefined} />
                 <AvatarFallback>{entry.username[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>
               {entry.username}
