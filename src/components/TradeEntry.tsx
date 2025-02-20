@@ -11,6 +11,7 @@ import { BehavioralAnalysis } from "./trade-form/BehavioralAnalysis";
 import { TradeHistory } from "./trade-form/TradeHistory";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { ImportTrades } from "./trade-form/ImportTrades";
 
 export const AVAILABLE_SYMBOLS = ["NIFTY", "BANKNIFTY"] as const;
 export const AVAILABLE_STRATEGIES = [
@@ -377,6 +378,7 @@ export default function TradeEntry() {
   return (
     <ErrorBoundary>
       <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
+        <ImportTrades />
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <BasicTradeInfo
