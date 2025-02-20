@@ -22,6 +22,7 @@ import {
   LineChart,
   Share2,
   Loader2,
+  Video,
 } from "lucide-react";
 import { TradeFlowChart } from "@/components/analytics/TradeFlowChart";
 import { TimePerformanceHeatmap } from "@/components/analytics/TimePerformanceHeatmap";
@@ -182,17 +183,23 @@ export default function Index() {
   return (
     <div className="h-[calc(100vh-4rem)] bg-background overflow-auto">
       <div className="container h-full py-4">
-        <header className="mb-2 flex items-center gap-4">
-          <Avatar className="h-28 w-28 [&_*]:scale-x-[-1]">
-            <AvatarImage src={profile?.avatar_url} alt={profile?.username || 'User avatar'} />
-            <AvatarFallback>
-              {(profile?.username?.[0] || user.email?.[0] || '?').toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Trading Journal</h1>
-            <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
+        <header className="mb-2 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-28 w-28 [&_*]:scale-x-[-1]">
+              <AvatarImage src={profile?.avatar_url} alt={profile?.username || 'User avatar'} />
+              <AvatarFallback>
+                {(profile?.username?.[0] || user.email?.[0] || '?').toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Trading Journal</h1>
+              <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
+            </div>
           </div>
+          <Button variant="outline" className="gap-2">
+            <span>Watch Overview</span>
+            <Video className="h-4 w-4" />
+          </Button>
         </header>
 
         <Card className="h-[calc(100%-4.5rem)]">
