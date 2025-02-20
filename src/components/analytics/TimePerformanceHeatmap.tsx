@@ -54,9 +54,8 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
               type="number"
               dataKey="winRate"
               name="Win Rate"
-              unit="%"
               domain={[0, 1]}
-              tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+              tickFormatter={(value) => `${(value * 100)}%`}
               tick={{ fontSize: 11, fill: '#6b7280' }}
               tickLine={{ stroke: '#9ca3af' }}
             />
