@@ -9,7 +9,7 @@ import { TradeFlowChart } from "@/components/analytics/TradeFlowChart";
 import { TimePerformanceHeatmap } from "@/components/analytics/TimePerformanceHeatmap";
 import { IntradayRiskMetrics } from "@/components/analytics/IntradayRiskMetrics";
 import { TradingCalendar } from "@/components/analytics/TradingCalendar";
-import { LearningCenter } from "@/components/LearningCenter";
+import LearningCenter from "@/components/LearningCenter";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { Trade } from "@/types/trade";
 

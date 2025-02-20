@@ -42,46 +42,46 @@ export function IntradayRiskMetrics({ trades }: IntradayRiskMetricsProps) {
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Card className="p-4">
-        <h3 className="text-lg font-medium mb-4">Biggest Winners & Losers</h3>
-        <div className="space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Card className="p-6">
+        <h3 className="text-xl font-semibold mb-6">Biggest Winners & Losers</h3>
+        <div className="space-y-6">
           <div>
-            <p className="text-sm text-muted-foreground">Biggest Winning Trade</p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-sm font-medium text-muted-foreground mb-2">Biggest Winning Trade</p>
+            <p className="text-3xl font-bold text-green-600">
               ₹{maxGainTrade?.pnl.toFixed(2)}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               at {new Date(maxGainTrade?.entry_time || "").toLocaleTimeString()}
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Biggest Losing Trade</p>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-sm font-medium text-muted-foreground mb-2">Biggest Losing Trade</p>
+            <p className="text-3xl font-bold text-red-600">
               ₹{maxLossTrade?.pnl.toFixed(2)}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               at {new Date(maxLossTrade?.entry_time || "").toLocaleTimeString()}
             </p>
           </div>
         </div>
       </Card>
       
-      <Card className="p-4">
-        <h3 className="text-lg font-medium mb-4">Daily Risk Metrics</h3>
-        <div className="space-y-4">
+      <Card className="p-6">
+        <h3 className="text-xl font-semibold mb-6">Daily Risk Metrics</h3>
+        <div className="space-y-6">
           <div>
-            <p className="text-sm text-muted-foreground">Worst Trading Day</p>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-sm font-medium text-muted-foreground mb-2">Worst Trading Day</p>
+            <p className="text-3xl font-bold text-red-600">
               ₹{dailyMaxLoss?.loss.toFixed(2)}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               on {dailyMaxLoss?.date}
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Average Trade Duration</p>
-            <p className="text-2xl font-bold">
+            <p className="text-sm font-medium text-muted-foreground mb-2">Average Trade Duration</p>
+            <p className="text-3xl font-bold">
               {Math.round(validTrades.reduce((sum, trade) => {
                 const duration = new Date(trade.exit_time!).getTime() - new Date(trade.entry_time!).getTime();
                 return sum + duration;
