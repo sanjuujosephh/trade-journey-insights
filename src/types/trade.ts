@@ -13,6 +13,7 @@ export interface Trade {
   stop_loss?: number | null;
   symbol: string;
   notes?: string | null;
+  chart_link?: string | null;
   
   // Trade Execution Details
   strike_price?: number | null;

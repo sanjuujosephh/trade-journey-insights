@@ -276,8 +276,12 @@ export default function TradeEntry() {
       exit_price: formData.exit_price ? parseFloat(formData.exit_price) : null,
       quantity: formData.quantity ? parseFloat(formData.quantity) : null,
       stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
+      strike_price: formData.strike_price ? parseFloat(formData.strike_price) : null,
       entry_time: formData.entry_time || null,
       exit_time: formData.exit_time || null,
+      followed_plan: Boolean(formData.followed_plan),
+      is_fomo_trade: Boolean(formData.is_fomo_trade),
+      is_impulsive_exit: Boolean(formData.is_impulsive_exit),
     };
     
     try {
@@ -673,7 +677,7 @@ export default function TradeEntry() {
                 id="followed_plan"
                 checked={formData.followed_plan}
                 onCheckedChange={(checked) => 
-                  handleSelectChange("followed_plan", checked ? "true" : "false")
+                  handleSelectChange("followed_plan", checked === true)
                 }
               />
               <Label htmlFor="followed_plan">Followed Trading Plan</Label>
@@ -683,7 +687,7 @@ export default function TradeEntry() {
                 id="is_fomo_trade"
                 checked={formData.is_fomo_trade}
                 onCheckedChange={(checked) => 
-                  handleSelectChange("is_fomo_trade", checked ? "true" : "false")
+                  handleSelectChange("is_fomo_trade", checked === true)
                 }
               />
               <Label htmlFor="is_fomo_trade">FOMO Trade</Label>
@@ -693,7 +697,7 @@ export default function TradeEntry() {
                 id="is_impulsive_exit"
                 checked={formData.is_impulsive_exit}
                 onCheckedChange={(checked) => 
-                  handleSelectChange("is_impulsive_exit", checked ? "true" : "false")
+                  handleSelectChange("is_impulsive_exit", checked === true)
                 }
               />
               <Label htmlFor="is_impulsive_exit">Impulsive Exit</Label>
