@@ -23,7 +23,7 @@ type TradeWithProfile = {
   profiles: {
     username: string;
     avatar_url: string | null;
-  } | null;
+  };
   exit_price: number | null;
   entry_price: number;
   quantity: number;
@@ -38,7 +38,7 @@ export function Leaderboard() {
         .from("trades")
         .select(`
           user_id,
-          profiles:profiles(username, avatar_url),
+          profiles (username, avatar_url),
           exit_price,
           entry_price,
           quantity,
@@ -49,7 +49,7 @@ export function Leaderboard() {
       if (!data) return [];
 
       // Group trades by user and calculate statistics
-      const userStats = data.reduce((acc: { [key: string]: any }, trade: TradeWithProfile) => {
+      const userStats = data.reduce<Record<string, any>>((acc, trade) => {
         const userId = trade.user_id;
         if (!acc[userId]) {
           acc[userId] = {
@@ -62,7 +62,7 @@ export function Leaderboard() {
         }
         
         acc[userId].total_trades++;
-        if (trade.outcome === 'win') {
+        if (trade.outcome === 'profit') {
           acc[userId].winning_trades++;
         }
         
@@ -80,7 +80,8 @@ export function Leaderboard() {
           profit_loss: stats.profit_loss,
           avatar_url: stats.avatar_url,
         }))
-        .sort((a, b) => b.profit_loss - a.profit_loss);
+        .sort((a, b) => b.profit_loss - a.profit_loss)
+        .slice(0, 10); // Show only top 10 performers
     },
   });
 
