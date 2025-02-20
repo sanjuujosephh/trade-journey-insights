@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import { Button } from "./components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "./contexts/ThemeProvider";
+import { TraderInfo } from "./components/TraderInfo";
 
 const queryClient = new QueryClient();
 
@@ -40,9 +41,11 @@ function Navigation() {
   return (
     <div className="h-16 border-b bg-background sticky top-0 z-10">
       <div className="flex h-full items-center px-4 container mx-auto">
-        <div className="flex-1" />
+        <div className="flex-1">
+          <TraderInfo />
+        </div>
         <div className="flex-1 flex justify-center">
-          <h1 className="text-xl font-bold">OneTradeJournal</h1>
+          <h1 className="text-xl font-bold">Onetradejournal</h1>
         </div>
         <div className="flex-1 flex justify-end items-center space-x-4">
           <ThemeToggle />

@@ -155,10 +155,10 @@ export function AuthForm() {
               minLength={6}
             />
           </div>
-          <div className="text-sm text-muted-foreground">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
-              <span className="font-semibold">Special Launch Offer:</span>
-              <span className="text-2xl font-bold">₹199</span>
+          <div className="text-sm">
+            <div className="inline-flex items-center gap-2">
+              <span className="font-semibold text-primary">Special Launch Offer:</span>
+              <span className="text-2xl font-bold text-primary">₹199</span>
               <span className="text-sm text-muted-foreground">/month</span>
             </div>
           </div>
