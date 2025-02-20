@@ -6,13 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trade } from "@/types/trade";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Loader2 } from "lucide-react"; // Changed this import
+import { AlertCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AIAnalysisPanel } from "./AIAnalysisPanel";
 import { TimePerformanceHeatmap } from "./analytics/TimePerformanceHeatmap";
 import { IntradayRiskMetrics } from "./analytics/IntradayRiskMetrics";
 import { TradeFlowChart } from "./analytics/TradeFlowChart";
 import { FOTradeTable } from "./analytics/FOTradeTable";
+import { TradingCalendar } from "./analytics/TradingCalendar";
 import { useState } from "react";
 import { calculateStats } from "@/utils/tradeCalculations";
 import { ErrorBoundary } from "./ErrorBoundary";
@@ -96,6 +97,7 @@ export default function Analytics() {
           <div className="flex items-center justify-between">
             <TabsList>
               <TabsTrigger value="performance">Trade Performance</TabsTrigger>
+              <TabsTrigger value="calendar">Calendar View</TabsTrigger>
               <TabsTrigger value="analysis">Trade Analysis</TabsTrigger>
               <TabsTrigger value="history">Trade History</TabsTrigger>
             </TabsList>
@@ -147,6 +149,12 @@ export default function Analytics() {
 
             <TradeFlowChart trades={trades} />
             <TimePerformanceHeatmap trades={trades} />
+          </TabsContent>
+
+          <TabsContent value="calendar">
+            <Card>
+              <TradingCalendar />
+            </Card>
           </TabsContent>
 
           <TabsContent value="analysis" className="space-y-6">
