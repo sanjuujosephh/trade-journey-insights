@@ -46,7 +46,7 @@ export default function Analytics() {
   });
 
   const { mutate: analyzeTradesWithAI, isPending: isAnalyzing } = useMutation({
-    mutationFn: async (options: AnalyzeTradesOptions = {}): Promise<AIAnalysisResponse> => {
+    mutationFn: async (options: AnalyzeTradesOptions): Promise<AIAnalysisResponse> => {
       const response = await supabase.functions.invoke('analyze-trades', {
         body: { trades, days: options.days || 1 }
       });
@@ -106,19 +106,33 @@ export default function Analytics() {
               <TabsTrigger value="history">Trade History</TabsTrigger>
             </TabsList>
             
-            <Button
-              onClick={() => analyzeTradesWithAI()}
-              disabled={isAnalyzing || trades.length === 0}
-            >
-              {isAnalyzing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing Today's Trades...
-                </>
-              ) : (
-                "Analyze Today's Trades"
-              )}
-            </Button>
+            <div className="flex gap-4">
+              <Button
+                onClick={() => analyzeTradesWithAI({ days: 1 })}
+                disabled={isAnalyzing || trades.length === 0}
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing Today's Trades...
+                  </>
+                ) : (
+                  "Analyze Today's Trades"
+                )}
+              </Button>
+              <Button
+                onClick={() => analyzeTradesWithAI({ days: 7 })}
+                disabled={isAnalyzing || trades.length === 0}
+              >
+                Analyze Last 7 Days
+              </Button>
+              <Button
+                onClick={() => analyzeTradesWithAI({ days: 30 })}
+                disabled={isAnalyzing || trades.length === 0}
+              >
+                Analyze This Month
+              </Button>
+            </div>
           </div>
 
           <TabsContent value="performance" className="space-y-6">
@@ -170,7 +184,6 @@ export default function Analytics() {
             <FOTradeTable 
               trades={trades} 
               onReplayTrade={(trade) => {
-                // Implement trade replay functionality
                 console.log("Replaying trade:", trade);
               }} 
             />
