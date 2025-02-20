@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AVAILABLE_SYMBOLS } from "@/components/TradeEntry";
+import { AVAILABLE_SYMBOLS } from "@/constants/tradeConstants";
 import { useToast } from "@/hooks/use-toast";
 import { OptionsFields } from "./basic-info/OptionsFields";
 import { TimeFields } from "./basic-info/TimeFields";

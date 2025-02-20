@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AVAILABLE_STRATEGIES } from "@/components/TradeEntry";
+import { AVAILABLE_STRATEGIES } from "@/constants/tradeConstants";
 import { OptionPricePosition } from "./behavioral/OptionPricePosition";
 
 interface MarketContextProps {
