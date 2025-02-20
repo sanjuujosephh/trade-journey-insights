@@ -36,7 +36,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
         value: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
         label: timeString
       });
-      currentTime += 5; // Increment by 5 minutes instead of 1
+      currentTime += 1; // Increment by 1 minute
     }
     return options;
   };
