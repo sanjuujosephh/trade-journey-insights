@@ -6,14 +6,22 @@ interface TradeChartProps {
 export function TradeChart({ chartLink }: TradeChartProps) {
   if (!chartLink) return null;
 
+  // Convert base64 or URL to proper format
+  const imageUrl = chartLink.startsWith('data:') ? chartLink : chartLink;
+
   return (
     <div className="w-full bg-card p-4 rounded-lg border">
       <h4 className="text-sm font-medium mb-2">Chart</h4>
       <div className="relative aspect-[16/9] rounded-md overflow-hidden border border-border">
         <img 
-          src={chartLink} 
+          src={imageUrl} 
           alt="TradingView Chart"
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+          className="w-full h-full object-contain bg-background"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.onerror = null; // Prevent infinite loop
+            target.src = '/placeholder.svg'; // Fallback image
+          }}
         />
         <a
           href={chartLink}
