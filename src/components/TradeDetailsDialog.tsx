@@ -7,44 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-interface Trade {
-  id: string;
-  symbol: string;
-  entry_price: number;
-  exit_price?: number;
-  quantity?: number;
-  trade_type: string;
-  stop_loss?: number;
-  strategy?: string;
-  outcome: string;
-  notes?: string;
-  timestamp: string;
-  entry_time?: string;
-  exit_time?: string;
-  strike_price?: number;
-  option_type?: string;
-  market_condition?: string;
-  timeframe?: string;
-  trade_direction?: string;
-  planned_risk_reward?: number;
-  actual_risk_reward?: number;
-  planned_target?: number;
-  exit_reason?: string;
-  slippage?: number;
-  post_exit_price?: number;
-  exit_efficiency?: number;
-  confidence_level?: number;
-  entry_emotion?: string;
-  exit_emotion?: string;
-  followed_plan?: boolean;
-  plan_deviation_reason?: string;
-  is_fomo_trade?: boolean;
-  is_impulsive_exit?: boolean;
-  ai_feedback?: string;
-  what_if_analysis?: Record<string, any>;
-  chart_link?: string;
-}
+import { Trade } from "@/types/trade";
 
 interface TradeDetailsDialogProps {
   trade: Trade | null;
