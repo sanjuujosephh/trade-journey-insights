@@ -297,6 +297,9 @@ export default function TradeEntry() {
       followed_plan: formData.followed_plan,
       is_fomo_trade: formData.is_fomo_trade,
       is_impulsive_exit: formData.is_impulsive_exit,
+      strategy: formData.strategy || null,
+      notes: formData.notes || null,
+      chart_link: formData.chart_link || null
     } as Omit<Trade, 'id' | 'timestamp'>;
     
     try {

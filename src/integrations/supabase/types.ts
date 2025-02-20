@@ -46,6 +46,7 @@ export type Database = {
           call_iv: number | null
           chart_link: string | null
           confidence_level: number | null
+          ema_position: string | null
           entry_emotion: string | null
           entry_price: number
           entry_time: string | null
@@ -80,6 +81,7 @@ export type Database = {
           trade_type: string
           user_id: string
           vix: number | null
+          vwap_position: string | null
           what_if_analysis: Json | null
         }
         Insert: {
@@ -88,6 +90,7 @@ export type Database = {
           call_iv?: number | null
           chart_link?: string | null
           confidence_level?: number | null
+          ema_position?: string | null
           entry_emotion?: string | null
           entry_price: number
           entry_time?: string | null
@@ -122,6 +125,7 @@ export type Database = {
           trade_type: string
           user_id: string
           vix?: number | null
+          vwap_position?: string | null
           what_if_analysis?: Json | null
         }
         Update: {
@@ -130,6 +134,7 @@ export type Database = {
           call_iv?: number | null
           chart_link?: string | null
           confidence_level?: number | null
+          ema_position?: string | null
           entry_emotion?: string | null
           entry_price?: number
           entry_time?: string | null
@@ -164,6 +169,7 @@ export type Database = {
           trade_type?: string
           user_id?: string
           vix?: number | null
+          vwap_position?: string | null
           what_if_analysis?: Json | null
         }
         Relationships: []
