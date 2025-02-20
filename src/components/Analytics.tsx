@@ -14,6 +14,8 @@ import { TradeFlowChart } from "./analytics/TradeFlowChart";
 import { FOTradeTable } from "./analytics/FOTradeTable";
 import { useState } from "react";
 import { calculateStats } from "@/utils/tradeCalculations";
+import { ErrorBoundary } from "./ErrorBoundary";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 interface AIAnalysisResponse {
   analysis: string;
@@ -24,7 +26,7 @@ export default function Analytics() {
   const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
 
-  const { data: trades = [] } = useQuery<Trade[]>({
+  const { data: trades = [], isLoading: isLoadingTrades, error: tradesError } = useQuery<Trade[]>({
     queryKey: ['trades'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -68,10 +70,26 @@ export default function Analytics() {
     },
   });
 
+  if (isLoadingTrades) return <LoadingSpinner />;
+  
+  if (tradesError) {
+    return (
+      <div className="p-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error loading trades</AlertTitle>
+          <AlertDescription>
+            {tradesError instanceof Error ? tradesError.message : 'Failed to load trades'}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   const stats = calculateStats(trades);
 
   return (
-    <>
+    <ErrorBoundary>
       <div className="h-full p-6">
         <Tabs defaultValue="performance" className="h-full space-y-6">
           <div className="flex items-center justify-between">
@@ -152,6 +170,6 @@ export default function Analytics() {
         onClose={() => setIsAnalysisPanelOpen(false)}
         analysis={currentAnalysis}
       />
-    </>
+    </ErrorBoundary>
   );
 }
