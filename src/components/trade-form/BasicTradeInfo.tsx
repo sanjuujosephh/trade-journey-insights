@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { AVAILABLE_SYMBOLS } from "@/components/TradeEntry";
 import { useToast } from "@/hooks/use-toast";
+import { OptionPricePosition } from "./behavioral/OptionPricePosition";
 
 interface BasicTradeInfoProps {
   formData: any;
@@ -77,6 +78,24 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="trade_notes">Trade Notes</Label>
+        <Input
+          id="trade_notes"
+          name="trade_notes"
+          placeholder="Enter your trade notes here"
+          value={formData.trade_notes}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <OptionPricePosition 
+          formData={formData} 
+          handleSelectChange={handleSelectChange} 
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
