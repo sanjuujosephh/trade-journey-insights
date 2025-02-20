@@ -3,26 +3,14 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 
 interface BehavioralAnalysisProps {
-  formData: {
-    followed_plan: boolean;
-    plan_deviation_reason: string;
-    is_fomo_trade: boolean;
-    is_impulsive_exit: boolean;
-    notes: string;
-    chart_link: string;
-  };
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  formData: any;
+  handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleSelectChange: (name: string, value: boolean) => void;
 }
 
-export function BehavioralAnalysis({
-  formData,
-  handleChange,
-  handleSelectChange,
-}: BehavioralAnalysisProps) {
+export function BehavioralAnalysis({ formData, handleChange, handleSelectChange }: BehavioralAnalysisProps) {
   return (
     <Card className="p-6 space-y-4 glass">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

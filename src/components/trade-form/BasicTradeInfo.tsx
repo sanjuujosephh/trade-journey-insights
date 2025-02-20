@@ -9,30 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const AVAILABLE_SYMBOLS = ["NIFTY", "BANKNIFTY"] as const;
+import { AVAILABLE_SYMBOLS } from "@/components/TradeEntry";
 
 interface BasicTradeInfoProps {
-  formData: {
-    symbol: string;
-    trade_type: string;
-    trade_direction: string;
-    strike_price: string;
-    option_type: string;
-    entry_price: string;
-    exit_price: string;
-    entry_time: string;
-    exit_time: string;
-  };
+  formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }
 
-export function BasicTradeInfo({
-  formData,
-  handleChange,
-  handleSelectChange,
-}: BasicTradeInfoProps) {
+export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: BasicTradeInfoProps) {
   return (
     <Card className="p-6 space-y-4 glass">
       <div className="space-y-2">

@@ -1,5 +1,4 @@
 
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -9,24 +8,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Maximize2, Image } from "lucide-react";
-import type { Trade } from "@/types/trade";
+import { Trade } from "@/types/trade";
 
 interface TradeHistoryProps {
   trades: Trade[];
   onEdit: (trade: Trade) => void;
   onDelete: (id: string) => void;
   onViewDetails: (trade: Trade) => void;
-  formatDisplayTime: (dateString: string) => string;
 }
 
-export function TradeHistory({
-  trades,
-  onEdit,
-  onDelete,
-  onViewDetails,
-  formatDisplayTime,
-}: TradeHistoryProps) {
+export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeHistoryProps) {
+  const formatDisplayTime = (dateString: string) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   return (
     <Card className="p-6 glass">
       <h3 className="text-lg font-medium mb-4">Trade History</h3>
@@ -81,7 +83,9 @@ export function TradeHistory({
                 </TableCell>
                 <TableCell>
                   <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs ${
+                    className={`inline-block px-2 py-1 rounded-full text
+
+-xs ${
                       trade.outcome === "profit"
                         ? "bg-green-100 text-green-800"
                         : trade.outcome === "loss"

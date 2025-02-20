@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,25 +11,12 @@ import {
 } from "@/components/ui/select";
 
 interface MarketContextProps {
-  formData: {
-    market_condition: string;
-    timeframe: string;
-    confidence_level: string;
-    entry_emotion: string;
-    exit_emotion: string;
-    stop_loss: string;
-    planned_target: string;
-    exit_reason: string;
-  };
+  formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }
 
-export function MarketContext({
-  formData,
-  handleChange,
-  handleSelectChange,
-}: MarketContextProps) {
+export function MarketContext({ formData, handleChange, handleSelectChange }: MarketContextProps) {
   return (
     <Card className="p-6 space-y-4 glass">
       <div className="space-y-2">
