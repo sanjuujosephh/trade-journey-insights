@@ -27,11 +27,11 @@ export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
       </div>
       <div className="flex flex-col gap-2">
         <Button variant="outline" className="gap-2">
-          <Video className="h-4 w-4" />
+          <Video className="h-4 w-4 border rounded border-input p-0.5" />
           <span>Watch Journal Overview</span>
         </Button>
         <Button variant="outline" className="gap-2">
-          <Youtube className="h-4 w-4" />
+          <Youtube className="h-4 w-4 border rounded border-input p-0.5" />
           <span>Subscribe To Daily Shorts</span>
         </Button>
       </div>

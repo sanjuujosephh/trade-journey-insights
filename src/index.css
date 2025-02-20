@@ -91,7 +91,12 @@
   @apply h-[300px] w-full;
 }
 
-/* Auth tabs specific styles */
+/* Apply styles only to auth form tabs */
+.auth-tabs [role="tab"] {
+  position: relative;
+}
+
 .auth-tabs [role="tab"][data-state="active"] {
-  @apply bg-background shadow-sm;
+  background-color: hsl(var(--background));
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
