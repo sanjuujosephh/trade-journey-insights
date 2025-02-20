@@ -33,7 +33,7 @@ export function TraderInfo() {
             className={`border-2 border-background ${bgColors[index]}`}
           >
             <img 
-              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`} 
+              src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`} 
               alt={`Trader ${index + 1}`} 
             />
           </Avatar>
