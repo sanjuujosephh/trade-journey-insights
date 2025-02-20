@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -85,6 +84,21 @@ export function TradeDetailsDialog({ trade, open, onOpenChange }: TradeDetailsDi
                 )}
               </div>
             </div>
+
+            {/* Chart Link */}
+            {trade.chart_link && (
+              <div className="col-span-2">
+                <h4 className="text-sm font-medium">Chart</h4>
+                <a
+                  href={trade.chart_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline text-sm mt-2 inline-block"
+                >
+                  View TradingView Chart
+                </a>
+              </div>
+            )}
 
             <div>
               <h4 className="text-sm font-medium">Exit Details</h4>

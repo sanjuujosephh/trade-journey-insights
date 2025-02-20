@@ -159,6 +159,18 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
         handleDateTimeChange={handleDateTimeChange}
         timeOptions={timeOptions}
       />
+
+      <div className="space-y-2">
+        <Label htmlFor="chart_link">TradingView Chart Link</Label>
+        <Input
+          id="chart_link"
+          name="chart_link"
+          type="url"
+          placeholder="https://www.tradingview.com/chart/..."
+          value={formData.chart_link}
+          onChange={handleChange}
+        />
+      </div>
     </Card>
   );
 }
