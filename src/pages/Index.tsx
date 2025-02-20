@@ -203,8 +203,8 @@ export default function Index() {
               <TabsTrigger value="calendar">Calendar View</TabsTrigger>
               <TabsTrigger value="analysis">Trade Analysis</TabsTrigger>
               <TabsTrigger value="ai-analysis">AI Analysis</TabsTrigger>
-              <TabsTrigger value="history">Trade History</TabsTrigger>
               <TabsTrigger value="learning">Learning Center</TabsTrigger>
+              <TabsTrigger value="history">Trade History</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
             </TabsList>
             

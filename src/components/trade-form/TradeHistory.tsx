@@ -83,9 +83,7 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeH
                 </TableCell>
                 <TableCell>
                   <span
-                    className={`inline-block px-2 py-1 rounded-full text
-
--xs ${
+                    className={`inline-block px-2 py-1 rounded-full text-xs ${
                       trade.outcome === "profit"
                         ? "bg-green-100 text-green-800"
                         : trade.outcome === "loss"
