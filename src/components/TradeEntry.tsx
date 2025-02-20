@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
-import { Trade } from "@/types/trade";
+import { Trade, FormData } from "@/types/trade";
 import { BasicTradeInfo } from "./trade-form/BasicTradeInfo";
 import { MarketContext } from "./trade-form/MarketContext";
 import { BehavioralAnalysis } from "./trade-form/BehavioralAnalysis";
@@ -12,65 +12,8 @@ import { TradeHistory } from "./trade-form/TradeHistory";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { ImportTrades } from "./trade-form/ImportTrades";
-
-export const AVAILABLE_SYMBOLS = ["NIFTY", "BANKNIFTY"] as const;
-export const AVAILABLE_STRATEGIES = [
-  "Trendline Breakout",
-  "Trendline Breakdown",
-  "Trendline Support",
-  "Trendline Resistance",
-  "Volume Area",
-  "Fibonacci Retracement",
-  "Channel Trading",
-  "Support and Resistance Zones",
-  "VWAP Reversion",
-  "Breakout and Retest",
-  "Volume Profile Analysis",
-  "Price Action Trading",
-  "Trend Following Strategy",
-  "Liquidity Grab Strategy",
-  "Fair Value Gap Strategy",
-  "Breakout Fakeout Strategy"
-] as const;
-
-interface FormData {
-  symbol: string;
-  entry_price: string;
-  exit_price: string;
-  quantity: string;
-  trade_type: string;
-  stop_loss: string;
-  strategy: string;
-  outcome: 'profit' | 'loss' | 'breakeven';
-  notes: string;
-  entry_time: string;
-  exit_time: string;
-  chart_link: string;
-  vix: string;
-  call_iv: string;
-  put_iv: string;
-  strike_price: string;
-  option_type: 'call' | 'put' | '';
-  market_condition: 'trending' | 'ranging' | 'news_driven' | 'volatile' | '';
-  timeframe: '1min' | '5min' | '15min' | '1hr' | '';
-  trade_direction: 'long' | 'short' | '';
-  planned_risk_reward: string;
-  actual_risk_reward: string;
-  planned_target: string;
-  exit_reason: 'stop_loss' | 'target' | 'manual' | 'time_based' | '';
-  slippage: string;
-  post_exit_price: string;
-  exit_efficiency: string;
-  confidence_level: string;
-  entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
-  exit_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
-  followed_plan: boolean;
-  plan_deviation_reason: string;
-  is_fomo_trade: boolean;
-  is_impulsive_exit: boolean;
-  vwap_position: string;
-  ema_position: string;
-}
+import { validateTradeForm } from "./trade-form/TradeFormValidation";
+import { AVAILABLE_SYMBOLS, AVAILABLE_STRATEGIES } from "@/constants/tradeConstants";
 
 const emptyFormData: FormData = {
   symbol: AVAILABLE_SYMBOLS[0],
@@ -120,16 +63,6 @@ export default function TradeEntry() {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-      }
-    };
-    getUser();
-  }, []);
-
   const { data: trades = [], isLoading } = useQuery({
     queryKey: ['trades'],
     queryFn: async () => {
@@ -143,7 +76,7 @@ export default function TradeEntry() {
     },
   });
 
-  const checkTradeLimit = async (date: string) => {
+  const checkTradeLimit = useCallback(async (date: string) => {
     if (editingId) return true;
     
     const dayStart = new Date(date);
@@ -165,7 +98,17 @@ export default function TradeEntry() {
     }
     
     return (existingTrades?.length || 0) < 2;
-  };
+  }, [editingId, userId]);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    getUser();
+  }, []);
 
   const addTrade = useMutation({
     mutationFn: async (newTrade: Omit<Trade, 'id' | 'timestamp'>) => {
@@ -189,11 +132,12 @@ export default function TradeEntry() {
         title: "Success",
         description: "Trade logged successfully!"
       });
+      setFormData(emptyFormData);
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to log trade. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to log trade",
         variant: "destructive"
       });
     }
@@ -217,38 +161,13 @@ export default function TradeEntry() {
         title: "Success",
         description: "Trade updated successfully!"
       });
+      setEditingId(null);
+      setFormData(emptyFormData);
     },
     onError: (error) => {
-      console.error('Update error:', error);
       toast({
         title: "Error",
-        description: "Failed to update trade. Please try again.",
-        variant: "destructive"
-      });
-    }
-  });
-
-  const deleteTrade = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('trades')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['trades'] });
-      toast({
-        title: "Success",
-        description: "Trade deleted successfully!"
-      });
-    },
-    onError: (error) => {
-      console.error('Delete error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete trade. Please try again.",
+        description: "Failed to update trade",
         variant: "destructive"
       });
     }
@@ -257,10 +176,11 @@ export default function TradeEntry() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!userId) {
+    const errors = validateTradeForm(formData);
+    if (errors.length > 0) {
       toast({
-        title: "Error",
-        description: "You must be logged in to log trades.",
+        title: "Validation Error",
+        description: errors.join(", "),
         variant: "destructive"
       });
       return;
@@ -305,79 +225,30 @@ export default function TradeEntry() {
     try {
       if (editingId) {
         await updateTrade.mutateAsync({ id: editingId, ...tradeData });
-        setEditingId(null);
       } else {
         await addTrade.mutateAsync(tradeData);
       }
-      
-      setFormData(emptyFormData);
     } catch (error) {
       console.error('Form submission error:', error);
     }
   };
 
-  const handleChange = (
+  const handleChange = useCallback((
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }, []);
 
-  const handleSelectChange = (name: string, value: string | boolean) => {
-    setFormData((prev) => ({
+  const handleSelectChange = useCallback((name: string, value: string | boolean) => {
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleEdit = (trade: Trade) => {
-    setFormData({
-      symbol: trade.symbol,
-      entry_price: trade.entry_price.toString(),
-      exit_price: trade.exit_price?.toString() ?? "",
-      quantity: trade.quantity?.toString() ?? "",
-      trade_type: trade.trade_type,
-      stop_loss: trade.stop_loss?.toString() ?? "",
-      strategy: trade.strategy ?? "",
-      outcome: trade.outcome,
-      notes: trade.notes ?? "",
-      entry_time: trade.entry_time ? formatToLocalDateTime(trade.entry_time) : "",
-      exit_time: trade.exit_time ? formatToLocalDateTime(trade.exit_time) : "",
-      chart_link: trade.chart_link ?? "",
-      vix: trade.vix?.toString() ?? "",
-      call_iv: trade.call_iv?.toString() ?? "",
-      put_iv: trade.put_iv?.toString() ?? "",
-      strike_price: trade.strike_price?.toString() ?? "",
-      option_type: trade.option_type ?? "",
-      vwap_position: trade.vwap_position ?? "",
-      ema_position: trade.ema_position ?? "",
-      market_condition: trade.market_condition ?? "",
-      timeframe: trade.timeframe ?? "",
-      trade_direction: trade.trade_direction ?? "",
-      planned_risk_reward: trade.planned_risk_reward?.toString() ?? "",
-      actual_risk_reward: trade.actual_risk_reward?.toString() ?? "",
-      planned_target: trade.planned_target?.toString() ?? "",
-      exit_reason: trade.exit_reason ?? "",
-      slippage: trade.slippage?.toString() ?? "",
-      post_exit_price: trade.post_exit_price?.toString() ?? "",
-      exit_efficiency: trade.exit_efficiency?.toString() ?? "",
-      confidence_level: trade.confidence_level?.toString() ?? "",
-      entry_emotion: trade.entry_emotion ?? "",
-      exit_emotion: trade.exit_emotion ?? "",
-      followed_plan: trade.followed_plan ?? true,
-      plan_deviation_reason: trade.plan_deviation_reason ?? "",
-      is_fomo_trade: trade.is_fomo_trade ?? false,
-      is_impulsive_exit: trade.is_impulsive_exit ?? false,
-    });
-    setEditingId(trade.id);
-  };
-
-  const handleDelete = async (id: string) => {
-    await deleteTrade.mutateAsync(id);
-  };
+  }, []);
 
   const formatToLocalDateTime = (dateString: string) => {
     if (!dateString) return "";
@@ -432,12 +303,69 @@ export default function TradeEntry() {
         {trades.length > 0 && (
           <TradeHistory
             trades={trades}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onViewDetails={(trade) => {
-              setSelectedTrade(trade);
-              setIsDialogOpen(true);
+            onEdit={(trade) => {
+              setFormData({
+                symbol: trade.symbol,
+                entry_price: trade.entry_price.toString(),
+                exit_price: trade.exit_price?.toString() ?? "",
+                quantity: trade.quantity?.toString() ?? "",
+                trade_type: trade.trade_type,
+                stop_loss: trade.stop_loss?.toString() ?? "",
+                strategy: trade.strategy ?? "",
+                outcome: trade.outcome,
+                notes: trade.notes ?? "",
+                entry_time: trade.entry_time ? formatToLocalDateTime(trade.entry_time) : "",
+                exit_time: trade.exit_time ? formatToLocalDateTime(trade.exit_time) : "",
+                chart_link: trade.chart_link ?? "",
+                vix: trade.vix?.toString() ?? "",
+                call_iv: trade.call_iv?.toString() ?? "",
+                put_iv: trade.put_iv?.toString() ?? "",
+                strike_price: trade.strike_price?.toString() ?? "",
+                option_type: trade.option_type ?? "",
+                vwap_position: trade.vwap_position ?? "",
+                ema_position: trade.ema_position ?? "",
+                market_condition: trade.market_condition ?? "",
+                timeframe: trade.timeframe ?? "",
+                trade_direction: trade.trade_direction ?? "",
+                planned_risk_reward: trade.planned_risk_reward?.toString() ?? "",
+                actual_risk_reward: trade.actual_risk_reward?.toString() ?? "",
+                planned_target: trade.planned_target?.toString() ?? "",
+                exit_reason: trade.exit_reason ?? "",
+                slippage: trade.slippage?.toString() ?? "",
+                post_exit_price: trade.post_exit_price?.toString() ?? "",
+                exit_efficiency: trade.exit_efficiency?.toString() ?? "",
+                confidence_level: trade.confidence_level?.toString() ?? "",
+                entry_emotion: trade.entry_emotion ?? "",
+                exit_emotion: trade.exit_emotion ?? "",
+                followed_plan: trade.followed_plan ?? true,
+                plan_deviation_reason: trade.plan_deviation_reason ?? "",
+                is_fomo_trade: trade.is_fomo_trade ?? false,
+                is_impulsive_exit: trade.is_impulsive_exit ?? false,
+              });
+              setEditingId(trade.id);
             }}
+            onDelete={async (id) => {
+              const { error } = await supabase
+                .from('trades')
+                .delete()
+                .eq('id', id);
+              
+              if (error) {
+                toast({
+                  title: "Error",
+                  description: "Failed to delete trade",
+                  variant: "destructive"
+                });
+                return;
+              }
+              
+              queryClient.invalidateQueries({ queryKey: ['trades'] });
+              toast({
+                title: "Success",
+                description: "Trade deleted successfully!"
+              });
+            }}
+            onViewDetails={setSelectedTrade}
           />
         )}
 
