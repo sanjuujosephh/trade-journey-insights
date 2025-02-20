@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { AVAILABLE_SYMBOLS } from "@/components/TradeEntry";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
 
 interface BasicTradeInfoProps {
   formData: any;
@@ -21,59 +20,41 @@ interface BasicTradeInfoProps {
 
 export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: BasicTradeInfoProps) {
   const { toast } = useToast();
-  const [entryDate, setEntryDate] = useState("");
-  const [entryTime, setEntryTime] = useState("");
-  const [exitDate, setExitDate] = useState("");
-  const [exitTime, setExitTime] = useState("");
 
-  useEffect(() => {
-    if (formData.entry_time) {
-      const date = new Date(formData.entry_time);
-      setEntryDate(date.toLocaleDateString('en-US'));
-      setEntryTime(date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }));
-    }
-    if (formData.exit_time) {
-      const date = new Date(formData.exit_time);
-      setExitDate(date.toLocaleDateString('en-US'));
-      setExitTime(date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }));
-    }
-  }, [formData.entry_time, formData.exit_time]);
+  const generateTimeOptions = () => {
+    const options = [];
+    let currentTime = 9 * 60 + 15; // Start at 9:15 AM
+    const endTime = 15 * 60 + 25; // End at 3:25 PM
 
-  const validateTime = (timeStr: string) => {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    const timeInMinutes = hours * 60 + minutes;
-    const marketOpenTime = 9 * 60 + 15;  // 9:15 AM
-    const marketCloseTime = 15 * 60 + 25; // 3:25 PM
-
-    if (timeInMinutes < marketOpenTime) {
-      return "09:15";
-    } else if (timeInMinutes > marketCloseTime) {
-      return "15:25";
+    while (currentTime <= endTime) {
+      const hours = Math.floor(currentTime / 60);
+      const minutes = currentTime % 60;
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours > 12 ? hours - 12 : hours;
+      const timeString = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+      options.push({
+        value: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
+        label: timeString
+      });
+      currentTime += 1; // Add 1 minute
     }
-    return timeStr;
+    return options;
   };
 
-  const handleTimeInputChange = (e: React.ChangeEvent<HTMLInputElement>, isEntry: boolean) => {
-    const { value } = e.target;
-    const [dateStr, timeStr] = value.split('T');
+  const timeOptions = generateTimeOptions();
+
+  const handleDateTimeChange = (type: 'entry' | 'exit', timeStr: string) => {
+    const currentDate = formData[`${type}_time`]?.split('T')[0] || new Date().toISOString().split('T')[0];
+    const newDateTime = `${currentDate}T${timeStr}`;
     
-    if (timeStr) {
-      const validatedTime = validateTime(timeStr);
-      if (validatedTime !== timeStr) {
-        toast({
-          description: `Time adjusted to market ${timeStr < "09:15" ? "opening" : "closing"} hours`,
-        });
+    const syntheticEvent = {
+      target: {
+        name: `${type}_time`,
+        value: newDateTime
       }
-      
-      const newDateTime = `${dateStr}T${validatedTime}`;
-      const syntheticEvent = {
-        target: {
-          name: isEntry ? "entry_time" : "exit_time",
-          value: newDateTime
-        }
-      } as React.ChangeEvent<HTMLInputElement>;
-      handleChange(syntheticEvent);
-    }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    handleChange(syntheticEvent);
   };
 
   return (
@@ -198,28 +179,66 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="entry_time">Entry Time</Label>
-          <Input
-            id="entry_time"
-            name="entry_time"
-            type="datetime-local"
-            value={formData.entry_time}
-            onChange={(e) => handleTimeInputChange(e, true)}
-            min={`${formData.entry_time?.split('T')[0] || new Date().toISOString().split('T')[0]}T09:15`}
-            max={`${formData.entry_time?.split('T')[0] || new Date().toISOString().split('T')[0]}T15:25`}
-            required
-          />
+          <div className="flex gap-4">
+            <Input
+              type="date"
+              value={formData.entry_time?.split('T')[0] || ''}
+              onChange={(e) => {
+                const timeStr = formData.entry_time?.split('T')[1] || '09:15';
+                const newDateTime = `${e.target.value}T${timeStr}`;
+                handleChange({
+                  target: { name: 'entry_time', value: newDateTime }
+                } as React.ChangeEvent<HTMLInputElement>);
+              }}
+              required
+            />
+            <Select
+              value={formData.entry_time?.split('T')[1] || ''}
+              onValueChange={(value) => handleDateTimeChange('entry', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent className="h-[200px] overflow-y-auto">
+                {timeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="exit_time">Exit Time</Label>
-          <Input
-            id="exit_time"
-            name="exit_time"
-            type="datetime-local"
-            value={formData.exit_time}
-            onChange={(e) => handleTimeInputChange(e, false)}
-            min={`${formData.exit_time?.split('T')[0] || new Date().toISOString().split('T')[0]}T09:15`}
-            max={`${formData.exit_time?.split('T')[0] || new Date().toISOString().split('T')[0]}T15:25`}
-          />
+          <div className="flex gap-4">
+            <Input
+              type="date"
+              value={formData.exit_time?.split('T')[0] || ''}
+              onChange={(e) => {
+                const timeStr = formData.exit_time?.split('T')[1] || '09:15';
+                const newDateTime = `${e.target.value}T${timeStr}`;
+                handleChange({
+                  target: { name: 'exit_time', value: newDateTime }
+                } as React.ChangeEvent<HTMLInputElement>);
+              }}
+            />
+            <Select
+              value={formData.exit_time?.split('T')[1] || ''}
+              onValueChange={(value) => handleDateTimeChange('exit', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent className="h-[200px] overflow-y-auto">
+                {timeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
     </Card>
