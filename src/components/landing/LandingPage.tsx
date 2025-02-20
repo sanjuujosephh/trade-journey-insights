@@ -22,7 +22,7 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
 
 export function LandingPage() {
   return (
-    <div className="w-full overflow-auto">
+    <div className="w-full overflow-auto bg-background">
       <div className="container py-8">
         <div className="mx-auto max-w-5xl text-center mb-8">
           <h1 className="text-4xl font-bold tracking-tight mb-6">
@@ -32,16 +32,18 @@ export function LandingPage() {
             Track your trades, analyze your performance, and become a better trader with
             our comprehensive suite of tools.
           </p>
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
-            <span className="font-semibold">Special Launch Offer:</span>
-            <span className="text-2xl font-bold">₹199</span>
-            <span className="text-sm text-muted-foreground">/month</span>
-          </div>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 mb-8">
+        <div className="grid gap-8 md:grid-cols-2 mb-16">
           <Card className="p-6">
             <h2 className="text-2xl font-bold mb-6">Start Your Journey</h2>
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
+                <span className="font-semibold">Special Launch Offer:</span>
+                <span className="text-2xl font-bold">₹199</span>
+                <span className="text-sm text-muted-foreground">/month</span>
+              </div>
+            </div>
             <AuthForm />
           </Card>
           <Card className="p-6">
@@ -52,17 +54,6 @@ export function LandingPage() {
             <Leaderboard />
           </Card>
         </div>
-
-        <Card className="p-6 mb-16">
-          <h2 className="text-2xl font-bold mb-6">Experience Our Powerful Dashboard</h2>
-          <div className="rounded-lg overflow-hidden border shadow-lg">
-            <img 
-              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d" 
-              alt="Trading Journal Dashboard" 
-              className="w-full object-cover"
-            />
-          </div>
-        </Card>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
