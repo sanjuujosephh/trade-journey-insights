@@ -31,22 +31,40 @@ export function TradeFlowChart({ trades }: TradeFlowChartProps) {
       <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={tradingData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-            <XAxis dataKey="time" />
-            <YAxis />
-            <Tooltip />
+            <XAxis 
+              dataKey="time" 
+              tick={{ fontSize: 11, fill: '#6b7280' }}
+              tickLine={{ stroke: '#9ca3af' }}
+            />
+            <YAxis 
+              tick={{ fontSize: 11, fill: '#6b7280' }}
+              tickLine={{ stroke: '#9ca3af' }}
+              tickFormatter={(value) => `₹${value}`}
+            />
+            <Tooltip 
+              contentStyle={{ 
+                fontSize: '12px',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                border: '1px solid #e5e7eb',
+                borderRadius: '6px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            />
             <Line
               type="stepAfter"
               dataKey="entryPrice"
               stroke="#2563eb"
-              dot={{ r: 6, fill: "#2563eb" }}
+              dot={{ r: 4, fill: "#2563eb" }}
               name="Entry Price"
+              strokeWidth={1.5}
             />
             <Line
               type="stepAfter"
               dataKey="exitPrice"
               stroke="#10b981"
-              dot={{ r: 6, fill: "#10b981" }}
+              dot={{ r: 4, fill: "#10b981" }}
               name="Exit Price"
+              strokeWidth={1.5}
             />
             {tradingData.map((trade, index) => (
               <ReferenceLine
@@ -54,6 +72,7 @@ export function TradeFlowChart({ trades }: TradeFlowChartProps) {
                 x={trade.time}
                 stroke={trade.pnl > 0 ? "#10b981" : "#ef4444"}
                 strokeDasharray="3 3"
+                strokeWidth={1}
               />
             ))}
           </LineChart>

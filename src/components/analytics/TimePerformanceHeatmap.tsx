@@ -47,6 +47,8 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
               name="Hour"
               domain={[9, 15]}
               tickFormatter={(hour) => `${hour}:00`}
+              tick={{ fontSize: 11, fill: '#6b7280' }}
+              tickLine={{ stroke: '#9ca3af' }}
             />
             <YAxis
               type="number"
@@ -55,8 +57,17 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
               unit="%"
               domain={[0, 1]}
               tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+              tick={{ fontSize: 11, fill: '#6b7280' }}
+              tickLine={{ stroke: '#9ca3af' }}
             />
             <Tooltip
+              contentStyle={{ 
+                fontSize: '12px',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                border: '1px solid #e5e7eb',
+                borderRadius: '6px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
               formatter={(value: any, name: string) => {
                 if (name === "Win Rate") return `${(Number(value) * 100).toFixed(1)}%`;
                 return value;
@@ -75,7 +86,7 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
           </ScatterChart>
         </ResponsiveContainer>
       </div>
-      <div className="text-sm text-muted-foreground mt-2">
+      <div className="text-xs text-muted-foreground mt-2">
         Circle size represents number of trades, color intensity represents P/L magnitude
       </div>
     </Card>
