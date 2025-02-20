@@ -34,7 +34,7 @@ export function Leaderboard() {
   const { data: leaderboard, isLoading } = useQuery({
     queryKey: ["leaderboard"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: trades, error } = await supabase
         .from("trades")
         .select(`
           user_id,
@@ -46,10 +46,10 @@ export function Leaderboard() {
         `)
         .throwOnError();
 
-      if (!data) return [];
+      if (!trades) return [];
 
       // Group trades by user and calculate statistics
-      const userStats = data.reduce<Record<string, any>>((acc, trade) => {
+      const userStats = trades.reduce<Record<string, any>>((acc, trade) => {
         const userId = trade.user_id;
         if (!acc[userId]) {
           acc[userId] = {
@@ -73,13 +73,14 @@ export function Leaderboard() {
         return acc;
       }, {});
 
-      return Object.values(userStats)
-        .map((stats: any): LeaderboardEntry => ({
-          username: stats.username,
-          win_rate: (stats.winning_trades / stats.total_trades) * 100 || 0,
-          profit_loss: stats.profit_loss,
-          avatar_url: stats.avatar_url,
-        }))
+      const leaderboardEntries: LeaderboardEntry[] = Object.values(userStats).map((stats) => ({
+        username: stats.username,
+        win_rate: (stats.winning_trades / stats.total_trades) * 100 || 0,
+        profit_loss: stats.profit_loss,
+        avatar_url: stats.avatar_url,
+      }));
+
+      return leaderboardEntries
         .sort((a, b) => b.profit_loss - a.profit_loss)
         .slice(0, 10); // Show only top 10 performers
     },
@@ -103,7 +104,7 @@ export function Leaderboard() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {leaderboard?.map((entry) => (
+        {leaderboard.map((entry) => (
           <TableRow key={entry.username}>
             <TableCell className="flex items-center gap-2">
               <Avatar className="h-6 w-6">

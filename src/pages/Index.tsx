@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,7 +16,7 @@ import {
   BarChart3,
   BookOpenText,
   BrainCircuit,
-  ChartLineUp,
+  ChartLine,
   Clock,
   CopyCheck,
   LineChart,
@@ -79,7 +78,7 @@ export default function Index() {
             description="Log your trades in real-time and keep track of your positions with ease."
           />
           <FeatureCard
-            icon={<ChartLineUp className="h-8 w-8" />}
+            icon={<ChartLine className="h-8 w-8" />}
             title="Performance Metrics"
             description="Track your win rate, profit/loss ratio, and other key performance indicators."
           />
