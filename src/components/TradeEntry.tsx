@@ -72,7 +72,7 @@ const emptyFormData: FormData = {
   entry_price: "",
   exit_price: "",
   quantity: "",
-  trade_type: "intraday",
+  trade_type: "options",
   stop_loss: "",
   strategy: "",
   outcome: "profit",
