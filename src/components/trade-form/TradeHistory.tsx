@@ -58,3 +58,79 @@ export function TradeHistory({
                   ₹{trade.entry_price}
                   {trade.entry_time && (
                     <div className="text-xs text-muted-foreground">
+                      {formatDisplayTime(trade.entry_time)}
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {trade.exit_price ? (
+                    <>
+                      ₹{trade.exit_price}
+                      {trade.exit_time && (
+                        <div className="text-xs text-muted-foreground">
+                          {formatDisplayTime(trade.exit_time)}
+                        </div>
+                      )}
+                    </>
+                  ) : '-'}
+                </TableCell>
+                <TableCell>
+                  {trade.exit_price && trade.quantity
+                    ? `₹${((Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity)).toFixed(2)}`
+                    : '-'}
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-block px-2 py-1 rounded-full text-xs ${
+                      trade.outcome === "profit"
+                        ? "bg-green-100 text-green-800"
+                        : trade.outcome === "loss"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {trade.outcome}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(trade)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onDelete(trade.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onViewDetails(trade)}
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </Button>
+                    {trade.chart_link && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => window.open(trade.chart_link, '_blank')}
+                      >
+                        <Image className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </Card>
+  );
+}
