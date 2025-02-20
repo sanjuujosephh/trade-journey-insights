@@ -12,11 +12,11 @@ export function TradeChart({ chartLink }: TradeChartProps) {
   return (
     <div className="w-full bg-card p-4 rounded-lg border">
       <h4 className="text-sm font-medium mb-2">Chart</h4>
-      <div className="relative aspect-[16/9] rounded-md overflow-hidden border border-border">
+      <div className="relative rounded-md overflow-hidden border border-border">
         <img 
           src={imageUrl} 
           alt="TradingView Chart"
-          className="w-full h-full object-contain bg-background"
+          className="w-full h-auto object-contain bg-background"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.onerror = null; // Prevent infinite loop
