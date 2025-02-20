@@ -76,6 +76,25 @@ const emptyFormData = {
   entry_time: "",
   exit_time: "",
   chart_link: "",
+  strike_price: "",
+  option_type: "",
+  market_condition: "",
+  timeframe: "",
+  trade_direction: "",
+  planned_risk_reward: "",
+  actual_risk_reward: "",
+  planned_target: "",
+  exit_reason: "",
+  slippage: "",
+  post_exit_price: "",
+  exit_efficiency: "",
+  confidence_level: "",
+  entry_emotion: "",
+  exit_emotion: "",
+  followed_plan: true,
+  plan_deviation_reason: "",
+  is_fomo_trade: false,
+  is_impulsive_exit: false,
 };
 
 export default function TradeEntry() {
@@ -345,6 +364,76 @@ export default function TradeEntry() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
+                <Label htmlFor="trade_type">Trade Type</Label>
+                <Select
+                  name="trade_type"
+                  value={formData.trade_type}
+                  onValueChange={(value) => handleSelectChange("trade_type", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="intraday">Intraday</SelectItem>
+                    <SelectItem value="options">Options</SelectItem>
+                    <SelectItem value="futures">Futures</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="trade_direction">Direction</Label>
+                <Select
+                  name="trade_direction"
+                  value={formData.trade_direction}
+                  onValueChange={(value) => handleSelectChange("trade_direction", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select direction" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="long">Long</SelectItem>
+                    <SelectItem value="short">Short</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {formData.trade_type === "options" && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="strike_price">Strike Price</Label>
+                  <Input
+                    id="strike_price"
+                    name="strike_price"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={formData.strike_price}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="option_type">Option Type</Label>
+                  <Select
+                    name="option_type"
+                    value={formData.option_type}
+                    onValueChange={(value) => handleSelectChange("option_type", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="call">Call</SelectItem>
+                      <SelectItem value="put">Put</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="entry_price">Entry Price</Label>
                 <Input
                   id="entry_price"
@@ -394,20 +483,110 @@ export default function TradeEntry() {
                 />
               </div>
             </div>
+          </Card>
+
+          <Card className="p-6 space-y-4 glass">
+            <div className="space-y-2">
+              <Label htmlFor="market_condition">Market Condition</Label>
+              <Select
+                name="market_condition"
+                value={formData.market_condition}
+                onValueChange={(value) => handleSelectChange("market_condition", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select condition" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="trending">Trending</SelectItem>
+                  <SelectItem value="ranging">Ranging</SelectItem>
+                  <SelectItem value="news_driven">News Driven</SelectItem>
+                  <SelectItem value="volatile">Volatile</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity</Label>
-                <Input
-                  id="quantity"
-                  name="quantity"
-                  type="number"
-                  step="1"
-                  placeholder="0"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                />
+                <Label htmlFor="timeframe">Timeframe</Label>
+                <Select
+                  name="timeframe"
+                  value={formData.timeframe}
+                  onValueChange={(value) => handleSelectChange("timeframe", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select timeframe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1min">1 min</SelectItem>
+                    <SelectItem value="5min">5 min</SelectItem>
+                    <SelectItem value="15min">15 min</SelectItem>
+                    <SelectItem value="1hr">1 hour</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="confidence_level">Confidence Level</Label>
+                <Select
+                  name="confidence_level"
+                  value={formData.confidence_level}
+                  onValueChange={(value) => handleSelectChange("confidence_level", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <SelectItem key={level} value={level.toString()}>
+                        {level}/5
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="entry_emotion">Entry Emotion</Label>
+                <Select
+                  name="entry_emotion"
+                  value={formData.entry_emotion}
+                  onValueChange={(value) => handleSelectChange("entry_emotion", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select emotion" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="neutral">Neutral</SelectItem>
+                    <SelectItem value="fear">Fear</SelectItem>
+                    <SelectItem value="greed">Greed</SelectItem>
+                    <SelectItem value="fomo">FOMO</SelectItem>
+                    <SelectItem value="revenge">Revenge</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exit_emotion">Exit Emotion</Label>
+                <Select
+                  name="exit_emotion"
+                  value={formData.exit_emotion}
+                  onValueChange={(value) => handleSelectChange("exit_emotion", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select emotion" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="neutral">Neutral</SelectItem>
+                    <SelectItem value="fear">Fear</SelectItem>
+                    <SelectItem value="greed">Greed</SelectItem>
+                    <SelectItem value="fomo">FOMO</SelectItem>
+                    <SelectItem value="revenge">Revenge</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="stop_loss">Stop Loss</Label>
                 <Input
@@ -420,99 +599,115 @@ export default function TradeEntry() {
                   onChange={handleChange}
                 />
               </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 space-y-4 glass">
-            <div className="space-y-2">
-              <Label htmlFor="chart_link">TradingView Chart Link</Label>
-              <Input
-                id="chart_link"
-                name="chart_link"
-                type="url"
-                placeholder="https://www.tradingview.com/chart/..."
-                value={formData.chart_link}
-                onChange={handleChange}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="planned_target">Target</Label>
+                <Input
+                  id="planned_target"
+                  name="planned_target"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={formData.planned_target}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="trade_type">Trade Type</Label>
+              <Label htmlFor="exit_reason">Exit Reason</Label>
               <Select
-                name="trade_type"
-                value={formData.trade_type}
-                onValueChange={(value) => handleSelectChange("trade_type", value)}
+                name="exit_reason"
+                value={formData.exit_reason}
+                onValueChange={(value) => handleSelectChange("exit_reason", value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select trade type" />
+                  <SelectValue placeholder="Select reason" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="intraday">Intraday</SelectItem>
-                  <SelectItem value="swing">Swing</SelectItem>
-                  <SelectItem value="options">Options</SelectItem>
-                  <SelectItem value="futures">Futures</SelectItem>
-                  <SelectItem value="crypto">Crypto</SelectItem>
+                  <SelectItem value="target">Hit Target</SelectItem>
+                  <SelectItem value="stop_loss">Stop Loss</SelectItem>
+                  <SelectItem value="manual">Manual Exit</SelectItem>
+                  <SelectItem value="time_based">Time Based</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="strategy">Strategy</Label>
-              <Select
-                name="strategy"
-                value={formData.strategy}
-                onValueChange={(value) => handleSelectChange("strategy", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select strategy" />
-                </SelectTrigger>
-                <SelectContent>
-                  {AVAILABLE_STRATEGIES.map((strategy) => (
-                    <SelectItem key={strategy} value={strategy}>
-                      {strategy}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="outcome">Outcome</Label>
-              <Select
-                name="outcome"
-                value={formData.outcome}
-                onValueChange={(value) => handleSelectChange("outcome", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select outcome" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="profit">Profit</SelectItem>
-                  <SelectItem value="loss">Loss</SelectItem>
-                  <SelectItem value="breakeven">Breakeven</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
-                name="notes"
-                placeholder="Add your trade notes..."
-                value={formData.notes}
-                onChange={handleChange}
-                className="h-[100px]"
-              />
             </div>
           </Card>
         </div>
 
+        <Card className="p-6 space-y-4 glass">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="followed_plan"
+                checked={formData.followed_plan}
+                onCheckedChange={(checked) => 
+                  handleSelectChange("followed_plan", checked ? "true" : "false")
+                }
+              />
+              <Label htmlFor="followed_plan">Followed Trading Plan</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="is_fomo_trade"
+                checked={formData.is_fomo_trade}
+                onCheckedChange={(checked) => 
+                  handleSelectChange("is_fomo_trade", checked ? "true" : "false")
+                }
+              />
+              <Label htmlFor="is_fomo_trade">FOMO Trade</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="is_impulsive_exit"
+                checked={formData.is_impulsive_exit}
+                onCheckedChange={(checked) => 
+                  handleSelectChange("is_impulsive_exit", checked ? "true" : "false")
+                }
+              />
+              <Label htmlFor="is_impulsive_exit">Impulsive Exit</Label>
+            </div>
+          </div>
+
+          {!formData.followed_plan && (
+            <div className="space-y-2">
+              <Label htmlFor="plan_deviation_reason">Reason for Not Following Plan</Label>
+              <Textarea
+                id="plan_deviation_reason"
+                name="plan_deviation_reason"
+                value={formData.plan_deviation_reason}
+                onChange={handleChange}
+                placeholder="Why did you deviate from your trading plan?"
+              />
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="notes">Trade Notes</Label>
+            <Textarea
+              id="notes"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              placeholder="Add your trade notes..."
+              className="h-[100px]"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="chart_link">Chart Link</Label>
+            <Input
+              id="chart_link"
+              name="chart_link"
+              type="url"
+              placeholder="TradingView chart link..."
+              value={formData.chart_link}
+              onChange={handleChange}
+            />
+          </div>
+        </Card>
+
         <div className="flex justify-end">
-          <Button 
-            type="submit" 
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground"
-          >
+          <Button type="submit" className="w-full sm:w-auto">
             {editingId ? "Update Trade" : "Log Trade"}
           </Button>
         </div>
