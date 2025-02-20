@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +17,14 @@ interface BasicTradeInfoProps {
 }
 
 export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: BasicTradeInfoProps) {
+  const getDateString = (dateTimeStr: string | undefined) => {
+    if (!dateTimeStr) {
+      const today = new Date();
+      return today.toISOString().split('T')[0];
+    }
+    return dateTimeStr.split('T')[0];
+  };
+
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const [datePart, timePart] = value.split('T');
@@ -84,7 +91,6 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="intraday">Intraday</SelectItem>
               <SelectItem value="options">Options</SelectItem>
               <SelectItem value="futures">Futures</SelectItem>
             </SelectContent>
@@ -177,8 +183,8 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             id="entry_time"
             name="entry_time"
             type="datetime-local"
-            min={`${formData.entry_time?.split('T')[0]}T09:15`}
-            max={`${formData.entry_time?.split('T')[0]}T15:25`}
+            min={`${getDateString(formData.entry_time)}T09:15`}
+            max={`${getDateString(formData.entry_time)}T15:25`}
             value={formData.entry_time}
             onChange={handleTimeChange}
             required
@@ -190,8 +196,8 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             id="exit_time"
             name="exit_time"
             type="datetime-local"
-            min={`${formData.exit_time?.split('T')[0]}T09:15`}
-            max={`${formData.exit_time?.split('T')[0]}T15:25`}
+            min={`${getDateString(formData.exit_time)}T09:15`}
+            max={`${getDateString(formData.exit_time)}T15:25`}
             value={formData.exit_time}
             onChange={handleTimeChange}
           />
