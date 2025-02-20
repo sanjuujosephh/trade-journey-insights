@@ -212,6 +212,10 @@ export default function TradeEntry() {
       timeframe: formData.timeframe || null,
       trade_direction: formData.trade_direction || null,
       exit_reason: formData.exit_reason || null,
+      slippage: formData.slippage || null,
+      post_exit_price: formData.post_exit_price || null,
+      exit_efficiency: formData.exit_efficiency || null,
+      confidence_level: formData.confidence_level || null,
       entry_emotion: formData.entry_emotion || null,
       exit_emotion: formData.exit_emotion || null,
       followed_plan: formData.followed_plan,
@@ -364,17 +368,25 @@ export default function TradeEntry() {
                 description: "Trade deleted successfully!"
               });
             }}
-            onViewDetails={setSelectedTrade}
+            onViewDetails={(trade) => {
+              setSelectedTrade(trade);
+              setIsDialogOpen(true);
+            }}
           />
         )}
 
         <ImportTrades />
 
-        <TradeDetailsDialog
-          trade={selectedTrade}
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-        />
+        {selectedTrade && (
+          <TradeDetailsDialog
+            trade={selectedTrade}
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) setSelectedTrade(null);
+            }}
+          />
+        )}
       </div>
     </ErrorBoundary>
   );

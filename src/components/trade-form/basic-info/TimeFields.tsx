@@ -40,8 +40,9 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
             value={formData.entry_time?.split('T')[1] || ''}
             onValueChange={(value) => handleDateTimeChange('entry', value)}
           >
-            <SelectTrigger className="w-[48px]">
-              <Clock className="h-4 w-4" />
+            <SelectTrigger className="w-[100px]">
+              <Clock className="h-[1.2rem] w-[1.2rem] mr-2" />
+              <SelectValue placeholder="Time" />
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((option) => (
@@ -76,8 +77,9 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
             value={formData.exit_time?.split('T')[1] || ''}
             onValueChange={(value) => handleDateTimeChange('exit', value)}
           >
-            <SelectTrigger className="w-[48px]">
-              <Clock className="h-4 w-4" />
+            <SelectTrigger className="w-[100px]">
+              <Clock className="h-[1.2rem] w-[1.2rem] mr-2" />
+              <SelectValue placeholder="Time" />
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((option) => (
