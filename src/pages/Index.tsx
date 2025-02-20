@@ -46,7 +46,7 @@ export default function Index() {
 
   if (!user) {
     return (
-      <div className="min-h-screen overflow-y-auto pb-8">
+      <div className="w-full">
         <div className="container py-8">
           <div className="mx-auto max-w-5xl text-center mb-16">
             <h1 className="text-4xl font-bold tracking-tight mb-6">

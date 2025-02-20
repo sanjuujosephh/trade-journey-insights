@@ -56,15 +56,15 @@
   * {
     @apply border-border;
   }
-  html, body {
-    @apply h-full;
+  html {
+    @apply h-full overflow-y-auto;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply min-h-full bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   #root {
-    @apply h-full;
+    @apply min-h-full;
   }
 }
 

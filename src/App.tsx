@@ -16,7 +16,7 @@ function Navigation() {
   const { user } = useAuth();
   
   return (
-    <div className="h-16 border-b">
+    <div className="h-16 border-b bg-background">
       <div className="flex h-full items-center px-4 container mx-auto">
         <div className="ml-auto flex items-center space-x-4">
           {user ? <UserMenu /> : <AuthModal />}
@@ -28,9 +28,9 @@ function Navigation() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="min-h-screen flex flex-col">
       <Navigation />
-      <main className="h-[calc(100vh-4rem)]">
+      <main className="flex-1">
         {children}
       </main>
     </div>
