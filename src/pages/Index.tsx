@@ -202,6 +202,7 @@ export default function Index() {
               <TabsTrigger value="performance">Trade Performance</TabsTrigger>
               <TabsTrigger value="calendar">Calendar View</TabsTrigger>
               <TabsTrigger value="analysis">Trade Analysis</TabsTrigger>
+              <TabsTrigger value="ai-analysis">AI Analysis</TabsTrigger>
               <TabsTrigger value="history">Trade History</TabsTrigger>
               <TabsTrigger value="learning">Learning Center</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
@@ -214,42 +215,6 @@ export default function Index() {
 
               <TabsContent value="performance" className="mt-0 h-full">
                 <div className="p-6">
-                  <div className="flex justify-end space-x-4 mb-6">
-                    <Button
-                      onClick={() => {
-                        fetchTrades(1);
-                        analyzeTradesWithAI({ days: 1 });
-                      }}
-                      disabled={isAnalyzing}
-                    >
-                      {isAnalyzing ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Analyzing Today's Trades...
-                        </>
-                      ) : (
-                        "Analyze Today's Trades"
-                      )}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        fetchTrades(7);
-                        analyzeTradesWithAI({ days: 7 });
-                      }}
-                      disabled={isAnalyzing}
-                    >
-                      Analyze Last 7 Days' Trades
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        fetchTrades(30);
-                        analyzeTradesWithAI({ days: 30 });
-                      }}
-                      disabled={isAnalyzing}
-                    >
-                      Analyze This Month's Trades
-                    </Button>
-                  </div>
                   <TradeFlowChart trades={trades} />
                   <TimePerformanceHeatmap trades={trades} />
                 </div>
@@ -265,6 +230,45 @@ export default function Index() {
                 <div className="p-6 space-y-6">
                   <IntradayRiskMetrics trades={trades} />
                   <TimePerformanceHeatmap trades={trades} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="ai-analysis" className="mt-0 h-full">
+                <div className="p-6">
+                  <div className="flex justify-end space-x-4 mb-6">
+                    <Button
+                      onClick={() => analyzeTradesWithAI({ days: 1 })}
+                      disabled={isAnalyzing || trades.length === 0}
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Analyzing Today's Trades...
+                        </>
+                      ) : (
+                        "Analyze Today's Trades"
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => analyzeTradesWithAI({ days: 7 })}
+                      disabled={isAnalyzing || trades.length === 0}
+                    >
+                      Analyze Last 7 Days' Trades
+                    </Button>
+                    <Button
+                      onClick={() => analyzeTradesWithAI({ days: 30 })}
+                      disabled={isAnalyzing || trades.length === 0}
+                    >
+                      Analyze This Month's Trades
+                    </Button>
+                  </div>
+                  <Card className="p-6">
+                    {currentAnalysis ? (
+                      <p className="whitespace-pre-wrap">{currentAnalysis}</p>
+                    ) : (
+                      <p className="text-muted-foreground">Select an analysis option above to get AI insights about your trades.</p>
+                    )}
+                  </Card>
                 </div>
               </TabsContent>
 

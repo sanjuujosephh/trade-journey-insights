@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Clock } from "lucide-react";
 
 interface TimeFieldsProps {
   formData: any;
@@ -21,7 +22,7 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
         <Label htmlFor="entry_time">Entry Time</Label>
-        <div className="flex gap-4">
+        <div className="flex gap-2">
           <Input
             type="date"
             value={formData.entry_time?.split('T')[0] || ''}
@@ -33,13 +34,15 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
               } as React.ChangeEvent<HTMLInputElement>);
             }}
             required
+            className="flex-1"
           />
           <Select
             value={formData.entry_time?.split('T')[1] || ''}
             onValueChange={(value) => handleDateTimeChange('entry', value)}
           >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Select time" />
+            <SelectTrigger className="w-[80px]">
+              <Clock className="h-4 w-4" />
+              <SelectValue placeholder="Time" />
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((option) => (
@@ -57,7 +60,7 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
       </div>
       <div className="space-y-2">
         <Label htmlFor="exit_time">Exit Time</Label>
-        <div className="flex gap-4">
+        <div className="flex gap-2">
           <Input
             type="date"
             value={formData.exit_time?.split('T')[0] || ''}
@@ -68,13 +71,15 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
                 target: { name: 'exit_time', value: newDateTime }
               } as React.ChangeEvent<HTMLInputElement>);
             }}
+            className="flex-1"
           />
           <Select
             value={formData.exit_time?.split('T')[1] || ''}
             onValueChange={(value) => handleDateTimeChange('exit', value)}
           >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Select time" />
+            <SelectTrigger className="w-[80px]">
+              <Clock className="h-4 w-4" />
+              <SelectValue placeholder="Time" />
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((option) => (

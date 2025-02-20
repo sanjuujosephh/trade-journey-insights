@@ -39,7 +39,7 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
               dataKey="date"
               type="category"
               name="Date"
-              tick={{ fontSize: 11, fill: '#6b7280', angle: -45, textAnchor: 'end' }}
+              tick={{ fontSize: 11, fill: '#6b7280', textAnchor: 'end' }}
               tickLine={{ stroke: '#9ca3af' }}
               interval={0}
             />
