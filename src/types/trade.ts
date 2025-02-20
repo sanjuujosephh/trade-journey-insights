@@ -15,10 +15,14 @@ export interface Trade {
   notes?: string | null;
   chart_link?: string | null;
   
-  // New fields for VIX and IV
+  // VIX and IV fields
   vix?: number | null;
   call_iv?: number | null;
   put_iv?: number | null;
+  
+  // New Option Price Position fields
+  vwap_position?: 'above_vwap' | 'below_vwap' | null;
+  ema_position?: 'above_20ema' | 'below_20ema' | null;
   
   // Trade Execution Details
   strike_price?: number | null;
@@ -67,11 +71,13 @@ export interface FormData {
   entry_time: string;
   exit_time: string;
   chart_link: string;
-  
-  // New fields for VIX and IV
   vix: string;
   call_iv: string;
   put_iv: string;
+  
+  // New Option Price Position fields
+  vwap_position: 'above_vwap' | 'below_vwap' | '';
+  ema_position: 'above_20ema' | 'below_20ema' | '';
   
   strike_price: string;
   option_type: 'call' | 'put' | '';

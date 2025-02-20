@@ -68,6 +68,8 @@ interface FormData {
   plan_deviation_reason: string;
   is_fomo_trade: boolean;
   is_impulsive_exit: boolean;
+  vwap_position: string;
+  ema_position: string;
 }
 
 const emptyFormData: FormData = {
@@ -88,6 +90,8 @@ const emptyFormData: FormData = {
   put_iv: "",
   strike_price: "",
   option_type: "",
+  vwap_position: "",
+  ema_position: "",
   market_condition: "",
   timeframe: "",
   trade_direction: "",
@@ -272,6 +276,8 @@ export default function TradeEntry() {
       vix: formData.vix ? parseFloat(formData.vix) : null,
       call_iv: formData.call_iv ? parseFloat(formData.call_iv) : null,
       put_iv: formData.put_iv ? parseFloat(formData.put_iv) : null,
+      vwap_position: formData.vwap_position || null,
+      ema_position: formData.ema_position || null,
       planned_risk_reward: formData.planned_risk_reward ? parseFloat(formData.planned_risk_reward) : null,
       actual_risk_reward: formData.actual_risk_reward ? parseFloat(formData.actual_risk_reward) : null,
       planned_target: formData.planned_target ? parseFloat(formData.planned_target) : null,
@@ -343,6 +349,8 @@ export default function TradeEntry() {
       put_iv: trade.put_iv ?? "",
       strike_price: trade.strike_price?.toString() ?? "",
       option_type: trade.option_type ?? "",
+      vwap_position: trade.vwap_position ?? "",
+      ema_position: trade.ema_position ?? "",
       market_condition: trade.market_condition ?? "",
       timeframe: trade.timeframe ?? "",
       trade_direction: trade.trade_direction ?? "",
