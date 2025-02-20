@@ -19,7 +19,9 @@ export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
           </AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Trading Journal</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Hey {profile?.first_name || 'There'}
+          </h1>
           <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
         </div>
       </div>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -13,6 +14,9 @@ import { RefreshCw } from "lucide-react";
 
 type Profile = {
   username: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  phone_number: string | null;
   twitter_id: string | null;
   telegram_id: string | null;
   avatar_url: string | null;
@@ -32,6 +36,9 @@ export function ProfileSettings() {
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile>({
     username: "",
+    first_name: "",
+    last_name: "",
+    phone_number: "",
     twitter_id: "",
     telegram_id: "",
     avatar_url: null,
@@ -45,7 +52,7 @@ export function ProfileSettings() {
       if (!user?.id) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("username, twitter_id, telegram_id, avatar_url")
+        .select("username, first_name, last_name, phone_number, twitter_id, telegram_id, avatar_url")
         .eq("id", user.id)
         .single();
 
@@ -58,7 +65,6 @@ export function ProfileSettings() {
   useEffect(() => {
     if (profileData) {
       setProfile(profileData);
-      // Try to extract current avatar style from URL
       const currentUrl = profileData.avatar_url || "";
       const styleMatch = currentUrl.match(/\/([^/]+)\/svg/);
       if (styleMatch && AVATAR_STYLES.some(s => s.value === styleMatch[1])) {
@@ -114,6 +120,9 @@ export function ProfileSettings() {
         .from("profiles")
         .update({
           username: profile.username,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          phone_number: profile.phone_number,
           twitter_id: profile.twitter_id,
           telegram_id: profile.telegram_id,
         })
@@ -210,6 +219,38 @@ export function ProfileSettings() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                value={profile.first_name || ""}
+                onChange={(e) => setProfile(prev => ({ ...prev, first_name: e.target.value }))}
+                placeholder="Enter your first name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                value={profile.last_name || ""}
+                onChange={(e) => setProfile(prev => ({ ...prev, last_name: e.target.value }))}
+                placeholder="Enter your last name"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber">Phone Number</Label>
+            <Input
+              id="phoneNumber"
+              value={profile.phone_number || ""}
+              onChange={(e) => setProfile(prev => ({ ...prev, phone_number: e.target.value }))}
+              placeholder="Enter your phone number"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <Input

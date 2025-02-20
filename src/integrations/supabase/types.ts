@@ -13,7 +13,10 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          first_name: string | null
           id: string
+          last_name: string | null
+          phone_number: string | null
           telegram_id: string | null
           twitter_id: string | null
           updated_at: string
@@ -22,7 +25,10 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          first_name?: string | null
           id: string
+          last_name?: string | null
+          phone_number?: string | null
           telegram_id?: string | null
           twitter_id?: string | null
           updated_at?: string
@@ -31,7 +37,10 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
+          phone_number?: string | null
           telegram_id?: string | null
           twitter_id?: string | null
           updated_at?: string
