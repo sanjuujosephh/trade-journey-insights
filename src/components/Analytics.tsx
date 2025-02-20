@@ -23,6 +23,10 @@ interface AIAnalysisResponse {
   analysis: string;
 }
 
+interface AnalyzeTradesOptions {
+  days?: number;
+}
+
 export default function Analytics() {
   const { toast } = useToast();
   const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
@@ -42,9 +46,9 @@ export default function Analytics() {
   });
 
   const { mutate: analyzeTradesWithAI, isPending: isAnalyzing } = useMutation({
-    mutationFn: async (): Promise<AIAnalysisResponse> => {
+    mutationFn: async (options: AnalyzeTradesOptions = {}): Promise<AIAnalysisResponse> => {
       const response = await supabase.functions.invoke('analyze-trades', {
-        body: { trades }
+        body: { trades, days: options.days || 1 }
       });
       
       if (response.error) {

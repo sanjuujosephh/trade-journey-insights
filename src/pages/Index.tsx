@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,11 +21,22 @@ import {
   CopyCheck,
   LineChart,
   Share2,
+  Loader2,
 } from "lucide-react";
+import { TradeFlowChart } from "@/components/analytics/TradeFlowChart";
+import { TimePerformanceHeatmap } from "@/components/analytics/TimePerformanceHeatmap";
+import { IntradayRiskMetrics } from "@/components/analytics/IntradayRiskMetrics";
+import { FOTradeTable } from "@/components/analytics/FOTradeTable";
+import { TradingCalendar } from "@/components/analytics/TradingCalendar";
+import { AIAnalysisPanel } from "@/components/AIAnalysisPanel";
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
   const { user } = useAuth();
+  const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
+  const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [trades, setTrades] = useState([]);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -43,6 +53,51 @@ export default function Index() {
     },
     enabled: !!user?.id
   });
+
+  const fetchTrades = async (days?: number) => {
+    setIsAnalyzing(true);
+    try {
+      let query = supabase
+        .from('trades')
+        .select('*')
+        .order('timestamp', { ascending: true });
+
+      if (days) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
+        query = query.gte('timestamp', startDate.toISOString());
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setTrades(data);
+    } catch (error) {
+      console.error('Error fetching trades:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const analyzeTradesWithAI = async (options: { days?: number }) => {
+    setIsAnalyzing(true);
+    try {
+      const response = await supabase.functions.invoke('analyze-trades', {
+        body: { trades, days: options.days || 1 }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to analyze trades');
+      }
+
+      setCurrentAnalysis(response.data.analysis);
+      setIsAnalysisPanelOpen(true);
+    } catch (error) {
+      console.error('AI Analysis error:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -154,64 +209,104 @@ export default function Index() {
         <Card className="h-[calc(100%-4.5rem)]">
           <Tabs defaultValue="trade-entry" className="h-full" onValueChange={setActiveTab}>
             <TabsList className="w-full justify-start border-b rounded-none px-6 bg-card">
-              <TabsTrigger
-                value="trade-entry"
-                className="data-[state=active]:bg-background"
-              >
-                Trade Entry
-              </TabsTrigger>
-              <TabsTrigger
-                value="analytics"
-                className="data-[state=active]:bg-background"
-              >
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger
-                value="learning"
-                className="data-[state=active]:bg-background"
-              >
-                Learning Center
-              </TabsTrigger>
-              <TabsTrigger
-                value="profile"
-                className="data-[state=active]:bg-background"
-              >
-                Profile
-              </TabsTrigger>
+              <TabsTrigger value="trade-entry">Trade Entry</TabsTrigger>
+              <TabsTrigger value="performance">Trade Performance</TabsTrigger>
+              <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+              <TabsTrigger value="analysis">Trade Analysis</TabsTrigger>
+              <TabsTrigger value="history">Trade History</TabsTrigger>
+              <TabsTrigger value="learning">Learning Center</TabsTrigger>
+              <TabsTrigger value="profile">Profile</TabsTrigger>
             </TabsList>
             
             <div className="h-[calc(100%-3rem)] overflow-y-auto">
-              <TabsContent
-                value="trade-entry"
-                className="mt-0 h-full"
-              >
+              <TabsContent value="trade-entry" className="mt-0 h-full">
                 <TradeEntry />
               </TabsContent>
 
-              <TabsContent
-                value="analytics"
-                className="mt-0 h-full"
-              >
-                <Analytics />
+              <TabsContent value="performance" className="mt-0 h-full">
+                <div className="p-6">
+                  <div className="flex justify-end space-x-4 mb-6">
+                    <Button
+                      onClick={() => {
+                        fetchTrades(1);
+                        analyzeTradesWithAI({ days: 1 });
+                      }}
+                      disabled={isAnalyzing}
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Analyzing Today's Trades...
+                        </>
+                      ) : (
+                        "Analyze Today's Trades"
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        fetchTrades(7);
+                        analyzeTradesWithAI({ days: 7 });
+                      }}
+                      disabled={isAnalyzing}
+                    >
+                      Analyze Last 7 Days' Trades
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        fetchTrades(30);
+                        analyzeTradesWithAI({ days: 30 });
+                      }}
+                      disabled={isAnalyzing}
+                    >
+                      Analyze This Month's Trades
+                    </Button>
+                  </div>
+                  <TradeFlowChart trades={trades} />
+                  <TimePerformanceHeatmap trades={trades} />
+                </div>
               </TabsContent>
 
-              <TabsContent
-                value="learning"
-                className="mt-0 h-full"
-              >
+              <TabsContent value="calendar" className="mt-0 h-full">
+                <Card>
+                  <TradingCalendar />
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="analysis" className="mt-0 h-full">
+                <div className="p-6 space-y-6">
+                  <IntradayRiskMetrics trades={trades} />
+                  <TimePerformanceHeatmap trades={trades} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="history" className="mt-0 h-full">
+                <div className="p-6">
+                  <FOTradeTable 
+                    trades={trades} 
+                    onReplayTrade={(trade) => {
+                      console.log("Replaying trade:", trade);
+                    }} 
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="learning" className="mt-0 h-full">
                 <LearningCenter />
               </TabsContent>
 
-              <TabsContent
-                value="profile"
-                className="mt-0 h-full p-6"
-              >
+              <TabsContent value="profile" className="mt-0 h-full p-6">
                 <ProfileSettings />
               </TabsContent>
             </div>
           </Tabs>
         </Card>
       </div>
+
+      <AIAnalysisPanel
+        isOpen={isAnalysisPanelOpen}
+        onClose={() => setIsAnalysisPanelOpen(false)}
+        analysis={currentAnalysis}
+      />
     </div>
   );
 }
