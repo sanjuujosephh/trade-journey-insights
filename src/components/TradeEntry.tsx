@@ -25,26 +25,9 @@ import { Pencil, Trash2, Maximize2, Image } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
+import { Trade } from "@/types/trade";
 
-interface Trade {
-  id: string;
-  symbol: string;
-  entry_price: number;
-  exit_price?: number;
-  quantity?: number;
-  trade_type: string;
-  stop_loss?: number;
-  strategy?: string;
-  outcome: string;
-  notes?: string;
-  timestamp: string;
-  entry_time?: string;
-  exit_time?: string;
-  user_id?: string;
-  chart_link?: string;
-}
-
-const AVAILABLE_SYMBOLS = ["NIFTY", "BANKNIFTY"];
+const AVAILABLE_SYMBOLS = ["NIFTY", "BANKNIFTY"] as const;
 const AVAILABLE_STRATEGIES = [
   "Trendline Breakout",
   "Trendline Breakdown",
@@ -62,9 +45,43 @@ const AVAILABLE_STRATEGIES = [
   "Liquidity Grab Strategy",
   "Fair Value Gap Strategy",
   "Breakout Fakeout Strategy"
-];
+] as const;
 
-const emptyFormData = {
+interface FormData {
+  symbol: string;
+  entry_price: string;
+  exit_price: string;
+  quantity: string;
+  trade_type: string;
+  stop_loss: string;
+  strategy: string;
+  outcome: 'profit' | 'loss' | 'breakeven';
+  notes: string;
+  entry_time: string;
+  exit_time: string;
+  chart_link: string;
+  strike_price: string;
+  option_type: string;
+  market_condition: string;
+  timeframe: string;
+  trade_direction: string;
+  planned_risk_reward: string;
+  actual_risk_reward: string;
+  planned_target: string;
+  exit_reason: string;
+  slippage: string;
+  post_exit_price: string;
+  exit_efficiency: string;
+  confidence_level: string;
+  entry_emotion: string;
+  exit_emotion: string;
+  followed_plan: boolean;
+  plan_deviation_reason: string;
+  is_fomo_trade: boolean;
+  is_impulsive_exit: boolean;
+}
+
+const emptyFormData: FormData = {
   symbol: AVAILABLE_SYMBOLS[0],
   entry_price: "",
   exit_price: "",
@@ -96,12 +113,12 @@ const emptyFormData = {
   plan_deviation_reason: "",
   is_fomo_trade: false,
   is_impulsive_exit: false,
-} as const;
+};
 
 export default function TradeEntry() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(emptyFormData);
+  const [formData, setFormData] = useState<FormData>(emptyFormData);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
@@ -131,7 +148,7 @@ export default function TradeEntry() {
   });
 
   const checkTradeLimit = async (date: string) => {
-    if (editingId) return true; // Allow editing existing trades
+    if (editingId) return true;
     
     const dayStart = new Date(date);
     dayStart.setHours(0, 0, 0, 0);
@@ -195,10 +212,7 @@ export default function TradeEntry() {
         .select()
         .single();
       
-      if (error) {
-        console.error('Error updating trade:', error);
-        throw error;
-      }
+      if (error) throw error;
       return data;
     },
     onSuccess: () => {
@@ -225,10 +239,7 @@ export default function TradeEntry() {
         .delete()
         .eq('id', id);
       
-      if (error) {
-        console.error('Error deleting trade:', error);
-        throw error;
-      }
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trades'] });
@@ -246,28 +257,6 @@ export default function TradeEntry() {
       });
     }
   });
-
-  const calculatePnL = (entry: number, exit: number | undefined, quantity: number | undefined) => {
-    if (!exit || !quantity) return null;
-    return ((exit - entry) * quantity).toFixed(2);
-  };
-
-  const formatToLocalDateTime = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    const offset = date.getTimezoneOffset();
-    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
-    return localDate.toISOString().slice(0, 16);
-  };
-
-  const formatDisplayTime = (dateString: string) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -336,12 +325,48 @@ export default function TradeEntry() {
       entry_time: trade.entry_time ? formatToLocalDateTime(trade.entry_time) : "",
       exit_time: trade.exit_time ? formatToLocalDateTime(trade.exit_time) : "",
       chart_link: trade.chart_link ?? "",
+      strike_price: trade.strike_price?.toString() ?? "",
+      option_type: trade.option_type ?? "",
+      market_condition: trade.market_condition ?? "",
+      timeframe: trade.timeframe ?? "",
+      trade_direction: trade.trade_direction ?? "",
+      planned_risk_reward: trade.planned_risk_reward?.toString() ?? "",
+      actual_risk_reward: trade.actual_risk_reward?.toString() ?? "",
+      planned_target: trade.planned_target?.toString() ?? "",
+      exit_reason: trade.exit_reason ?? "",
+      slippage: trade.slippage?.toString() ?? "",
+      post_exit_price: trade.post_exit_price?.toString() ?? "",
+      exit_efficiency: trade.exit_efficiency?.toString() ?? "",
+      confidence_level: trade.confidence_level?.toString() ?? "",
+      entry_emotion: trade.entry_emotion ?? "",
+      exit_emotion: trade.exit_emotion ?? "",
+      followed_plan: trade.followed_plan ?? true,
+      plan_deviation_reason: trade.plan_deviation_reason ?? "",
+      is_fomo_trade: trade.is_fomo_trade ?? false,
+      is_impulsive_exit: trade.is_impulsive_exit ?? false,
     });
     setEditingId(trade.id);
   };
 
   const handleDelete = async (id: string) => {
     await deleteTrade.mutateAsync(id);
+  };
+
+  const formatToLocalDateTime = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().slice(0, 16);
+  };
+
+  const formatDisplayTime = (dateString: string) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
   };
 
   return (
