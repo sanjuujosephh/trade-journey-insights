@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -61,20 +62,20 @@ interface FormData {
   exit_time: string;
   chart_link: string;
   strike_price: string;
-  option_type: string;
-  market_condition: string;
-  timeframe: string;
-  trade_direction: string;
+  option_type: 'call' | 'put' | '';
+  market_condition: 'trending' | 'ranging' | 'news_driven' | 'volatile' | '';
+  timeframe: '1min' | '5min' | '15min' | '1hr' | '';
+  trade_direction: 'long' | 'short' | '';
   planned_risk_reward: string;
   actual_risk_reward: string;
   planned_target: string;
-  exit_reason: string;
+  exit_reason: 'stop_loss' | 'target' | 'manual' | 'time_based' | '';
   slippage: string;
   post_exit_price: string;
   exit_efficiency: string;
   confidence_level: string;
-  entry_emotion: string;
-  exit_emotion: string;
+  entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
+  exit_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
   followed_plan: boolean;
   plan_deviation_reason: string;
   is_fomo_trade: boolean;
@@ -277,12 +278,26 @@ export default function TradeEntry() {
       quantity: formData.quantity ? parseFloat(formData.quantity) : null,
       stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
       strike_price: formData.strike_price ? parseFloat(formData.strike_price) : null,
+      planned_risk_reward: formData.planned_risk_reward ? parseFloat(formData.planned_risk_reward) : null,
+      actual_risk_reward: formData.actual_risk_reward ? parseFloat(formData.actual_risk_reward) : null,
+      planned_target: formData.planned_target ? parseFloat(formData.planned_target) : null,
+      slippage: formData.slippage ? parseFloat(formData.slippage) : null,
+      post_exit_price: formData.post_exit_price ? parseFloat(formData.post_exit_price) : null,
+      exit_efficiency: formData.exit_efficiency ? parseFloat(formData.exit_efficiency) : null,
+      confidence_level: formData.confidence_level ? parseInt(formData.confidence_level) : null,
       entry_time: formData.entry_time || null,
       exit_time: formData.exit_time || null,
-      followed_plan: Boolean(formData.followed_plan),
-      is_fomo_trade: Boolean(formData.is_fomo_trade),
-      is_impulsive_exit: Boolean(formData.is_impulsive_exit),
-    };
+      option_type: formData.option_type || null,
+      market_condition: formData.market_condition || null,
+      timeframe: formData.timeframe || null,
+      trade_direction: formData.trade_direction || null,
+      exit_reason: formData.exit_reason || null,
+      entry_emotion: formData.entry_emotion || null,
+      exit_emotion: formData.exit_emotion || null,
+      followed_plan: formData.followed_plan,
+      is_fomo_trade: formData.is_fomo_trade,
+      is_impulsive_exit: formData.is_impulsive_exit,
+    } as Omit<Trade, 'id' | 'timestamp'>;
     
     try {
       if (editingId) {
