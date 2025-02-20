@@ -46,7 +46,7 @@ export default function Index() {
 
   if (!user) {
     return (
-      <div className="w-full">
+      <div className="w-full overflow-auto">
         <div className="container py-8">
           <div className="mx-auto max-w-5xl text-center mb-16">
             <h1 className="text-4xl font-bold tracking-tight mb-6">
@@ -136,7 +136,7 @@ export default function Index() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] bg-background">
+    <div className="h-[calc(100vh-4rem)] bg-background overflow-auto">
       <div className="container h-full py-4">
         <header className="mb-2 flex items-center gap-4">
           <Avatar className="h-28 w-28 [&_*]:scale-x-[-1]">

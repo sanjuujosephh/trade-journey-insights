@@ -16,7 +16,7 @@ function Navigation() {
   const { user } = useAuth();
   
   return (
-    <div className="h-16 border-b bg-background">
+    <div className="h-16 border-b bg-background sticky top-0 z-10">
       <div className="flex h-full items-center px-4 container mx-auto">
         <div className="ml-auto flex items-center space-x-4">
           {user ? <UserMenu /> : <AuthModal />}
@@ -28,9 +28,9 @@ function Navigation() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
       <Navigation />
-      <main className="flex-1">
+      <main className="flex-1 overflow-auto">
         {children}
       </main>
     </div>
@@ -38,7 +38,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client="{queryClient}">
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
