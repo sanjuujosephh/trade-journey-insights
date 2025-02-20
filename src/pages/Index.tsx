@@ -197,8 +197,8 @@ export default function Index() {
             </div>
           </div>
           <Button variant="outline" className="gap-2">
-            <span>Watch Overview</span>
             <Video className="h-4 w-4" />
+            <span>Watch Overview</span>
           </Button>
         </header>
 
