@@ -130,6 +130,11 @@ export function AuthForm() {
       </TabsContent>
       <TabsContent value="signup">
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
+            <span className="font-semibold">Special Launch Offer:</span>
+            <span className="text-2xl font-bold">₹199</span>
+            <span className="text-sm text-muted-foreground">/month</span>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email-signup">Email</Label>
             <Input

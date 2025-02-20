@@ -5,7 +5,7 @@ import './index.css';
 import { ThemeProvider } from './contexts/ThemeProvider';
 
 createRoot(document.getElementById("root")!).render(
-  <ThemeProvider>
+  <ThemeProvider defaultTheme="light">
     <App />
   </ThemeProvider>
 );

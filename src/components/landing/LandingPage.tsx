@@ -37,13 +37,6 @@ export function LandingPage() {
         <div className="grid gap-8 md:grid-cols-2 mb-16">
           <Card className="p-6">
             <h2 className="text-2xl font-bold mb-6">Start Your Journey</h2>
-            <div className="mb-6">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
-                <span className="font-semibold">Special Launch Offer:</span>
-                <span className="text-2xl font-bold">₹199</span>
-                <span className="text-sm text-muted-foreground">/month</span>
-              </div>
-            </div>
             <AuthForm />
           </Card>
           <Card className="p-6">
