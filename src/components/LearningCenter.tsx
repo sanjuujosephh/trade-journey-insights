@@ -27,6 +27,8 @@ interface StrategyStats {
   totalPnL: number;
 }
 
+type Sentiment = 'positive' | 'negative' | 'neutral';
+
 export default function LearningCenter() {
   const { data: trades = [] } = useQuery<Trade[]>({
     queryKey: ['trades'],
@@ -105,7 +107,7 @@ export default function LearningCenter() {
     positive: ['patient', 'disciplined', 'confident', 'calm', 'focused', 'planned'],
   };
 
-  const analyzeSentiment = (notes: string) => {
+  const analyzeSentiment = (notes: string): Sentiment => {
     const lowerNotes = notes.toLowerCase();
     const negativeCount = emotionalKeywords.negative.filter(word => lowerNotes.includes(word)).length;
     const positiveCount = emotionalKeywords.positive.filter(word => lowerNotes.includes(word)).length;
@@ -118,7 +120,7 @@ export default function LearningCenter() {
   const recentTradesAnalysis = trades.slice(0, 5).map(trade => ({
     id: trade.id,
     date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
-    sentiment: trade.notes ? analyzeSentiment(trade.notes) : 'neutral',
+    sentiment: trade.notes ? analyzeSentiment(trade.notes) : 'neutral' as const,
     outcome: trade.outcome,
     lesson: trade.notes || "No notes provided",
   }));
