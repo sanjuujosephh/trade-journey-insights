@@ -14,7 +14,7 @@ export function ImportTrades() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const processTrades = useMutation({
-    mutationFn: async (csvData: string[][]) => {
+    mutationFn: async (csvData: Array<Array<string>>) => {
       const { data, error } = await supabase.functions.invoke('process-trades', {
         body: { trades: csvData }
       });
@@ -57,7 +57,9 @@ export function ImportTrades() {
 
     Papa.parse(file, {
       complete: (results) => {
-        processTrades.mutate(results.data);
+        // Ensure the parsed data is a string[][]
+        const parsedData = results.data as Array<Array<string>>;
+        processTrades.mutate(parsedData);
       },
       error: () => {
         toast({
