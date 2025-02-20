@@ -21,17 +21,19 @@ function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-    >
-      {theme === "light" ? (
-        <Moon className="h-5 w-5" />
-      ) : (
-        <Sun className="h-5 w-5" />
-      )}
-    </Button>
+    <div data-theme-toggle>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      >
+        {theme === "light" ? (
+          <Moon className="h-5 w-5" />
+        ) : (
+          <Sun className="h-5 w-5" />
+        )}
+      </Button>
+    </div>
   );
 }
 
@@ -49,7 +51,9 @@ function Navigation() {
         </div>
         <div className="flex-1 flex justify-end items-center space-x-4">
           <ThemeToggle />
-          {user ? <UserMenu /> : <AuthModal />}
+          <div data-user-nav>
+            {user ? <UserMenu /> : <AuthModal />}
+          </div>
         </div>
       </div>
     </div>
