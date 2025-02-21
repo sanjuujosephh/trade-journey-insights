@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from "react";
-import { FormData } from "@/types/trade";
+import { FormData, Trade } from "@/types/trade";
 import { AVAILABLE_SYMBOLS } from "@/constants/tradeConstants";
 
 const emptyFormData: FormData = {
