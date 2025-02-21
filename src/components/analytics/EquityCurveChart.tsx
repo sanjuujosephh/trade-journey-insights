@@ -1,5 +1,6 @@
 
 import { Card } from "@/components/ui/card";
+import { Trade } from "@/types/trade";
 import {
   AreaChart,
   Area,
@@ -11,10 +12,17 @@ import {
 } from "recharts";
 
 interface EquityCurveChartProps {
-  data: { date: string; balance: number }[];
+  trades: Trade[];
 }
 
-export function EquityCurveChart({ data }: EquityCurveChartProps) {
+export function EquityCurveChart({ trades }: EquityCurveChartProps) {
+  const data = trades.map(trade => ({
+    date: new Date(trade.entry_time || trade.timestamp).toLocaleDateString(),
+    balance: trade.exit_price && trade.entry_price 
+      ? (trade.exit_price - trade.entry_price) * (trade.quantity || 1)
+      : 0
+  }));
+
   return (
     <Card className="p-4">
       <h3 className="text-lg font-medium mb-2">Equity Curve</h3>

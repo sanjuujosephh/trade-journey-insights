@@ -1,5 +1,6 @@
 
 import { Card } from "@/components/ui/card";
+import { Trade } from "@/types/trade";
 import {
   BarChart,
   Bar,
@@ -12,10 +13,25 @@ import {
 } from "recharts";
 
 interface StreakChartProps {
-  data: { type: string; length: number }[];
+  trades: Trade[];
 }
 
-export function StreakChart({ data }: StreakChartProps) {
+export function StreakChart({ trades }: StreakChartProps) {
+  const data = trades.reduce((acc: { type: string; length: number }[], trade, index) => {
+    if (index === 0) {
+      return [{ type: trade.outcome, length: 1 }];
+    }
+
+    const lastStreak = acc[acc.length - 1];
+    if (lastStreak.type === trade.outcome) {
+      lastStreak.length += 1;
+      return acc;
+    }
+
+    acc.push({ type: trade.outcome, length: 1 });
+    return acc;
+  }, []);
+
   return (
     <Card className="p-4">
       <h3 className="text-lg font-medium mb-2">Win/Loss Streaks</h3>
