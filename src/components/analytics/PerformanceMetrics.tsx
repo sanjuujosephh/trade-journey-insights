@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
@@ -14,15 +13,14 @@ interface MetricCardProps {
 
 function MetricCard({ label, value, tooltipText, indicator }: MetricCardProps) {
   return (
-    <Card className="p-4 flex flex-col gap-2 relative">
-      <div className="absolute left-0 top-0 w-1 h-full bg-primary rounded-l-lg" />
+    <Card className="p-4 flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">{label}</span>
+        <span className="text-xs text-muted-foreground">{label}</span>
         {tooltipText && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                <HelpCircle className="h-3 w-3 text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-xs">{tooltipText}</p>
@@ -31,7 +29,7 @@ function MetricCard({ label, value, tooltipText, indicator }: MetricCardProps) {
           </TooltipProvider>
         )}
       </div>
-      <span className={`text-xl font-bold ${
+      <span className={`text-lg font-semibold ${
         indicator === 'positive' ? 'text-green-600' :
         indicator === 'negative' ? 'text-red-600' :
         ''
