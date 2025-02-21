@@ -20,8 +20,11 @@ export function ThemeProvider({
   defaultTheme = "light",
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme;
-    return savedTheme || defaultTheme;
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem("theme") as Theme;
+      return savedTheme || defaultTheme;
+    }
+    return defaultTheme;
   });
 
   useEffect(() => {
@@ -30,6 +33,12 @@ export function ThemeProvider({
     root.classList.add(theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  // Apply theme immediately on mount
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.add(theme);
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

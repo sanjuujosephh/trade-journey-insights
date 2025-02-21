@@ -14,7 +14,14 @@ import { useTheme } from "./contexts/ThemeProvider";
 import { TraderInfo } from "./components/TraderInfo";
 import { AuthModal } from "./components/auth/AuthModal";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
