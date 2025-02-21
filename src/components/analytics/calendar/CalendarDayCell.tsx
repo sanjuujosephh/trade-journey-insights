@@ -1,3 +1,4 @@
+
 import { format, isSameMonth, isToday } from "date-fns";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DayStats } from "./calendarUtils";
@@ -28,17 +29,26 @@ export function CalendarDayCell({
       case 'options':
         return dayStats && (
           <>
-            <div className="font-medium">{format(day, "d")}</div>
-            <div className="text-[10px] space-y-0.5">
-              {dayStats.vwapPosition && (
-                <div className="capitalize text-xs">{dayStats.vwapPosition.replace('_', ' ')}</div>
+            <div className="font-medium mb-1">{format(day, "d")}</div>
+            <div className="text-[10px] space-y-1">
+              {dayStats.trade_direction && (
+                <div className="text-xs capitalize">
+                  {dayStats.option_type} {dayStats.trade_direction}
+                </div>
               )}
-              {dayStats.emaPosition && (
-                <div className="capitalize text-xs">{dayStats.emaPosition.replace('_', ' ')}</div>
+              {(dayStats.vwapPosition || dayStats.emaPosition) && (
+                <div className="text-xs">
+                  Price was: {dayStats.vwapPosition?.replace('_', ' ')}
+                  {dayStats.emaPosition && `, ${dayStats.emaPosition.replace('_', ' ')}`}
+                </div>
               )}
-              {dayStats.vix && <div className="text-xs">VIX: {dayStats.vix.toFixed(1)}</div>}
+              {dayStats.vix && (
+                <div className="text-xs">VIX: {dayStats.vix.toFixed(1)}</div>
+              )}
               {(dayStats.callIv || dayStats.putIv) && (
-                <div className="text-xs">IV: {dayStats.callIv?.toFixed(1)}/{dayStats.putIv?.toFixed(1)}</div>
+                <div className="text-xs">
+                  IV: {dayStats.callIv?.toFixed(1)}/{dayStats.putIv?.toFixed(1)}
+                </div>
               )}
             </div>
           </>
@@ -85,7 +95,7 @@ export function CalendarDayCell({
       case 'options':
         return (
           <>
-            <div>Option Price Position:</div>
+            <div>Direction: {dayStats.option_type} {dayStats.trade_direction}</div>
             <div>VWAP: {dayStats.vwapPosition?.replace('_', ' ') || 'N/A'}</div>
             <div>EMA: {dayStats.emaPosition?.replace('_', ' ') || 'N/A'}</div>
             <div>VIX: {dayStats.vix?.toFixed(1) || 'N/A'}</div>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -45,7 +46,9 @@ export function TradingCalendar() {
             confidenceLevel: trade.confidence_level || undefined,
             disciplineScore: trade.followed_plan ? 100 : 0,
             vwapPosition: trade.vwap_position || undefined,
-            emaPosition: trade.ema_position || undefined
+            emaPosition: trade.ema_position || undefined,
+            option_type: trade.option_type || undefined,
+            trade_direction: trade.trade_direction || undefined
           };
         }
         
@@ -61,6 +64,8 @@ export function TradingCalendar() {
         if (trade.put_iv) tradeDays[dayKey].putIv = trade.put_iv;
         if (trade.vwap_position) tradeDays[dayKey].vwapPosition = trade.vwap_position;
         if (trade.ema_position) tradeDays[dayKey].emaPosition = trade.ema_position;
+        if (trade.option_type) tradeDays[dayKey].option_type = trade.option_type;
+        if (trade.trade_direction) tradeDays[dayKey].trade_direction = trade.trade_direction;
 
         // Update psychology data
         if (trade.market_condition) tradeDays[dayKey].marketCondition = trade.market_condition;
@@ -148,7 +153,7 @@ export function TradingCalendar() {
           />
         </div>
 
-        <div className="bg-card p-6 rounded-lg">
+        <div className="bg-background rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Weekly P&L View</h3>
           <CalendarGrid
             days={daysInWeek}
@@ -168,7 +173,7 @@ export function TradingCalendar() {
           />
         </div>
 
-        <div className="bg-card p-6 rounded-lg">
+        <div className="bg-background rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Options Data</h3>
           <CalendarGrid
             days={daysInMonth}
@@ -180,7 +185,7 @@ export function TradingCalendar() {
           />
         </div>
 
-        <div className="bg-card p-6 rounded-lg">
+        <div className="bg-background rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Psychology Tracker</h3>
           <CalendarGrid
             days={daysInMonth}
