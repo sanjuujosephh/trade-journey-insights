@@ -98,7 +98,7 @@ export default function TradeEntry() {
       return false;
     }
     
-    return (existingTrades?.length || 0) < 2;
+    return (existingTrades?.length || 0) < 1; // Updated to 1 trade per day limit
   }, [editingId, userId]);
 
   useEffect(() => {
@@ -115,7 +115,7 @@ export default function TradeEntry() {
     mutationFn: async (newTrade: Omit<Trade, 'id' | 'timestamp'>) => {
       const canAddTrade = await checkTradeLimit(newTrade.entry_time || new Date().toISOString());
       if (!canAddTrade) {
-        throw new Error("Daily trade limit reached (2 trades per day)");
+        throw new Error("Daily trade limit reached (1 trade per day)"); // Updated error message
       }
 
       const { data, error } = await supabase
