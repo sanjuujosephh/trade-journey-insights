@@ -125,10 +125,11 @@ export function MarketContext({
               <SelectValue placeholder="Select exit emotion" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="satisfied">Satisfied</SelectItem>
-              <SelectItem value="regretful">Regretful</SelectItem>
-              <SelectItem value="relieved">Relieved</SelectItem>
-              <SelectItem value="frustrated">Frustrated</SelectItem>
+              <SelectItem value="fear">Fear</SelectItem>
+              <SelectItem value="greed">Greed</SelectItem>
+              <SelectItem value="fomo">FOMO</SelectItem>
+              <SelectItem value="revenge">Revenge</SelectItem>
+              <SelectItem value="neutral">Neutral</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -166,3 +167,4 @@ export function MarketContext({
     </Card>
   );
 }
+
