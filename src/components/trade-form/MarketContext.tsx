@@ -76,9 +76,12 @@ export function MarketContext({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="1min">1 Minute</SelectItem>
+            <SelectItem value="3min">3 Minutes</SelectItem>
             <SelectItem value="5min">5 Minutes</SelectItem>
             <SelectItem value="15min">15 Minutes</SelectItem>
             <SelectItem value="1hr">1 Hour</SelectItem>
+            <SelectItem value="4hr">4 Hours</SelectItem>
+            <SelectItem value="1day">1 Day</SelectItem>
           </SelectContent>
         </Select>
       </div>
