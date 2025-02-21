@@ -1,20 +1,16 @@
 
 import { useState, useCallback, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
 import { Trade, FormData } from "@/types/trade";
-import { BasicTradeInfo } from "./trade-form/BasicTradeInfo";
-import { MarketContext } from "./trade-form/MarketContext";
-import { BehavioralAnalysis } from "./trade-form/BehavioralAnalysis";
 import { TradeHistory } from "./trade-form/TradeHistory";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { ImportTrades } from "./trade-form/ImportTrades";
-import { validateTradeForm } from "./trade-form/TradeFormValidation";
-import { AVAILABLE_SYMBOLS, AVAILABLE_STRATEGIES } from "@/constants/tradeConstants";
+import { TradeFormManager } from "./trade-form/TradeFormManager";
+import { AVAILABLE_SYMBOLS } from "@/constants/tradeConstants";
 
 const emptyFormData: FormData = {
   symbol: AVAILABLE_SYMBOLS[0],
@@ -98,7 +94,7 @@ export default function TradeEntry() {
       return false;
     }
     
-    return (existingTrades?.length || 0) < 1; // Updated to 1 trade per day limit
+    return (existingTrades?.length || 0) < 1;
   }, [editingId, userId]);
 
   useEffect(() => {
@@ -115,7 +111,7 @@ export default function TradeEntry() {
     mutationFn: async (newTrade: Omit<Trade, 'id' | 'timestamp'>) => {
       const canAddTrade = await checkTradeLimit(newTrade.entry_time || new Date().toISOString());
       if (!canAddTrade) {
-        throw new Error("Daily trade limit reached (1 trade per day)"); // Updated error message
+        throw new Error("Daily trade limit reached (1 trade per day)");
       }
 
       const { data, error } = await supabase
@@ -174,19 +170,7 @@ export default function TradeEntry() {
     }
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const errors = validateTradeForm(formData);
-    if (errors.length > 0) {
-      toast({
-        title: "Validation Error",
-        description: errors.join(", "),
-        variant: "destructive"
-      });
-      return;
-    }
-    
+  const handleSubmit = async (e: React.FormEvent) => {    
     const tradeData = {
       ...formData,
       entry_price: parseFloat(formData.entry_price),
@@ -252,54 +236,18 @@ export default function TradeEntry() {
     }));
   }, []);
 
-  const formatToLocalDateTime = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    const offset = date.getTimezoneOffset();
-    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
-    return localDate.toISOString().slice(0, 16);
-  };
-
-  const formatDisplayTime = (dateString: string) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
   if (isLoading) return <LoadingSpinner />;
 
   return (
     <ErrorBoundary>
       <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <BasicTradeInfo
-              formData={formData}
-              handleChange={handleChange}
-              handleSelectChange={handleSelectChange}
-            />
-            <MarketContext
-              formData={formData}
-              handleChange={handleChange}
-              handleSelectChange={handleSelectChange}
-            />
-          </div>
-
-          <BehavioralAnalysis
-            formData={formData}
-            handleChange={handleChange}
-            handleSelectChange={handleSelectChange}
-          />
-
-          <div className="flex justify-end">
-            <Button type="submit" className="w-full sm:w-auto">
-              {editingId ? "Update Trade" : "Log Trade"}
-            </Button>
-          </div>
-        </form>
+        <TradeFormManager
+          formData={formData}
+          handleChange={handleChange}
+          handleSelectChange={handleSelectChange}
+          onSubmit={handleSubmit}
+          editingId={editingId}
+        />
 
         {trades.length > 0 && (
           <TradeHistory
@@ -315,8 +263,8 @@ export default function TradeEntry() {
                 strategy: trade.strategy ?? "",
                 outcome: trade.outcome,
                 notes: trade.notes ?? "",
-                entry_time: trade.entry_time ? formatToLocalDateTime(trade.entry_time) : "",
-                exit_time: trade.exit_time ? formatToLocalDateTime(trade.exit_time) : "",
+                entry_time: trade.entry_time || "",
+                exit_time: trade.exit_time || "",
                 chart_link: trade.chart_link ?? "",
                 vix: trade.vix?.toString() ?? "",
                 call_iv: trade.call_iv?.toString() ?? "",
