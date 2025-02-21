@@ -16,6 +16,7 @@ export interface DayStats {
   emaPosition?: string;
   option_type?: string;
   trade_direction?: string;
+  disciplineScore?: number;
 }
 
 export interface TradeDay {

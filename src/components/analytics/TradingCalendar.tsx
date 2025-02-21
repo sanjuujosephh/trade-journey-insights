@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -42,8 +41,9 @@ export function TradingCalendar() {
             putIv: trade.put_iv || undefined,
             marketCondition: trade.market_condition || undefined,
             riskReward: trade.planned_risk_reward || undefined,
-            emotionalState: trade.entry_emotion || undefined,
-            confidenceLevel: trade.confidence_level || undefined,
+            emotionalState: trade.overall_emotional_state || undefined,
+            emotionalScore: trade.emotional_score || undefined,
+            confidenceScore: trade.confidence_level_score || undefined,
             disciplineScore: trade.followed_plan ? 100 : 0,
             vwapPosition: trade.vwap_position || undefined,
             emaPosition: trade.ema_position || undefined,
@@ -70,8 +70,9 @@ export function TradingCalendar() {
         // Update psychology data
         if (trade.market_condition) tradeDays[dayKey].marketCondition = trade.market_condition;
         if (trade.planned_risk_reward) tradeDays[dayKey].riskReward = trade.planned_risk_reward;
-        if (trade.entry_emotion) tradeDays[dayKey].emotionalState = trade.entry_emotion;
-        if (trade.confidence_level) tradeDays[dayKey].confidenceLevel = trade.confidence_level;
+        if (trade.overall_emotional_state) tradeDays[dayKey].emotionalState = trade.overall_emotional_state;
+        if (trade.emotional_score) tradeDays[dayKey].emotionalScore = trade.emotional_score;
+        if (trade.confidence_level_score) tradeDays[dayKey].confidenceScore = trade.confidence_level_score;
         if (trade.followed_plan !== undefined) {
           tradeDays[dayKey].disciplineScore = trade.followed_plan ? 100 : 0;
         }
