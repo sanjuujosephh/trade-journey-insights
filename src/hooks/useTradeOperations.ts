@@ -19,23 +19,43 @@ export function useTradeOperations() {
       }
     };
     getUser();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user.id ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const { data: trades = [], isLoading } = useQuery({
-    queryKey: ['trades'],
+    queryKey: ['trades', userId],
     queryFn: async () => {
+      if (!userId) return [];
+      
       const { data, error } = await supabase
         .from('trades')
         .select('*')
+        .eq('user_id', userId)
         .order('timestamp', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching trades:', error);
+        throw error;
+      }
+      
       return data;
     },
+    enabled: !!userId,
   });
 
   const checkTradeLimit = useCallback(async (date: string) => {
-    if (!userId) return false;
+    if (!userId) {
+      console.error('No user ID available');
+      return false;
+    }
     
     const dayStart = new Date(date);
     dayStart.setHours(0, 0, 0, 0);
@@ -60,6 +80,10 @@ export function useTradeOperations() {
 
   const addTrade = useMutation({
     mutationFn: async (newTrade: Omit<Trade, 'id' | 'timestamp'>) => {
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
       const canAddTrade = await checkTradeLimit(newTrade.entry_time || new Date().toISOString());
       if (!canAddTrade) {
         throw new Error("Daily trade limit reached (1 trade per day)");
@@ -71,17 +95,22 @@ export function useTradeOperations() {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding trade:', error);
+        throw error;
+      }
+      
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['trades'] });
+      queryClient.invalidateQueries({ queryKey: ['trades', userId] });
       toast({
         title: "Success",
         description: "Trade logged successfully!"
       });
     },
     onError: (error) => {
+      console.error('Add trade error:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to log trade",
@@ -92,27 +121,37 @@ export function useTradeOperations() {
 
   const updateTrade = useMutation({
     mutationFn: async ({ id, ...trade }: Partial<Trade> & { id: string }) => {
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
       const { data, error } = await supabase
         .from('trades')
-        .update({ ...trade, user_id: userId })
+        .update(trade)
         .eq('id', id)
+        .eq('user_id', userId)  // Ensure user can only update their own trades
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating trade:', error);
+        throw error;
+      }
+      
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['trades'] });
+      queryClient.invalidateQueries({ queryKey: ['trades', userId] });
       toast({
         title: "Success",
         description: "Trade updated successfully!"
       });
     },
     onError: (error) => {
+      console.error('Update trade error:', error);
       toast({
         title: "Error",
-        description: "Failed to update trade",
+        description: error instanceof Error ? error.message : "Failed to update trade",
         variant: "destructive"
       });
     }
