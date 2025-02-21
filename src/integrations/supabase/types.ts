@@ -64,10 +64,7 @@ export type Database = {
           exit_price: number | null
           exit_reason: string | null
           exit_time: string | null
-          followed_plan: boolean | null
           id: string
-          is_fomo_trade: boolean | null
-          is_impulsive_exit: boolean | null
           market_condition: string | null
           notes: string | null
           option_type: string | null
@@ -108,10 +105,7 @@ export type Database = {
           exit_price?: number | null
           exit_reason?: string | null
           exit_time?: string | null
-          followed_plan?: boolean | null
           id?: string
-          is_fomo_trade?: boolean | null
-          is_impulsive_exit?: boolean | null
           market_condition?: string | null
           notes?: string | null
           option_type?: string | null
@@ -152,10 +146,7 @@ export type Database = {
           exit_price?: number | null
           exit_reason?: string | null
           exit_time?: string | null
-          followed_plan?: boolean | null
           id?: string
-          is_fomo_trade?: boolean | null
-          is_impulsive_exit?: boolean | null
           market_condition?: string | null
           notes?: string | null
           option_type?: string | null

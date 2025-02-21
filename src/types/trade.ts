@@ -48,10 +48,6 @@ export interface Trade {
   confidence_level?: number | null;
   entry_emotion?: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | null;
   exit_emotion?: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | null;
-  followed_plan?: boolean;
-  plan_deviation_reason?: string | null;
-  is_fomo_trade?: boolean;
-  is_impulsive_exit?: boolean;
   user_id?: string;
   
   // AI Analysis Fields
@@ -95,8 +91,4 @@ export interface FormData {
   confidence_level: string;
   entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
   exit_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
-  followed_plan: boolean;
-  plan_deviation_reason: string;
-  is_fomo_trade: boolean;
-  is_impulsive_exit: boolean;
 }

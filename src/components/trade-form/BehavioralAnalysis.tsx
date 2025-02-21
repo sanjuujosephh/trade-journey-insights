@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 
 interface BehavioralAnalysisProps {
   formData: any;
@@ -60,37 +59,6 @@ export function BehavioralAnalysis({
               <SelectItem value="frustrated">Frustrated</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="followed_plan"
-            checked={formData.followed_plan}
-            onCheckedChange={(value) => handleSelectChange("followed_plan", value)}
-          />
-          <Label htmlFor="followed_plan">Followed Trading Plan</Label>
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="is_fomo_trade"
-            checked={formData.is_fomo_trade}
-            onCheckedChange={(value) => handleSelectChange("is_fomo_trade", value)}
-          />
-          <Label htmlFor="is_fomo_trade">FOMO Trade</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="is_impulsive_exit"
-            checked={formData.is_impulsive_exit}
-            onCheckedChange={(value) => handleSelectChange("is_impulsive_exit", value)}
-          />
-          <Label htmlFor="is_impulsive_exit">Impulsive Exit</Label>
         </div>
       </div>
     </Card>

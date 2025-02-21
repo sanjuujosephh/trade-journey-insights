@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -45,10 +44,6 @@ const emptyFormData: FormData = {
   confidence_level: "",
   entry_emotion: "",
   exit_emotion: "",
-  followed_plan: true,
-  plan_deviation_reason: "",
-  is_fomo_trade: false,
-  is_impulsive_exit: false,
 };
 
 export default function TradeEntry() {
@@ -202,10 +197,6 @@ export default function TradeEntry() {
       strategy: formData.strategy || null,
       notes: formData.notes || null,
       chart_link: formData.chart_link || null,
-      followed_plan: formData.followed_plan,
-      is_fomo_trade: formData.is_fomo_trade,
-      is_impulsive_exit: formData.is_impulsive_exit,
-      plan_deviation_reason: formData.plan_deviation_reason || null
     } as Omit<Trade, 'id' | 'timestamp'>;
     
     try {
@@ -286,10 +277,6 @@ export default function TradeEntry() {
                 confidence_level: trade.confidence_level?.toString() ?? "",
                 entry_emotion: trade.entry_emotion ?? "",
                 exit_emotion: trade.exit_emotion ?? "",
-                followed_plan: trade.followed_plan ?? true,
-                plan_deviation_reason: trade.plan_deviation_reason ?? "",
-                is_fomo_trade: trade.is_fomo_trade ?? false,
-                is_impulsive_exit: trade.is_impulsive_exit ?? false,
               });
               setEditingId(trade.id);
             }}
