@@ -4,8 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import { ThemeProvider } from "./contexts/ThemeProvider";
-import { AuthModal } from "./components/auth/AuthModal";
 import { UserMenu } from "./components/auth/UserMenu";
 import { useAuth } from "./contexts/AuthContext";
 import Index from "./pages/Index";
@@ -14,6 +12,7 @@ import { Button } from "./components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "./contexts/ThemeProvider";
 import { TraderInfo } from "./components/TraderInfo";
+import { AuthModal } from "./components/auth/AuthModal";
 
 const queryClient = new QueryClient();
 
@@ -73,21 +72,19 @@ function Layout({ children }: { children: React.ReactNode }) {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light">
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <BrowserRouter>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Layout>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
