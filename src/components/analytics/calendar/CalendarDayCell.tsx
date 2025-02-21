@@ -65,13 +65,16 @@ export function CalendarDayCell({
                 <div>R/R: {dayStats.riskReward.toFixed(1)}</div>
               )}
               {dayStats.emotionalState && (
-                <div className="capitalize">{dayStats.emotionalState}</div>
+                <div className={cn(
+                  "capitalize",
+                  dayStats.emotionalState === 'positive' && "text-green-600",
+                  dayStats.emotionalState === 'negative' && "text-red-600"
+                )}>
+                  {dayStats.emotionalState}
+                </div>
               )}
-              {dayStats.confidenceLevel && (
-                <div>Conf: {dayStats.confidenceLevel}/5</div>
-              )}
-              {dayStats.disciplineScore !== undefined && (
-                <div>Disc: {dayStats.disciplineScore}%</div>
+              {dayStats.confidenceScore !== undefined && (
+                <div>Conf: {Math.round(dayStats.confidenceScore)}%</div>
               )}
             </div>
           </>
@@ -108,9 +111,9 @@ export function CalendarDayCell({
           <>
             <div>Market: {dayStats.marketCondition?.replace('_', ' ') || 'N/A'}</div>
             <div>R/R: {dayStats.riskReward?.toFixed(1) || 'N/A'}</div>
-            <div>Emotion: {dayStats.emotionalState || 'N/A'}</div>
-            <div>Confidence: {dayStats.confidenceLevel ? `${dayStats.confidenceLevel}/5` : 'N/A'}</div>
-            <div>Discipline: {dayStats.disciplineScore || 'N/A'}%</div>
+            <div>Emotional State: {dayStats.emotionalState || 'N/A'}</div>
+            <div>Emotional Score: {dayStats.emotionalScore?.toFixed(1) || 'N/A'}</div>
+            <div>Confidence: {Math.round(dayStats.confidenceScore || 0)}%</div>
           </>
         );
       default:

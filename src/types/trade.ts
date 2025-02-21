@@ -1,4 +1,3 @@
-
 export interface Trade {
   id: string;
   entry_price: number;
@@ -46,8 +45,11 @@ export interface Trade {
   
   // Psychological & Behavioral Data
   confidence_level?: number | null;
+  confidence_level_score?: number | null;
   entry_emotion?: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | null;
-  exit_emotion?: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | null;
+  exit_emotion?: 'satisfied' | 'regretful' | 'relieved' | 'frustrated' | null;
+  emotional_score?: number | null;
+  overall_emotional_state?: 'positive' | 'negative' | 'neutral' | null;
   user_id?: string;
   
   // AI Analysis Fields
@@ -90,5 +92,5 @@ export interface FormData {
   exit_efficiency: string;
   confidence_level: string;
   entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
-  exit_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
+  exit_emotion: 'satisfied' | 'regretful' | 'relieved' | 'frustrated' | '';
 }

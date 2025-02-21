@@ -10,8 +10,8 @@ export interface DayStats {
   marketCondition?: string;
   riskReward?: number;
   emotionalState?: string;
-  confidenceLevel?: number;
-  disciplineScore?: number;
+  emotionalScore?: number;
+  confidenceScore?: number;
   vwapPosition?: string;
   emaPosition?: string;
   option_type?: string;

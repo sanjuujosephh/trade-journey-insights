@@ -55,7 +55,9 @@ export type Database = {
           call_iv: number | null
           chart_link: string | null
           confidence_level: number | null
+          confidence_level_score: number | null
           ema_position: string | null
+          emotional_score: number | null
           entry_emotion: string | null
           entry_price: number
           entry_time: string | null
@@ -69,6 +71,7 @@ export type Database = {
           notes: string | null
           option_type: string | null
           outcome: string
+          overall_emotional_state: string | null
           plan_deviation_reason: string | null
           planned_risk_reward: number | null
           planned_target: number | null
@@ -96,7 +99,9 @@ export type Database = {
           call_iv?: number | null
           chart_link?: string | null
           confidence_level?: number | null
+          confidence_level_score?: number | null
           ema_position?: string | null
+          emotional_score?: number | null
           entry_emotion?: string | null
           entry_price: number
           entry_time?: string | null
@@ -110,6 +115,7 @@ export type Database = {
           notes?: string | null
           option_type?: string | null
           outcome: string
+          overall_emotional_state?: string | null
           plan_deviation_reason?: string | null
           planned_risk_reward?: number | null
           planned_target?: number | null
@@ -137,7 +143,9 @@ export type Database = {
           call_iv?: number | null
           chart_link?: string | null
           confidence_level?: number | null
+          confidence_level_score?: number | null
           ema_position?: string | null
+          emotional_score?: number | null
           entry_emotion?: string | null
           entry_price?: number
           entry_time?: string | null
@@ -151,6 +159,7 @@ export type Database = {
           notes?: string | null
           option_type?: string | null
           outcome?: string
+          overall_emotional_state?: string | null
           plan_deviation_reason?: string | null
           planned_risk_reward?: number | null
           planned_target?: number | null
@@ -179,6 +188,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_emotional_score: {
+        Args: {
+          entry_emotion: string
+          exit_emotion: string
+        }
+        Returns: number
+      }
       check_trade_limit: {
         Args: {
           entry_date: string
