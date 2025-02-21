@@ -84,14 +84,23 @@ export function useTradeOperations() {
         throw new Error("User not authenticated");
       }
 
-      const canAddTrade = await checkTradeLimit(newTrade.entry_time || new Date().toISOString());
+      // Ensure entry_time is a valid ISO string
+      const entryTime = newTrade.entry_time ? new Date(newTrade.entry_time).toISOString() : new Date().toISOString();
+      const exitTime = newTrade.exit_time ? new Date(newTrade.exit_time).toISOString() : null;
+
+      const canAddTrade = await checkTradeLimit(entryTime);
       if (!canAddTrade) {
         throw new Error("Daily trade limit reached (1 trade per day)");
       }
 
       const { data, error } = await supabase
         .from('trades')
-        .insert([{ ...newTrade, user_id: userId }])
+        .insert([{ 
+          ...newTrade, 
+          user_id: userId,
+          entry_time: entryTime,
+          exit_time: exitTime 
+        }])
         .select()
         .single();
       
@@ -125,11 +134,18 @@ export function useTradeOperations() {
         throw new Error("User not authenticated");
       }
 
+      // Ensure valid timestamp formats
+      const updates = {
+        ...trade,
+        entry_time: trade.entry_time ? new Date(trade.entry_time).toISOString() : undefined,
+        exit_time: trade.exit_time ? new Date(trade.exit_time).toISOString() : undefined
+      };
+
       const { data, error } = await supabase
         .from('trades')
-        .update(trade)
+        .update(updates)
         .eq('id', id)
-        .eq('user_id', userId)  // Ensure user can only update their own trades
+        .eq('user_id', userId)
         .select()
         .single();
       
