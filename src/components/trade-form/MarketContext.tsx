@@ -102,10 +102,11 @@ export function MarketContext({
               <SelectValue placeholder="Select entry emotion" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="confident">Confident</SelectItem>
+              <SelectItem value="fear">Fear</SelectItem>
+              <SelectItem value="greed">Greed</SelectItem>
+              <SelectItem value="fomo">FOMO</SelectItem>
+              <SelectItem value="revenge">Revenge</SelectItem>
               <SelectItem value="neutral">Neutral</SelectItem>
-              <SelectItem value="fearful">Fearful</SelectItem>
-              <SelectItem value="greedy">Greedy</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -121,10 +122,11 @@ export function MarketContext({
               <SelectValue placeholder="Select exit emotion" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="satisfied">Satisfied</SelectItem>
-              <SelectItem value="regretful">Regretful</SelectItem>
-              <SelectItem value="relieved">Relieved</SelectItem>
-              <SelectItem value="frustrated">Frustrated</SelectItem>
+              <SelectItem value="fear">Fear</SelectItem>
+              <SelectItem value="greed">Greed</SelectItem>
+              <SelectItem value="fomo">FOMO</SelectItem>
+              <SelectItem value="revenge">Revenge</SelectItem>
+              <SelectItem value="neutral">Neutral</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -150,15 +152,16 @@ export function MarketContext({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="trade_notes">Trade Notes</Label>
+        <Label htmlFor="notes">Trade Notes</Label>
         <Input
-          id="trade_notes"
-          name="trade_notes"
+          id="notes"
+          name="notes"
           placeholder="Enter your trade notes here"
-          value={formData.trade_notes}
+          value={formData.notes}
           onChange={handleChange}
         />
       </div>
     </Card>
   );
 }
+

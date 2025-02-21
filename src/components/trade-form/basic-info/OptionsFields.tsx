@@ -1,6 +1,6 @@
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -15,53 +15,71 @@ interface OptionsFieldsProps {
   handleSelectChange: (name: string, value: string) => void;
 }
 
-export function OptionsFields({ formData, handleChange, handleSelectChange }: OptionsFieldsProps) {
+export function OptionsFields({
+  formData,
+  handleChange,
+  handleSelectChange,
+}: OptionsFieldsProps) {
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label htmlFor="strike_price">Strike Price</Label>
+        <Input
+          id="strike_price"
+          name="strike_price"
+          type="number"
+          step="0.01"
+          placeholder="0.00"
+          value={formData.strike_price}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="strike_price">Strike Price</Label>
+          <Label htmlFor="stop_loss">Stop Loss</Label>
           <Input
-            id="strike_price"
-            name="strike_price"
+            id="stop_loss"
+            name="stop_loss"
             type="number"
             step="0.01"
             placeholder="0.00"
-            value={formData.strike_price}
+            value={formData.stop_loss}
             onChange={handleChange}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="option_type">Option Type</Label>
-          <Select
-            name="option_type"
-            value={formData.option_type}
-            onValueChange={(value) => handleSelectChange("option_type", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="call">Call</SelectItem>
-              <SelectItem value="put">Put</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="quantity">Quantity</Label>
+          <Input
+            id="quantity"
+            name="quantity"
+            type="number"
+            step="1"
+            placeholder="0"
+            value={formData.quantity}
+            onChange={handleChange}
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="vix">VIX</Label>
-          <Input
-            id="vix"
-            name="vix"
-            type="number"
-            step="0.01"
-            placeholder="VIX Value"
-            value={formData.vix}
-            onChange={handleChange}
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="option_type">Option Type</Label>
+        <Select
+          name="option_type"
+          value={formData.option_type}
+          onValueChange={(value) => handleSelectChange("option_type", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select option type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="call">Call</SelectItem>
+            <SelectItem value="put">Put</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="call_iv">Call IV</Label>
           <Input
@@ -69,7 +87,7 @@ export function OptionsFields({ formData, handleChange, handleSelectChange }: Op
             name="call_iv"
             type="number"
             step="0.01"
-            placeholder="Call IV %"
+            placeholder="0.00"
             value={formData.call_iv}
             onChange={handleChange}
           />
@@ -81,11 +99,24 @@ export function OptionsFields({ formData, handleChange, handleSelectChange }: Op
             name="put_iv"
             type="number"
             step="0.01"
-            placeholder="Put IV %"
+            placeholder="0.00"
             value={formData.put_iv}
             onChange={handleChange}
           />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="vix">VIX</Label>
+        <Input
+          id="vix"
+          name="vix"
+          type="number"
+          step="0.01"
+          placeholder="0.00"
+          value={formData.vix}
+          onChange={handleChange}
+        />
       </div>
     </>
   );
