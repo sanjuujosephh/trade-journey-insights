@@ -22,30 +22,31 @@ export function OptionsFields({
 }: OptionsFieldsProps) {
   return (
     <>
-      <div className="space-y-2">
-        <Label htmlFor="strike_price">Strike Price</Label>
-        <Input
-          id="strike_price"
-          name="strike_price"
-          type="number"
-          step="0.01"
-          placeholder="0.00"
-          value={formData.strike_price}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="quantity">Quantity</Label>
-        <Input
-          id="quantity"
-          name="quantity"
-          type="number"
-          step="1"
-          placeholder="0"
-          value={formData.quantity}
-          onChange={handleChange}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="strike_price">Strike Price</Label>
+          <Input
+            id="strike_price"
+            name="strike_price"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            value={formData.strike_price}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="quantity">Quantity</Label>
+          <Input
+            id="quantity"
+            name="quantity"
+            type="number"
+            step="1"
+            placeholder="0"
+            value={formData.quantity}
+            onChange={handleChange}
+          />
+        </div>
       </div>
 
       <div className="space-y-2">

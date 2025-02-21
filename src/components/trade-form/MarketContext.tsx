@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -102,10 +101,10 @@ export function MarketContext({
               <SelectValue placeholder="Select entry emotion" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="fear">Fear</SelectItem>
-              <SelectItem value="greed">Greed</SelectItem>
-              <SelectItem value="fomo">FOMO</SelectItem>
-              <SelectItem value="revenge">Revenge</SelectItem>
+              <SelectItem value="confident">Confident</SelectItem>
+              <SelectItem value="calm">Calm</SelectItem>
+              <SelectItem value="anxious">Anxious</SelectItem>
+              <SelectItem value="nervous">Nervous</SelectItem>
               <SelectItem value="neutral">Neutral</SelectItem>
             </SelectContent>
           </Select>
@@ -122,10 +121,10 @@ export function MarketContext({
               <SelectValue placeholder="Select exit emotion" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="fear">Fear</SelectItem>
-              <SelectItem value="greed">Greed</SelectItem>
-              <SelectItem value="fomo">FOMO</SelectItem>
-              <SelectItem value="revenge">Revenge</SelectItem>
+              <SelectItem value="confident">Confident</SelectItem>
+              <SelectItem value="calm">Calm</SelectItem>
+              <SelectItem value="anxious">Anxious</SelectItem>
+              <SelectItem value="nervous">Nervous</SelectItem>
               <SelectItem value="neutral">Neutral</SelectItem>
             </SelectContent>
           </Select>
@@ -164,4 +163,3 @@ export function MarketContext({
     </Card>
   );
 }
-
