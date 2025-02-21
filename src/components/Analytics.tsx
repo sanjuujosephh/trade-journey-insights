@@ -45,4 +45,3 @@ export function Analytics({ trades }: AnalyticsProps) {
     </div>
   );
 }
-
