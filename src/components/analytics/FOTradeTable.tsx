@@ -1,6 +1,5 @@
 
 import { Trade } from "@/types/trade";
-import { Card } from "@/components/ui/card";
 import { TradeHistory } from "@/components/trade-form/TradeHistory";
 
 interface FOTradeTableProps {
@@ -9,13 +8,11 @@ interface FOTradeTableProps {
 
 export function FOTradeTable({ trades }: FOTradeTableProps) {
   return (
-    <Card className="p-6">
-      <TradeHistory 
-        trades={trades} 
-        onEdit={() => {}} 
-        onDelete={() => {}} 
-        onViewDetails={() => {}}
-      />
-    </Card>
+    <TradeHistory 
+      trades={trades} 
+      onEdit={() => {}} 
+      onDelete={() => {}} 
+      onViewDetails={() => {}}
+    />
   );
 }
