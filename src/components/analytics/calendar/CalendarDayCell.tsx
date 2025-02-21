@@ -29,8 +29,8 @@ export function CalendarDayCell({
       case 'options':
         return dayStats && (
           <>
-            <div className="font-medium mb-1">{format(day, "d")}</div>
-            <div className="text-[10px] space-y-1">
+            <div className="font-medium">{format(day, "d")}</div>
+            <div className="text-[10px] space-y-0.5">
               {dayStats.vwapPosition && (
                 <div className="capitalize">{dayStats.vwapPosition.replace('_', ' ')}</div>
               )}
@@ -86,6 +86,7 @@ export function CalendarDayCell({
       case 'options':
         return (
           <>
+            <div>Option Price Position:</div>
             <div>VWAP: {dayStats.vwapPosition?.replace('_', ' ') || 'N/A'}</div>
             <div>EMA: {dayStats.emaPosition?.replace('_', ' ') || 'N/A'}</div>
             <div>VIX: {dayStats.vix?.toFixed(1) || 'N/A'}</div>
