@@ -1,12 +1,13 @@
 
 import { FormEvent } from "react";
-import { FormData, Trade } from "@/types/trade";
+import { FormData } from "@/types/trade";
 import { BasicTradeInfo } from "./BasicTradeInfo";
 import { MarketContext } from "./MarketContext";
 import { BehavioralAnalysis } from "./BehavioralAnalysis";
 import { TradeFormActions } from "./TradeFormActions";
-import { validateTradeForm } from "./TradeFormValidation";
+import { FormSection } from "./FormSection";
 import { useToast } from "@/hooks/use-toast";
+import { validateTradeForm } from "@/utils/trade-form/validation";
 
 interface TradeFormManagerProps {
   formData: FormData;
@@ -43,7 +44,7 @@ export function TradeFormManager({
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <FormSection>
         <BasicTradeInfo
           formData={formData}
           handleChange={handleChange}
@@ -54,7 +55,7 @@ export function TradeFormManager({
           handleChange={handleChange}
           handleSelectChange={handleSelectChange}
         />
-      </div>
+      </FormSection>
 
       <BehavioralAnalysis
         formData={formData}
