@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -11,23 +12,14 @@ import { Card } from "./ui/card";
 import { IntradayRiskMetrics } from "./analytics/IntradayRiskMetrics";
 import { FOTradeTable } from "./analytics/FOTradeTable";
 import { TradingCalendar } from "./analytics/TradingCalendar";
+import { Trade } from "@/types/trade";
 
-export function Analytics() {
+interface AnalyticsProps {
+  trades: Trade[];
+}
+
+export function Analytics({ trades }: AnalyticsProps) {
   const { user } = useAuth();
-
-  const { data: trades = [] } = useQuery({
-    queryKey: ['trades'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('trades')
-        .select('*')
-        .order('entry_time', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!user?.id
-  });
 
   return (
     <div className="space-y-8">
@@ -53,3 +45,4 @@ export function Analytics() {
     </div>
   );
 }
+
