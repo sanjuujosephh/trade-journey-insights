@@ -41,11 +41,11 @@ export function TradingCalendar() {
             callIv: trade.call_iv || undefined,
             putIv: trade.put_iv || undefined,
             marketCondition: trade.market_condition || undefined,
-            riskReward: trade.planned_risk_reward || undefined,
+            riskReward: undefined, // We'll calculate this below
             emotionalState: trade.overall_emotional_state || undefined,
             emotionalScore: trade.emotional_score || undefined,
             confidenceScore: trade.confidence_level_score || undefined,
-            disciplineScore: trade.followed_plan ? 100 : 0,
+            disciplineScore: undefined,
             vwapPosition: trade.vwap_position || undefined,
             emaPosition: trade.ema_position || undefined,
             option_type: trade.option_type || undefined,
@@ -59,6 +59,13 @@ export function TradingCalendar() {
         }
         tradeDays[dayKey].tradeCount += 1;
 
+        // Set risk/reward - prefer actual over planned if available
+        if (trade.actual_risk_reward !== null) {
+          tradeDays[dayKey].riskReward = trade.actual_risk_reward;
+        } else if (trade.planned_risk_reward !== null && tradeDays[dayKey].riskReward === undefined) {
+          tradeDays[dayKey].riskReward = trade.planned_risk_reward;
+        }
+
         // Update options data
         if (trade.vix) tradeDays[dayKey].vix = trade.vix;
         if (trade.call_iv) tradeDays[dayKey].callIv = trade.call_iv;
@@ -70,13 +77,9 @@ export function TradingCalendar() {
 
         // Update psychology data
         if (trade.market_condition) tradeDays[dayKey].marketCondition = trade.market_condition;
-        if (trade.planned_risk_reward) tradeDays[dayKey].riskReward = trade.planned_risk_reward;
         if (trade.overall_emotional_state) tradeDays[dayKey].emotionalState = trade.overall_emotional_state;
         if (trade.emotional_score) tradeDays[dayKey].emotionalScore = trade.emotional_score;
         if (trade.confidence_level_score) tradeDays[dayKey].confidenceScore = trade.confidence_level_score;
-        if (trade.followed_plan !== undefined) {
-          tradeDays[dayKey].disciplineScore = trade.followed_plan ? 100 : 0;
-        }
       });
 
       return tradeDays;
