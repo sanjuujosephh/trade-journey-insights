@@ -59,14 +59,14 @@ export function CalendarDayCell({
             <div className="font-medium mb-1">{format(day, "d")}</div>
             <div className="text-[10px] space-y-1">
               {dayStats.marketCondition && (
-                <div className="capitalize">{dayStats.marketCondition.replace('_', ' ')}</div>
+                <div className="text-xs capitalize">{dayStats.marketCondition.replace('_', ' ')}</div>
               )}
               {dayStats.riskReward && (
-                <div>R/R: {dayStats.riskReward.toFixed(1)}</div>
+                <div className="text-xs">R/R: {dayStats.riskReward.toFixed(1)}</div>
               )}
               {dayStats.emotionalState && (
                 <div className={cn(
-                  "capitalize",
+                  "text-xs capitalize",
                   dayStats.emotionalState === 'positive' && "text-green-600",
                   dayStats.emotionalState === 'negative' && "text-red-600"
                 )}>
@@ -74,7 +74,7 @@ export function CalendarDayCell({
                 </div>
               )}
               {dayStats.confidenceScore !== undefined && (
-                <div>Conf: {Math.round(dayStats.confidenceScore)}%</div>
+                <div className="text-xs">Conf: {Math.round(dayStats.confidenceScore)}%</div>
               )}
             </div>
           </>

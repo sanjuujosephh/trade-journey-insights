@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, getDay } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { CalendarGrid } from "./calendar/CalendarGrid";
@@ -87,21 +88,6 @@ export function TradingCalendar() {
     end: endOfMonth(currentDate),
   });
 
-  // Calculate weekly totals for each day of the week
-  const weeklyTotals: { [key: number]: number } = {};
-  Object.entries(tradeDays).forEach(([dateKey, dayStats]) => {
-    const date = new Date(dateKey);
-    const dayOfWeek = getDay(date);
-    weeklyTotals[dayOfWeek] = (weeklyTotals[dayOfWeek] || 0) + dayStats.totalPnL;
-  });
-
-  const weekStart = startOfWeek(currentDate);
-  const weekEnd = endOfWeek(currentDate);
-  const daysInWeek = eachDayOfInterval({
-    start: weekStart,
-    end: weekEnd,
-  });
-
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -148,26 +134,6 @@ export function TradingCalendar() {
             days={daysInMonth}
             currentDate={currentDate}
             tradeDays={tradeDays}
-            view="pnl"
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
-          />
-        </div>
-
-        <div className="bg-background rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Weekly P&L View</h3>
-          <CalendarGrid
-            days={daysInWeek}
-            currentDate={currentDate}
-            tradeDays={Object.fromEntries(
-              daysInWeek.map(day => [
-                format(day, "yyyy-MM-dd"),
-                {
-                  totalPnL: weeklyTotals[getDay(day)] || 0,
-                  tradeCount: 0
-                }
-              ])
-            )}
             view="pnl"
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
