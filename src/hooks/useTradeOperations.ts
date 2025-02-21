@@ -20,7 +20,6 @@ export function useTradeOperations() {
     };
     getUser();
 
-    // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUserId(session?.user.id ?? null);
     });
@@ -84,23 +83,30 @@ export function useTradeOperations() {
         throw new Error("User not authenticated");
       }
 
-      // Ensure entry_time is a valid ISO string
-      const entryTime = newTrade.entry_time ? new Date(newTrade.entry_time).toISOString() : new Date().toISOString();
-      const exitTime = newTrade.exit_time ? new Date(newTrade.exit_time).toISOString() : null;
+      // Ensure valid timestamps
+      const now = new Date().toISOString();
+      const tradeData = {
+        ...newTrade,
+        user_id: userId,
+        entry_time: newTrade.entry_time ? new Date(newTrade.entry_time).toISOString() : now,
+        exit_time: newTrade.exit_time ? new Date(newTrade.exit_time).toISOString() : null,
+        timestamp: now
+      };
 
-      const canAddTrade = await checkTradeLimit(entryTime);
+      // Calculate P/L and set outcome
+      if (tradeData.exit_price && tradeData.entry_price && tradeData.quantity) {
+        const pnl = (tradeData.exit_price - tradeData.entry_price) * tradeData.quantity;
+        tradeData.outcome = pnl > 0 ? 'profit' : pnl < 0 ? 'loss' : 'breakeven';
+      }
+
+      const canAddTrade = await checkTradeLimit(tradeData.entry_time);
       if (!canAddTrade) {
         throw new Error("Daily trade limit reached (1 trade per day)");
       }
 
       const { data, error } = await supabase
         .from('trades')
-        .insert([{ 
-          ...newTrade, 
-          user_id: userId,
-          entry_time: entryTime,
-          exit_time: exitTime 
-        }])
+        .insert([tradeData])
         .select()
         .single();
       
@@ -134,11 +140,16 @@ export function useTradeOperations() {
         throw new Error("User not authenticated");
       }
 
-      // Ensure valid timestamp formats
+      // Calculate P/L and set outcome
+      if (trade.exit_price && trade.entry_price && trade.quantity) {
+        const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+        trade.outcome = pnl > 0 ? 'profit' : pnl < 0 ? 'loss' : 'breakeven';
+      }
+
       const updates = {
         ...trade,
         entry_time: trade.entry_time ? new Date(trade.entry_time).toISOString() : undefined,
-        exit_time: trade.exit_time ? new Date(trade.exit_time).toISOString() : undefined
+        exit_time: trade.exit_time ? new Date(trade.exit_time).toISOString() : null
       };
 
       const { data, error } = await supabase

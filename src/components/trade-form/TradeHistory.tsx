@@ -29,6 +29,30 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeH
     });
   };
 
+  const calculatePnL = (trade: Trade) => {
+    if (!trade.exit_price || !trade.entry_price || !trade.quantity) return null;
+    return (trade.exit_price - trade.entry_price) * trade.quantity;
+  };
+
+  const formatPnL = (pnl: number | null) => {
+    if (pnl === null) return '-';
+    return `₹${pnl.toFixed(2)}`;
+  };
+
+  const getOutcomeStyle = (pnl: number | null) => {
+    if (pnl === null) return 'bg-gray-100 text-gray-800';
+    if (pnl > 0) return 'bg-green-100 text-green-800';
+    if (pnl < 0) return 'bg-red-100 text-red-800';
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  const getOutcomeText = (pnl: number | null) => {
+    if (pnl === null) return 'Pending';
+    if (pnl > 0) return 'Profit';
+    if (pnl < 0) return 'Loss';
+    return 'Breakeven';
+  };
+
   return (
     <Card className="p-6 glass">
       <h3 className="text-lg font-medium mb-4">Trade History</h3>
@@ -47,89 +71,84 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeH
             </TableRow>
           </TableHeader>
           <TableBody>
-            {trades.map((trade) => (
-              <TableRow key={trade.id}>
-                <TableCell>
-                  {trade.entry_time 
-                    ? new Date(trade.entry_time).toLocaleDateString()
-                    : new Date(trade.timestamp).toLocaleDateString()}
-                </TableCell>
-                <TableCell className="font-medium">{trade.symbol}</TableCell>
-                <TableCell>{trade.trade_type}</TableCell>
-                <TableCell>
-                  ₹{trade.entry_price}
-                  {trade.entry_time && (
-                    <div className="text-xs text-muted-foreground">
-                      {formatDisplayTime(trade.entry_time)}
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {trade.exit_price ? (
-                    <>
-                      ₹{trade.exit_price}
-                      {trade.exit_time && (
-                        <div className="text-xs text-muted-foreground">
-                          {formatDisplayTime(trade.exit_time)}
-                        </div>
-                      )}
-                    </>
-                  ) : '-'}
-                </TableCell>
-                <TableCell>
-                  {trade.exit_price && trade.quantity
-                    ? `₹${((Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity)).toFixed(2)}`
-                    : '-'}
-                </TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs ${
-                      trade.outcome === "profit"
-                        ? "bg-green-100 text-green-800"
-                        : trade.outcome === "loss"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {trade.outcome}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEdit(trade)}
+            {trades.map((trade) => {
+              const pnl = calculatePnL(trade);
+              return (
+                <TableRow key={trade.id}>
+                  <TableCell>
+                    {trade.entry_time 
+                      ? new Date(trade.entry_time).toLocaleDateString()
+                      : new Date(trade.timestamp).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="font-medium">{trade.symbol}</TableCell>
+                  <TableCell>{trade.trade_type}</TableCell>
+                  <TableCell>
+                    ₹{trade.entry_price}
+                    {trade.entry_time && (
+                      <div className="text-xs text-muted-foreground">
+                        {formatDisplayTime(trade.entry_time)}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {trade.exit_price ? (
+                      <>
+                        ₹{trade.exit_price}
+                        {trade.exit_time && (
+                          <div className="text-xs text-muted-foreground">
+                            {formatDisplayTime(trade.exit_time)}
+                          </div>
+                        )}
+                      </>
+                    ) : '-'}
+                  </TableCell>
+                  <TableCell>
+                    {formatPnL(pnl)}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs ${getOutcomeStyle(pnl)}`}
                     >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDelete(trade.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onViewDetails(trade)}
-                    >
-                      <Maximize2 className="h-4 w-4" />
-                    </Button>
-                    {trade.chart_link && (
+                      {getOutcomeText(pnl)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => window.open(trade.chart_link, '_blank')}
+                        onClick={() => onEdit(trade)}
                       >
-                        <Image className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" />
                       </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onDelete(trade.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onViewDetails(trade)}
+                      >
+                        <Maximize2 className="h-4 w-4" />
+                      </Button>
+                      {trade.chart_link && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => window.open(trade.chart_link, '_blank')}
+                        >
+                          <Image className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
