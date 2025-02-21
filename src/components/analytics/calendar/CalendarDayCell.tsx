@@ -1,4 +1,3 @@
-
 import { format, isSameMonth, isToday } from "date-fns";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DayStats } from "./calendarUtils";
@@ -32,14 +31,14 @@ export function CalendarDayCell({
             <div className="font-medium">{format(day, "d")}</div>
             <div className="text-[10px] space-y-0.5">
               {dayStats.vwapPosition && (
-                <div className="capitalize">{dayStats.vwapPosition.replace('_', ' ')}</div>
+                <div className="capitalize text-xs">{dayStats.vwapPosition.replace('_', ' ')}</div>
               )}
               {dayStats.emaPosition && (
-                <div className="capitalize">{dayStats.emaPosition.replace('_', ' ')}</div>
+                <div className="capitalize text-xs">{dayStats.emaPosition.replace('_', ' ')}</div>
               )}
-              {dayStats.vix && <div>VIX: {dayStats.vix.toFixed(1)}</div>}
+              {dayStats.vix && <div className="text-xs">VIX: {dayStats.vix.toFixed(1)}</div>}
               {(dayStats.callIv || dayStats.putIv) && (
-                <div>IV: {dayStats.callIv?.toFixed(1)}/{dayStats.putIv?.toFixed(1)}</div>
+                <div className="text-xs">IV: {dayStats.callIv?.toFixed(1)}/{dayStats.putIv?.toFixed(1)}</div>
               )}
             </div>
           </>
@@ -121,7 +120,7 @@ export function CalendarDayCell({
           <button
             onClick={() => onSelect(day)}
             className={cn(
-              "py-2 px-1 rounded-md text-xs transition-colors min-h-[60px] w-full",
+              "p-2 rounded-md text-xs transition-colors min-h-[75px] w-full",
               !isSameMonth(day, currentDate) && "opacity-50",
               isToday(day) && "ring-1 ring-primary",
               isSelected && "ring-1 ring-primary ring-offset-2",

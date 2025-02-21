@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -7,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { CalendarGrid } from "./calendar/CalendarGrid";
 import { TradeDay } from "./calendar/calendarUtils";
-import { Card } from "@/components/ui/card";
 
 export function TradingCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -138,7 +136,7 @@ export function TradingCalendar() {
       </div>
 
       <div className="space-y-8">
-        <div className="bg-card p-6 rounded-lg">
+        <div className="bg-background rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Monthly P&L View</h3>
           <CalendarGrid
             days={daysInMonth}
