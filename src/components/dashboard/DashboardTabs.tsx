@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { IntradayRiskMetrics } from "@/components/analytics/IntradayRiskMetrics"
 import { TradingCalendar } from "@/components/analytics/TradingCalendar";
 import LearningCenter from "@/components/LearningCenter";
 import { ProfileSettings } from "@/components/ProfileSettings";
+import { PerformanceMetrics } from "@/components/analytics/PerformanceMetrics";
 import { Trade } from "@/types/trade";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +23,6 @@ interface DashboardTabsProps {
   analyzeTradesWithAI: (options: { days?: number }) => void;
 }
 
-// Define tab background colors
 const tabColors = {
   "trade-entry": "bg-[#D3E4FD]", // Soft Blue
   "performance": "bg-[#E5DEFF]", // Soft Purple
@@ -76,7 +75,8 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="performance" className="mt-0 h-full">
-            <div className="p-6">
+            <div className="p-6 space-y-6">
+              <PerformanceMetrics trades={trades} />
               <TradeFlowChart trades={trades} />
               <TimePerformanceHeatmap trades={trades} />
             </div>
@@ -136,12 +136,7 @@ export function DashboardTabs({
 
           <TabsContent value="history" className="mt-0 h-full">
             <div className="p-6">
-              <FOTradeTable 
-                trades={trades} 
-                onReplayTrade={(trade) => {
-                  console.log("Replaying trade:", trade);
-                }} 
-              />
+              <FOTradeTable trades={trades} />
             </div>
           </TabsContent>
 

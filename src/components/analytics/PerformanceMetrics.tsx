@@ -63,9 +63,10 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
   const winningTrades = trades.filter(t => calculatePnL(t) > 0);
   const losingTrades = trades.filter(t => calculatePnL(t) < 0);
 
-  // AI-assisted metrics (placeholder values until AI integration)
+  // AI-assisted metrics (using actual data from trade records)
   const tradesWithoutMistake = (trades.filter(t => !t.plan_deviation_reason).length / trades.length) * 100;
-  const winnersWithMistake = (winningTrades.filter(t => t.plan_deviation_reason).length / winningTrades.length) * 100;
+  const winnersWithMistake = winningTrades.length > 0 ?
+    (winningTrades.filter(t => t.plan_deviation_reason).length / winningTrades.length) * 100 : 0;
 
   // Calculate average exits
   const avgExitWinner = winningTrades.length > 0 ?
@@ -108,7 +109,7 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
   const avgLosingDay = losingDays.length > 0 ?
     losingDays.reduce((sum, pnl) => sum + pnl, 0) / losingDays.length : 0;
 
-  // AI-assisted management metrics (placeholder values until AI integration)
+  // Calculate trade management metrics
   const tradesCorrect = (trades.filter(t => !t.is_impulsive_exit && t.followed_plan).length / trades.length) * 100;
   const tradesIncorrect = 100 - tradesCorrect;
 
@@ -116,12 +117,12 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
       <MetricCard
         label="Biggest Winner"
-        value={`$${biggestWinner.toFixed(2)}`}
+        value={`₹${biggestWinner.toFixed(2)}`}
         indicator="positive"
       />
       <MetricCard
         label="Biggest Loser"
-        value={`$${biggestLoser.toFixed(2)}`}
+        value={`₹${biggestLoser.toFixed(2)}`}
         indicator="negative"
       />
       <MetricCard
@@ -145,12 +146,12 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
         indicator="negative"
       />
       <MetricCard
-        label="Winners Holding Time Avg (Hours)"
-        value={winnersHoldingTime.toFixed(2)}
+        label="Winners Holding Time"
+        value={`${winnersHoldingTime.toFixed(2)}h`}
       />
       <MetricCard
-        label="Losers Holding Time Avg (Hours)"
-        value={losersHoldingTime.toFixed(2)}
+        label="Losers Holding Time"
+        value={`${losersHoldingTime.toFixed(2)}h`}
       />
       <MetricCard
         label="Trades per Day"
@@ -158,17 +159,17 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
       />
       <MetricCard
         label="Avg Day P&L"
-        value={`$${avgDayPnL.toFixed(2)}`}
+        value={`₹${avgDayPnL.toFixed(2)}`}
         indicator={avgDayPnL > 0 ? "positive" : "negative"}
       />
       <MetricCard
         label="Avg. Winning Day"
-        value={`$${avgWinningDay.toFixed(2)}`}
+        value={`₹${avgWinningDay.toFixed(2)}`}
         indicator="positive"
       />
       <MetricCard
         label="Avg. Losing Day"
-        value={`$${avgLosingDay.toFixed(2)}`}
+        value={`₹${avgLosingDay.toFixed(2)}`}
         indicator="negative"
       />
       <MetricCard
