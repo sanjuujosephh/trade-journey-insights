@@ -5,9 +5,9 @@ import { supabase } from "@/lib/supabase";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarGrid } from "./calendar/CalendarGrid";
 import { TradeDay } from "./calendar/calendarUtils";
+import { Card } from "@/components/ui/card";
 
 export function TradingCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -31,26 +31,40 @@ export function TradingCalendar() {
       const tradeDays: TradeDay = {};
       
       trades.forEach((trade) => {
-        if (!trade.entry_time || !trade.exit_price || !trade.entry_price || !trade.quantity) return;
+        if (!trade.entry_time) return;
         
         const dayKey = format(new Date(trade.entry_time), "yyyy-MM-dd");
         if (!tradeDays[dayKey]) {
           tradeDays[dayKey] = {
             totalPnL: 0,
             tradeCount: 0,
-            vix: trade.vix,
-            callIv: trade.call_iv,
-            putIv: trade.put_iv,
-            marketCondition: trade.market_condition,
-            riskReward: trade.planned_risk_reward,
-            emotionalState: trade.entry_emotion,
-            confidenceLevel: trade.confidence_level,
+            vix: trade.vix || undefined,
+            callIv: trade.call_iv || undefined,
+            putIv: trade.put_iv || undefined,
+            marketCondition: trade.market_condition || undefined,
+            riskReward: trade.planned_risk_reward || undefined,
+            emotionalState: trade.entry_emotion || undefined,
+            confidenceLevel: trade.confidence_level || undefined,
             disciplineScore: trade.followed_plan ? 100 : 0
           };
         }
         
-        tradeDays[dayKey].totalPnL += (trade.exit_price - trade.entry_price) * trade.quantity;
+        // Calculate P&L
+        if (trade.exit_price && trade.entry_price && trade.quantity) {
+          tradeDays[dayKey].totalPnL += (trade.exit_price - trade.entry_price) * trade.quantity;
+        }
         tradeDays[dayKey].tradeCount += 1;
+
+        // Update options data if available
+        if (trade.vix) tradeDays[dayKey].vix = trade.vix;
+        if (trade.call_iv) tradeDays[dayKey].callIv = trade.call_iv;
+        if (trade.put_iv) tradeDays[dayKey].putIv = trade.put_iv;
+
+        // Update psychology data
+        if (trade.entry_emotion) tradeDays[dayKey].emotionalState = trade.entry_emotion;
+        if (trade.confidence_level) tradeDays[dayKey].confidenceLevel = trade.confidence_level;
+        if (trade.market_condition) tradeDays[dayKey].marketCondition = trade.market_condition;
+        if (trade.planned_risk_reward) tradeDays[dayKey].riskReward = trade.planned_risk_reward;
       });
 
       return tradeDays;
@@ -108,15 +122,9 @@ export function TradingCalendar() {
         </div>
       </div>
 
-      <Tabs defaultValue="monthly" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="monthly">Monthly View</TabsTrigger>
-          <TabsTrigger value="weekly">Weekly View</TabsTrigger>
-          <TabsTrigger value="options">Options Data</TabsTrigger>
-          <TabsTrigger value="psychology">Psychology Tracker</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="monthly" className="space-y-4">
+      <div className="space-y-8">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Monthly P&L View</h3>
           <CalendarGrid
             days={daysInMonth}
             currentDate={currentDate}
@@ -125,9 +133,10 @@ export function TradingCalendar() {
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />
-        </TabsContent>
+        </Card>
 
-        <TabsContent value="weekly" className="space-y-4">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Weekly P&L View</h3>
           <CalendarGrid
             days={daysInWeek}
             currentDate={currentDate}
@@ -136,9 +145,10 @@ export function TradingCalendar() {
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />
-        </TabsContent>
+        </Card>
 
-        <TabsContent value="options" className="space-y-4">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Options Data</h3>
           <CalendarGrid
             days={daysInMonth}
             currentDate={currentDate}
@@ -147,9 +157,10 @@ export function TradingCalendar() {
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />
-        </TabsContent>
+        </Card>
 
-        <TabsContent value="psychology" className="space-y-4">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Psychology Tracker</h3>
           <CalendarGrid
             days={daysInMonth}
             currentDate={currentDate}
@@ -158,8 +169,9 @@ export function TradingCalendar() {
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />
-        </TabsContent>
-      </Tabs>
+        </Card>
+      </div>
     </div>
   );
 }
+
