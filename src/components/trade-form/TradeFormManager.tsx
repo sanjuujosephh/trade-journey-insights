@@ -3,7 +3,6 @@ import { FormEvent } from "react";
 import { FormData } from "@/types/trade";
 import { BasicTradeInfo } from "./BasicTradeInfo";
 import { MarketContext } from "./MarketContext";
-import { BehavioralAnalysis } from "./BehavioralAnalysis";
 import { TradeFormActions } from "./TradeFormActions";
 import { FormSection } from "./FormSection";
 import { useToast } from "@/hooks/use-toast";
@@ -56,12 +55,6 @@ export function TradeFormManager({
           handleSelectChange={handleSelectChange}
         />
       </FormSection>
-
-      <BehavioralAnalysis
-        formData={formData}
-        handleChange={handleChange}
-        handleSelectChange={handleSelectChange}
-      />
 
       <TradeFormActions isEditing={!!editingId} />
     </form>
