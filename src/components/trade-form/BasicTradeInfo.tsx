@@ -125,7 +125,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
         />
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="entry_price">Entry Price</Label>
           <Input
@@ -148,6 +148,18 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             step="0.01"
             placeholder="0.00"
             value={formData.exit_price}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="stop_loss">Stop Loss</Label>
+          <Input
+            id="stop_loss"
+            name="stop_loss"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            value={formData.stop_loss}
             onChange={handleChange}
           />
         </div>

@@ -35,31 +35,17 @@ export function OptionsFields({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="stop_loss">Stop Loss</Label>
-          <Input
-            id="stop_loss"
-            name="stop_loss"
-            type="number"
-            step="0.01"
-            placeholder="0.00"
-            value={formData.stop_loss}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="quantity">Quantity</Label>
-          <Input
-            id="quantity"
-            name="quantity"
-            type="number"
-            step="1"
-            placeholder="0"
-            value={formData.quantity}
-            onChange={handleChange}
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="quantity">Quantity</Label>
+        <Input
+          id="quantity"
+          name="quantity"
+          type="number"
+          step="1"
+          placeholder="0"
+          value={formData.quantity}
+          onChange={handleChange}
+        />
       </div>
 
       <div className="space-y-2">
