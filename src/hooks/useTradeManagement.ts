@@ -1,226 +1,46 @@
 
-import { useState, useCallback, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
-import { Trade, FormData } from "@/types/trade";
-import { AVAILABLE_SYMBOLS } from "@/constants/tradeConstants";
-
-const emptyFormData: FormData = {
-  symbol: AVAILABLE_SYMBOLS[0],
-  entry_price: "",
-  exit_price: "",
-  quantity: "",
-  trade_type: "options",
-  stop_loss: "",
-  strategy: "",
-  outcome: "profit",
-  notes: "",
-  entry_time: "",
-  exit_time: "",
-  chart_link: "",
-  vix: "",
-  call_iv: "",
-  put_iv: "",
-  strike_price: "",
-  option_type: "",
-  vwap_position: "",
-  ema_position: "",
-  market_condition: "",
-  timeframe: "",
-  trade_direction: "",
-  planned_risk_reward: "",
-  actual_risk_reward: "",
-  planned_target: "",
-  exit_reason: "",
-  slippage: "",
-  post_exit_price: "",
-  exit_efficiency: "",
-  confidence_level: "",
-  entry_emotion: "",
-  exit_emotion: "",
-};
+import { useTradeForm } from "./useTradeForm";
+import { useTradeOperations } from "./useTradeOperations";
+import { transformTradeData } from "@/utils/trade-form/transformations";
 
 export function useTradeManagement() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<FormData>(emptyFormData);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const {
+    formData,
+    editingId,
+    selectedTrade,
+    isDialogOpen,
+    setSelectedTrade,
+    setIsDialogOpen,
+    setFormData,
+    setEditingId,
+    handleChange,
+    handleSelectChange,
+    resetForm,
+  } = useTradeForm();
 
-  const { data: trades = [], isLoading } = useQuery({
-    queryKey: ['trades'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('trades')
-        .select('*')
-        .order('timestamp', { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  const {
+    trades,
+    isLoading,
+    addTrade,
+    updateTrade,
+  } = useTradeOperations();
 
-  const checkTradeLimit = useCallback(async (date: string) => {
-    if (editingId) return true;
-    
-    const dayStart = new Date(date);
-    dayStart.setHours(0, 0, 0, 0);
-    
-    const dayEnd = new Date(date);
-    dayEnd.setHours(23, 59, 59, 999);
-    
-    const { data: existingTrades, error } = await supabase
-      .from('trades')
-      .select('id')
-      .gte('entry_time', dayStart.toISOString())
-      .lte('entry_time', dayEnd.toISOString())
-      .eq('user_id', userId);
-    
-    if (error) {
-      console.error('Error checking trade limit:', error);
-      return false;
-    }
-    
-    return (existingTrades?.length || 0) < 1;
-  }, [editingId, userId]);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-      }
-    };
-    getUser();
-  }, []);
-
-  const addTrade = useMutation({
-    mutationFn: async (newTrade: Omit<Trade, 'id' | 'timestamp'>) => {
-      const canAddTrade = await checkTradeLimit(newTrade.entry_time || new Date().toISOString());
-      if (!canAddTrade) {
-        throw new Error("Daily trade limit reached (1 trade per day)");
-      }
-
-      const { data, error } = await supabase
-        .from('trades')
-        .insert([{ ...newTrade, user_id: userId }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['trades'] });
-      toast({
-        title: "Success",
-        description: "Trade logged successfully!"
-      });
-      setFormData(emptyFormData);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to log trade",
-        variant: "destructive"
-      });
-    }
-  });
-
-  const updateTrade = useMutation({
-    mutationFn: async ({ id, ...trade }: Partial<Trade> & { id: string }) => {
-      const { data, error } = await supabase
-        .from('trades')
-        .update({ ...trade, user_id: userId })
-        .eq('id', id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['trades'] });
-      toast({
-        title: "Success",
-        description: "Trade updated successfully!"
-      });
-      setEditingId(null);
-      setFormData(emptyFormData);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to update trade",
-        variant: "destructive"
-      });
-    }
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {    
-    const tradeData = {
-      ...formData,
-      entry_price: parseFloat(formData.entry_price),
-      exit_price: formData.exit_price ? parseFloat(formData.exit_price) : null,
-      quantity: formData.quantity ? parseFloat(formData.quantity) : null,
-      stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
-      strike_price: formData.strike_price ? parseFloat(formData.strike_price) : null,
-      vix: formData.vix ? parseFloat(formData.vix) : null,
-      call_iv: formData.call_iv ? parseFloat(formData.call_iv) : null,
-      put_iv: formData.put_iv ? parseFloat(formData.put_iv) : null,
-      vwap_position: formData.vwap_position || null,
-      ema_position: formData.ema_position || null,
-      planned_risk_reward: formData.planned_risk_reward ? parseFloat(formData.planned_risk_reward) : null,
-      actual_risk_reward: formData.actual_risk_reward ? parseFloat(formData.actual_risk_reward) : null,
-      planned_target: formData.planned_target ? parseFloat(formData.planned_target) : null,
-      slippage: formData.slippage ? parseFloat(formData.slippage) : null,
-      post_exit_price: formData.post_exit_price ? parseFloat(formData.post_exit_price) : null,
-      exit_efficiency: formData.exit_efficiency ? parseFloat(formData.exit_efficiency) : null,
-      confidence_level: formData.confidence_level ? parseInt(formData.confidence_level) : null,
-      entry_time: formData.entry_time || null,
-      exit_time: formData.exit_time || null,
-      option_type: formData.option_type || null,
-      market_condition: formData.market_condition || null,
-      timeframe: formData.timeframe || null,
-      trade_direction: formData.trade_direction || null,
-      exit_reason: formData.exit_reason || null,
-      entry_emotion: formData.entry_emotion || null,
-      exit_emotion: formData.exit_emotion || null,
-      strategy: formData.strategy || null,
-      notes: formData.notes || null,
-      chart_link: formData.chart_link || null,
-    } as Omit<Trade, 'id' | 'timestamp'>;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const tradeData = transformTradeData(formData);
     
     try {
       if (editingId) {
         await updateTrade.mutateAsync({ id: editingId, ...tradeData });
+        resetForm();
       } else {
         await addTrade.mutateAsync(tradeData);
+        resetForm();
       }
     } catch (error) {
       console.error('Form submission error:', error);
     }
   };
-
-  const handleChange = useCallback((
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  }, []);
-
-  const handleSelectChange = useCallback((name: string, value: string | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  }, []);
 
   return {
     formData,
