@@ -61,10 +61,10 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
   const winningTrades = trades.filter(t => calculatePnL(t) > 0);
   const losingTrades = trades.filter(t => calculatePnL(t) < 0);
 
-  // AI-assisted metrics (using actual data from trade records)
-  const tradesWithoutMistake = (trades.filter(t => !t.plan_deviation_reason).length / trades.length) * 100;
-  const winnersWithMistake = winningTrades.length > 0 ?
-    (winningTrades.filter(t => t.plan_deviation_reason).length / winningTrades.length) * 100 : 0;
+  // AI-assisted metrics (using exit reason and deviation details)
+  const tradesFollowedPlan = (trades.filter(t => t.exit_reason === 'target' || t.exit_reason === 'stop_loss').length / trades.length) * 100;
+  const winnersWithDeviation = winningTrades.length > 0 ?
+    (winningTrades.filter(t => t.exit_reason === 'manual').length / winningTrades.length) * 100 : 0;
 
   // Calculate average exits
   const avgExitWinner = winningTrades.length > 0 ?
@@ -108,7 +108,7 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
     losingDays.reduce((sum, pnl) => sum + pnl, 0) / losingDays.length : 0;
 
   // Calculate trade management metrics
-  const tradesCorrect = (trades.filter(t => !t.is_impulsive_exit && t.followed_plan).length / trades.length) * 100;
+  const tradesCorrect = (trades.filter(t => t.exit_reason !== 'manual').length / trades.length) * 100;
   const tradesIncorrect = 100 - tradesCorrect;
 
   return (
@@ -124,14 +124,14 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
         indicator="negative"
       />
       <MetricCard
-        label="Trades Without Mistake"
-        value={`${tradesWithoutMistake.toFixed(2)}%`}
-        tooltipText="Percentage of trades executed without significant errors"
+        label="Plan Adherence"
+        value={`${tradesFollowedPlan.toFixed(2)}%`}
+        tooltipText="Percentage of trades that followed the planned strategy"
       />
       <MetricCard
-        label="Winners With Mistake"
-        value={`${winnersWithMistake.toFixed(2)}%`}
-        tooltipText="Percentage of winning trades that had execution mistakes"
+        label="Winners with Deviation"
+        value={`${winnersWithDeviation.toFixed(2)}%`}
+        tooltipText="Percentage of winning trades that deviated from plan"
       />
       <MetricCard
         label="Avg. Exit Winner"
