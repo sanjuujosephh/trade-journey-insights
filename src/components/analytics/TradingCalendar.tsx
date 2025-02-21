@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, getDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { CalendarGrid } from "./calendar/CalendarGrid";
@@ -45,7 +45,9 @@ export function TradingCalendar() {
             riskReward: trade.planned_risk_reward || undefined,
             emotionalState: trade.entry_emotion || undefined,
             confidenceLevel: trade.confidence_level || undefined,
-            disciplineScore: trade.followed_plan ? 100 : 0
+            disciplineScore: trade.followed_plan ? 100 : 0,
+            vwapPosition: trade.vwap_position || undefined,
+            emaPosition: trade.ema_position || undefined
           };
         }
         
@@ -55,16 +57,21 @@ export function TradingCalendar() {
         }
         tradeDays[dayKey].tradeCount += 1;
 
-        // Update options data if available
+        // Update options data
         if (trade.vix) tradeDays[dayKey].vix = trade.vix;
         if (trade.call_iv) tradeDays[dayKey].callIv = trade.call_iv;
         if (trade.put_iv) tradeDays[dayKey].putIv = trade.put_iv;
+        if (trade.vwap_position) tradeDays[dayKey].vwapPosition = trade.vwap_position;
+        if (trade.ema_position) tradeDays[dayKey].emaPosition = trade.ema_position;
 
         // Update psychology data
-        if (trade.entry_emotion) tradeDays[dayKey].emotionalState = trade.entry_emotion;
-        if (trade.confidence_level) tradeDays[dayKey].confidenceLevel = trade.confidence_level;
         if (trade.market_condition) tradeDays[dayKey].marketCondition = trade.market_condition;
         if (trade.planned_risk_reward) tradeDays[dayKey].riskReward = trade.planned_risk_reward;
+        if (trade.entry_emotion) tradeDays[dayKey].emotionalState = trade.entry_emotion;
+        if (trade.confidence_level) tradeDays[dayKey].confidenceLevel = trade.confidence_level;
+        if (trade.followed_plan !== undefined) {
+          tradeDays[dayKey].disciplineScore = trade.followed_plan ? 100 : 0;
+        }
       });
 
       return tradeDays;
@@ -76,6 +83,14 @@ export function TradingCalendar() {
     end: endOfMonth(currentDate),
   });
 
+  // Calculate weekly totals for each day of the week
+  const weeklyTotals: { [key: number]: number } = {};
+  Object.entries(tradeDays).forEach(([dateKey, dayStats]) => {
+    const date = new Date(dateKey);
+    const dayOfWeek = getDay(date);
+    weeklyTotals[dayOfWeek] = (weeklyTotals[dayOfWeek] || 0) + dayStats.totalPnL;
+  });
+
   const weekStart = startOfWeek(currentDate);
   const weekEnd = endOfWeek(currentDate);
   const daysInWeek = eachDayOfInterval({
@@ -84,7 +99,7 @@ export function TradingCalendar() {
   });
 
   return (
-    <div className="p-4 space-y-8">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">
           {format(currentDate, "MMMM yyyy")}
@@ -123,7 +138,7 @@ export function TradingCalendar() {
       </div>
 
       <div className="space-y-8">
-        <Card className="p-6">
+        <div className="bg-card p-6 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">Monthly P&L View</h3>
           <CalendarGrid
             days={daysInMonth}
@@ -133,21 +148,29 @@ export function TradingCalendar() {
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />
-        </Card>
+        </div>
 
-        <Card className="p-6">
+        <div className="bg-card p-6 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">Weekly P&L View</h3>
           <CalendarGrid
             days={daysInWeek}
             currentDate={currentDate}
-            tradeDays={tradeDays}
+            tradeDays={Object.fromEntries(
+              daysInWeek.map(day => [
+                format(day, "yyyy-MM-dd"),
+                {
+                  totalPnL: weeklyTotals[getDay(day)] || 0,
+                  tradeCount: 0
+                }
+              ])
+            )}
             view="pnl"
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />
-        </Card>
+        </div>
 
-        <Card className="p-6">
+        <div className="bg-card p-6 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">Options Data</h3>
           <CalendarGrid
             days={daysInMonth}
@@ -157,9 +180,9 @@ export function TradingCalendar() {
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />
-        </Card>
+        </div>
 
-        <Card className="p-6">
+        <div className="bg-card p-6 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">Psychology Tracker</h3>
           <CalendarGrid
             days={daysInMonth}
@@ -169,9 +192,8 @@ export function TradingCalendar() {
             selectedDate={selectedDate}
             onDateSelect={setSelectedDate}
           />
-        </Card>
+        </div>
       </div>
     </div>
   );
 }
-

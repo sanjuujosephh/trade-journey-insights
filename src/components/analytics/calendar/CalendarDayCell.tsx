@@ -31,9 +31,16 @@ export function CalendarDayCell({
           <>
             <div className="font-medium mb-1">{format(day, "d")}</div>
             <div className="text-[10px] space-y-1">
+              {dayStats.vwapPosition && (
+                <div className="capitalize">{dayStats.vwapPosition.replace('_', ' ')}</div>
+              )}
+              {dayStats.emaPosition && (
+                <div className="capitalize">{dayStats.emaPosition.replace('_', ' ')}</div>
+              )}
               {dayStats.vix && <div>VIX: {dayStats.vix.toFixed(1)}</div>}
-              {dayStats.callIv && <div>Call IV: {dayStats.callIv.toFixed(1)}</div>}
-              {dayStats.putIv && <div>Put IV: {dayStats.putIv.toFixed(1)}</div>}
+              {(dayStats.callIv || dayStats.putIv) && (
+                <div>IV: {dayStats.callIv?.toFixed(1)}/{dayStats.putIv?.toFixed(1)}</div>
+              )}
             </div>
           </>
         );
@@ -42,11 +49,20 @@ export function CalendarDayCell({
           <>
             <div className="font-medium mb-1">{format(day, "d")}</div>
             <div className="text-[10px] space-y-1">
+              {dayStats.marketCondition && (
+                <div className="capitalize">{dayStats.marketCondition.replace('_', ' ')}</div>
+              )}
+              {dayStats.riskReward && (
+                <div>R/R: {dayStats.riskReward.toFixed(1)}</div>
+              )}
               {dayStats.emotionalState && (
                 <div className="capitalize">{dayStats.emotionalState}</div>
               )}
               {dayStats.confidenceLevel && (
-                <div>Conf: {dayStats.confidenceLevel}%</div>
+                <div>Conf: {dayStats.confidenceLevel}/5</div>
+              )}
+              {dayStats.disciplineScore !== undefined && (
+                <div>Disc: {dayStats.disciplineScore}%</div>
               )}
             </div>
           </>
@@ -70,6 +86,8 @@ export function CalendarDayCell({
       case 'options':
         return (
           <>
+            <div>VWAP: {dayStats.vwapPosition?.replace('_', ' ') || 'N/A'}</div>
+            <div>EMA: {dayStats.emaPosition?.replace('_', ' ') || 'N/A'}</div>
             <div>VIX: {dayStats.vix?.toFixed(1) || 'N/A'}</div>
             <div>Call IV: {dayStats.callIv?.toFixed(1) || 'N/A'}</div>
             <div>Put IV: {dayStats.putIv?.toFixed(1) || 'N/A'}</div>
@@ -78,10 +96,10 @@ export function CalendarDayCell({
       case 'psychology':
         return (
           <>
-            <div>Market: {dayStats.marketCondition || 'N/A'}</div>
+            <div>Market: {dayStats.marketCondition?.replace('_', ' ') || 'N/A'}</div>
             <div>R/R: {dayStats.riskReward?.toFixed(1) || 'N/A'}</div>
             <div>Emotion: {dayStats.emotionalState || 'N/A'}</div>
-            <div>Confidence: {dayStats.confidenceLevel || 'N/A'}%</div>
+            <div>Confidence: {dayStats.confidenceLevel ? `${dayStats.confidenceLevel}/5` : 'N/A'}</div>
             <div>Discipline: {dayStats.disciplineScore || 'N/A'}%</div>
           </>
         );

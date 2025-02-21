@@ -12,6 +12,8 @@ export interface DayStats {
   emotionalState?: string;
   confidenceLevel?: number;
   disciplineScore?: number;
+  vwapPosition?: string;
+  emaPosition?: string;
 }
 
 export interface TradeDay {
