@@ -37,7 +37,7 @@ export function Analytics({ trades }: AnalyticsProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <IntradayRiskMetrics trades={trades} />
-        <TradingCalendar trades={trades} />
+        <TradingCalendar />
       </div>
 
       <DailyPerformanceTable trades={trades} />
