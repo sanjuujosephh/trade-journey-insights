@@ -76,12 +76,9 @@ export function MarketContext({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="1min">1 Minute</SelectItem>
-            <SelectItem value="3min">3 Minutes</SelectItem>
             <SelectItem value="5min">5 Minutes</SelectItem>
             <SelectItem value="15min">15 Minutes</SelectItem>
             <SelectItem value="1hr">1 Hour</SelectItem>
-            <SelectItem value="4hr">4 Hours</SelectItem>
-            <SelectItem value="1day">1 Day</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -125,10 +122,11 @@ export function MarketContext({
               <SelectValue placeholder="Select exit emotion" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="satisfied">Satisfied</SelectItem>
-              <SelectItem value="regretful">Regretful</SelectItem>
-              <SelectItem value="relieved">Relieved</SelectItem>
-              <SelectItem value="frustrated">Frustrated</SelectItem>
+              <SelectItem value="fear">Fear</SelectItem>
+              <SelectItem value="greed">Greed</SelectItem>
+              <SelectItem value="fomo">FOMO</SelectItem>
+              <SelectItem value="revenge">Revenge</SelectItem>
+              <SelectItem value="neutral">Neutral</SelectItem>
             </SelectContent>
           </Select>
         </div>
