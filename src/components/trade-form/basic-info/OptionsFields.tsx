@@ -66,7 +66,19 @@ export function OptionsFields({
         </Select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="vix">VIX</Label>
+          <Input
+            id="vix"
+            name="vix"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            value={formData.vix}
+            onChange={handleChange}
+          />
+        </div>
         <div className="space-y-2">
           <Label htmlFor="call_iv">Call IV</Label>
           <Input
@@ -91,19 +103,6 @@ export function OptionsFields({
             onChange={handleChange}
           />
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="vix">VIX</Label>
-        <Input
-          id="vix"
-          name="vix"
-          type="number"
-          step="0.01"
-          placeholder="0.00"
-          value={formData.vix}
-          onChange={handleChange}
-        />
       </div>
     </>
   );

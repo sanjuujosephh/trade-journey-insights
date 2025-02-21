@@ -48,9 +48,9 @@ export function DashboardTabs({
         <TabsList className="w-full justify-start border-b rounded-none px-6 bg-background">
           {Object.entries({
             "trade-entry": "Trade Entry",
-            "performance": "Trade Performance",
+            "performance": "Trade Analysis",
             "calendar": "Calendar View",
-            "analysis": "Trade Analysis",
+            "analysis": "Behaviour Analysis",
             "ai-analysis": "AI Analysis",
             "learning": "Learning Center",
             "history": "Trade History",
