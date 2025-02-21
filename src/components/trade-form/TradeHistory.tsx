@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Maximize2, Image } from "lucide-react";
 import { Trade } from "@/types/trade";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 interface TradeHistoryProps {
   trades: Trade[];
@@ -20,6 +22,8 @@ interface TradeHistoryProps {
 }
 
 export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeHistoryProps) {
+  const { toast } = useToast();
+
   const formatDisplayTime = (dateString: string) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleTimeString('en-US', {
@@ -51,6 +55,30 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeH
     if (pnl > 0) return 'Profit';
     if (pnl < 0) return 'Loss';
     return 'Breakeven';
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('trades')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      onDelete(id);
+      toast({
+        title: "Success",
+        description: "Trade deleted successfully!"
+      });
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete trade",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -124,7 +152,7 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeH
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => onDelete(trade.id)}
+                        onClick={() => handleDelete(trade.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

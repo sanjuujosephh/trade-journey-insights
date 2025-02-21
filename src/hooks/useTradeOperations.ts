@@ -37,7 +37,6 @@ export function useTradeOperations() {
       const { data, error } = await supabase
         .from('trades')
         .select('*')
-        .eq('user_id', userId)
         .order('timestamp', { ascending: false });
       
       if (error) {
@@ -66,8 +65,7 @@ export function useTradeOperations() {
       .from('trades')
       .select('id')
       .gte('entry_time', dayStart.toISOString())
-      .lte('entry_time', dayEnd.toISOString())
-      .eq('user_id', userId);
+      .lte('entry_time', dayEnd.toISOString());
     
     if (error) {
       console.error('Error checking trade limit:', error);
@@ -93,11 +91,7 @@ export function useTradeOperations() {
         timestamp: now
       };
 
-      // Calculate P/L and set outcome
-      if (tradeData.exit_price && tradeData.entry_price && tradeData.quantity) {
-        const pnl = (tradeData.exit_price - tradeData.entry_price) * tradeData.quantity;
-        tradeData.outcome = pnl > 0 ? 'profit' : pnl < 0 ? 'loss' : 'breakeven';
-      }
+      console.log('Adding trade with data:', tradeData);
 
       const canAddTrade = await checkTradeLimit(tradeData.entry_time);
       if (!canAddTrade) {
@@ -140,23 +134,18 @@ export function useTradeOperations() {
         throw new Error("User not authenticated");
       }
 
-      // Calculate P/L and set outcome
-      if (trade.exit_price && trade.entry_price && trade.quantity) {
-        const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
-        trade.outcome = pnl > 0 ? 'profit' : pnl < 0 ? 'loss' : 'breakeven';
-      }
-
       const updates = {
         ...trade,
         entry_time: trade.entry_time ? new Date(trade.entry_time).toISOString() : undefined,
         exit_time: trade.exit_time ? new Date(trade.exit_time).toISOString() : null
       };
 
+      console.log('Updating trade with data:', updates);
+
       const { data, error } = await supabase
         .from('trades')
         .update(updates)
         .eq('id', id)
-        .eq('user_id', userId)
         .select()
         .single();
       
