@@ -22,7 +22,7 @@ export function OptionsFields({
 }: OptionsFieldsProps) {
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="strike_price">Strike Price</Label>
           <Input
@@ -47,23 +47,22 @@ export function OptionsFields({
             onChange={handleChange}
           />
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="option_type">Option Type</Label>
-        <Select
-          name="option_type"
-          value={formData.option_type}
-          onValueChange={(value) => handleSelectChange("option_type", value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select option type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="call">Call</SelectItem>
-            <SelectItem value="put">Put</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="space-y-2">
+          <Label htmlFor="option_type">Option Type</Label>
+          <Select
+            name="option_type"
+            value={formData.option_type}
+            onValueChange={(value) => handleSelectChange("option_type", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select option type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="call">Call</SelectItem>
+              <SelectItem value="put">Put</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -107,3 +106,4 @@ export function OptionsFields({
     </>
   );
 }
+

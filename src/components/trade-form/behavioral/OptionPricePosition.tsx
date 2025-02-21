@@ -20,7 +20,7 @@ export function OptionPricePosition({
   return (
     <div className="space-y-2">
       <Label>Option Price Was</Label>
-      <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Select
           name="vwap_position"
           value={formData.vwap_position}
@@ -51,3 +51,4 @@ export function OptionPricePosition({
     </div>
   );
 }
+
