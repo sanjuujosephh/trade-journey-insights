@@ -242,22 +242,22 @@ export function ProfileSettings() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phoneNumber">Phone Number</Label>
-            <Input
-              id="phoneNumber"
-              value={profile.phone_number || ""}
-              onChange={(e) => setProfile(prev => ({ ...prev, phone_number: e.target.value }))}
-              placeholder="Enter your phone number"
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <Input
               id="username"
               value={profile.username || ""}
               onChange={(e) => setProfile(prev => ({ ...prev, username: e.target.value }))}
               placeholder="Enter your username"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber">Phone Number</Label>
+            <Input
+              id="phoneNumber"
+              value={profile.phone_number || ""}
+              onChange={(e) => setProfile(prev => ({ ...prev, phone_number: e.target.value }))}
+              placeholder="Enter your phone number"
             />
           </div>
 

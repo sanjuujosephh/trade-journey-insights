@@ -16,6 +16,9 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          phone_number: string | null
+          telegram_id: string | null
+          twitter_id: string | null
           updated_at: string
           username: string | null
         }
@@ -25,6 +28,9 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          phone_number?: string | null
+          telegram_id?: string | null
+          twitter_id?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -34,6 +40,9 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          phone_number?: string | null
+          telegram_id?: string | null
+          twitter_id?: string | null
           updated_at?: string
           username?: string | null
         }
