@@ -84,19 +84,13 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="trade_type">Trade Type</Label>
-          <Select
+          <Input
+            id="trade_type"
             name="trade_type"
-            value={formData.trade_type}
-            onValueChange={(value) => handleSelectChange("trade_type", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="options">Options</SelectItem>
-              <SelectItem value="futures">Futures</SelectItem>
-            </SelectContent>
-          </Select>
+            value="options"
+            readOnly
+            className="bg-gray-100"
+          />
         </div>
         
         <div className="space-y-2">
@@ -117,13 +111,11 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
         </div>
       </div>
 
-      {formData.trade_type === "options" && (
-        <OptionsFields
-          formData={formData}
-          handleChange={handleChange}
-          handleSelectChange={handleSelectChange}
-        />
-      )}
+      <OptionsFields
+        formData={formData}
+        handleChange={handleChange}
+        handleSelectChange={handleSelectChange}
+      />
 
       <div className="grid grid-cols-3 gap-4">
         <div className="space-y-2">
