@@ -18,21 +18,38 @@ export function TradingCalendar() {
       const monthStart = startOfMonth(currentDate);
       const monthEnd = endOfMonth(currentDate);
 
-      const { data: trades } = await supabase
+      console.log("Fetching trades for:", {
+        monthStart: monthStart.toISOString(),
+        monthEnd: monthEnd.toISOString()
+      });
+
+      const { data: trades, error } = await supabase
         .from("trades")
         .select("*")
         .gte("entry_time", monthStart.toISOString())
         .lte("entry_time", monthEnd.toISOString())
         .order("entry_time");
 
+      if (error) {
+        console.error("Supabase query error:", error);
+        return {};
+      }
+
+      console.log("Received trades:", trades);
+
       if (!trades) return {};
 
       const tradeDays: TradeDay = {};
       
       trades.forEach((trade) => {
-        if (!trade.entry_time) return;
+        if (!trade.entry_time) {
+          console.log("Trade missing entry_time:", trade);
+          return;
+        }
         
         const dayKey = format(new Date(trade.entry_time), "yyyy-MM-dd");
+        console.log("Processing trade for day:", dayKey, trade);
+
         if (!tradeDays[dayKey]) {
           tradeDays[dayKey] = {
             totalPnL: 0,
@@ -59,21 +76,33 @@ export function TradingCalendar() {
         }
         tradeDays[dayKey].tradeCount += 1;
 
-        // Calculate and set risk/reward ratio
+        // Calculate and set risk/reward ratio with logging
+        console.log("Risk/Reward calculation inputs:", {
+          actual_risk_reward: trade.actual_risk_reward,
+          planned_risk_reward: trade.planned_risk_reward,
+          entry_price: trade.entry_price,
+          exit_price: trade.exit_price,
+          stop_loss: trade.stop_loss
+        });
+
         if (trade.actual_risk_reward) {
-          // If we have actual R/R, use it
+          console.log("Using actual R/R:", trade.actual_risk_reward);
           tradeDays[dayKey].riskReward = trade.actual_risk_reward;
         } else if (trade.planned_risk_reward && tradeDays[dayKey].riskReward === undefined) {
-          // If we have planned R/R and haven't set a value yet, use planned
+          console.log("Using planned R/R:", trade.planned_risk_reward);
           tradeDays[dayKey].riskReward = trade.planned_risk_reward;
         } else if (trade.exit_price && trade.entry_price && trade.stop_loss && tradeDays[dayKey].riskReward === undefined) {
-          // If we have all the components to calculate R/R and haven't set a value yet
           const reward = trade.exit_price - trade.entry_price;
           const risk = Math.abs(trade.entry_price - trade.stop_loss);
+          console.log("Calculating R/R from components:", { reward, risk });
           if (risk !== 0) {
-            tradeDays[dayKey].riskReward = reward / risk;
+            const calculatedRR = reward / risk;
+            console.log("Calculated R/R:", calculatedRR);
+            tradeDays[dayKey].riskReward = calculatedRR;
           }
         }
+
+        console.log("Final R/R value for day:", tradeDays[dayKey].riskReward);
 
         // Update options data
         if (trade.vix) tradeDays[dayKey].vix = trade.vix;
@@ -91,6 +120,7 @@ export function TradingCalendar() {
         if (trade.confidence_level_score) tradeDays[dayKey].confidenceScore = trade.confidence_level_score;
       });
 
+      console.log("Final tradeDays object:", tradeDays);
       return tradeDays;
     },
   });
@@ -179,4 +209,3 @@ export function TradingCalendar() {
     </div>
   );
 }
-
