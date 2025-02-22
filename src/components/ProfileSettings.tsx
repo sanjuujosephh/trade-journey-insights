@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -97,7 +96,7 @@ export function ProfileSettings() {
     if (profileData) {
       setProfile(profileData);
     }
-  }, [profileData]);
+  });
 
   if (!user) return null;
 

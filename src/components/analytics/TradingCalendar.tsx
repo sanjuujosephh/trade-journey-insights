@@ -1,12 +1,12 @@
 
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import { useTradeDays } from "@/hooks/useTradeDays";
+import { CalendarHeader } from "./calendar/CalendarHeader";
 import { PnLCalendarView } from "./calendar/views/PnLCalendarView";
 import { OptionsCalendarView } from "./calendar/views/OptionsCalendarView";
 import { PsychologyCalendarView } from "./calendar/views/PsychologyCalendarView";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export function TradingCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -19,69 +19,65 @@ export function TradingCalendar() {
     end: endOfMonth(currentDate),
   });
 
+  const handlePreviousMonth = () => {
+    setCurrentDate(date => {
+      const newDate = new Date(date);
+      newDate.setMonth(date.getMonth() - 1);
+      return newDate;
+    });
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(date => {
+      const newDate = new Date(date);
+      newDate.setMonth(date.getMonth() + 1);
+      return newDate;
+    });
+  };
+
+  const handleToday = () => {
+    setCurrentDate(new Date());
+  };
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">
-          {format(currentDate, "MMMM yyyy")}
-        </h2>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setCurrentDate(new Date())}
-          >
-            <Calendar className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setCurrentDate(date => {
-              const newDate = new Date(date);
-              newDate.setMonth(date.getMonth() - 1);
-              return newDate;
-            })}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setCurrentDate(date => {
-              const newDate = new Date(date);
-              newDate.setMonth(date.getMonth() + 1);
-              return newDate;
-            })}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <CalendarHeader
+        currentDate={currentDate}
+        onPreviousMonth={handlePreviousMonth}
+        onNextMonth={handleNextMonth}
+        onToday={handleToday}
+      />
 
       <div className="space-y-8">
-        <PnLCalendarView
-          days={daysInMonth}
-          currentDate={currentDate}
-          tradeDays={tradeDays}
-          selectedDate={selectedDate}
-          onDateSelect={setSelectedDate}
-        />
+        <ErrorBoundary>
+          <PnLCalendarView
+            days={daysInMonth}
+            currentDate={currentDate}
+            tradeDays={tradeDays}
+            selectedDate={selectedDate}
+            onDateSelect={setSelectedDate}
+          />
+        </ErrorBoundary>
 
-        <OptionsCalendarView
-          days={daysInMonth}
-          currentDate={currentDate}
-          tradeDays={tradeDays}
-          selectedDate={selectedDate}
-          onDateSelect={setSelectedDate}
-        />
+        <ErrorBoundary>
+          <OptionsCalendarView
+            days={daysInMonth}
+            currentDate={currentDate}
+            tradeDays={tradeDays}
+            selectedDate={selectedDate}
+            onDateSelect={setSelectedDate}
+          />
+        </ErrorBoundary>
 
-        <PsychologyCalendarView
-          days={daysInMonth}
-          currentDate={currentDate}
-          tradeDays={tradeDays}
-          selectedDate={selectedDate}
-          onDateSelect={setSelectedDate}
-        />
+        <ErrorBoundary>
+          <PsychologyCalendarView
+            days={daysInMonth}
+            currentDate={currentDate}
+            tradeDays={tradeDays}
+            selectedDate={selectedDate}
+            onDateSelect={setSelectedDate}
+          />
+        </ErrorBoundary>
       </div>
     </div>
   );
