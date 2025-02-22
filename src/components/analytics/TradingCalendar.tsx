@@ -41,7 +41,7 @@ export function TradingCalendar() {
             callIv: trade.call_iv || undefined,
             putIv: trade.put_iv || undefined,
             marketCondition: trade.market_condition || undefined,
-            riskReward: undefined, // We'll calculate this below
+            riskReward: undefined,
             emotionalState: trade.overall_emotional_state || undefined,
             emotionalScore: trade.emotional_score || undefined,
             confidenceScore: trade.confidence_level_score || undefined,
@@ -59,11 +59,20 @@ export function TradingCalendar() {
         }
         tradeDays[dayKey].tradeCount += 1;
 
-        // Set risk/reward - prefer actual over planned if available
-        if (trade.actual_risk_reward !== null) {
+        // Calculate and set risk/reward ratio
+        if (trade.actual_risk_reward) {
+          // If we have actual R/R, use it
           tradeDays[dayKey].riskReward = trade.actual_risk_reward;
-        } else if (trade.planned_risk_reward !== null && tradeDays[dayKey].riskReward === undefined) {
+        } else if (trade.planned_risk_reward && tradeDays[dayKey].riskReward === undefined) {
+          // If we have planned R/R and haven't set a value yet, use planned
           tradeDays[dayKey].riskReward = trade.planned_risk_reward;
+        } else if (trade.exit_price && trade.entry_price && trade.stop_loss && tradeDays[dayKey].riskReward === undefined) {
+          // If we have all the components to calculate R/R and haven't set a value yet
+          const reward = trade.exit_price - trade.entry_price;
+          const risk = Math.abs(trade.entry_price - trade.stop_loss);
+          if (risk !== 0) {
+            tradeDays[dayKey].riskReward = reward / risk;
+          }
         }
 
         // Update options data
@@ -170,3 +179,4 @@ export function TradingCalendar() {
     </div>
   );
 }
+
