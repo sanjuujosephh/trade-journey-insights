@@ -1,7 +1,8 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, PenLine, BarChart2, Calendar, Brain, Bot, GraduationCap, History, Settings } from "lucide-react";
 import TradeEntry from "@/components/TradeEntry";
 import { FOTradeTable } from "@/components/analytics/FOTradeTable";
 import { TradeFlowChart } from "@/components/analytics/TradeFlowChart";
@@ -42,30 +43,38 @@ export function DashboardTabs({
   currentAnalysis,
   analyzeTradesWithAI
 }: DashboardTabsProps) {
+  const tabConfig = {
+    "trade-entry": { label: "Trade Entry", icon: PenLine },
+    "performance": { label: "Trade Analysis", icon: BarChart2 },
+    "calendar": { label: "Calendar View", icon: Calendar },
+    "analysis": { label: "Behaviour Analysis", icon: Brain },
+    "ai-analysis": { label: "AI Analysis", icon: Bot },
+    "learning": { label: "Learning Center", icon: GraduationCap },
+    "history": { label: "Trade History", icon: History },
+    "profile": { label: "Profile", icon: Settings }
+  } as const;
+
   return (
     <Card>
       <Tabs defaultValue="trade-entry" className="h-[calc(100%-4.5rem)]" onValueChange={setActiveTab}>
         <TabsList className="w-full justify-start border-b rounded-none px-6 bg-background">
-          {Object.entries({
-            "trade-entry": "Trade Entry",
-            "performance": "Trade Analysis",
-            "calendar": "Calendar View",
-            "analysis": "Behaviour Analysis",
-            "ai-analysis": "AI Analysis",
-            "learning": "Learning Center",
-            "history": "Trade History",
-            "profile": "Profile"
-          }).map(([value, label]) => (
-            <TabsTrigger
-              key={value}
-              value={value}
-              className={cn(
-                "transition-colors duration-200",
-                activeTab === value && tabColors[value as keyof typeof tabColors]
+          {Object.entries(tabConfig).map(([value, { label, icon: Icon }], index) => (
+            <>
+              <TabsTrigger
+                key={value}
+                value={value}
+                className={cn(
+                  "transition-colors duration-200 flex items-center gap-2",
+                  activeTab === value && tabColors[value as keyof typeof tabColors]
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                {label}
+              </TabsTrigger>
+              {index < Object.entries(tabConfig).length - 1 && (
+                <span className="mx-2 text-gray-300">|</span>
               )}
-            >
-              {label}
-            </TabsTrigger>
+            </>
           ))}
         </TabsList>
         
