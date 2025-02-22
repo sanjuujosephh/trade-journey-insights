@@ -1,140 +1,18 @@
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import { CalendarGrid } from "./calendar/CalendarGrid";
-import { TradeDay } from "./calendar/calendarUtils";
+import { useTradeDays } from "@/hooks/useTradeDays";
+import { PnLCalendarView } from "./calendar/views/PnLCalendarView";
+import { OptionsCalendarView } from "./calendar/views/OptionsCalendarView";
+import { PsychologyCalendarView } from "./calendar/views/PsychologyCalendarView";
 
 export function TradingCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const { data: tradeDays = {} } = useQuery({
-    queryKey: ["calendar-trades", format(currentDate, "yyyy-MM")],
-    queryFn: async () => {
-      const monthStart = startOfMonth(currentDate);
-      const monthEnd = endOfMonth(currentDate);
-
-      console.log("Fetching trades for:", {
-        monthStart: monthStart.toISOString(),
-        monthEnd: monthEnd.toISOString()
-      });
-
-      const { data: trades, error } = await supabase
-        .from("trades")
-        .select("*")
-        .gte("entry_time", monthStart.toISOString())
-        .lte("entry_time", monthEnd.toISOString())
-        .order("entry_time");
-      
-      if (error) {
-        console.error("Supabase query error:", error);
-        return {};
-      }
-
-      console.log("Received trades:", trades);
-
-      if (!trades) return {};
-
-      const tradeDays: TradeDay = {};
-      
-      trades.forEach((trade) => {
-        if (!trade.entry_time) {
-          console.log("Trade missing entry_time:", trade);
-          return;
-        }
-        
-        const dayKey = format(new Date(trade.entry_time), "yyyy-MM-dd");
-        console.log("Processing trade for day:", dayKey, trade);
-
-        if (!tradeDays[dayKey]) {
-          tradeDays[dayKey] = {
-            totalPnL: 0,
-            tradeCount: 0,
-            vix: trade.vix || undefined,
-            callIv: trade.call_iv || undefined,
-            putIv: trade.put_iv || undefined,
-            marketCondition: trade.market_condition || undefined,
-            riskReward: undefined,
-            emotionalState: trade.overall_emotional_state || undefined,
-            emotionalScore: trade.emotional_score || undefined,
-            confidenceScore: trade.confidence_level_score || undefined,
-            disciplineScore: undefined,
-            vwapPosition: trade.vwap_position || undefined,
-            emaPosition: trade.ema_position || undefined,
-            option_type: trade.option_type || undefined,
-            trade_direction: trade.trade_direction || undefined
-          };
-        }
-        
-        // Calculate P&L
-        if (trade.exit_price && trade.entry_price && trade.quantity) {
-          tradeDays[dayKey].totalPnL += (trade.exit_price - trade.entry_price) * trade.quantity;
-        }
-        tradeDays[dayKey].tradeCount += 1;
-
-        // Calculate and set risk/reward ratio with improved validation
-        console.log("Risk/Reward calculation inputs:", {
-          actual_risk_reward: trade.actual_risk_reward,
-          planned_risk_reward: trade.planned_risk_reward,
-          entry_price: trade.entry_price,
-          exit_price: trade.exit_price,
-          stop_loss: trade.stop_loss
-        });
-
-        // Only update riskReward if we have a valid value and haven't set one yet
-        // or if we have an actual R/R (which should override planned or calculated)
-        if (trade.actual_risk_reward !== null && trade.actual_risk_reward !== undefined) {
-          console.log("Using actual R/R:", trade.actual_risk_reward);
-          tradeDays[dayKey].riskReward = Number(trade.actual_risk_reward);
-        } else if (
-          trade.planned_risk_reward !== null && 
-          trade.planned_risk_reward !== undefined && 
-          tradeDays[dayKey].riskReward === undefined
-        ) {
-          console.log("Using planned R/R:", trade.planned_risk_reward);
-          tradeDays[dayKey].riskReward = Number(trade.planned_risk_reward);
-        } else if (
-          trade.exit_price && 
-          trade.entry_price && 
-          trade.stop_loss && 
-          tradeDays[dayKey].riskReward === undefined
-        ) {
-          const reward = Number(trade.exit_price) - Number(trade.entry_price);
-          const risk = Math.abs(Number(trade.entry_price) - Number(trade.stop_loss));
-          console.log("Calculating R/R from components:", { reward, risk });
-          if (risk !== 0) {
-            const calculatedRR = reward / risk;
-            console.log("Calculated R/R:", calculatedRR);
-            tradeDays[dayKey].riskReward = Number(calculatedRR.toFixed(2)); // Round to 2 decimal places
-          }
-        }
-
-        console.log("Final R/R value for day:", tradeDays[dayKey].riskReward);
-
-        // Update options data
-        if (trade.vix) tradeDays[dayKey].vix = trade.vix;
-        if (trade.call_iv) tradeDays[dayKey].callIv = trade.call_iv;
-        if (trade.put_iv) tradeDays[dayKey].putIv = trade.put_iv;
-        if (trade.vwap_position) tradeDays[dayKey].vwapPosition = trade.vwap_position;
-        if (trade.ema_position) tradeDays[dayKey].emaPosition = trade.ema_position;
-        if (trade.option_type) tradeDays[dayKey].option_type = trade.option_type;
-        if (trade.trade_direction) tradeDays[dayKey].trade_direction = trade.trade_direction;
-
-        // Update psychology data
-        if (trade.market_condition) tradeDays[dayKey].marketCondition = trade.market_condition;
-        if (trade.overall_emotional_state) tradeDays[dayKey].emotionalState = trade.overall_emotional_state;
-        if (trade.emotional_score) tradeDays[dayKey].emotionalScore = trade.emotional_score;
-        if (trade.confidence_level_score) tradeDays[dayKey].confidenceScore = trade.confidence_level_score;
-      });
-
-      console.log("Final tradeDays object:", tradeDays);
-      return tradeDays;
-    },
-  });
+  const { data: tradeDays = {} } = useTradeDays(currentDate);
 
   const daysInMonth = eachDayOfInterval({
     start: startOfMonth(currentDate),
@@ -181,41 +59,29 @@ export function TradingCalendar() {
       </div>
 
       <div className="space-y-8">
-        <div className="bg-background rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Monthly P&L View</h3>
-          <CalendarGrid
-            days={daysInMonth}
-            currentDate={currentDate}
-            tradeDays={tradeDays}
-            view="pnl"
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
-          />
-        </div>
+        <PnLCalendarView
+          days={daysInMonth}
+          currentDate={currentDate}
+          tradeDays={tradeDays}
+          selectedDate={selectedDate}
+          onDateSelect={setSelectedDate}
+        />
 
-        <div className="bg-background rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Options Data</h3>
-          <CalendarGrid
-            days={daysInMonth}
-            currentDate={currentDate}
-            tradeDays={tradeDays}
-            view="options"
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
-          />
-        </div>
+        <OptionsCalendarView
+          days={daysInMonth}
+          currentDate={currentDate}
+          tradeDays={tradeDays}
+          selectedDate={selectedDate}
+          onDateSelect={setSelectedDate}
+        />
 
-        <div className="bg-background rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Psychology Tracker</h3>
-          <CalendarGrid
-            days={daysInMonth}
-            currentDate={currentDate}
-            tradeDays={tradeDays}
-            view="psychology"
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
-          />
-        </div>
+        <PsychologyCalendarView
+          days={daysInMonth}
+          currentDate={currentDate}
+          tradeDays={tradeDays}
+          selectedDate={selectedDate}
+          onDateSelect={setSelectedDate}
+        />
       </div>
     </div>
   );
