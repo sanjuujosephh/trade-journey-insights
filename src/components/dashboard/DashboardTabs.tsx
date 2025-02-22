@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,23 +57,18 @@ export function DashboardTabs({
     <Card>
       <Tabs defaultValue="trade-entry" className="h-[calc(100%-4.5rem)]" onValueChange={setActiveTab}>
         <TabsList className="w-full justify-start border-b rounded-none px-6 bg-background">
-          {Object.entries(tabConfig).map(([value, { label, icon: Icon }], index) => (
-            <>
-              <TabsTrigger
-                key={value}
-                value={value}
-                className={cn(
-                  "transition-colors duration-200 flex items-center gap-2",
-                  activeTab === value && tabColors[value as keyof typeof tabColors]
-                )}
-              >
-                <Icon className="w-4 h-4" />
-                {label}
-              </TabsTrigger>
-              {index < Object.entries(tabConfig).length - 1 && (
-                <span className="mx-2 text-gray-300">|</span>
+          {Object.entries(tabConfig).map(([value, { label, icon: Icon }]) => (
+            <TabsTrigger
+              key={value}
+              value={value}
+              className={cn(
+                "transition-colors duration-200 flex items-center gap-2",
+                activeTab === value && tabColors[value as keyof typeof tabColors]
               )}
-            </>
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </TabsTrigger>
           ))}
         </TabsList>
         
