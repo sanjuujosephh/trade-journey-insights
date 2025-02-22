@@ -16,9 +16,6 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
-          phone_number: string | null
-          telegram_id: string | null
-          twitter_id: string | null
           updated_at: string
           username: string | null
         }
@@ -28,9 +25,6 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
-          phone_number?: string | null
-          telegram_id?: string | null
-          twitter_id?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -40,9 +34,6 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
-          phone_number?: string | null
-          telegram_id?: string | null
-          twitter_id?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -72,7 +63,6 @@ export type Database = {
           option_type: string | null
           outcome: string
           overall_emotional_state: string | null
-          plan_deviation_reason: string | null
           planned_risk_reward: number | null
           planned_target: number | null
           post_exit_price: number | null
@@ -83,7 +73,6 @@ export type Database = {
           strategy: string | null
           strike_price: number | null
           symbol: string
-          target: number | null
           timeframe: string | null
           timestamp: string
           trade_direction: string | null
@@ -91,7 +80,6 @@ export type Database = {
           user_id: string
           vix: number | null
           vwap_position: string | null
-          what_if_analysis: Json | null
         }
         Insert: {
           actual_risk_reward?: number | null
@@ -116,7 +104,6 @@ export type Database = {
           option_type?: string | null
           outcome: string
           overall_emotional_state?: string | null
-          plan_deviation_reason?: string | null
           planned_risk_reward?: number | null
           planned_target?: number | null
           post_exit_price?: number | null
@@ -127,7 +114,6 @@ export type Database = {
           strategy?: string | null
           strike_price?: number | null
           symbol: string
-          target?: number | null
           timeframe?: string | null
           timestamp?: string
           trade_direction?: string | null
@@ -135,7 +121,6 @@ export type Database = {
           user_id: string
           vix?: number | null
           vwap_position?: string | null
-          what_if_analysis?: Json | null
         }
         Update: {
           actual_risk_reward?: number | null
@@ -160,7 +145,6 @@ export type Database = {
           option_type?: string | null
           outcome?: string
           overall_emotional_state?: string | null
-          plan_deviation_reason?: string | null
           planned_risk_reward?: number | null
           planned_target?: number | null
           post_exit_price?: number | null
@@ -171,7 +155,6 @@ export type Database = {
           strategy?: string | null
           strike_price?: number | null
           symbol?: string
-          target?: number | null
           timeframe?: string | null
           timestamp?: string
           trade_direction?: string | null
@@ -179,7 +162,6 @@ export type Database = {
           user_id?: string
           vix?: number | null
           vwap_position?: string | null
-          what_if_analysis?: Json | null
         }
         Relationships: []
       }

@@ -29,7 +29,7 @@ export function TradingCalendar() {
         .gte("entry_time", monthStart.toISOString())
         .lte("entry_time", monthEnd.toISOString())
         .order("entry_time");
-
+      
       if (error) {
         console.error("Supabase query error:", error);
         return {};
@@ -76,7 +76,7 @@ export function TradingCalendar() {
         }
         tradeDays[dayKey].tradeCount += 1;
 
-        // Calculate and set risk/reward ratio with logging
+        // Calculate and set risk/reward ratio with improved validation
         console.log("Risk/Reward calculation inputs:", {
           actual_risk_reward: trade.actual_risk_reward,
           planned_risk_reward: trade.planned_risk_reward,
@@ -85,20 +85,31 @@ export function TradingCalendar() {
           stop_loss: trade.stop_loss
         });
 
-        if (trade.actual_risk_reward) {
+        // Only update riskReward if we have a valid value and haven't set one yet
+        // or if we have an actual R/R (which should override planned or calculated)
+        if (trade.actual_risk_reward !== null && trade.actual_risk_reward !== undefined) {
           console.log("Using actual R/R:", trade.actual_risk_reward);
-          tradeDays[dayKey].riskReward = trade.actual_risk_reward;
-        } else if (trade.planned_risk_reward && tradeDays[dayKey].riskReward === undefined) {
+          tradeDays[dayKey].riskReward = Number(trade.actual_risk_reward);
+        } else if (
+          trade.planned_risk_reward !== null && 
+          trade.planned_risk_reward !== undefined && 
+          tradeDays[dayKey].riskReward === undefined
+        ) {
           console.log("Using planned R/R:", trade.planned_risk_reward);
-          tradeDays[dayKey].riskReward = trade.planned_risk_reward;
-        } else if (trade.exit_price && trade.entry_price && trade.stop_loss && tradeDays[dayKey].riskReward === undefined) {
-          const reward = trade.exit_price - trade.entry_price;
-          const risk = Math.abs(trade.entry_price - trade.stop_loss);
+          tradeDays[dayKey].riskReward = Number(trade.planned_risk_reward);
+        } else if (
+          trade.exit_price && 
+          trade.entry_price && 
+          trade.stop_loss && 
+          tradeDays[dayKey].riskReward === undefined
+        ) {
+          const reward = Number(trade.exit_price) - Number(trade.entry_price);
+          const risk = Math.abs(Number(trade.entry_price) - Number(trade.stop_loss));
           console.log("Calculating R/R from components:", { reward, risk });
           if (risk !== 0) {
             const calculatedRR = reward / risk;
             console.log("Calculated R/R:", calculatedRR);
-            tradeDays[dayKey].riskReward = calculatedRR;
+            tradeDays[dayKey].riskReward = Number(calculatedRR.toFixed(2)); // Round to 2 decimal places
           }
         }
 
