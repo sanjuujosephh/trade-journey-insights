@@ -53,7 +53,7 @@ function Navigation() {
           <TraderInfo />
         </div>
         <div className="flex-1 flex justify-center">
-          <h1 className="text-xl font-bold">Onetradejournal</h1>
+          <h1 className="text-xl font-medium">Onetradejournal</h1>
         </div>
         <div className="flex-1 flex justify-end items-center space-x-4">
           <ThemeToggle />

@@ -87,7 +87,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
           <Input
             id="trade_type"
             name="trade_type"
-            value="options"
+            value="Options"
             readOnly
             className="bg-gray-100"
           />
