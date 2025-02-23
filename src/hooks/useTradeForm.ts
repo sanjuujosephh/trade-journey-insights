@@ -53,6 +53,17 @@ export function useTradeForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    
+    // If this is a datetime field, ensure it's in the correct format
+    if (name === 'entry_time' || name === 'exit_time') {
+      const formattedDate = value ? new Date(value).toISOString() : '';
+      setFormData(prev => ({
+        ...prev,
+        [name]: formattedDate,
+      }));
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value,

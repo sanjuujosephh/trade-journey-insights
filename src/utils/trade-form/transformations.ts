@@ -2,6 +2,10 @@
 import { FormData, Trade } from "@/types/trade";
 
 export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'timestamp'> => {
+  // Ensure dates are in ISO format
+  const entryTime = formData.entry_time ? new Date(formData.entry_time).toISOString() : null;
+  const exitTime = formData.exit_time ? new Date(formData.exit_time).toISOString() : null;
+
   return {
     entry_price: parseFloat(formData.entry_price),
     exit_price: formData.exit_price ? parseFloat(formData.exit_price) : null,
@@ -20,8 +24,8 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     post_exit_price: formData.post_exit_price ? parseFloat(formData.post_exit_price) : null,
     exit_efficiency: formData.exit_efficiency ? parseFloat(formData.exit_efficiency) : null,
     confidence_level: formData.confidence_level ? parseInt(formData.confidence_level) : null,
-    entry_time: formData.entry_time || null,
-    exit_time: formData.exit_time || null,
+    entry_time: entryTime,
+    exit_time: exitTime,
     option_type: formData.option_type || null,
     market_condition: formData.market_condition || null,
     timeframe: formData.timeframe || null,
