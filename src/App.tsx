@@ -14,6 +14,7 @@ import { useTheme } from "./contexts/ThemeProvider";
 import { TraderInfo } from "./components/TraderInfo";
 import { AuthModal } from "./components/auth/AuthModal";
 import { Footer } from "./components/Footer";
+import { MonthlyPnL } from "./components/MonthlyPnL";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +60,7 @@ function Navigation() {
           </Link>
         </div>
         <div className="flex-1 flex justify-end items-center space-x-4">
+          {user && <MonthlyPnL />}
           <ThemeToggle />
           <div data-user-nav>
             {user ? <UserMenu /> : <AuthModal />}
