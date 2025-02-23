@@ -12,37 +12,43 @@ export function MonthlyPnL() {
   useEffect(() => {
     if (!user) return;
 
-    // Fetch initial monthly P&L
     const fetchMonthlyPnL = async () => {
-      const currentDate = new Date();
-      const monthStart = startOfMonth(currentDate);
-      const monthEnd = endOfMonth(currentDate);
+      try {
+        const currentDate = new Date();
+        const monthStart = startOfMonth(currentDate);
+        const monthEnd = endOfMonth(currentDate);
 
-      const { data: trades, error } = await supabase
-        .from('trades')
-        .select('entry_price, exit_price, quantity')
-        .gte('entry_time', monthStart.toISOString())
-        .lte('entry_time', monthEnd.toISOString())
-        .eq('user_id', user.id);
+        const { data: trades, error } = await supabase
+          .from('trades')
+          .select('entry_price, exit_price, quantity')
+          .gte('entry_time', monthStart.toISOString())
+          .lte('entry_time', monthEnd.toISOString())
+          .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Error fetching trades:', error);
-        return;
-      }
-
-      const totalPnL = trades.reduce((sum, trade) => {
-        if (trade.exit_price && trade.entry_price && trade.quantity) {
-          return sum + ((trade.exit_price - trade.entry_price) * trade.quantity);
+        if (error) {
+          console.error('Error fetching trades:', error);
+          return;
         }
-        return sum;
-      }, 0);
 
-      setMonthlyPnL(totalPnL);
+        const totalPnL = trades?.reduce((sum, trade) => {
+          if (trade.exit_price && trade.entry_price && trade.quantity) {
+            return sum + ((trade.exit_price - trade.entry_price) * trade.quantity);
+          }
+          return sum;
+        }, 0) || 0;
+
+        setMonthlyPnL(totalPnL);
+      } catch (err) {
+        console.error('Error calculating P&L:', err);
+      }
     };
+
+    // Initial fetch
+    fetchMonthlyPnL();
 
     // Set up real-time subscription
     const channel = supabase
-      .channel('schema-db-changes')
+      .channel('trades-changes')
       .on(
         'postgres_changes',
         {
@@ -58,9 +64,6 @@ export function MonthlyPnL() {
       )
       .subscribe();
 
-    // Initial fetch
-    fetchMonthlyPnL();
-
     // Cleanup subscription
     return () => {
       supabase.removeChannel(channel);
@@ -72,7 +75,7 @@ export function MonthlyPnL() {
   return (
     <Button 
       variant="outline" 
-      className="h-10 w-10 p-0 border rounded"
+      className="h-10 min-w-[4rem] px-2 flex items-center justify-center border rounded bg-background"
     >
       <div className="flex flex-col items-center justify-center text-center w-full leading-none">
         <span className="text-[10px] text-foreground">P&L</span>
