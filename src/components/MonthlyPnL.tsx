@@ -4,13 +4,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 export function MonthlyPnL() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [monthlyPnL, setMonthlyPnL] = useState<number | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const calculateMonthlyPnL = async () => {
     if (!user) return;
+    setIsRefreshing(true);
 
     try {
       const currentDate = new Date();
@@ -26,6 +31,11 @@ export function MonthlyPnL() {
 
       if (error) {
         console.error('Error fetching trades:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch P&L data"
+        });
         return;
       }
 
@@ -37,8 +47,16 @@ export function MonthlyPnL() {
       }, 0) || 0;
 
       setMonthlyPnL(totalPnL);
+      console.log('Monthly P&L updated:', totalPnL);
     } catch (err) {
       console.error('Error calculating P&L:', err);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to calculate P&L"
+      });
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -48,9 +66,9 @@ export function MonthlyPnL() {
     // Initial calculation
     calculateMonthlyPnL();
 
-    // Set up real-time subscription
+    // Set up real-time subscription for all trade changes
     const channel = supabase
-      .channel('trades-changes')
+      .channel('trades-pnl')
       .on(
         'postgres_changes',
         {
@@ -60,11 +78,13 @@ export function MonthlyPnL() {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          // Recalculate P&L on any trade changes
+          console.log('Received trade change:', payload);
           calculateMonthlyPnL();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
     // Cleanup subscription
     return () => {
@@ -72,12 +92,24 @@ export function MonthlyPnL() {
     };
   }, [user]);
 
+  const handleRefresh = async () => {
+    if (!isRefreshing) {
+      await calculateMonthlyPnL();
+      toast({
+        title: "Refreshed",
+        description: "P&L data has been updated"
+      });
+    }
+  };
+
   if (!user || monthlyPnL === null) return null;
 
   return (
     <Button 
       variant="outline" 
-      className="h-10 min-w-[4rem] px-2 flex items-center justify-center border rounded bg-background"
+      className="h-10 min-w-[4rem] px-2 flex items-center justify-center border rounded bg-background relative"
+      onClick={handleRefresh}
+      disabled={isRefreshing}
     >
       <div className="flex flex-col items-center justify-center text-center w-full leading-none">
         <span className="text-[10px] text-foreground">P&L</span>
@@ -85,6 +117,9 @@ export function MonthlyPnL() {
           ₹{monthlyPnL.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
         </span>
       </div>
+      {isRefreshing && (
+        <ReloadIcon className="h-3 w-3 animate-spin absolute right-1 top-1" />
+      )}
     </Button>
   );
 }
