@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -54,10 +53,9 @@ function Navigation() {
         <div className="flex-1 md:block hidden">
           <TraderInfo />
         </div>
-        <div className="flex-1 flex justify-center">
+        <div className="flex-1 flex md:justify-center justify-start">
           <Link to="/" className="text-xl font-medium hover:opacity-80 transition-opacity">
-            <span className="hidden md:inline">Onetradejournal</span>
-            <span className="md:hidden">OTJ</span>
+            Onetradejournal
           </Link>
         </div>
         <div className="flex-1 flex justify-end items-center gap-2">
