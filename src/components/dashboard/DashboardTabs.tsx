@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,15 +57,14 @@ export function DashboardTabs({
   return (
     <Card>
       <Tabs defaultValue="trade-entry" className="h-[calc(100%-4.5rem)]" onValueChange={setActiveTab}>
-        <TabsList className="w-full justify-start overflow-x-auto flex-nowrap border-b rounded-none px-6 bg-background">
+        <TabsList className="w-full justify-start overflow-x-auto flex-nowrap border-b rounded-none px-2 sm:px-6 bg-background scrollbar-hide">
           {Object.entries(tabConfig).map(([value, { label, icon: Icon }]) => (
             <TabsTrigger
               key={value}
               value={value}
               className={cn(
-                "transition-colors duration-200 flex items-center gap-2 whitespace-nowrap",
-                activeTab === value && tabColors[value as keyof typeof tabColors],
-                "md:text-base text-sm"
+                "transition-colors duration-200 flex items-center gap-2 whitespace-nowrap text-sm md:text-base",
+                activeTab === value && tabColors[value as keyof typeof tabColors]
               )}
             >
               <Icon className="w-4 h-4" />
@@ -75,12 +75,12 @@ export function DashboardTabs({
         </TabsList>
         
         <div className="h-[calc(100%-3rem)] overflow-y-auto">
-          <TabsContent value="trade-entry" className="mt-0 h-full">
+          <TabsContent value="trade-entry" className="mt-0 h-full p-0 sm:p-2">
             <TradeEntry />
           </TabsContent>
 
           <TabsContent value="performance" className="mt-0 h-full">
-            <div className="p-2 md:p-6 space-y-6">
+            <div className="p-1 sm:p-2 md:p-6 space-y-6">
               <PerformanceMetrics trades={trades} />
               <TradeFlowChart trades={trades} />
               <TimePerformanceHeatmap trades={trades} />
@@ -88,20 +88,20 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="calendar" className="mt-0 h-full">
-            <Card>
+            <Card className="p-1 sm:p-2">
               <TradingCalendar />
             </Card>
           </TabsContent>
 
           <TabsContent value="analysis" className="mt-0 h-full">
-            <div className="p-2 md:p-6 space-y-6">
+            <div className="p-1 sm:p-2 md:p-6 space-y-6">
               <IntradayRiskMetrics trades={trades} />
               <TimePerformanceHeatmap trades={trades} />
             </div>
           </TabsContent>
 
           <TabsContent value="ai-analysis" className="mt-0 h-full">
-            <div className="p-2 md:p-6">
+            <div className="p-1 sm:p-2 md:p-6">
               <div className="flex flex-col md:flex-row md:justify-end gap-4 mb-6">
                 <Button
                   onClick={() => analyzeTradesWithAI({ days: 1 })}
@@ -125,7 +125,7 @@ export function DashboardTabs({
                   Analyze This Month's Trades
                 </Button>
               </div>
-              <Card className="p-4 md:p-6">
+              <Card className="p-2 sm:p-4 md:p-6">
                 {currentAnalysis ? (
                   <p className="whitespace-pre-wrap text-sm md:text-base">{currentAnalysis}</p>
                 ) : (
@@ -136,7 +136,7 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="history" className="mt-0 h-full">
-            <div className="p-2 md:p-6">
+            <div className="p-1 sm:p-2 md:p-6">
               <FOTradeTable trades={trades} />
             </div>
           </TabsContent>
@@ -146,7 +146,7 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="profile" className="mt-0 h-full">
-            <div className="p-2 md:p-6">
+            <div className="p-1 sm:p-2 md:p-6">
               <ProfileSettings />
             </div>
           </TabsContent>
@@ -155,3 +155,4 @@ export function DashboardTabs({
     </Card>
   );
 }
+

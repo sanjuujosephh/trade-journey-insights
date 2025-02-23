@@ -79,6 +79,15 @@
   }
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 .glass {
   @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl;
 }
