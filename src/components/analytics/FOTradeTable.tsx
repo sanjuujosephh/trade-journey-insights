@@ -2,6 +2,7 @@
 import { Trade } from "@/types/trade";
 import { TradeHistory } from "@/components/trade-form/TradeHistory";
 import { useTradeOperations } from "@/hooks/useTradeOperations";
+import { supabase } from "@/lib/supabase";
 
 interface FOTradeTableProps {
   trades: Trade[];
