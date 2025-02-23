@@ -71,8 +71,8 @@ export default function Index() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] bg-background overflow-auto">
-      <div className="container h-full py-4">
+    <div className="bg-background h-full">
+      <div className="container py-4">
         <DashboardHeader profile={profile} user={user} />
         <DashboardTabs
           trades={trades}
@@ -92,3 +92,4 @@ export default function Index() {
     </div>
   );
 }
+
