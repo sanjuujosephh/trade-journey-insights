@@ -51,15 +51,16 @@ function Navigation() {
   return (
     <div className="h-16 border-b bg-background sticky top-0 z-10">
       <div className="flex h-full items-center px-4 container mx-auto">
-        <div className="flex-1">
+        <div className="flex-1 md:block hidden">
           <TraderInfo />
         </div>
         <div className="flex-1 flex justify-center">
           <Link to="/" className="text-xl font-medium hover:opacity-80 transition-opacity">
-            Onetradejournal
+            <span className="hidden md:inline">Onetradejournal</span>
+            <span className="md:hidden">OTJ</span>
           </Link>
         </div>
-        <div className="flex-1 flex justify-end items-center space-x-4">
+        <div className="flex-1 flex justify-end items-center gap-2">
           {user && <MonthlyPnL />}
           <ThemeToggle />
           <div data-user-nav>
