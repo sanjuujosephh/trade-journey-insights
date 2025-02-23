@@ -5,9 +5,10 @@ export const getDateAndTime = (dateTimeStr: string) => {
     const date = new Date(dateTimeStr);
     if (isNaN(date.getTime())) return { date: '', time: '' };
     
-    // Convert UTC to IST by adding 5 hours and 30 minutes
-    const istOffset = 5.5 * 60 * 60 * 1000;
-    const istDate = new Date(date.getTime() + istOffset);
+    // Convert UTC to IST by adding 5:30 hours
+    const istDate = new Date(date.getTime());
+    istDate.setHours(date.getUTCHours() + 5);
+    istDate.setMinutes(date.getUTCMinutes() + 30);
     
     const yyyy = istDate.getFullYear();
     const mm = String(istDate.getMonth() + 1).padStart(2, '0');
@@ -19,8 +20,7 @@ export const getDateAndTime = (dateTimeStr: string) => {
     const formattedTime = `${hours}:${minutes}`;
     
     console.log('Input UTC datetime:', dateTimeStr);
-    console.log('Formatted date (IST):', formattedDate);
-    console.log('Formatted time (IST):', formattedTime);
+    console.log('Formatted IST datetime:', `${formattedDate} ${formattedTime}`);
     
     return {
       date: formattedDate,
@@ -37,31 +37,34 @@ export const formatDateTime = (date: string, time: string) => {
   if (!time) time = '00:00';
   
   try {
-    const [year, month, day] = date.split('-');
-    const [hours, minutes] = time.split(':');
+    const [hours, minutes] = time.split(':').map(Number);
+    const [year, month, day] = date.split('-').map(Number);
     
-    // Create date in local time (which will be IST)
-    const localDate = new Date(
-      parseInt(year),
-      parseInt(month) - 1,
-      parseInt(day),
-      parseInt(hours),
-      parseInt(minutes)
-    );
+    // Create date in IST timezone
+    const istDate = new Date(year, month - 1, day, hours, minutes);
     
-    // Convert IST to UTC by subtracting 5 hours and 30 minutes
-    const utcDate = new Date(localDate.getTime() - (5.5 * 60 * 60 * 1000));
+    // Convert IST to UTC by subtracting 5:30 hours
+    const utcDate = new Date(istDate.getTime());
+    utcDate.setHours(istDate.getHours() - 5);
+    utcDate.setMinutes(istDate.getMinutes() - 30);
     
-    if (isNaN(utcDate.getTime())) return '';
+    // Set UTC time components directly
+    const utcFinal = new Date(Date.UTC(
+      utcDate.getFullYear(),
+      utcDate.getMonth(),
+      utcDate.getDate(),
+      utcDate.getHours(),
+      utcDate.getMinutes()
+    ));
     
-    console.log('Input IST date:', date);
-    console.log('Input IST time:', time);
-    console.log('Output UTC datetime:', utcDate.toISOString());
+    if (isNaN(utcFinal.getTime())) return '';
     
-    return utcDate.toISOString();
+    console.log('Input IST:', `${date} ${time}`);
+    console.log('Output UTC:', utcFinal.toISOString());
+    
+    return utcFinal.toISOString();
   } catch (error) {
     console.error('Error formatting datetime:', error);
     return '';
   }
 };
-
