@@ -72,10 +72,10 @@ export function MonthlyPnL() {
   return (
     <Button 
       variant="outline" 
-      className="h-10 px-3 text-sm font-normal bg-background"
+      className="h-10 px-3 text-sm font-normal bg-background rounded-md"
     >
       <div className="flex flex-col items-start leading-none">
-        <span className="text-[10px] text-muted-foreground">Monthly P&L</span>
+        <span className="text-[10px] text-foreground">Monthly P&L</span>
         <span className={`text-sm ${monthlyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
           ₹{monthlyPnL.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
         </span>
