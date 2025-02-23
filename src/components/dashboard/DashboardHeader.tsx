@@ -10,7 +10,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
   return (
-    <header className="mb-2 flex flex-col gap-4">
+    <header className="mb-2 flex flex-col sm:flex-row items-start justify-between gap-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <Avatar className="h-28 w-28 [&_*]:scale-x-[-1]">
           <AvatarImage src={profile?.avatar_url} alt={profile?.username || 'User avatar'} />
@@ -25,7 +25,7 @@ export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
           <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:absolute sm:top-4 sm:right-6">
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
         <Button variant="outline" className="gap-2">
           <Video className="h-4 w-4" />
           <span>Watch Journal Overview</span>
@@ -38,4 +38,3 @@ export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
     </header>
   );
 }
-
