@@ -4,8 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { useToast } from "@/hooks/use-toast";
+import { RefreshCw } from "lucide-react";
 
 export function MonthlyPnL() {
   const { user } = useAuth();
@@ -118,7 +118,7 @@ export function MonthlyPnL() {
         </span>
       </div>
       {isRefreshing && (
-        <ReloadIcon className="h-3 w-3 animate-spin absolute right-1 top-1" />
+        <RefreshCw className="h-3 w-3 animate-spin absolute right-1 top-1" />
       )}
     </Button>
   );
