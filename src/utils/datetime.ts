@@ -2,24 +2,20 @@
 export const getDateAndTime = (dateTimeStr: string) => {
   if (!dateTimeStr) return { date: '', time: '' };
   try {
+    // Parse the input date (assumes input is already in IST)
     const date = new Date(dateTimeStr);
     if (isNaN(date.getTime())) return { date: '', time: '' };
     
-    // Convert UTC to IST by adding 5:30 hours
-    const istDate = new Date(date.getTime());
-    istDate.setHours(date.getUTCHours() + 5);
-    istDate.setMinutes(date.getUTCMinutes() + 30);
-    
-    const yyyy = istDate.getFullYear();
-    const mm = String(istDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(istDate.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
     const formattedDate = `${yyyy}-${mm}-${dd}`;
     
-    const hours = String(istDate.getHours()).padStart(2, '0');
-    const minutes = String(istDate.getMinutes()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
     const formattedTime = `${hours}:${minutes}`;
     
-    console.log('Input UTC datetime:', dateTimeStr);
+    console.log('Input IST datetime:', dateTimeStr);
     console.log('Formatted IST datetime:', `${formattedDate} ${formattedTime}`);
     
     return {
@@ -43,26 +39,12 @@ export const formatDateTime = (date: string, time: string) => {
     // Create date in IST timezone
     const istDate = new Date(year, month - 1, day, hours, minutes);
     
-    // Convert IST to UTC by subtracting 5:30 hours
-    const utcDate = new Date(istDate.getTime());
-    utcDate.setHours(istDate.getHours() - 5);
-    utcDate.setMinutes(istDate.getMinutes() - 30);
+    if (isNaN(istDate.getTime())) return '';
     
-    // Set UTC time components directly
-    const utcFinal = new Date(Date.UTC(
-      utcDate.getFullYear(),
-      utcDate.getMonth(),
-      utcDate.getDate(),
-      utcDate.getHours(),
-      utcDate.getMinutes()
-    ));
+    console.log('Input IST date/time:', `${date} ${time}`);
+    console.log('Output IST ISO:', istDate.toISOString());
     
-    if (isNaN(utcFinal.getTime())) return '';
-    
-    console.log('Input IST:', `${date} ${time}`);
-    console.log('Output UTC:', utcFinal.toISOString());
-    
-    return utcFinal.toISOString();
+    return istDate.toISOString();
   } catch (error) {
     console.error('Error formatting datetime:', error);
     return '';
