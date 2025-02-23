@@ -74,14 +74,16 @@ export default function Index() {
     <div className="bg-background h-full">
       <div className="container py-4">
         <DashboardHeader profile={profile} user={user} />
-        <DashboardTabs
-          trades={trades}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          isAnalyzing={isAnalyzing}
-          currentAnalysis={currentAnalysis}
-          analyzeTradesWithAI={analyzeTradesWithAI}
-        />
+        <div className="mt-8">
+          <DashboardTabs
+            trades={trades}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            isAnalyzing={isAnalyzing}
+            currentAnalysis={currentAnalysis}
+            analyzeTradesWithAI={analyzeTradesWithAI}
+          />
+        </div>
       </div>
 
       <AIAnalysisPanel
@@ -92,4 +94,3 @@ export default function Index() {
     </div>
   );
 }
-

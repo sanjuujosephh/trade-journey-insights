@@ -3,27 +3,27 @@ import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
-    <footer className="border-t bg-background mt-auto">
+    <footer className="border-t bg-black mt-8">
       <div className="container mx-auto py-8 px-4">
         <div className="grid gap-8">
           <nav className="flex justify-center gap-6">
-            <Link to="/privacy-policy" className="text-sm hover:underline">
+            <Link to="/privacy-policy" className="text-sm text-gray-300 hover:text-white hover:underline">
               Privacy Policy
             </Link>
-            <Link to="/no-refund-policy" className="text-sm hover:underline">
+            <Link to="/no-refund-policy" className="text-sm text-gray-300 hover:text-white hover:underline">
               No Refund Policy
             </Link>
-            <Link to="/terms" className="text-sm hover:underline">
+            <Link to="/terms" className="text-sm text-gray-300 hover:text-white hover:underline">
               Terms and Conditions
             </Link>
           </nav>
 
-          <div className="text-sm text-muted-foreground space-y-4">
-            <p className="text-center">
+          <div className="text-sm text-gray-400 space-y-4">
+            <p className="text-center text-gray-300">
               © 2025 Onetradejournal by Softscotch Solution Private Limited. All Rights Reserved.
             </p>
-            <div className="prose prose-sm max-w-4xl mx-auto text-muted-foreground text-left space-y-4">
-              <h3 className="text-base font-medium text-foreground text-center">Disclaimer: No Investment Advice</h3>
+            <div className="prose prose-sm max-w-4xl mx-auto text-gray-400 text-left space-y-4">
+              <h3 className="text-base font-medium text-white text-center">Disclaimer: No Investment Advice</h3>
               <p>
                 Investment is subject to market risks. Uncertainty is always a factor, and various risks can overlap and amplify each other, potentially leading to unforeseen impacts on the value of investments. The value of assets and any associated income may rise or fall, and there is a possibility of losing the full amount of your initial investment. Market fluctuations and related changes are just some of the factors that can influence these variations. Historical performance does not guarantee or predict future results.
               </p>
