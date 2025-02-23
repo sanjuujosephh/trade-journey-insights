@@ -25,7 +25,7 @@ export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
           <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      <div className="flex flex-col gap-2 w-full sm:w-auto self-end sm:self-start">
         <Button variant="outline" className="gap-2">
           <Video className="h-4 w-4" />
           <span>Watch Journal Overview</span>

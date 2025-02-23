@@ -32,6 +32,7 @@ export default function TradeEntry() {
 
   const handleEdit = (trade: Trade) => {
     setFormData({
+      ...formData,
       symbol: trade.symbol,
       entry_price: trade.entry_price.toString(),
       exit_price: trade.exit_price?.toString() ?? "",
