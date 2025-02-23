@@ -2,23 +2,20 @@
 export const getDateAndTime = (dateTimeStr: string) => {
   if (!dateTimeStr) return { date: '', time: '' };
   try {
-    // Parse the input date (assumes input is in ISO format)
+    // Parse the input date (assumes input is in IST)
     const date = new Date(dateTimeStr);
     if (isNaN(date.getTime())) return { date: '', time: '' };
     
-    // Add 5 hours and 30 minutes to convert to IST
-    const istDate = new Date(date.getTime() + (5 * 60 + 30) * 60 * 1000);
-    
-    const yyyy = istDate.getFullYear();
-    const mm = String(istDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(istDate.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
     const formattedDate = `${yyyy}-${mm}-${dd}`;
     
-    const hours = String(istDate.getHours()).padStart(2, '0');
-    const minutes = String(istDate.getMinutes()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
     const formattedTime = `${hours}:${minutes}`;
     
-    console.log('Input ISO datetime:', dateTimeStr);
+    console.log('Input IST datetime:', dateTimeStr);
     console.log('Formatted IST datetime:', `${formattedDate} ${formattedTime}`);
     
     return {
@@ -42,18 +39,14 @@ export const formatDateTime = (date: string, time: string) => {
     // Create date in IST timezone
     const istDate = new Date(year, month - 1, day, hours, minutes);
     
-    // Subtract 5 hours and 30 minutes to convert from IST to UTC
-    const utcDate = new Date(istDate.getTime() - (5 * 60 + 30) * 60 * 1000);
-    
-    if (isNaN(utcDate.getTime())) return '';
+    if (isNaN(istDate.getTime())) return '';
     
     console.log('Input IST date/time:', `${date} ${time}`);
-    console.log('Output UTC ISO:', utcDate.toISOString());
+    console.log('Output IST ISO:', istDate.toISOString());
     
-    return utcDate.toISOString();
+    return istDate.toISOString();
   } catch (error) {
     console.error('Error formatting datetime:', error);
     return '';
   }
 };
-
