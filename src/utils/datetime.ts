@@ -2,25 +2,20 @@
 export const getDateAndTime = (dateTimeStr: string) => {
   if (!dateTimeStr) return { date: '', time: '' };
   try {
-    // Parse the input date (assumes input is in IST)
-    const date = new Date(dateTimeStr);
-    if (isNaN(date.getTime())) return { date: '', time: '' };
+    // Create a local date object (no timezone conversion)
+    const [datePart, timePart] = dateTimeStr.split('T');
+    if (!datePart) return { date: '', time: '' };
     
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const formattedDate = `${yyyy}-${mm}-${dd}`;
+    // Extract time from the time part (before the Z or timezone offset if present)
+    const timeMatch = timePart?.match(/(\d{2}):(\d{2})/);
+    const time = timeMatch ? `${timeMatch[1]}:${timeMatch[2]}` : '00:00';
     
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const formattedTime = `${hours}:${minutes}`;
-    
-    console.log('Input IST datetime:', dateTimeStr);
-    console.log('Formatted IST datetime:', `${formattedDate} ${formattedTime}`);
+    console.log('Input datetime:', dateTimeStr);
+    console.log('Parsed date and time:', { date: datePart, time });
     
     return {
-      date: formattedDate,
-      time: formattedTime
+      date: datePart,
+      time: time
     };
   } catch (error) {
     console.error('Error parsing date:', error);
@@ -36,15 +31,16 @@ export const formatDateTime = (date: string, time: string) => {
     const [hours, minutes] = time.split(':').map(Number);
     const [year, month, day] = date.split('-').map(Number);
     
-    // Create date in IST timezone
-    const istDate = new Date(year, month - 1, day, hours, minutes);
+    // Format the date string directly without using Date object
+    const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
     
-    if (isNaN(istDate.getTime())) return '';
+    const isoString = `${formattedDate}T${formattedTime}.000Z`;
     
-    console.log('Input IST date/time:', `${date} ${time}`);
-    console.log('Output IST ISO:', istDate.toISOString());
+    console.log('Input date/time:', `${date} ${time}`);
+    console.log('Formatted ISO:', isoString);
     
-    return istDate.toISOString();
+    return isoString;
   } catch (error) {
     console.error('Error formatting datetime:', error);
     return '';

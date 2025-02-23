@@ -20,11 +20,16 @@ export function TimeFields({ formData, handleChange, timeOptions, handleDateTime
       } as React.ChangeEvent<HTMLInputElement>);
       return;
     }
+    
     const time = type === 'entry' ? entryTime : exitTime;
+    const formattedDateTime = formatDateTime(date, time);
+    
+    console.log(`${type} date change:`, { date, time, formattedDateTime });
+    
     handleChange({
       target: { 
         name: `${type}_time`, 
-        value: formatDateTime(date, time)
+        value: formattedDateTime
       }
     } as React.ChangeEvent<HTMLInputElement>);
   };
@@ -32,10 +37,14 @@ export function TimeFields({ formData, handleChange, timeOptions, handleDateTime
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
     const date = type === 'entry' ? entryDate : exitDate;
     if (date) {
+      const formattedDateTime = formatDateTime(date, time);
+      
+      console.log(`${type} time change:`, { date, time, formattedDateTime });
+      
       handleChange({
         target: {
           name: `${type}_time`,
-          value: formatDateTime(date, time)
+          value: formattedDateTime
         }
       } as React.ChangeEvent<HTMLInputElement>);
     }
