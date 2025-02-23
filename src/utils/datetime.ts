@@ -5,16 +5,17 @@ export const getDateAndTime = (dateTimeStr: string) => {
     const date = new Date(dateTimeStr);
     if (isNaN(date.getTime())) return { date: '', time: '' };
     
+    // Add IST offset (5 hours and 30 minutes) to UTC time
     const istOffset = 5.5 * 60 * 60 * 1000;
     const istDate = new Date(date.getTime() + istOffset);
     
-    const yyyy = istDate.getFullYear();
-    const mm = String(istDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(istDate.getDate()).padStart(2, '0');
+    const yyyy = istDate.getUTCFullYear();
+    const mm = String(istDate.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(istDate.getUTCDate()).padStart(2, '0');
     const formattedDate = `${yyyy}-${mm}-${dd}`;
     
-    const hours = String(istDate.getHours()).padStart(2, '0');
-    const minutes = String(istDate.getMinutes()).padStart(2, '0');
+    const hours = String(istDate.getUTCHours()).padStart(2, '0');
+    const minutes = String(istDate.getUTCMinutes()).padStart(2, '0');
     const formattedTime = `${hours}:${minutes}`;
     
     console.log('Processing datetime:', dateTimeStr);
@@ -39,7 +40,8 @@ export const formatDateTime = (date: string, time: string) => {
     const [year, month, day] = date.split('-');
     const [hours, minutes] = time.split(':');
     
-    const localDate = new Date(
+    // Create date in IST
+    const istDate = new Date(
       parseInt(year),
       parseInt(month) - 1,
       parseInt(day),
@@ -47,7 +49,8 @@ export const formatDateTime = (date: string, time: string) => {
       parseInt(minutes)
     );
     
-    const utcDate = new Date(localDate.getTime() - (5.5 * 60 * 60 * 1000));
+    // Convert IST to UTC by subtracting the offset
+    const utcDate = new Date(istDate.getTime() - (5.5 * 60 * 60 * 1000));
     
     if (isNaN(utcDate.getTime())) return '';
     

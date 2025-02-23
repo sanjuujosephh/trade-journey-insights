@@ -45,6 +45,20 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
 
   const timeOptions = generateTimeOptions();
 
+  const handleDateTimeChange = (type: 'entry' | 'exit', timeStr: string) => {
+    const currentDate = formData[`${type}_time`]?.split('T')[0] || new Date().toISOString().split('T')[0];
+    const newDateTime = `${currentDate}T${timeStr}:00Z`; // Add seconds and UTC indicator
+    
+    const syntheticEvent = {
+      target: {
+        name: `${type}_time`,
+        value: newDateTime
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    handleChange(syntheticEvent);
+  };
+
   return (
     <Card className="p-6 space-y-4 glass">
       <div className="space-y-2">
@@ -147,6 +161,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
         formData={formData}
         handleChange={handleChange}
         timeOptions={timeOptions}
+        handleDateTimeChange={handleDateTimeChange}
       />
 
       <div className="space-y-2">
