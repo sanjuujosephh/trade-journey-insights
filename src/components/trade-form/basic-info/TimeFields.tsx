@@ -18,6 +18,25 @@ interface TimeFieldsProps {
 }
 
 export function TimeFields({ formData, handleChange, handleDateTimeChange, timeOptions }: TimeFieldsProps) {
+  const getDateAndTime = (dateTimeStr: string) => {
+    if (!dateTimeStr) return { date: '', time: '' };
+    try {
+      const date = new Date(dateTimeStr);
+      if (isNaN(date.getTime())) return { date: '', time: '' };
+      
+      return {
+        date: date.toISOString().split('T')[0],
+        time: date.toTimeString().substring(0, 5)
+      };
+    } catch (error) {
+      console.error('Error parsing date:', error);
+      return { date: '', time: '' };
+    }
+  };
+
+  const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
+  const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
+
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
@@ -25,10 +44,15 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
         <div className="flex gap-2">
           <Input
             type="date"
-            value={formData.entry_time?.split('T')[0] || ''}
+            value={entryDate}
             onChange={(e) => {
-              const timeStr = formData.entry_time?.split('T')[1] || '09:15';
-              const newDateTime = `${e.target.value}T${timeStr}`;
+              if (!e.target.value) {
+                handleChange({
+                  target: { name: 'entry_time', value: '' }
+                } as React.ChangeEvent<HTMLInputElement>);
+                return;
+              }
+              const newDateTime = `${e.target.value}T${entryTime || '09:15'}`;
               handleChange({
                 target: { name: 'entry_time', value: newDateTime }
               } as React.ChangeEvent<HTMLInputElement>);
@@ -37,8 +61,12 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
             className="flex-1"
           />
           <Select
-            value={formData.entry_time?.split('T')[1] || ''}
-            onValueChange={(value) => handleDateTimeChange('entry', value)}
+            value={entryTime}
+            onValueChange={(value) => {
+              if (entryDate) {
+                handleDateTimeChange('entry', value);
+              }
+            }}
           >
             <SelectTrigger className="w-[100px]">
               <Clock className="h-[1.2rem] w-[1.2rem] mr-2" />
@@ -63,10 +91,15 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
         <div className="flex gap-2">
           <Input
             type="date"
-            value={formData.exit_time?.split('T')[0] || ''}
+            value={exitDate}
             onChange={(e) => {
-              const timeStr = formData.exit_time?.split('T')[1] || '09:15';
-              const newDateTime = `${e.target.value}T${timeStr}`;
+              if (!e.target.value) {
+                handleChange({
+                  target: { name: 'exit_time', value: '' }
+                } as React.ChangeEvent<HTMLInputElement>);
+                return;
+              }
+              const newDateTime = `${e.target.value}T${exitTime || '09:15'}`;
               handleChange({
                 target: { name: 'exit_time', value: newDateTime }
               } as React.ChangeEvent<HTMLInputElement>);
@@ -74,8 +107,12 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
             className="flex-1"
           />
           <Select
-            value={formData.exit_time?.split('T')[1] || ''}
-            onValueChange={(value) => handleDateTimeChange('exit', value)}
+            value={exitTime}
+            onValueChange={(value) => {
+              if (exitDate) {
+                handleDateTimeChange('exit', value);
+              }
+            }}
           >
             <SelectTrigger className="w-[100px]">
               <Clock className="h-[1.2rem] w-[1.2rem] mr-2" />

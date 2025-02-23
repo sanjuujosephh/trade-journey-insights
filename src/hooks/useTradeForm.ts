@@ -54,13 +54,33 @@ export function useTradeForm() {
   ) => {
     const { name, value } = e.target;
     
-    // If this is a datetime field, ensure it's in the correct format
+    // Handle date and time fields
     if (name === 'entry_time' || name === 'exit_time') {
-      const formattedDate = value ? new Date(value).toISOString() : '';
-      setFormData(prev => ({
-        ...prev,
-        [name]: formattedDate,
-      }));
+      try {
+        // Check if we have a valid date string
+        if (value) {
+          const date = new Date(value);
+          // Verify it's a valid date before converting
+          if (!isNaN(date.getTime())) {
+            setFormData(prev => ({
+              ...prev,
+              [name]: date.toISOString(),
+            }));
+            return;
+          }
+        }
+        // If no value or invalid date, just store empty string
+        setFormData(prev => ({
+          ...prev,
+          [name]: '',
+        }));
+      } catch (error) {
+        console.error('Date parsing error:', error);
+        setFormData(prev => ({
+          ...prev,
+          [name]: '',
+        }));
+      }
       return;
     }
     
