@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabase";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw } from "lucide-react";
 
 export function MonthlyPnL() {
   const { user } = useAuth();
@@ -107,7 +106,7 @@ export function MonthlyPnL() {
   return (
     <Button 
       variant="outline" 
-      className="h-10 min-w-[4rem] px-2 flex items-center justify-center border rounded bg-background relative"
+      className="h-10 min-w-[4rem] px-2 flex items-center justify-center border rounded bg-background"
       onClick={handleRefresh}
       disabled={isRefreshing}
     >
@@ -117,9 +116,6 @@ export function MonthlyPnL() {
           ₹{monthlyPnL.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
         </span>
       </div>
-      {isRefreshing && (
-        <RefreshCw className="h-3 w-3 animate-spin absolute right-1 top-1" />
-      )}
     </Button>
   );
 }

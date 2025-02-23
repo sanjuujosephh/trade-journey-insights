@@ -56,18 +56,20 @@ export function DashboardTabs({
   return (
     <Card>
       <Tabs defaultValue="trade-entry" className="h-[calc(100%-4.5rem)]" onValueChange={setActiveTab}>
-        <TabsList className="w-full justify-start border-b rounded-none px-6 bg-background">
+        <TabsList className="w-full justify-start overflow-x-auto flex-nowrap border-b rounded-none px-6 bg-background">
           {Object.entries(tabConfig).map(([value, { label, icon: Icon }]) => (
             <TabsTrigger
               key={value}
               value={value}
               className={cn(
-                "transition-colors duration-200 flex items-center gap-2",
-                activeTab === value && tabColors[value as keyof typeof tabColors]
+                "transition-colors duration-200 flex items-center gap-2 whitespace-nowrap",
+                activeTab === value && tabColors[value as keyof typeof tabColors],
+                "md:text-base text-sm"
               )}
             >
               <Icon className="w-4 h-4" />
-              {label}
+              <span className="hidden sm:inline">{label}</span>
+              <span className="sm:hidden">{label.split(' ')[0]}</span>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -78,7 +80,7 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="performance" className="mt-0 h-full">
-            <div className="p-6 space-y-6">
+            <div className="p-2 md:p-6 space-y-6">
               <PerformanceMetrics trades={trades} />
               <TradeFlowChart trades={trades} />
               <TimePerformanceHeatmap trades={trades} />
@@ -92,53 +94,49 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="analysis" className="mt-0 h-full">
-            <div className="p-6 space-y-6">
+            <div className="p-2 md:p-6 space-y-6">
               <IntradayRiskMetrics trades={trades} />
               <TimePerformanceHeatmap trades={trades} />
             </div>
           </TabsContent>
 
           <TabsContent value="ai-analysis" className="mt-0 h-full">
-            <div className="p-6">
-              <div className="flex justify-end space-x-4 mb-6">
+            <div className="p-2 md:p-6">
+              <div className="flex flex-col md:flex-row md:justify-end gap-4 mb-6">
                 <Button
                   onClick={() => analyzeTradesWithAI({ days: 1 })}
                   disabled={isAnalyzing || trades.length === 0}
+                  className="w-full md:w-auto"
                 >
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Analyzing Today's Trades...
-                    </>
-                  ) : (
-                    "Analyze Today's Trades"
-                  )}
+                  {isAnalyzing ? "Analyzing Today's Trades..." : "Analyze Today's Trades"}
                 </Button>
                 <Button
                   onClick={() => analyzeTradesWithAI({ days: 7 })}
                   disabled={isAnalyzing || trades.length === 0}
+                  className="w-full md:w-auto"
                 >
                   Analyze Last 7 Days' Trades
                 </Button>
                 <Button
                   onClick={() => analyzeTradesWithAI({ days: 30 })}
                   disabled={isAnalyzing || trades.length === 0}
+                  className="w-full md:w-auto"
                 >
                   Analyze This Month's Trades
                 </Button>
               </div>
-              <Card className="p-6">
+              <Card className="p-4 md:p-6">
                 {currentAnalysis ? (
-                  <p className="whitespace-pre-wrap">{currentAnalysis}</p>
+                  <p className="whitespace-pre-wrap text-sm md:text-base">{currentAnalysis}</p>
                 ) : (
-                  <p className="text-muted-foreground">Select an analysis option above to get AI insights about your trades.</p>
+                  <p className="text-muted-foreground text-sm md:text-base">Select an analysis option above to get AI insights about your trades.</p>
                 )}
               </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="history" className="mt-0 h-full">
-            <div className="p-6">
+            <div className="p-2 md:p-6">
               <FOTradeTable trades={trades} />
             </div>
           </TabsContent>
@@ -148,7 +146,7 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="profile" className="mt-0 h-full">
-            <div className="p-6">
+            <div className="p-2 md:p-6">
               <ProfileSettings />
             </div>
           </TabsContent>
