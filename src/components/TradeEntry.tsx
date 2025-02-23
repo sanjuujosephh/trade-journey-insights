@@ -31,45 +31,39 @@ export default function TradeEntry() {
   if (isLoading) return <LoadingSpinner />;
 
   const handleEdit = (trade: Trade) => {
+    console.log('Raw trade data:', trade);
+    console.log('Raw entry_time:', trade.entry_time);
+    console.log('Raw exit_time:', trade.exit_time);
+
     // Format the entry and exit times correctly
     const entryTime = trade.entry_time ? new Date(trade.entry_time).toISOString().slice(0, 16) : "";
     const exitTime = trade.exit_time ? new Date(trade.exit_time).toISOString().slice(0, 16) : "";
 
+    console.log('Formatted entry_time:', entryTime);
+    console.log('Formatted exit_time:', exitTime);
+
     setFormData({
-      ...formData,
-      symbol: trade.symbol,
+      ...trade,
       entry_price: trade.entry_price.toString(),
       exit_price: trade.exit_price?.toString() ?? "",
       quantity: trade.quantity?.toString() ?? "",
-      trade_type: trade.trade_type,
       stop_loss: trade.stop_loss?.toString() ?? "",
-      strategy: trade.strategy ?? "",
-      outcome: trade.outcome,
-      notes: trade.notes ?? "",
-      entry_time: entryTime,
-      exit_time: exitTime,
-      chart_link: trade.chart_link ?? "",
+      strike_price: trade.strike_price?.toString() ?? "",
       vix: trade.vix?.toString() ?? "",
       call_iv: trade.call_iv?.toString() ?? "",
       put_iv: trade.put_iv?.toString() ?? "",
-      strike_price: trade.strike_price?.toString() ?? "",
-      option_type: trade.option_type ?? "",
-      vwap_position: trade.vwap_position ?? "",
-      ema_position: trade.ema_position ?? "",
-      market_condition: trade.market_condition ?? "",
-      timeframe: trade.timeframe ?? "",
-      trade_direction: trade.trade_direction ?? "",
       planned_risk_reward: trade.planned_risk_reward?.toString() ?? "",
       actual_risk_reward: trade.actual_risk_reward?.toString() ?? "",
       planned_target: trade.planned_target?.toString() ?? "",
-      exit_reason: trade.exit_reason ?? "",
       slippage: trade.slippage?.toString() ?? "",
       post_exit_price: trade.post_exit_price?.toString() ?? "",
       exit_efficiency: trade.exit_efficiency?.toString() ?? "",
       confidence_level: trade.confidence_level?.toString() ?? "",
-      entry_emotion: trade.entry_emotion ?? "",
-      exit_emotion: trade.exit_emotion ?? "",
+      entry_time: entryTime,
+      exit_time: exitTime,
     });
+    
+    console.log('Updated formData:', formData);
     setEditingId(trade.id);
   };
 
@@ -132,3 +126,4 @@ export default function TradeEntry() {
     </ErrorBoundary>
   );
 }
+
