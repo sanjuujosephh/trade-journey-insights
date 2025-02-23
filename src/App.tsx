@@ -69,9 +69,9 @@ function Navigation() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col min-h-screen overflow-hidden">
       <Navigation />
-      <main className="flex-1">
+      <main className="flex-grow">
         {children}
       </main>
       <Footer />

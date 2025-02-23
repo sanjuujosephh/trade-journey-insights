@@ -22,7 +22,7 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
 
 export function LandingPage() {
   return (
-    <div className="w-full overflow-auto bg-background">
+    <div className="bg-background">
       <div className="container py-16">
         <div className="mx-auto max-w-5xl text-center mb-16">
           <h1 className="text-4xl font-bold tracking-tight mb-6">
