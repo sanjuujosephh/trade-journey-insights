@@ -63,7 +63,7 @@ export function DashboardTabs({
               key={value}
               value={value}
               className={cn(
-                "transition-colors duration-200 flex items-center gap-2 whitespace-nowrap text-sm md:text-base",
+                "transition-colors duration-200 flex items-center gap-2 whitespace-nowrap text-xs sm:text-sm",
                 activeTab === value && tabColors[value as keyof typeof tabColors]
               )}
             >
