@@ -106,7 +106,7 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
             className="flex-1"
           />
           <Select
-            value={entryTime}
+            defaultValue={entryTime}
             onValueChange={(value) => {
               if (entryDate) {
                 handleChange({
@@ -120,7 +120,9 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
           >
             <SelectTrigger className="w-[100px]">
               <Clock className="h-[1.2rem] w-[1.2rem] mr-2" />
-              <SelectValue placeholder="Time" />
+              <SelectValue placeholder="Time" defaultValue={entryTime}>
+                {entryTime || "Time"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((option) => (
@@ -159,7 +161,7 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
             className="flex-1"
           />
           <Select
-            value={exitTime}
+            defaultValue={exitTime}
             onValueChange={(value) => {
               if (exitDate) {
                 handleChange({
@@ -173,7 +175,9 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
           >
             <SelectTrigger className="w-[100px]">
               <Clock className="h-[1.2rem] w-[1.2rem] mr-2" />
-              <SelectValue placeholder="Time" />
+              <SelectValue placeholder="Time" defaultValue={exitTime}>
+                {exitTime || "Time"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((option) => (
