@@ -63,6 +63,11 @@
     @apply bg-background text-foreground overflow-auto;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Remove border from calendar content */
+  [role="tabpanel"][value="calendar"] * {
+    @apply border-0;
+  }
 }
 
 .glass {
@@ -98,7 +103,6 @@
 
 .auth-tabs [role="tab"][data-state="active"] {
   background-color: hsl(var(--background));
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 /* Header icon styles */

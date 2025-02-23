@@ -2,7 +2,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserMenu } from "./components/auth/UserMenu";
 import { useAuth } from "./contexts/AuthContext";
@@ -54,7 +54,9 @@ function Navigation() {
           <TraderInfo />
         </div>
         <div className="flex-1 flex justify-center">
-          <h1 className="text-xl font-medium">Onetradejournal</h1>
+          <Link to="/" className="text-xl font-medium hover:opacity-80 transition-opacity">
+            Onetradejournal
+          </Link>
         </div>
         <div className="flex-1 flex justify-end items-center space-x-4">
           <ThemeToggle />
@@ -98,4 +100,3 @@ const App = () => (
 );
 
 export default App;
-

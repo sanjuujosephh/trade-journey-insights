@@ -22,8 +22,8 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
 
 export function LandingPage() {
   return (
-    <div className="bg-background">
-      <div className="container py-16">
+    <div className="bg-background py-12">
+      <div className="container py-8">
         <div className="mx-auto max-w-5xl text-center mb-16">
           <h1 className="text-4xl font-bold tracking-tight mb-6">
             Your Complete Trading Journal & Analytics Platform
@@ -84,4 +84,3 @@ export function LandingPage() {
     </div>
   );
 }
-
