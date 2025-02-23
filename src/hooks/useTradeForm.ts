@@ -54,22 +54,30 @@ export function useTradeForm() {
   ) => {
     const { name, value } = e.target;
     
-    // Handle date and time fields
+    // Handle date fields
     if (name === 'entry_time' || name === 'exit_time') {
       try {
-        // Check if we have a valid date string
-        if (value) {
-          const date = new Date(value);
-          // Verify it's a valid date before converting
-          if (!isNaN(date.getTime())) {
-            setFormData(prev => ({
-              ...prev,
-              [name]: date.toISOString(),
-            }));
-            return;
-          }
+        // Allow empty values
+        if (!value) {
+          setFormData(prev => ({
+            ...prev,
+            [name]: '',
+          }));
+          return;
         }
-        // If no value or invalid date, just store empty string
+
+        // Try to parse the date
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+          // Only set if we have a valid date
+          setFormData(prev => ({
+            ...prev,
+            [name]: date.toISOString(),
+          }));
+          return;
+        }
+
+        console.warn(`Invalid date value received: ${value}`);
         setFormData(prev => ({
           ...prev,
           [name]: '',
