@@ -6,8 +6,10 @@ export function formatDateTime(dateString: string) {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'Invalid Date';
     
-    // Format directly without timezone conversion since we're already in IST
-    return date.toLocaleString('en-IN', {
+    // Add IST offset for display
+    const istDate = new Date(date.getTime() + (5 * 60 + 30) * 60 * 1000);
+    
+    return istDate.toLocaleString('en-IN', {
       year: 'numeric',
       month: 'numeric',
       day: 'numeric',
@@ -20,3 +22,4 @@ export function formatDateTime(dateString: string) {
     return 'Invalid Date';
   }
 }
+
