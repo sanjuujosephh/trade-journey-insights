@@ -64,9 +64,11 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Remove border from calendar content */
-  [role="tabpanel"][value="calendar"] * {
-    @apply border-0;
+  /* Remove borders and shadows from calendar content */
+  [role="tabpanel"][value="calendar"] *,
+  [role="tabpanel"][value="calendar"] button,
+  [role="tabpanel"][value="calendar"] div {
+    @apply border-0 shadow-none;
   }
 }
 
