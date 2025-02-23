@@ -13,6 +13,7 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "./contexts/ThemeProvider";
 import { TraderInfo } from "./components/TraderInfo";
 import { AuthModal } from "./components/auth/AuthModal";
+import { Footer } from "./components/Footer";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -73,6 +74,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-auto">
         {children}
       </main>
+      <Footer />
     </div>
   );
 }
