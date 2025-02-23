@@ -21,24 +21,27 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
   const getDateAndTime = (dateTimeStr: string) => {
     if (!dateTimeStr) return { date: '', time: '' };
     try {
-      // Create date object and adjust for local timezone
+      // Create date object and convert to IST
       const date = new Date(dateTimeStr);
       if (isNaN(date.getTime())) return { date: '', time: '' };
       
+      // Adjust to IST (UTC+5:30)
+      const istDate = new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
+      
       // Format date to YYYY-MM-DD
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, '0');
-      const dd = String(date.getDate()).padStart(2, '0');
+      const yyyy = istDate.getUTCFullYear();
+      const mm = String(istDate.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(istDate.getUTCDate()).padStart(2, '0');
       const formattedDate = `${yyyy}-${mm}-${dd}`;
       
       // Format time to HH:mm
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const hours = String(istDate.getUTCHours()).padStart(2, '0');
+      const minutes = String(istDate.getUTCMinutes()).padStart(2, '0');
       const formattedTime = `${hours}:${minutes}`;
       
       console.log('Processing datetime:', dateTimeStr);
-      console.log('Formatted date:', formattedDate);
-      console.log('Formatted time:', formattedTime);
+      console.log('Formatted date (IST):', formattedDate);
+      console.log('Formatted time (IST):', formattedTime);
       
       return {
         date: formattedDate,
@@ -55,18 +58,18 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
     if (!time) time = '00:00';
     
     try {
-      // Create date string in local timezone
+      // Parse the date and time in IST
       const [year, month, day] = date.split('-');
       const [hours, minutes] = time.split(':');
       
-      // Create date object using local timezone
-      const dateObj = new Date(
+      // Create date object in IST
+      const dateObj = new Date(Date.UTC(
         parseInt(year),
-        parseInt(month) - 1, // Month is 0-based
+        parseInt(month) - 1,
         parseInt(day),
-        parseInt(hours),
-        parseInt(minutes)
-      );
+        parseInt(hours) - 5, // Adjust for IST offset (-5:30)
+        parseInt(minutes) - 30
+      ));
       
       if (isNaN(dateObj.getTime())) return '';
       
@@ -83,7 +86,7 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="entry_time">Entry Time</Label>
+        <Label htmlFor="entry_time">Entry Time (IST)</Label>
         <div className="flex gap-2">
           <Input
             type="date"
@@ -139,7 +142,7 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="exit_time">Exit Time</Label>
+        <Label htmlFor="exit_time">Exit Time (IST)</Label>
         <div className="flex gap-2">
           <Input
             type="date"
