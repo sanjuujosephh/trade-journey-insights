@@ -21,19 +21,20 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
   const getDateAndTime = (dateTimeStr: string) => {
     if (!dateTimeStr) return { date: '', time: '' };
     try {
-      // Create date object from the input string
+      // Create date object and adjust for local timezone
       const date = new Date(dateTimeStr);
       if (isNaN(date.getTime())) return { date: '', time: '' };
       
-      // Format to YYYY-MM-DD
-      const formattedDate = date.toLocaleDateString('en-CA'); // Uses YYYY-MM-DD format
+      // Format date to YYYY-MM-DD
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const formattedDate = `${yyyy}-${mm}-${dd}`;
       
-      // Format to HH:mm in 24-hour format
-      const formattedTime = date.toLocaleTimeString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
+      // Format time to HH:mm
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const formattedTime = `${hours}:${minutes}`;
       
       console.log('Processing datetime:', dateTimeStr);
       console.log('Formatted date:', formattedDate);
@@ -49,25 +50,35 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
     }
   };
 
-  const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
-  const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
-
   const formatDateTime = (date: string, time: string) => {
     if (!date) return '';
     if (!time) time = '00:00';
     
     try {
-      // Create a new Date object in local timezone
-      const dateObj = new Date(`${date}T${time}`);
+      // Create date string in local timezone
+      const [year, month, day] = date.split('-');
+      const [hours, minutes] = time.split(':');
+      
+      // Create date object using local timezone
+      const dateObj = new Date(
+        parseInt(year),
+        parseInt(month) - 1, // Month is 0-based
+        parseInt(day),
+        parseInt(hours),
+        parseInt(minutes)
+      );
+      
       if (isNaN(dateObj.getTime())) return '';
       
-      // Format to ISO string and trim seconds/milliseconds
-      return dateObj.toISOString().slice(0, -8);
+      return dateObj.toISOString();
     } catch (error) {
       console.error('Error formatting datetime:', error);
       return '';
     }
   };
+
+  const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
+  const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -181,4 +192,3 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
     </div>
   );
 }
-
