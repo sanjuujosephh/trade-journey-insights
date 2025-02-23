@@ -4,6 +4,7 @@ import { TradeHistory } from "@/components/trade-form/TradeHistory";
 import { useTradeOperations } from "@/hooks/useTradeOperations";
 import { TradeDetailsDialog } from "@/components/TradeDetailsDialog";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 interface FOTradeTableProps {
   trades: Trade[];
