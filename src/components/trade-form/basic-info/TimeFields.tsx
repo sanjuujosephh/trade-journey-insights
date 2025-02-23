@@ -6,9 +6,10 @@ interface TimeFieldsProps {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   timeOptions: { value: string; label: string; }[];
+  handleDateTimeChange: (type: 'entry' | 'exit', timeStr: string) => void;
 }
 
-export function TimeFields({ formData, handleChange, timeOptions }: TimeFieldsProps) {
+export function TimeFields({ formData, handleChange, timeOptions, handleDateTimeChange }: TimeFieldsProps) {
   const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
   const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
 
