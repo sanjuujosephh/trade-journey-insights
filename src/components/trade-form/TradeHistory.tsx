@@ -83,7 +83,6 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeH
 
   return (
     <Card className="p-6 glass">
-      <h3 className="text-lg font-medium mb-4">Trade History</h3>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>

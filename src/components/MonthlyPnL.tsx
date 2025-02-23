@@ -9,42 +9,44 @@ export function MonthlyPnL() {
   const { user } = useAuth();
   const [monthlyPnL, setMonthlyPnL] = useState<number | null>(null);
 
+  const calculateMonthlyPnL = async () => {
+    if (!user) return;
+
+    try {
+      const currentDate = new Date();
+      const monthStart = startOfMonth(currentDate);
+      const monthEnd = endOfMonth(currentDate);
+
+      const { data: trades, error } = await supabase
+        .from('trades')
+        .select('entry_price, exit_price, quantity')
+        .gte('entry_time', monthStart.toISOString())
+        .lte('entry_time', monthEnd.toISOString())
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching trades:', error);
+        return;
+      }
+
+      const totalPnL = trades?.reduce((sum, trade) => {
+        if (trade.exit_price && trade.entry_price && trade.quantity) {
+          return sum + ((trade.exit_price - trade.entry_price) * trade.quantity);
+        }
+        return sum;
+      }, 0) || 0;
+
+      setMonthlyPnL(totalPnL);
+    } catch (err) {
+      console.error('Error calculating P&L:', err);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
 
-    const fetchMonthlyPnL = async () => {
-      try {
-        const currentDate = new Date();
-        const monthStart = startOfMonth(currentDate);
-        const monthEnd = endOfMonth(currentDate);
-
-        const { data: trades, error } = await supabase
-          .from('trades')
-          .select('entry_price, exit_price, quantity')
-          .gte('entry_time', monthStart.toISOString())
-          .lte('entry_time', monthEnd.toISOString())
-          .eq('user_id', user.id);
-
-        if (error) {
-          console.error('Error fetching trades:', error);
-          return;
-        }
-
-        const totalPnL = trades?.reduce((sum, trade) => {
-          if (trade.exit_price && trade.entry_price && trade.quantity) {
-            return sum + ((trade.exit_price - trade.entry_price) * trade.quantity);
-          }
-          return sum;
-        }, 0) || 0;
-
-        setMonthlyPnL(totalPnL);
-      } catch (err) {
-        console.error('Error calculating P&L:', err);
-      }
-    };
-
-    // Initial fetch
-    fetchMonthlyPnL();
+    // Initial calculation
+    calculateMonthlyPnL();
 
     // Set up real-time subscription
     const channel = supabase
@@ -57,9 +59,9 @@ export function MonthlyPnL() {
           table: 'trades',
           filter: `user_id=eq.${user.id}`
         },
-        () => {
-          // Refetch P&L when trades change
-          fetchMonthlyPnL();
+        (payload) => {
+          // Recalculate P&L on any trade changes
+          calculateMonthlyPnL();
         }
       )
       .subscribe();

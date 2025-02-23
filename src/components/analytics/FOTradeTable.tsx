@@ -2,7 +2,8 @@
 import { Trade } from "@/types/trade";
 import { TradeHistory } from "@/components/trade-form/TradeHistory";
 import { useTradeOperations } from "@/hooks/useTradeOperations";
-import { supabase } from "@/lib/supabase";
+import { TradeDetailsDialog } from "@/components/TradeDetailsDialog";
+import { useState } from "react";
 
 interface FOTradeTableProps {
   trades: Trade[];
@@ -10,10 +11,11 @@ interface FOTradeTableProps {
 
 export function FOTradeTable({ trades }: FOTradeTableProps) {
   const { updateTrade } = useTradeOperations();
+  const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const handleEdit = (trade: Trade) => {
-    // This will be handled by the parent component's onEdit prop
-    console.log('Editing trade:', trade);
+    updateTrade.mutate({ ...trade });
   };
 
   const handleDelete = async (id: string) => {
@@ -24,24 +26,35 @@ export function FOTradeTable({ trades }: FOTradeTableProps) {
         .eq('id', id);
       
       if (error) throw error;
-      
-      // The real-time subscription will handle the UI update
     } catch (error) {
       console.error('Error deleting trade:', error);
     }
   };
 
   const handleViewDetails = (trade: Trade) => {
-    // This will be handled by the parent component's onViewDetails prop
-    console.log('Viewing trade details:', trade);
+    setSelectedTrade(trade);
+    setIsDialogOpen(true);
   };
 
   return (
-    <TradeHistory 
-      trades={trades} 
-      onEdit={handleEdit}
-      onDelete={handleDelete}
-      onViewDetails={handleViewDetails}
-    />
+    <>
+      <TradeHistory 
+        trades={trades} 
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onViewDetails={handleViewDetails}
+      />
+      
+      {selectedTrade && (
+        <TradeDetailsDialog
+          trade={selectedTrade}
+          open={isDialogOpen}
+          onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) setSelectedTrade(null);
+          }}
+        />
+      )}
+    </>
   );
 }
