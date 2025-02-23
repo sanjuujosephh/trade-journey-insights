@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { Upload } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Upload, Download } from "lucide-react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import Papa from "papaparse";
 
@@ -12,6 +12,19 @@ export function ImportTrades() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const { data: trades = [] } = useQuery({
+    queryKey: ['trades'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trades')
+        .select('*')
+        .order('entry_time', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    }
+  });
 
   const processTrades = useMutation({
     mutationFn: async (csvData: Array<Array<string>>) => {
@@ -21,7 +34,6 @@ export function ImportTrades() {
 
       if (error) throw error;
       
-      // Insert the processed trades
       const { error: insertError } = await supabase
         .from('trades')
         .insert(data.trades);
@@ -57,7 +69,6 @@ export function ImportTrades() {
 
     Papa.parse(file, {
       complete: (results) => {
-        // Ensure the parsed data is a string[][]
         const parsedData = results.data as Array<Array<string>>;
         processTrades.mutate(parsedData);
       },
@@ -72,12 +83,40 @@ export function ImportTrades() {
     });
   };
 
+  const handleExportCSV = () => {
+    if (!trades.length) {
+      toast({
+        title: "No trades to export",
+        description: "Add some trades first before exporting.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const csv = Papa.unparse(trades);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `trades_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Success",
+      description: "Trades exported successfully!"
+    });
+  };
+
   return (
     <Card className="p-6">
       <div className="flex flex-col items-center gap-4">
-        <h3 className="text-lg font-medium">Import Trades</h3>
+        <h3 className="text-lg font-medium">Import/Export Trades</h3>
         <p className="text-sm text-muted-foreground text-center">
-          Upload a CSV file with your trades. Our AI will analyze and import them automatically.
+          Upload a CSV file with your trades or export your existing trades.
         </p>
         <div className="flex items-center gap-4">
           <Button
@@ -86,6 +125,13 @@ export function ImportTrades() {
           >
             <Upload className="mr-2 h-4 w-4" />
             {isProcessing ? "Processing..." : "Upload CSV"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleExportCSV}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
           </Button>
           <input
             id="csv-upload"

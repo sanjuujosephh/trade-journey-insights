@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { startOfMonth, endOfMonth } from "date-fns";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export function MonthlyPnL() {
   const { user } = useAuth();
@@ -70,13 +70,16 @@ export function MonthlyPnL() {
   if (!user || monthlyPnL === null) return null;
 
   return (
-    <Card className="flex items-center px-4 py-2 border">
-      <div>
-        <div className="text-xs text-muted-foreground mb-1">Monthly P&L</div>
-        <div className={`font-medium ${monthlyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+    <Button 
+      variant="outline" 
+      className="h-10 px-3 text-sm font-normal bg-background"
+    >
+      <div className="flex flex-col items-start leading-none">
+        <span className="text-[10px] text-muted-foreground">Monthly P&L</span>
+        <span className={`text-sm ${monthlyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
           ₹{monthlyPnL.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-        </div>
+        </span>
       </div>
-    </Card>
+    </Button>
   );
 }
