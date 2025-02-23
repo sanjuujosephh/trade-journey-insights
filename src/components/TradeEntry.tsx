@@ -31,6 +31,10 @@ export default function TradeEntry() {
   if (isLoading) return <LoadingSpinner />;
 
   const handleEdit = (trade: Trade) => {
+    // Format the entry and exit times correctly
+    const entryTime = trade.entry_time ? new Date(trade.entry_time).toISOString().slice(0, 16) : "";
+    const exitTime = trade.exit_time ? new Date(trade.exit_time).toISOString().slice(0, 16) : "";
+
     setFormData({
       ...formData,
       symbol: trade.symbol,
@@ -42,8 +46,8 @@ export default function TradeEntry() {
       strategy: trade.strategy ?? "",
       outcome: trade.outcome,
       notes: trade.notes ?? "",
-      entry_time: trade.entry_time || "",
-      exit_time: trade.exit_time || "",
+      entry_time: entryTime,
+      exit_time: exitTime,
       chart_link: trade.chart_link ?? "",
       vix: trade.vix?.toString() ?? "",
       call_iv: trade.call_iv?.toString() ?? "",
