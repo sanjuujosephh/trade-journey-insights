@@ -32,13 +32,13 @@ export default function TradeEntry() {
   const handleEdit = (trade: Trade) => {
     console.log('Raw trade data:', trade);
     
-    // Format dates for form fields (keep time part)
     const formatDateTime = (dateStr: string | null | undefined): string => {
       if (!dateStr) return "";
       try {
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) return "";
-        return date.toISOString().slice(0, -8); // Keep format as "YYYY-MM-DDTHH:mm"
+        
+        return date.toISOString().slice(0, 16);
       } catch (error) {
         console.error('Error formatting date:', error);
         return "";
@@ -87,7 +87,6 @@ export default function TradeEntry() {
       option_type: trade.option_type ?? ""
     });
     
-    console.log('Updated formData:', formData);
     setEditingId(trade.id);
   };
 

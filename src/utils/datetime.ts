@@ -2,20 +2,23 @@
 export const getDateAndTime = (dateTimeStr: string) => {
   if (!dateTimeStr) return { date: '', time: '' };
   try {
-    // Create a local date object (no timezone conversion)
-    const [datePart, timePart] = dateTimeStr.split('T');
-    if (!datePart) return { date: '', time: '' };
+    // Parse the input datetime string
+    const date = new Date(dateTimeStr);
     
-    // Extract time from the time part (before the Z or timezone offset if present)
-    const timeMatch = timePart?.match(/(\d{2}):(\d{2})/);
-    const time = timeMatch ? `${timeMatch[1]}:${timeMatch[2]}` : '00:00';
+    // Format date to YYYY-MM-DD
+    const datePart = date.toLocaleDateString('en-CA'); // This gives YYYY-MM-DD format
     
-    console.log('Input datetime:', dateTimeStr);
-    console.log('Parsed date and time:', { date: datePart, time });
+    // Format time to HH:mm in IST
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const time = `${hours}:${minutes}`;
+    
+    console.log('getDateAndTime input:', dateTimeStr);
+    console.log('Parsed to:', { date: datePart, time });
     
     return {
       date: datePart,
-      time: time
+      time
     };
   } catch (error) {
     console.error('Error parsing date:', error);
@@ -28,19 +31,13 @@ export const formatDateTime = (date: string, time: string) => {
   if (!time) time = '00:00';
   
   try {
-    const [hours, minutes] = time.split(':').map(Number);
-    const [year, month, day] = date.split('-').map(Number);
+    // Create date string in YYYY-MM-DD HH:mm format
+    const dateTimeStr = `${date}T${time}`;
     
-    // Format the date string directly without using Date object
-    const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+    console.log('formatDateTime input:', { date, time });
+    console.log('Formatted:', dateTimeStr);
     
-    const isoString = `${formattedDate}T${formattedTime}.000Z`;
-    
-    console.log('Input date/time:', `${date} ${time}`);
-    console.log('Formatted ISO:', isoString);
-    
-    return isoString;
+    return dateTimeStr;
   } catch (error) {
     console.error('Error formatting datetime:', error);
     return '';

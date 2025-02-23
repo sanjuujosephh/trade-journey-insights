@@ -3,27 +3,22 @@ export function formatDateTime(dateString: string) {
   if (!dateString) return 'N/A';
   
   try {
-    // Parse the ISO string directly without timezone conversion
-    const [datePart, timePart] = dateString.split('T');
-    if (!datePart || !timePart) return 'Invalid Date';
+    const date = new Date(dateString);
     
-    const [year, month, day] = datePart.split('-');
-    const [hour, minute] = timePart.split(':');
+    // Format the date and time in IST
+    const formattedDate = date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
     
-    // Create date parts array for formatting
-    const dateParts = {
-      year,
-      month: parseInt(month),
-      day: parseInt(day),
-      hour: parseInt(hour),
-      minute: parseInt(minute)
-    };
+    const formattedTime = date.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
     
-    // Format the time in 12-hour format
-    const hour12 = dateParts.hour % 12 || 12;
-    const ampm = dateParts.hour >= 12 ? 'PM' : 'AM';
-    
-    return `${dateParts.day}/${dateParts.month}/${dateParts.year}, ${hour12}:${String(dateParts.minute).padStart(2, '0')} ${ampm}`;
+    return `${formattedDate}, ${formattedTime}`;
   } catch (error) {
     console.error('Error formatting date:', error);
     return 'Invalid Date';
