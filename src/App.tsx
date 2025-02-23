@@ -69,9 +69,9 @@ function Navigation() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="min-h-screen flex flex-col">
       <Navigation />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1">
         {children}
       </main>
       <Footer />

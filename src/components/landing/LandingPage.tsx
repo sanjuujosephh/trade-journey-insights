@@ -23,8 +23,8 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
 export function LandingPage() {
   return (
     <div className="w-full overflow-auto bg-background">
-      <div className="container py-8">
-        <div className="mx-auto max-w-5xl text-center mb-8">
+      <div className="container py-16">
+        <div className="mx-auto max-w-5xl text-center mb-16">
           <h1 className="text-4xl font-bold tracking-tight mb-6">
             Your Complete Trading Journal & Analytics Platform
           </h1>
@@ -48,7 +48,7 @@ export function LandingPage() {
           </Card>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-16">
           <FeatureCard
             icon={<LineChart className="h-8 w-8" />}
             title="Advanced Analytics"
