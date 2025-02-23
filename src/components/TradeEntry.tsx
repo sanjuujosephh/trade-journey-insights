@@ -1,4 +1,3 @@
-
 import { ErrorBoundary } from "./ErrorBoundary";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
 import { TradeHistory } from "./trade-form/TradeHistory";
@@ -32,12 +31,22 @@ export default function TradeEntry() {
 
   const handleEdit = (trade: Trade) => {
     console.log('Raw trade data:', trade);
-    console.log('Raw entry_time:', trade.entry_time);
-    console.log('Raw exit_time:', trade.exit_time);
+    
+    // Format dates for form fields (keep time part)
+    const formatDateTime = (dateStr: string | null | undefined): string => {
+      if (!dateStr) return "";
+      try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return "";
+        return date.toISOString().slice(0, -8); // Keep format as "YYYY-MM-DDTHH:mm"
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return "";
+      }
+    };
 
-    // Format the entry and exit times correctly
-    const entryTime = trade.entry_time ? new Date(trade.entry_time).toISOString().slice(0, 16) : "";
-    const exitTime = trade.exit_time ? new Date(trade.exit_time).toISOString().slice(0, 16) : "";
+    const entryTime = formatDateTime(trade.entry_time);
+    const exitTime = formatDateTime(trade.exit_time);
 
     console.log('Formatted entry_time:', entryTime);
     console.log('Formatted exit_time:', exitTime);
@@ -61,8 +70,8 @@ export default function TradeEntry() {
       confidence_level: trade.confidence_level?.toString() ?? "",
       entry_time: entryTime,
       exit_time: exitTime,
-      strategy: trade.strategy ?? "", // Ensure strategy is always set
-      trade_type: trade.trade_type, // Ensure required fields are included
+      strategy: trade.strategy ?? "",
+      trade_type: trade.trade_type,
       symbol: trade.symbol,
       outcome: trade.outcome,
       notes: trade.notes ?? "",

@@ -26,7 +26,11 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
       
       return {
         date: date.toISOString().split('T')[0],
-        time: date.toTimeString().substring(0, 5)
+        time: date.toLocaleTimeString('en-GB', { 
+          hour: '2-digit', 
+          minute: '2-digit',
+          hour12: false 
+        })
       };
     } catch (error) {
       console.error('Error parsing date:', error);
@@ -36,6 +40,12 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
 
   const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
   const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
+
+  const formatDateTime = (date: string, time: string) => {
+    if (!date) return '';
+    if (!time) time = '00:00';
+    return new Date(`${date}T${time}`).toISOString();
+  };
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -52,9 +62,11 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
                 } as React.ChangeEvent<HTMLInputElement>);
                 return;
               }
-              const newDateTime = `${e.target.value}T${entryTime || '09:15'}`;
               handleChange({
-                target: { name: 'entry_time', value: newDateTime }
+                target: { 
+                  name: 'entry_time', 
+                  value: formatDateTime(e.target.value, entryTime)
+                }
               } as React.ChangeEvent<HTMLInputElement>);
             }}
             required
@@ -64,7 +76,12 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
             value={entryTime}
             onValueChange={(value) => {
               if (entryDate) {
-                handleDateTimeChange('entry', value);
+                handleChange({
+                  target: {
+                    name: 'entry_time',
+                    value: formatDateTime(entryDate, value)
+                  }
+                } as React.ChangeEvent<HTMLInputElement>);
               }
             }}
           >
@@ -99,9 +116,11 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
                 } as React.ChangeEvent<HTMLInputElement>);
                 return;
               }
-              const newDateTime = `${e.target.value}T${exitTime || '09:15'}`;
               handleChange({
-                target: { name: 'exit_time', value: newDateTime }
+                target: { 
+                  name: 'exit_time', 
+                  value: formatDateTime(e.target.value, exitTime)
+                }
               } as React.ChangeEvent<HTMLInputElement>);
             }}
             className="flex-1"
@@ -110,7 +129,12 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
             value={exitTime}
             onValueChange={(value) => {
               if (exitDate) {
-                handleDateTimeChange('exit', value);
+                handleChange({
+                  target: {
+                    name: 'exit_time',
+                    value: formatDateTime(exitDate, value)
+                  }
+                } as React.ChangeEvent<HTMLInputElement>);
               }
             }}
           >
@@ -135,3 +159,4 @@ export function TimeFields({ formData, handleChange, handleDateTimeChange, timeO
     </div>
   );
 }
+
