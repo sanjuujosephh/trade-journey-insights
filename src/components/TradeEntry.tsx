@@ -112,6 +112,7 @@ export default function TradeEntry() {
               setSelectedTrade(trade);
               setIsDialogOpen(true);
             }}
+            showEditButton={true}
           />
         )}
 

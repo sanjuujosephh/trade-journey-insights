@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Maximize2, Image } from "lucide-react";
+import { Trash2, Maximize2, Image, Pencil } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
@@ -19,9 +19,10 @@ interface TradeHistoryProps {
   onEdit: (trade: Trade) => void;
   onDelete: (id: string) => void;
   onViewDetails: (trade: Trade) => void;
+  showEditButton?: boolean;
 }
 
-export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeHistoryProps) {
+export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEditButton = false }: TradeHistoryProps) {
   const { toast } = useToast();
 
   const formatDisplayTime = (dateString: string) => {
@@ -141,6 +142,15 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails }: TradeH
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
+                      {showEditButton && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onEdit(trade)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
