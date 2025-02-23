@@ -61,6 +61,21 @@ export default function TradeEntry() {
       confidence_level: trade.confidence_level?.toString() ?? "",
       entry_time: entryTime,
       exit_time: exitTime,
+      strategy: trade.strategy ?? "", // Ensure strategy is always set
+      trade_type: trade.trade_type, // Ensure required fields are included
+      symbol: trade.symbol,
+      outcome: trade.outcome,
+      notes: trade.notes ?? "",
+      chart_link: trade.chart_link ?? "",
+      vwap_position: trade.vwap_position ?? "",
+      ema_position: trade.ema_position ?? "",
+      market_condition: trade.market_condition ?? "",
+      timeframe: trade.timeframe ?? "",
+      trade_direction: trade.trade_direction ?? "",
+      exit_reason: trade.exit_reason ?? "",
+      entry_emotion: trade.entry_emotion ?? "",
+      exit_emotion: trade.exit_emotion ?? "",
+      option_type: trade.option_type ?? ""
     });
     
     console.log('Updated formData:', formData);
@@ -126,4 +141,3 @@ export default function TradeEntry() {
     </ErrorBoundary>
   );
 }
-

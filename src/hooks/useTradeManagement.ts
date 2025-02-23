@@ -27,13 +27,17 @@ export function useTradeManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submit form data:', formData);
     const tradeData = transformTradeData(formData);
+    console.log('Transformed trade data:', tradeData);
     
     try {
       if (editingId) {
+        console.log('Updating trade:', editingId, tradeData);
         await updateTrade.mutateAsync({ id: editingId, ...tradeData });
         resetForm();
       } else {
+        console.log('Adding new trade:', tradeData);
         await addTrade.mutateAsync(tradeData);
         resetForm();
       }
