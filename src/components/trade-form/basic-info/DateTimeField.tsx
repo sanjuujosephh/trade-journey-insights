@@ -19,6 +19,18 @@ export function DateTimeField({
   onTimeChange,
   required = false,
 }: DateTimeFieldProps) {
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Prevent time value from interfering with date field
+    const newDate = e.target.value;
+    onDateChange(newDate);
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Prevent date value from interfering with time field
+    const newTime = e.target.value;
+    onTimeChange(newTime);
+  };
+
   return (
     <div className="space-y-2">
       <Label htmlFor={label}>{label}</Label>
@@ -26,7 +38,7 @@ export function DateTimeField({
         <Input
           type="text"
           value={date}
-          onChange={(e) => onDateChange(e.target.value)}
+          onChange={handleDateChange}
           placeholder="DD-MM-YYYY"
           required={required}
           className="flex-1"
@@ -34,7 +46,7 @@ export function DateTimeField({
         <Input
           type="text"
           value={time}
-          onChange={(e) => onTimeChange(e.target.value)}
+          onChange={handleTimeChange}
           placeholder="HH:MM AM/PM"
           required={required}
           className="w-[120px]"

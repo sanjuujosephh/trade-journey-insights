@@ -12,21 +12,21 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
   const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
 
   const handleDateChange = (type: 'entry' | 'exit') => (date: string) => {
-    const time = type === 'entry' ? entryTime : exitTime;
+    const currentTime = type === 'entry' ? entryTime : exitTime;
     handleChange({
       target: { 
         name: `${type}_time`, 
-        value: `${date} ${time}`.trim()
+        value: date && currentTime ? `${date} ${currentTime}` : date
       }
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
-    const date = type === 'entry' ? entryDate : exitDate;
+    const currentDate = type === 'entry' ? entryDate : exitDate;
     handleChange({
       target: {
         name: `${type}_time`,
-        value: `${date} ${time}`.trim()
+        value: currentDate && time ? `${currentDate} ${time}` : time
       }
     } as React.ChangeEvent<HTMLInputElement>);
   };
