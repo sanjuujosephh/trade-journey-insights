@@ -1,11 +1,10 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Trade } from "@/types/trade";
 import { transformTradeData } from "@/utils/trade-form/transformations";
-import { dateToISTString } from "@/utils/datetime";
+import { dateToISTString, parseISTString } from "@/utils/datetime";
 
 export function useTradeOperations() {
   const { toast } = useToast();
@@ -53,12 +52,12 @@ export function useTradeOperations() {
   const checkTradeLimit = useCallback(async (entryTime: string) => {
     if (!userId) return false;
     
-    const date = new Date(entryTime);
+    const date = parseISTString(entryTime);
     const dayStart = new Date(date);
-    dayStart.setHours(0, 0, 0, 0);
+    dayStart.setHours(9, 0, 0, 0);
     
     const dayEnd = new Date(date);
-    dayEnd.setHours(23, 59, 59, 999);
+    dayEnd.setHours(15, 59, 59, 999);
     
     const { data: existingTrades, error } = await supabase
       .from('trades')
@@ -135,8 +134,8 @@ export function useTradeOperations() {
 
       const updates = {
         ...trade,
-        entry_time: trade.entry_time || undefined,
-        exit_time: trade.exit_time || null
+        entry_time: trade.entry_time ? dateToISTString(parseISTString(trade.entry_time)) : undefined,
+        exit_time: trade.exit_time ? dateToISTString(parseISTString(trade.exit_time)) : null
       };
 
       console.log('Updating trade with data:', updates);
@@ -180,4 +179,3 @@ export function useTradeOperations() {
     userId,
   };
 }
-
