@@ -2,15 +2,15 @@
 // Helper function to format date and time consistently in IST
 const formatToIST = (date: Date, includeSeconds = false) => {
   try {
-    // Ensure we're using IST
+    // Create date string with IST offset
     const options: Intl.DateTimeFormatOptions = {
       timeZone: 'Asia/Kolkata',
-      hour12: false,
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     };
 
     if (includeSeconds) {
@@ -46,29 +46,23 @@ export const dateToISTString = (date: Date): string => {
 export const parseISTString = (dateTimeStr: string): Date => {
   if (!dateTimeStr) throw new Error('No datetime string provided');
   
-  // Add IST offset if not present
-  const hasOffset = dateTimeStr.includes('+') || dateTimeStr.includes('Z');
-  const fullDateTimeStr = hasOffset ? dateTimeStr : `${dateTimeStr}+05:30`;
-  
-  const date = new Date(fullDateTimeStr);
-  if (isNaN(date.getTime())) {
-    throw new Error('Invalid date string');
+  try {
+    // Create a Date object in IST timezone
+    const date = new Date(dateTimeStr);
+    return date;
+  } catch (error) {
+    console.error('Error parsing IST string:', error);
+    throw error;
   }
-  
-  return date;
 };
 
+// Helper function to get date and time parts from IST datetime string
 export const getDateAndTime = (dateTimeStr: string) => {
   if (!dateTimeStr) return { date: '', time: '' };
   
   try {
     const date = parseISTString(dateTimeStr);
     const { datePart, timePart } = formatToIST(date);
-    
-    console.log('getDateAndTime:', {
-      input: dateTimeStr,
-      parsed: { date: datePart, time: timePart }
-    });
     
     return {
       date: datePart,
@@ -80,15 +74,19 @@ export const getDateAndTime = (dateTimeStr: string) => {
   }
 };
 
+// Helper function to format date and time to IST datetime string
 export const formatDateTime = (date: string, time: string) => {
   if (!date) return '';
   if (!time) time = '00:00';
   
   try {
-    const dateTimeStr = `${date}T${time}+05:30`;
-    console.log('formatDateTime:', {
-      input: { date, time },
-      output: dateTimeStr
+    // Combine date and time strings
+    const dateTimeStr = `${date}T${time}`;
+    
+    console.log('formatDateTime input:', {
+      date,
+      time,
+      combined: dateTimeStr
     });
     
     return dateTimeStr;
@@ -97,4 +95,3 @@ export const formatDateTime = (date: string, time: string) => {
     return '';
   }
 };
-
