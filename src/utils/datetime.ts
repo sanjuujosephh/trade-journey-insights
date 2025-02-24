@@ -26,21 +26,41 @@ export const dateToISTString = (date: Date): string => {
   return `${datePart} ${timePart}`;
 };
 
-// Parse IST string back to Date object
-export const parseISTString = (dateStr: string): Date => {
-  if (!dateStr) throw new Error('Date string is required');
+// Parse date string in DD-MM-YYYY format
+export const parseDateString = (dateStr: string): Date | null => {
+  if (!dateStr) return null;
   
-  const [datePart, timePart] = dateStr.split(' ');
-  const [day, month, year] = datePart.split('-').map(Number);
-  const [time, period] = timePart.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
+  const [day, month, year] = dateStr.split('-').map(Number);
+  if (!day || !month || !year) return null;
   
-  if (period === 'PM' && hours !== 12) hours += 12;
-  if (period === 'AM' && hours === 12) hours = 0;
-  
-  const date = new Date(year, month - 1, day, hours, minutes);
-  if (isNaN(date.getTime())) throw new Error('Invalid date string');
-  
-  return date;
+  const date = new Date(year, month - 1, day);
+  return isNaN(date.getTime()) ? null : date;
 };
 
+// Parse time string in HH:MM AM/PM format
+export const parseTimeString = (timeStr: string): Date | null => {
+  if (!timeStr) return null;
+  
+  const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return null;
+  
+  let [_, hours, minutes, period] = match;
+  let hour = parseInt(hours);
+  const minute = parseInt(minutes);
+  
+  if (hour > 12 || minute > 59) return null;
+  
+  if (period.toUpperCase() === 'PM' && hour !== 12) hour += 12;
+  if (period.toUpperCase() === 'AM' && hour === 12) hour = 0;
+  
+  const date = new Date();
+  date.setHours(hour, minute, 0, 0);
+  return isNaN(date.getTime()) ? null : date;
+};
+
+// Validate the full date-time combination
+export const isValidDateTime = (date: string, time: string): boolean => {
+  const parsedDate = parseDateString(date);
+  const parsedTime = parseTimeString(time);
+  return parsedDate !== null && parsedTime !== null;
+};

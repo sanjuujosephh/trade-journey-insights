@@ -3,6 +3,7 @@ import { useTradeForm } from "./useTradeForm";
 import { useTradeOperations } from "./useTradeOperations";
 import { transformTradeData } from "@/utils/trade-form/transformations";
 import { useToast } from "@/hooks/use-toast";
+import { isValidDateTime } from "@/utils/datetime";
 
 export function useTradeManagement() {
   const { toast } = useToast();
@@ -31,40 +32,19 @@ export function useTradeManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate date fields
-    if (formData.entry_time) {
-      try {
-        const entryDate = new Date(formData.entry_time);
-        if (isNaN(entryDate.getTime())) {
-          toast({
-            title: "Invalid Date",
-            description: "Please enter a valid entry time",
-            variant: "destructive"
-          });
-          return;
-        }
-      } catch (error) {
-        toast({
-          title: "Invalid Date",
-          description: "Please enter a valid entry time",
-          variant: "destructive"
-        });
-        return;
-      }
+    // Validate entry date and time
+    if (!isValidDateTime(formData.entry_date, formData.entry_time)) {
+      toast({
+        title: "Invalid Date",
+        description: "Please enter a valid entry time",
+        variant: "destructive"
+      });
+      return;
     }
 
-    if (formData.exit_time) {
-      try {
-        const exitDate = new Date(formData.exit_time);
-        if (isNaN(exitDate.getTime())) {
-          toast({
-            title: "Invalid Date",
-            description: "Please enter a valid exit time",
-            variant: "destructive"
-          });
-          return;
-        }
-      } catch (error) {
+    // Validate exit date and time if provided
+    if (formData.exit_date && formData.exit_time) {
+      if (!isValidDateTime(formData.exit_date, formData.exit_time)) {
         toast({
           title: "Invalid Date",
           description: "Please enter a valid exit time",

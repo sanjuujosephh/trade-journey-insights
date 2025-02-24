@@ -1,5 +1,7 @@
 
 import { DateTimeField } from "./DateTimeField";
+import { useEffect } from "react";
+import { parseTimeString } from "@/utils/datetime";
 
 interface TimeFieldsProps {
   formData: any;
@@ -17,12 +19,15 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
-    handleChange({
-      target: {
-        name: `${type}_time`,
-        value: time
-      }
-    } as React.ChangeEvent<HTMLInputElement>);
+    const validTime = parseTimeString(time);
+    if (validTime || time === '') {
+      handleChange({
+        target: {
+          name: `${type}_time`,
+          value: time
+        }
+      } as React.ChangeEvent<HTMLInputElement>);
+    }
   };
 
   return (
