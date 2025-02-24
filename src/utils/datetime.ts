@@ -1,73 +1,56 @@
 
 // Helper function to format date and time consistently in IST
-const formatToIST = (date: Date, includeSeconds = false) => {
+const formatToIST = (date: Date | null | undefined, includeSeconds = false) => {  
+  if (!date) return { datePart: '', timePart: '' };
+  
   try {
-    const options: Intl.DateTimeFormatOptions = {
-      timeZone: 'Asia/Kolkata',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    };
+    // Create date forcing IST timezone
+    const istDate = new Date(date.getTime());
 
-    if (includeSeconds) {
-      options.second = '2-digit';
-    }
+    // Format date part
+    const year = istDate.getFullYear();
+    const month = String(istDate.getMonth() + 1).padStart(2, '0');
+    const day = String(istDate.getDate()).padStart(2, '0');
+    const datePart = `${year}-${month}-${day}`;
 
-    const formatter = new Intl.DateTimeFormat('en-IN', options);
-    const parts = formatter.formatToParts(date);
-    const values: { [key: string]: string } = {};
-    parts.forEach(part => {
-      values[part.type] = part.value;
-    });
-
-    const datePart = `${values.year}-${values.month}-${values.day}`;
+    // Format time part
+    const hours = String(istDate.getHours()).padStart(2, '0');
+    const minutes = String(istDate.getMinutes()).padStart(2, '0');
+    const seconds = String(istDate.getSeconds()).padStart(2, '0');
     const timePart = includeSeconds 
-      ? `${values.hour}:${values.minute}:${values.second}` 
-      : `${values.hour}:${values.minute}`;
+      ? `${hours}:${minutes}:${seconds}`
+      : `${hours}:${minutes}`;
 
     return { datePart, timePart };
   } catch (error) {
     console.error('Error formatting date to IST:', error);
-    throw error;
+    return { datePart: '', timePart: '' };
   }
 };
 
 // Convert a Date object to IST datetime string
 export const dateToISTString = (date: Date): string => {
-  const options: Intl.DateTimeFormatOptions = {
-    timeZone: 'Asia/Kolkata',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  };
+  try {
+    const hours = date.getHours();
+    const adjustedDate = new Date(date);
 
-  const formatter = new Intl.DateTimeFormat('en-IN', options);
-  const parts = formatter.formatToParts(date);
-  const values: { [key: string]: string } = {};
-  parts.forEach(part => {
-    values[part.type] = part.value;
-  });
+    // Ensure time is between 9:00 and 15:59
+    if (hours < 9) {
+      adjustedDate.setHours(9, 0, 0, 0);
+    } else if (hours >= 16) {
+      adjustedDate.setHours(15, 59, 59, 999);
+    }
 
-  // Ensure time is between 9:00 and 15:59
-  const hour = parseInt(values.hour);
-  if (hour < 9) {
-    values.hour = '09';
-    values.minute = '00';
-    values.second = '00';
-  } else if (hour >= 16) {
-    values.hour = '15';
-    values.minute = '59';
-    values.second = '59';
+    const { datePart } = formatToIST(adjustedDate);
+    const hours24 = String(adjustedDate.getHours()).padStart(2, '0');
+    const minutes = String(adjustedDate.getMinutes()).padStart(2, '0');
+    const seconds = String(adjustedDate.getSeconds()).padStart(2, '0');
+
+    return `${datePart}T${hours24}:${minutes}:${seconds}`;
+  } catch (error) {
+    console.error('Error in dateToISTString:', error);
+    throw error;
   }
-
-  return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}:${values.second}`;
 };
 
 // Parse an IST datetime string to Date object
@@ -87,11 +70,10 @@ export const parseISTString = (dateTimeStr: string): Date => {
     } else if (hour >= 16) {
       hour = 15;
       minute = 59;
-      second = second || 59;
+      second = 59;
     }
 
-    const date = new Date(year, month - 1, day, hour, minute, second);
-    return date;
+    return new Date(year, month - 1, day, hour, minute, second);
   } catch (error) {
     console.error('Error parsing IST string:', error);
     throw error;
@@ -99,13 +81,17 @@ export const parseISTString = (dateTimeStr: string): Date => {
 };
 
 // Helper function to get date and time parts from IST datetime string
-export const getDateAndTime = (dateTimeStr: string) => {
+export const getDateAndTime = (dateTimeStr: string | null | undefined) => {
   if (!dateTimeStr) return { date: '', time: '' };
   
   try {
-    const date = parseISTString(dateTimeStr);
+    const date = new Date(dateTimeStr);
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date string:', dateTimeStr);
+      return { date: '', time: '' };
+    }
+
     const { datePart, timePart } = formatToIST(date);
-    
     return {
       date: datePart,
       time: timePart
@@ -123,9 +109,12 @@ export const formatDateTime = (date: string, time: string) => {
   
   try {
     // Combine date and time strings
-    const dateTimeStr = `${date}T${time}`;
-    const parsedDate = parseISTString(dateTimeStr); // This will enforce trading hours
-    const formattedDateTime = dateToISTString(parsedDate);
+    const [hours, minutes] = time.split(':');
+    const dateObj = new Date(date);
+    dateObj.setHours(Number(hours), Number(minutes), 0);
+
+    // This will enforce trading hours
+    const formattedDateTime = dateToISTString(dateObj);
     
     console.log('formatDateTime:', {
       input: { date, time },
@@ -138,4 +127,3 @@ export const formatDateTime = (date: string, time: string) => {
     return '';
   }
 };
-
