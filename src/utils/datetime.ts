@@ -4,19 +4,22 @@ const formatToIST = (date: Date | null | undefined, includeSeconds = false) => {
   if (!date) return { datePart: '', timePart: '' };
   
   try {
-    // Format date part
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    // Format date part (DD-MM-YYYY)
     const day = String(date.getDate()).padStart(2, '0');
-    const datePart = `${year}-${month}-${day}`;
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const datePart = `${day}-${month}-${year}`;
 
-    // Format time part
-    const hours = String(date.getHours()).padStart(2, '0');
+    // Format time part with AM/PM
+    const hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = hours % 12 || 12;
+    
     const timePart = includeSeconds 
-      ? `${hours}:${minutes}:${seconds}`
-      : `${hours}:${minutes}`;
+      ? `${String(hours12).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`
+      : `${String(hours12).padStart(2, '0')}:${minutes} ${ampm}`;
 
     return { datePart, timePart };
   } catch (error) {
@@ -25,13 +28,13 @@ const formatToIST = (date: Date | null | undefined, includeSeconds = false) => {
   }
 };
 
-// Convert a Date object to IST datetime string
+// Convert a Date object to IST datetime string for database
 export const dateToISTString = (date: Date): string => {
   try {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     
-    // Ensure time is between 9:00 and 15:59
+    // Ensure time is between 9:00 AM and 3:59 PM
     if (hours < 9) {
       date.setHours(9, 0, 0, 0);
     } else if (hours > 15 || (hours === 15 && minutes >= 60)) {
@@ -56,10 +59,10 @@ export const parseISTString = (dateTimeStr: string): Date => {
   
   try {
     const [datePart, timePart] = dateTimeStr.split(' ');
-    const [year, month, day] = datePart.split('-').map(Number);
+    const [day, month, year] = datePart.split('-').map(Number);
     let [hour, minute, second] = (timePart || '00:00:00').split(':').map(Number);
 
-    // Ensure time is between 9:00 and 15:59
+    // Ensure time is between 9:00 AM and 3:59 PM
     if (hour < 9) {
       hour = 9;
       minute = 0;
@@ -87,10 +90,16 @@ export const getDateAndTime = (dateTimeStr: string | null | undefined) => {
       console.warn('Invalid date string format:', dateTimeStr);
       return { date: '', time: '' };
     }
+
+    // Convert time to 12-hour format with AM/PM
+    const [hours24, minutes] = timePart.split(':');
+    const hour24 = parseInt(hours24, 10);
+    const ampm = hour24 >= 12 ? 'PM' : 'AM';
+    const hour12 = hour24 % 12 || 12;
     
     return {
       date: datePart,
-      time: timePart.slice(0, 5) // Get HH:mm part only
+      time: `${String(hour12).padStart(2, '0')}:${minutes} ${ampm}`
     };
   } catch (error) {
     console.error('Error in getDateAndTime:', error);
@@ -101,11 +110,23 @@ export const getDateAndTime = (dateTimeStr: string | null | undefined) => {
 // Helper function to format date and time to IST datetime string
 export const formatDateTime = (date: string, time: string) => {
   if (!date) return '';
-  if (!time) time = '09:00';
+  if (!time) time = '09:00 AM';
   
   try {
+    // Parse time to 24-hour format
+    const [timePart, meridiem] = time.split(' ');
+    const [hours12, minutes] = timePart.split(':');
+    let hours24 = parseInt(hours12, 10);
+    
+    if (meridiem === 'PM' && hours24 !== 12) {
+      hours24 += 12;
+    } else if (meridiem === 'AM' && hours24 === 12) {
+      hours24 = 0;
+    }
+
     // Combine date and time strings
-    const dateTimeStr = `${date} ${time}:00`;
+    const timeStr = `${String(hours24).padStart(2, '0')}:${minutes}:00`;
+    const dateTimeStr = `${date} ${timeStr}`;
     console.log('Formatting datetime:', dateTimeStr);
     return dateTimeStr;
   } catch (error) {

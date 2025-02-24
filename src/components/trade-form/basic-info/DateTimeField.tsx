@@ -28,7 +28,7 @@ export function DateTimeField({
           value={date}
           onChange={(e) => onDateChange(e.target.value)}
           required={required}
-          placeholder="YYYY-MM-DD"
+          placeholder="DD-MM-YYYY"
           className="flex-1"
         />
         <Input
@@ -36,8 +36,8 @@ export function DateTimeField({
           value={time}
           onChange={(e) => onTimeChange(e.target.value)}
           required={required}
-          placeholder="HH:MM"
-          className="w-[100px]"
+          placeholder="HH:MM AM"
+          className="w-[120px]"
         />
       </div>
     </div>
