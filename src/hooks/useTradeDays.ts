@@ -1,26 +1,53 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { format, startOfMonth, endOfMonth } from "date-fns";
+import { format } from "date-fns";
 import { TradeDay } from "@/components/analytics/calendar/calendarUtils";
+
+const formatToIST = (date: Date) => {
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'Asia/Kolkata',
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  };
+
+  const parts = new Intl.DateTimeFormat('en-IN', options).formatToParts(date);
+  const values: { [key: string]: string } = {};
+  parts.forEach(part => {
+    values[part.type] = part.value;
+  });
+
+  return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}:${values.second}`;
+};
 
 export function useTradeDays(currentDate: Date) {
   return useQuery({
     queryKey: ["calendar-trades", format(currentDate, "yyyy-MM")],
     queryFn: async () => {
-      const monthStart = startOfMonth(currentDate);
-      const monthEnd = endOfMonth(currentDate);
+      const monthStart = new Date(currentDate);
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+      
+      const monthEnd = new Date(currentDate);
+      monthEnd.setMonth(monthEnd.getMonth() + 1);
+      monthEnd.setDate(0);
+      monthEnd.setHours(23, 59, 59, 999);
 
       console.log("Fetching trades for:", {
-        monthStart: monthStart.toISOString(),
-        monthEnd: monthEnd.toISOString()
+        monthStart: formatToIST(monthStart),
+        monthEnd: formatToIST(monthEnd)
       });
 
       const { data: trades, error } = await supabase
         .from("trades")
         .select("*")
-        .gte("entry_time", monthStart.toISOString())
-        .lte("entry_time", monthEnd.toISOString())
+        .gte("entry_time", formatToIST(monthStart))
+        .lte("entry_time", formatToIST(monthEnd))
         .order("entry_time");
       
       if (error) {

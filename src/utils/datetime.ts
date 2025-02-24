@@ -1,27 +1,50 @@
 
+// Helper function to format date and time consistently in IST
+const formatToIST = (date: Date, includeSeconds = false) => {
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'Asia/Kolkata',
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
+
+  if (includeSeconds) {
+    options.second = '2-digit';
+  }
+
+  const parts = new Intl.DateTimeFormat('en-IN', options).formatToParts(date);
+  const values: { [key: string]: string } = {};
+  parts.forEach(part => {
+    values[part.type] = part.value;
+  });
+
+  const datePart = `${values.year}-${values.month}-${values.day}`;
+  const timePart = includeSeconds 
+    ? `${values.hour}:${values.minute}:${values.second}` 
+    : `${values.hour}:${values.minute}`;
+
+  return { datePart, timePart };
+};
+
 export const getDateAndTime = (dateTimeStr: string) => {
   if (!dateTimeStr) return { date: '', time: '' };
   try {
-    // Create a date object in local time (IST)
     const date = new Date(dateTimeStr);
-    
-    // Format date to YYYY-MM-DD
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const datePart = `${year}-${month}-${day}`;
-    
-    // Format time to HH:mm in IST (local time)
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const time = `${hours}:${minutes}`;
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date');
+    }
+
+    const { datePart, timePart } = formatToIST(date);
     
     console.log('getDateAndTime input:', dateTimeStr);
-    console.log('Parsed to:', { date: datePart, time });
+    console.log('Parsed to:', { date: datePart, time: timePart });
     
     return {
       date: datePart,
-      time
+      time: timePart
     };
   } catch (error) {
     console.error('Error parsing date:', error);
@@ -34,7 +57,6 @@ export const formatDateTime = (date: string, time: string) => {
   if (!time) time = '00:00';
   
   try {
-    // Create datetime string in YYYY-MM-DD HH:mm format (local time/IST)
     const dateTimeStr = `${date}T${time}`;
     
     console.log('formatDateTime input:', { date, time });

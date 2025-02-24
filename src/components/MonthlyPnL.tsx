@@ -6,6 +6,27 @@ import { startOfMonth, endOfMonth } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
+const formatToIST = (date: Date) => {
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'Asia/Kolkata',
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  };
+
+  const parts = new Intl.DateTimeFormat('en-IN', options).formatToParts(date);
+  const values: { [key: string]: string } = {};
+  parts.forEach(part => {
+    values[part.type] = part.value;
+  });
+
+  return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}:${values.second}`;
+};
+
 export function MonthlyPnL() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -19,13 +40,16 @@ export function MonthlyPnL() {
     try {
       const currentDate = new Date();
       const monthStart = startOfMonth(currentDate);
+      monthStart.setHours(0, 0, 0, 0);
+      
       const monthEnd = endOfMonth(currentDate);
+      monthEnd.setHours(23, 59, 59, 999);
 
       const { data: trades, error } = await supabase
         .from('trades')
         .select('entry_price, exit_price, quantity')
-        .gte('entry_time', monthStart.toISOString())
-        .lte('entry_time', monthEnd.toISOString())
+        .gte('entry_time', formatToIST(monthStart))
+        .lte('entry_time', formatToIST(monthEnd))
         .eq('user_id', user.id);
 
       if (error) {

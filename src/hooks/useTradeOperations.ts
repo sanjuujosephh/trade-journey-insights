@@ -6,6 +6,30 @@ import { supabase } from "@/lib/supabase";
 import { Trade } from "@/types/trade";
 import { transformTradeData } from "@/utils/trade-form/transformations";
 
+const formatToIST = (date: Date, includeSeconds = false) => {
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'Asia/Kolkata',
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
+
+  if (includeSeconds) {
+    options.second = '2-digit';
+  }
+
+  const parts = new Intl.DateTimeFormat('en-IN', options).formatToParts(date);
+  const values: { [key: string]: string } = {};
+  parts.forEach(part => {
+    values[part.type] = part.value;
+  });
+
+  return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}${includeSeconds ? `:${values.second}` : ''}`;
+};
+
 export function useTradeOperations() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -64,8 +88,8 @@ export function useTradeOperations() {
     const { data: existingTrades, error } = await supabase
       .from('trades')
       .select('id')
-      .gte('entry_time', dayStart.toISOString())
-      .lte('entry_time', dayEnd.toISOString());
+      .gte('entry_time', formatToIST(dayStart))
+      .lte('entry_time', formatToIST(dayEnd));
     
     if (error) {
       console.error('Error checking trade limit:', error);
@@ -81,14 +105,13 @@ export function useTradeOperations() {
         throw new Error("User not authenticated");
       }
 
-      // Ensure valid timestamps
-      const now = new Date().toISOString();
+      const now = new Date();
       const tradeData = {
         ...newTrade,
         user_id: userId,
-        entry_time: newTrade.entry_time ? new Date(newTrade.entry_time).toISOString() : now,
-        exit_time: newTrade.exit_time ? new Date(newTrade.exit_time).toISOString() : null,
-        timestamp: now
+        entry_time: newTrade.entry_time ? newTrade.entry_time : formatToIST(now),
+        exit_time: newTrade.exit_time ? newTrade.exit_time : null,
+        timestamp: formatToIST(now)
       };
 
       console.log('Adding trade with data:', tradeData);
@@ -136,8 +159,8 @@ export function useTradeOperations() {
 
       const updates = {
         ...trade,
-        entry_time: trade.entry_time ? new Date(trade.entry_time).toISOString() : undefined,
-        exit_time: trade.exit_time ? new Date(trade.exit_time).toISOString() : null
+        entry_time: trade.entry_time ? trade.entry_time : undefined,
+        exit_time: trade.exit_time ? trade.exit_time : null
       };
 
       console.log('Updating trade with data:', updates);

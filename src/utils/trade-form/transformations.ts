@@ -1,43 +1,45 @@
 
-import { FormData, Trade } from "@/types/trade";
+import type { FormData, Trade } from "@/types/trade";
+
+const sanitizeNumber = (value: string): number | null => {
+  if (!value) return null;
+  const num = parseFloat(value);
+  return isNaN(num) ? null : num;
+};
 
 export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'timestamp'> => {
-  // Ensure dates are in ISO format
-  const entryTime = formData.entry_time ? new Date(formData.entry_time).toISOString() : null;
-  const exitTime = formData.exit_time ? new Date(formData.exit_time).toISOString() : null;
-
   return {
     entry_price: parseFloat(formData.entry_price),
-    exit_price: formData.exit_price ? parseFloat(formData.exit_price) : null,
-    quantity: formData.quantity ? parseFloat(formData.quantity) : null,
-    stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
-    strike_price: formData.strike_price ? parseFloat(formData.strike_price) : null,
-    vix: formData.vix ? parseFloat(formData.vix) : null,
-    call_iv: formData.call_iv ? parseFloat(formData.call_iv) : null,
-    put_iv: formData.put_iv ? parseFloat(formData.put_iv) : null,
+    exit_price: sanitizeNumber(formData.exit_price),
+    quantity: sanitizeNumber(formData.quantity),
+    trade_type: formData.trade_type,
+    stop_loss: sanitizeNumber(formData.stop_loss),
+    strategy: formData.strategy || null,
+    outcome: formData.outcome,
+    notes: formData.notes || null,
+    entry_time: formData.entry_time || null,
+    exit_time: formData.exit_time || null,
+    chart_link: formData.chart_link || null,
+    vix: sanitizeNumber(formData.vix),
+    call_iv: sanitizeNumber(formData.call_iv),
+    put_iv: sanitizeNumber(formData.put_iv),
+    strike_price: sanitizeNumber(formData.strike_price),
+    option_type: formData.option_type || null,
     vwap_position: formData.vwap_position || null,
     ema_position: formData.ema_position || null,
-    planned_risk_reward: formData.planned_risk_reward ? parseFloat(formData.planned_risk_reward) : null,
-    actual_risk_reward: formData.actual_risk_reward ? parseFloat(formData.actual_risk_reward) : null,
-    planned_target: formData.planned_target ? parseFloat(formData.planned_target) : null,
-    slippage: formData.slippage ? parseFloat(formData.slippage) : null,
-    post_exit_price: formData.post_exit_price ? parseFloat(formData.post_exit_price) : null,
-    exit_efficiency: formData.exit_efficiency ? parseFloat(formData.exit_efficiency) : null,
-    confidence_level: formData.confidence_level ? parseInt(formData.confidence_level) : null,
-    entry_time: entryTime,
-    exit_time: exitTime,
-    option_type: formData.option_type || null,
     market_condition: formData.market_condition || null,
     timeframe: formData.timeframe || null,
     trade_direction: formData.trade_direction || null,
+    planned_risk_reward: sanitizeNumber(formData.planned_risk_reward),
+    actual_risk_reward: sanitizeNumber(formData.actual_risk_reward),
+    planned_target: sanitizeNumber(formData.planned_target),
     exit_reason: formData.exit_reason || null,
+    slippage: sanitizeNumber(formData.slippage),
+    post_exit_price: sanitizeNumber(formData.post_exit_price),
+    exit_efficiency: sanitizeNumber(formData.exit_efficiency),
+    confidence_level: sanitizeNumber(formData.confidence_level),
     entry_emotion: formData.entry_emotion || null,
     exit_emotion: formData.exit_emotion || null,
-    strategy: formData.strategy || null,
-    notes: formData.notes || null,
-    chart_link: formData.chart_link || null,
-    symbol: formData.symbol,
-    trade_type: formData.trade_type,
-    outcome: formData.outcome,
+    symbol: formData.symbol
   };
 };
