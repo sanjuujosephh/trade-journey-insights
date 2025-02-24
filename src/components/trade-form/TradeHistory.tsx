@@ -184,4 +184,3 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
     </Card>
   );
 }
-
