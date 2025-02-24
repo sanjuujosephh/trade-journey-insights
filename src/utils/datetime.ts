@@ -19,3 +19,27 @@ export const formatToIST = (date: Date | null | undefined) => {
     timePart: `${formattedHours}:${formattedMinutes} ${ampm}`
   };
 };
+
+// Convert Date object to IST string format
+export const dateToISTString = (date: Date): string => {
+  const { datePart, timePart } = formatToIST(date);
+  return `${datePart} ${timePart}`;
+};
+
+// Parse IST string back to Date object
+export const parseISTString = (dateStr: string): Date => {
+  if (!dateStr) throw new Error('Date string is required');
+  
+  const [datePart, timePart] = dateStr.split(' ');
+  const [day, month, year] = datePart.split('-').map(Number);
+  const [time, period] = timePart.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+  
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+  
+  const date = new Date(year, month - 1, day, hours, minutes);
+  if (isNaN(date.getTime())) throw new Error('Invalid date string');
+  
+  return date;
+};

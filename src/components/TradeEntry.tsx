@@ -1,3 +1,4 @@
+
 import { ErrorBoundary } from "./ErrorBoundary";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
 import { TradeHistory } from "./trade-form/TradeHistory";
@@ -7,7 +8,7 @@ import { TradeFormManager } from "./trade-form/TradeFormManager";
 import { useTradeManagement } from "@/hooks/useTradeManagement";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import { Trade } from "@/types/trade";
+import { Trade, FormData } from "@/types/trade";
 
 export default function TradeEntry() {
   const { toast } = useToast();
@@ -32,8 +33,7 @@ export default function TradeEntry() {
   const handleEdit = (trade: Trade) => {
     console.log('Raw trade data:', trade);
     
-    setFormData({
-      ...trade,
+    const formDataUpdate: FormData = {
       entry_price: trade.entry_price.toString(),
       exit_price: trade.exit_price?.toString() ?? "",
       quantity: trade.quantity?.toString() ?? "",
@@ -51,6 +51,8 @@ export default function TradeEntry() {
       confidence_level: trade.confidence_level?.toString() ?? "",
       entry_time: trade.entry_time ?? "",
       exit_time: trade.exit_time ?? "",
+      entry_date: trade.entry_date ?? "",
+      exit_date: trade.exit_date ?? "",
       strategy: trade.strategy ?? "",
       trade_type: trade.trade_type,
       symbol: trade.symbol,
@@ -66,8 +68,9 @@ export default function TradeEntry() {
       entry_emotion: trade.entry_emotion ?? "",
       exit_emotion: trade.exit_emotion ?? "",
       option_type: trade.option_type ?? ""
-    });
+    };
     
+    setFormData(formDataUpdate);
     setEditingId(trade.id);
   };
 

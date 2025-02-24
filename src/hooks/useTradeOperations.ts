@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Trade } from "@/types/trade";
 import { transformTradeData } from "@/utils/trade-form/transformations";
-import { dateToISTString, parseISTString } from "@/utils/datetime";
+import { dateToISTString, parseISTString, formatToIST } from "@/utils/datetime";
 
 export function useTradeOperations() {
   const { toast } = useToast();
