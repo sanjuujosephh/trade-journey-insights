@@ -19,14 +19,20 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
-    const validTime = parseTimeString(time);
-    if (validTime || time === '') {
-      handleChange({
-        target: {
-          name: `${type}_time`,
-          value: time
-        }
-      } as React.ChangeEvent<HTMLInputElement>);
+    // Allow typing at all times
+    handleChange({
+      target: {
+        name: `${type}_time`,
+        value: time
+      }
+    } as React.ChangeEvent<HTMLInputElement>);
+
+    // Only validate completed time strings
+    if (time.length >= 8) {  // Length of "HH:MM AM" or "HH:MM PM"
+      const validTime = parseTimeString(time);
+      if (!validTime && time !== '') {
+        console.log('Invalid time format:', time);
+      }
     }
   };
 
@@ -50,3 +56,4 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
     </div>
   );
 }
+

@@ -33,15 +33,22 @@ export function DateTimeField({
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let timeValue = e.target.value;
+    let value = e.target.value;
     
-    // Allow typing by immediately passing the value
-    onTimeChange(timeValue);
+    // Always pass the raw value to parent
+    onTimeChange(value);
     
-    // Format if it matches the expected pattern
-    if (/^(0?[1-9]|1[0-2]):[0-5][0-9]$/.test(timeValue)) {
-      timeValue += ' AM';
-      onTimeChange(timeValue);
+    // Auto-format the time input if it matches certain patterns
+    if (value.length === 5 && /^\d{2}:\d{2}$/.test(value)) {
+      const hour = parseInt(value.split(':')[0]);
+      if (hour >= 0 && hour <= 23) {
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const formattedHour = hour > 12 ? String(hour - 12).padStart(2, '0') : 
+                             hour === 0 ? '12' : 
+                             String(hour).padStart(2, '0');
+        value = `${formattedHour}:${value.split(':')[1]} ${ampm}`;
+        onTimeChange(value);
+      }
     }
   };
 
@@ -83,7 +90,7 @@ export function DateTimeField({
           type="text"
           value={time}
           onChange={handleTimeChange}
-          placeholder="HH:MM AM/PM"
+          placeholder="HH:MM"
           required={required}
           className="w-[120px]"
         />
@@ -91,3 +98,4 @@ export function DateTimeField({
     </div>
   );
 }
+
