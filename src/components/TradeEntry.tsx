@@ -32,31 +32,6 @@ export default function TradeEntry() {
   const handleEdit = (trade: Trade) => {
     console.log('Raw trade data:', trade);
     
-    const formatDateTime = (dateStr: string | null | undefined): string => {
-      if (!dateStr) return "";
-      try {
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return "";
-        
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
-      } catch (error) {
-        console.error('Error formatting date:', error);
-        return "";
-      }
-    };
-
-    const entryTime = formatDateTime(trade.entry_time);
-    const exitTime = formatDateTime(trade.exit_time);
-
-    console.log('Formatted entry_time:', entryTime);
-    console.log('Formatted exit_time:', exitTime);
-
     setFormData({
       ...trade,
       entry_price: trade.entry_price.toString(),
@@ -74,8 +49,8 @@ export default function TradeEntry() {
       post_exit_price: trade.post_exit_price?.toString() ?? "",
       exit_efficiency: trade.exit_efficiency?.toString() ?? "",
       confidence_level: trade.confidence_level?.toString() ?? "",
-      entry_time: entryTime,
-      exit_time: exitTime,
+      entry_time: trade.entry_time ?? "",
+      exit_time: trade.exit_time ?? "",
       strategy: trade.strategy ?? "",
       trade_type: trade.trade_type,
       symbol: trade.symbol,

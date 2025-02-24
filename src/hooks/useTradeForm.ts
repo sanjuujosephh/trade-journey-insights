@@ -53,45 +53,6 @@ export function useTradeForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    
-    // Handle date fields
-    if (name === 'entry_time' || name === 'exit_time') {
-      try {
-        // Allow empty values
-        if (!value) {
-          setFormData(prev => ({
-            ...prev,
-            [name]: '',
-          }));
-          return;
-        }
-
-        // Try to parse the date
-        const date = new Date(value);
-        if (!isNaN(date.getTime())) {
-          // Only set if we have a valid date
-          setFormData(prev => ({
-            ...prev,
-            [name]: date.toISOString(),
-          }));
-          return;
-        }
-
-        console.warn(`Invalid date value received: ${value}`);
-        setFormData(prev => ({
-          ...prev,
-          [name]: '',
-        }));
-      } catch (error) {
-        console.error('Date parsing error:', error);
-        setFormData(prev => ({
-          ...prev,
-          [name]: '',
-        }));
-      }
-      return;
-    }
-    
     setFormData(prev => ({
       ...prev,
       [name]: value,
