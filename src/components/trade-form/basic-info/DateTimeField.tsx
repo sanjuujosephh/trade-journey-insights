@@ -1,6 +1,8 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
+import { formatToIST } from "@/utils/datetime";
 
 interface DateTimeFieldProps {
   label: string;
@@ -19,20 +21,24 @@ export function DateTimeField({
   onTimeChange,
   required = false
 }: DateTimeFieldProps) {
+  // Initialize with current date and time if no values provided
+  useEffect(() => {
+    if (!date || !time) {
+      const now = new Date();
+      const { datePart, timePart } = formatToIST(now);
+      if (!date) onDateChange(datePart);
+      if (!time) onTimeChange(timePart);
+    }
+  }, []);
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow empty value or validate date format
-    if (!value || /^(\d{2}-\d{2}-\d{4})?$/.test(value)) {
-      onDateChange(value);
-    }
+    onDateChange(value);
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow empty value or validate time format
-    if (!value || /^(\d{2}:\d{2}\s?(?:AM|PM))?$/i.test(value)) {
-      onTimeChange(value);
-    }
+    onTimeChange(value);
   };
 
   return (
@@ -41,7 +47,7 @@ export function DateTimeField({
       <div className="flex gap-2">
         <Input
           type="text"
-          value={date || ''}
+          value={date}
           onChange={handleDateChange}
           required={required}
           placeholder="DD-MM-YYYY"
@@ -49,7 +55,7 @@ export function DateTimeField({
         />
         <Input
           type="text"
-          value={time || ''}
+          value={time}
           onChange={handleTimeChange}
           required={required}
           placeholder="HH:MM AM"

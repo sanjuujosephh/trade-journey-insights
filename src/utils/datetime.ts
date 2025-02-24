@@ -1,6 +1,6 @@
 
 // Helper function to format date and time consistently in IST
-const formatToIST = (date: Date | null | undefined, includeSeconds = false) => {  
+export const formatToIST = (date: Date | null | undefined, includeSeconds = false) => {  
   if (!date) return { datePart: '', timePart: '' };
   
   try {
