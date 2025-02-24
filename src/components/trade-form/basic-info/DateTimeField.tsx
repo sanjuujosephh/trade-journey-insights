@@ -21,22 +21,22 @@ export function DateTimeField({
 }: DateTimeFieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor={label}>{label} (IST)</Label>
+      <Label htmlFor={label}>{label}</Label>
       <div className="flex gap-2">
         <Input
           type="text"
           value={date}
           onChange={(e) => onDateChange(e.target.value)}
-          required={required}
           placeholder="DD-MM-YYYY"
+          required={required}
           className="flex-1"
         />
         <Input
           type="text"
           value={time}
           onChange={(e) => onTimeChange(e.target.value)}
+          placeholder="HH:MM AM/PM"
           required={required}
-          placeholder="HH:MM AM"
           className="w-[120px]"
         />
       </div>
