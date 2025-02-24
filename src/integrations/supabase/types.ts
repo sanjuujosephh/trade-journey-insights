@@ -58,9 +58,11 @@ export type Database = {
           confidence_level_score: number | null
           ema_position: string | null
           emotional_score: number | null
+          entry_date: string | null
           entry_emotion: string | null
           entry_price: number
           entry_time: string | null
+          exit_date: string | null
           exit_efficiency: number | null
           exit_emotion: string | null
           exit_price: number | null
@@ -99,9 +101,11 @@ export type Database = {
           confidence_level_score?: number | null
           ema_position?: string | null
           emotional_score?: number | null
+          entry_date?: string | null
           entry_emotion?: string | null
           entry_price: number
           entry_time?: string | null
+          exit_date?: string | null
           exit_efficiency?: number | null
           exit_emotion?: string | null
           exit_price?: number | null
@@ -140,9 +144,11 @@ export type Database = {
           confidence_level_score?: number | null
           ema_position?: string | null
           emotional_score?: number | null
+          entry_date?: string | null
           entry_emotion?: string | null
           entry_price?: number
           entry_time?: string | null
+          exit_date?: string | null
           exit_efficiency?: number | null
           exit_emotion?: string | null
           exit_price?: number | null

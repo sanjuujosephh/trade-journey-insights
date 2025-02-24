@@ -1,6 +1,5 @@
 
 import { DateTimeField } from "./DateTimeField";
-import { getDateAndTime, formatDateTime } from "@/utils/datetime";
 
 interface TimeFieldsProps {
   formData: any;
@@ -8,29 +7,20 @@ interface TimeFieldsProps {
 }
 
 export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
-  const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
-  const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
-
   const handleDateChange = (type: 'entry' | 'exit') => (date: string) => {
-    const currentTime = type === 'entry' ? entryTime : exitTime;
-    const formattedDateTime = formatDateTime(date, currentTime);
-    
     handleChange({
       target: { 
-        name: `${type}_time`, 
-        value: formattedDateTime || ''
+        name: `${type}_date`, 
+        value: date
       }
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
-    const currentDate = type === 'entry' ? entryDate : exitDate;
-    const formattedDateTime = formatDateTime(currentDate, time);
-    
     handleChange({
       target: {
         name: `${type}_time`,
-        value: formattedDateTime || ''
+        value: time
       }
     } as React.ChangeEvent<HTMLInputElement>);
   };
@@ -39,16 +29,16 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
     <div className="grid grid-cols-2 gap-4">
       <DateTimeField
         label="Entry Time"
-        date={entryDate}
-        time={entryTime}
+        date={formData.entry_date || ''}
+        time={formData.entry_time || ''}
         onDateChange={handleDateChange('entry')}
         onTimeChange={handleTimeChange('entry')}
         required
       />
       <DateTimeField
         label="Exit Time"
-        date={exitDate}
-        time={exitTime}
+        date={formData.exit_date || ''}
+        time={formData.exit_time || ''}
         onDateChange={handleDateChange('exit')}
         onTimeChange={handleTimeChange('exit')}
       />

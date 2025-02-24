@@ -6,6 +6,8 @@ export interface Trade {
   outcome: 'profit' | 'loss' | 'breakeven';
   strategy?: string | null;
   trade_type: string;
+  entry_date?: string | null;
+  exit_date?: string | null;
   entry_time?: string | null;
   exit_time?: string | null;
   timestamp: string;
@@ -67,6 +69,8 @@ export interface FormData {
   strategy: string;
   outcome: 'profit' | 'loss' | 'breakeven';
   notes: string;
+  entry_date: string;
+  exit_date: string;
   entry_time: string;
   exit_time: string;
   chart_link: string;

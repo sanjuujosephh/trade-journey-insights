@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -82,12 +81,16 @@ export function useTradeOperations() {
       }
 
       const now = new Date();
+      const { datePart, timePart } = formatToIST(now);
+      
       const tradeData = {
         ...newTrade,
         user_id: userId,
-        entry_time: newTrade.entry_time || dateToISTString(now),
+        entry_date: newTrade.entry_date || datePart,
+        entry_time: newTrade.entry_time || timePart,
+        exit_date: newTrade.exit_date || null,
         exit_time: newTrade.exit_time || null,
-        timestamp: dateToISTString(now)
+        timestamp: now
       };
 
       console.log('Adding trade with data:', tradeData);
@@ -133,17 +136,11 @@ export function useTradeOperations() {
         throw new Error("User not authenticated");
       }
 
-      const updates = {
-        ...trade,
-        entry_time: trade.entry_time ? dateToISTString(parseISTString(trade.entry_time)) : undefined,
-        exit_time: trade.exit_time ? dateToISTString(parseISTString(trade.exit_time)) : null
-      };
-
-      console.log('Updating trade with data:', updates);
+      console.log('Updating trade with data:', trade);
 
       const { data, error } = await supabase
         .from('trades')
-        .update(updates)
+        .update(trade)
         .eq('id', id)
         .select()
         .single();
