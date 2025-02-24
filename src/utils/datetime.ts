@@ -4,23 +4,18 @@ export const formatToIST = (date: Date | null | undefined) => {
   if (!date) return { datePart: '', timePart: '' };
   
   try {
-    // Convert to IST
-    const istDate = new Date(date.getTime());
-    // Add IST offset (UTC+5:30)
-    istDate.setMinutes(istDate.getMinutes() + 330);
-
     // Format date part (DD-MM-YYYY)
-    const day = String(istDate.getDate()).padStart(2, '0');
-    const month = String(istDate.getMonth() + 1).padStart(2, '0');
-    const year = istDate.getFullYear();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
     const datePart = `${day}-${month}-${year}`;
 
     // Format time part with AM/PM
-    const hours = istDate.getHours();
-    const minutes = String(istDate.getMinutes()).padStart(2, '0');
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    const hours12 = hours % 12 || 12;
-    const timePart = `${String(hours12).padStart(2, '0')}:${minutes} ${ampm}`;
+    hours = hours % 12 || 12;
+    const timePart = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
 
     return { datePart, timePart };
   } catch (error) {
@@ -29,7 +24,7 @@ export const formatToIST = (date: Date | null | undefined) => {
   }
 };
 
-// Format datetime for database (UTC format)
+// Format datetime for database (text format)
 export const formatDateTime = (date: string, time: string): string | null => {
   if (!date || !time) return null;
   
@@ -60,12 +55,12 @@ export const formatDateTime = (date: string, time: string): string | null => {
       adjustedMinutes = 59;
     }
 
-    // Create date in local timezone
-    const dateObj = new Date(year, month - 1, day, adjustedHours, adjustedMinutes);
-    
-    // Convert to UTC ISO string
-    return dateObj.toISOString();
+    // Format final datetime string
+    const formattedHours = String(adjustedHours % 12 || 12).padStart(2, '0');
+    const formattedMinutes = String(adjustedMinutes).padStart(2, '0');
+    const ampm = adjustedHours >= 12 ? 'PM' : 'AM';
 
+    return `${date} ${formattedHours}:${formattedMinutes} ${ampm}`;
   } catch (error) {
     console.error('Error formatting datetime:', error);
     return null;
@@ -77,14 +72,9 @@ export const getDateAndTime = (dateTimeStr: string | null | undefined) => {
   if (!dateTimeStr) return { date: '', time: '' };
   
   try {
-    const date = new Date(dateTimeStr);
-    if (isNaN(date.getTime())) {
-      console.warn('Invalid date string format:', dateTimeStr);
-      return { date: '', time: '' };
-    }
-
-    const { datePart, timePart } = formatToIST(date);
-    return { date: datePart, time: timePart };
+    const [datePart, timePart] = dateTimeStr.split(' ');
+    const time = timePart && dateTimeStr.split(' ').slice(1).join(' ');
+    return { date: datePart || '', time: time || '' };
   } catch (error) {
     console.error('Error in getDateAndTime:', error);
     return { date: '', time: '' };
@@ -109,16 +99,15 @@ export const parseISTString = (dateTimeStr: string): Date => {
     if (meridiem === 'PM' && hours12 !== 12) hours24 += 12;
     if (meridiem === 'AM' && hours12 === 12) hours24 = 0;
 
-    // Create date in local timezone first
-    const localDate = new Date(year, month - 1, day, hours24, minutes);
+    const date = new Date(year, month - 1, day, hours24, minutes);
     
-    // Convert local time to UTC by adjusting for IST offset (-5:30)
-    const utcDate = new Date(localDate.getTime() - (330 * 60 * 1000));
-    
-    return utcDate;
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date string format');
+    }
+
+    return date;
   } catch (error) {
     console.error('Error parsing IST string:', error);
     throw error;
   }
 };
-
