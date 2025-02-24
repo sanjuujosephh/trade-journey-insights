@@ -32,17 +32,27 @@ export function DateTimeField({
   }, []);
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Validate date format (DD-MM-YYYY)
-    if (!value || /^\d{0,2}(-\d{0,2})?(-\d{0,4})?$/.test(value)) {
+    let value = e.target.value;
+    
+    // Allow typing and deleting
+    if (!value || value.length <= 10) {
+      // Automatically add hyphens
+      value = value.replace(/\D/g, '').replace(/(\d{2})(?=\d)/g, '$1-');
       onDateChange(value);
     }
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toUpperCase();
-    // Validate time format (HH:MM AM/PM)
-    if (!value || /^\d{0,2}(:\d{0,2})?\s?(AM|PM)?$/i.test(value)) {
+    let value = e.target.value.toUpperCase();
+    
+    // Allow typing and deleting
+    if (!value || value.length <= 8) {
+      // Format time input
+      value = value
+        .replace(/[^\d\s:AMP]/g, '')
+        .replace(/(\d{2})(?=\d)/g, '$1:')
+        .replace(/:([^\d]|$)/, ':');
+      
       onTimeChange(value);
     }
   };
@@ -58,6 +68,7 @@ export function DateTimeField({
           required={required}
           placeholder="DD-MM-YYYY"
           className="flex-1"
+          maxLength={10}
         />
         <Input
           type="text"
@@ -66,6 +77,7 @@ export function DateTimeField({
           required={required}
           placeholder="HH:MM AM"
           className="w-[120px]"
+          maxLength={8}
         />
       </div>
     </div>

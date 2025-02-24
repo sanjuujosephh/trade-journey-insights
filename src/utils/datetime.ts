@@ -28,15 +28,26 @@ export const formatToIST = (date: Date | null | undefined) => {
 export const formatDateTime = (date: string, time: string): string | null => {
   if (!date || !time) return null;
   
+  // Allow incomplete inputs
+  if (date.length < 10 || !date.includes('-')) return null;
+  
   try {
     // Parse date
     const [day, month, year] = date.split('-').map(Number);
     if (!day || !month || !year) return null;
 
     // Parse time
-    const [timePart, meridiem] = time.split(' ');
-    const [hours12, minutes] = timePart.split(':').map(Number);
+    const timeParts = time.trim().split(' ');
+    if (timeParts.length !== 2) return null;
+    
+    const [timeValue, meridiem] = timeParts;
+    if (!timeValue || !meridiem) return null;
+    
+    const [hours12, minutes] = timeValue.split(':').map(Number);
     if (isNaN(hours12) || isNaN(minutes)) return null;
+
+    // Validate meridiem
+    if (!['AM', 'PM'].includes(meridiem)) return null;
 
     // Convert to 24-hour format
     let hours24 = hours12;
