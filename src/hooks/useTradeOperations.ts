@@ -38,7 +38,7 @@ export function useTradeOperations() {
       const { data, error } = await supabase
         .from('trades')
         .select('*')
-        .order('timestamp', { ascending: false });
+        .order('entry_time', { ascending: false });
       
       if (error) {
         console.error('Error fetching trades:', error);

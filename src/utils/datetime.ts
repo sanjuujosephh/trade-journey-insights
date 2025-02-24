@@ -4,19 +4,16 @@ const formatToIST = (date: Date | null | undefined, includeSeconds = false) => {
   if (!date) return { datePart: '', timePart: '' };
   
   try {
-    // Create date forcing IST timezone
-    const istDate = new Date(date.getTime());
-
     // Format date part
-    const year = istDate.getFullYear();
-    const month = String(istDate.getMonth() + 1).padStart(2, '0');
-    const day = String(istDate.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     const datePart = `${year}-${month}-${day}`;
 
     // Format time part
-    const hours = String(istDate.getHours()).padStart(2, '0');
-    const minutes = String(istDate.getMinutes()).padStart(2, '0');
-    const seconds = String(istDate.getSeconds()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
     const timePart = includeSeconds 
       ? `${hours}:${minutes}:${seconds}`
       : `${hours}:${minutes}`;
@@ -32,21 +29,21 @@ const formatToIST = (date: Date | null | undefined, includeSeconds = false) => {
 export const dateToISTString = (date: Date): string => {
   try {
     const hours = date.getHours();
-    const adjustedDate = new Date(date);
-
+    const minutes = date.getMinutes();
+    
     // Ensure time is between 9:00 and 15:59
     if (hours < 9) {
-      adjustedDate.setHours(9, 0, 0, 0);
-    } else if (hours >= 16) {
-      adjustedDate.setHours(15, 59, 59, 999);
+      date.setHours(9, 0, 0, 0);
+    } else if (hours > 15 || (hours === 15 && minutes >= 60)) {
+      date.setHours(15, 59, 59, 999);
     }
 
-    const { datePart } = formatToIST(adjustedDate);
-    const hours24 = String(adjustedDate.getHours()).padStart(2, '0');
-    const minutes = String(adjustedDate.getMinutes()).padStart(2, '0');
-    const seconds = String(adjustedDate.getSeconds()).padStart(2, '0');
+    const { datePart } = formatToIST(date);
+    const hours24 = String(date.getHours()).padStart(2, '0');
+    const minutes24 = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
 
-    return `${datePart}T${hours24}:${minutes}:${seconds}`;
+    return `${datePart} ${hours24}:${minutes24}:${seconds}`;
   } catch (error) {
     console.error('Error in dateToISTString:', error);
     throw error;
@@ -58,7 +55,7 @@ export const parseISTString = (dateTimeStr: string): Date => {
   if (!dateTimeStr) throw new Error('No datetime string provided');
   
   try {
-    const [datePart, timePart] = dateTimeStr.split('T');
+    const [datePart, timePart] = dateTimeStr.split(' ');
     const [year, month, day] = datePart.split('-').map(Number);
     let [hour, minute, second] = (timePart || '00:00:00').split(':').map(Number);
 
@@ -67,7 +64,7 @@ export const parseISTString = (dateTimeStr: string): Date => {
       hour = 9;
       minute = 0;
       second = 0;
-    } else if (hour >= 16) {
+    } else if (hour > 15 || (hour === 15 && minute >= 60)) {
       hour = 15;
       minute = 59;
       second = 59;
@@ -85,16 +82,15 @@ export const getDateAndTime = (dateTimeStr: string | null | undefined) => {
   if (!dateTimeStr) return { date: '', time: '' };
   
   try {
-    const date = new Date(dateTimeStr);
-    if (isNaN(date.getTime())) {
-      console.warn('Invalid date string:', dateTimeStr);
+    const [datePart, timePart] = dateTimeStr.split(' ');
+    if (!datePart || !timePart) {
+      console.warn('Invalid date string format:', dateTimeStr);
       return { date: '', time: '' };
     }
-
-    const { datePart, timePart } = formatToIST(date);
+    
     return {
       date: datePart,
-      time: timePart
+      time: timePart.slice(0, 5) // Get HH:mm part only
     };
   } catch (error) {
     console.error('Error in getDateAndTime:', error);
@@ -109,19 +105,9 @@ export const formatDateTime = (date: string, time: string) => {
   
   try {
     // Combine date and time strings
-    const [hours, minutes] = time.split(':');
-    const dateObj = new Date(date);
-    dateObj.setHours(Number(hours), Number(minutes), 0);
-
-    // This will enforce trading hours
-    const formattedDateTime = dateToISTString(dateObj);
-    
-    console.log('formatDateTime:', {
-      input: { date, time },
-      output: formattedDateTime
-    });
-    
-    return formattedDateTime;
+    const dateTimeStr = `${date} ${time}:00`;
+    console.log('Formatting datetime:', dateTimeStr);
+    return dateTimeStr;
   } catch (error) {
     console.error('Error in formatDateTime:', error);
     return '';
