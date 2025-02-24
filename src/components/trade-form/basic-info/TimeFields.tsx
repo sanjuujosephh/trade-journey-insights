@@ -1,7 +1,6 @@
 
 import { DateTimeField } from "./DateTimeField";
-import { formatDateTime, getDateAndTime } from "@/utils/datetime";
-import { useToast } from "@/hooks/use-toast";
+import { getDateAndTime } from "@/utils/datetime";
 
 interface TimeFieldsProps {
   formData: any;
@@ -9,49 +8,27 @@ interface TimeFieldsProps {
 }
 
 export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
-  const { toast } = useToast();
   const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
   const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
 
   const handleDateChange = (type: 'entry' | 'exit') => (date: string) => {
     const time = type === 'entry' ? entryTime : exitTime;
-    const formattedDateTime = formatDateTime(date, time);
-    
-    if (formattedDateTime) {
-      handleChange({
-        target: { 
-          name: `${type}_time`, 
-          value: formattedDateTime 
-        }
-      } as React.ChangeEvent<HTMLInputElement>);
-    } else {
-      toast({
-        title: "Invalid Date",
-        description: "Please enter a valid date in DD-MM-YYYY format",
-        variant: "destructive"
-      });
-    }
+    handleChange({
+      target: { 
+        name: `${type}_time`, 
+        value: `${date} ${time}`.trim()
+      }
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
     const date = type === 'entry' ? entryDate : exitDate;
-    if (date) {
-      const formattedDateTime = formatDateTime(date, time);
-      if (formattedDateTime) {
-        handleChange({
-          target: {
-            name: `${type}_time`,
-            value: formattedDateTime
-          }
-        } as React.ChangeEvent<HTMLInputElement>);
-      } else {
-        toast({
-          title: "Invalid Time",
-          description: "Please enter a valid time in HH:MM AM/PM format",
-          variant: "destructive"
-        });
+    handleChange({
+      target: {
+        name: `${type}_time`,
+        value: `${date} ${time}`.trim()
       }
-    }
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   return (
