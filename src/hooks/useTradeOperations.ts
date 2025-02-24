@@ -1,10 +1,11 @@
+
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Trade } from "@/types/trade";
 import { transformTradeData } from "@/utils/trade-form/transformations";
-import { dateToISTString, parseISTString, formatToIST } from "@/utils/datetime";
+import { formatToIST, parseDateString, parseTimeString } from "@/utils/datetime";
 
 export function useTradeOperations() {
   const { toast } = useToast();
@@ -49,21 +50,27 @@ export function useTradeOperations() {
     enabled: !!userId,
   });
 
-  const checkTradeLimit = useCallback(async (entryTime: string) => {
+  const checkTradeLimit = useCallback(async (entryDate: string, entryTime: string) => {
     if (!userId) return false;
     
-    const date = parseISTString(entryTime);
+    const date = parseDateString(entryDate);
+    if (!date) return false;
+    
     const dayStart = new Date(date);
     dayStart.setHours(9, 0, 0, 0);
     
     const dayEnd = new Date(date);
     dayEnd.setHours(15, 59, 59, 999);
     
+    const { datePart: startDate, timePart: startTime } = formatToIST(dayStart);
+    const { datePart: endDate, timePart: endTime } = formatToIST(dayEnd);
+    
     const { data: existingTrades, error } = await supabase
       .from('trades')
       .select('id')
-      .gte('entry_time', dateToISTString(dayStart))
-      .lte('entry_time', dateToISTString(dayEnd))
+      .eq('entry_date', entryDate)
+      .gte('entry_time', startTime)
+      .lte('entry_time', endTime)
       .eq('user_id', userId);
     
     if (error) {
@@ -95,7 +102,7 @@ export function useTradeOperations() {
 
       console.log('Adding trade with data:', tradeData);
 
-      const canAddTrade = await checkTradeLimit(tradeData.entry_time);
+      const canAddTrade = await checkTradeLimit(tradeData.entry_date, tradeData.entry_time);
       if (!canAddTrade) {
         throw new Error("Daily trade limit reached (1 trade per day)");
       }
