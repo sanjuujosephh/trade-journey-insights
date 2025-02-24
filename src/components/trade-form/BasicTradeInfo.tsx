@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -123,16 +124,6 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
       <TimeFields
         formData={formData}
         handleChange={handleChange}
-        handleDateTimeChange={(type, timeStr) => {
-          const currentDate = formData[`${type}_time`]?.split(' ')[0] || '';
-          const newDateTime = `${currentDate} ${timeStr}`;
-          handleChange({
-            target: {
-              name: `${type}_time`,
-              value: newDateTime
-            }
-          } as React.ChangeEvent<HTMLInputElement>);
-        }}
       />
 
       <div className="space-y-2">

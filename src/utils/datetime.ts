@@ -40,8 +40,8 @@ export const formatDateTime = (date: string, time: string): string | null => {
 
     // Parse time
     const [timePart, meridiem] = time.split(' ');
-    const [hours12, mins] = timePart.split(':').map(Number);
-    if (isNaN(hours12) || isNaN(mins)) return null;
+    const [hours12, minutes] = timePart.split(':').map(Number);
+    if (isNaN(hours12) || isNaN(minutes)) return null;
 
     // Convert to 24-hour format
     let hours24 = hours12;
@@ -49,16 +49,19 @@ export const formatDateTime = (date: string, time: string): string | null => {
     if (meridiem === 'AM' && hours12 === 12) hours24 = 0;
 
     // Ensure trading hours (9 AM to 3:59 PM)
+    let adjustedHours = hours24;
+    let adjustedMinutes = minutes;
+    
     if (hours24 < 9) {
-      hours24 = 9;
-      mins = 0;
+      adjustedHours = 9;
+      adjustedMinutes = 0;
     } else if (hours24 >= 16) {
-      hours24 = 15;
-      mins = 59;
+      adjustedHours = 15;
+      adjustedMinutes = 59;
     }
 
     // Create date in local timezone
-    const dateObj = new Date(year, month - 1, day, hours24, mins);
+    const dateObj = new Date(year, month - 1, day, adjustedHours, adjustedMinutes);
     
     // Convert to UTC ISO string
     return dateObj.toISOString();
