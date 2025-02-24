@@ -2,15 +2,18 @@
 export const getDateAndTime = (dateTimeStr: string) => {
   if (!dateTimeStr) return { date: '', time: '' };
   try {
-    // Parse the input datetime string
+    // Create a date object in local time (IST)
     const date = new Date(dateTimeStr);
     
     // Format date to YYYY-MM-DD
-    const datePart = date.toLocaleDateString('en-CA'); // This gives YYYY-MM-DD format
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const datePart = `${year}-${month}-${day}`;
     
-    // Format time to HH:mm in IST
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+    // Format time to HH:mm in IST (local time)
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
     const time = `${hours}:${minutes}`;
     
     console.log('getDateAndTime input:', dateTimeStr);
@@ -31,7 +34,7 @@ export const formatDateTime = (date: string, time: string) => {
   if (!time) time = '00:00';
   
   try {
-    // Create date string in YYYY-MM-DD HH:mm format
+    // Create datetime string in YYYY-MM-DD HH:mm format (local time/IST)
     const dateTimeStr = `${date}T${time}`;
     
     console.log('formatDateTime input:', { date, time });

@@ -3,9 +3,10 @@ export function formatDateTime(dateString: string) {
   if (!dateString) return 'N/A';
   
   try {
+    // Create date object in local time (IST)
     const date = new Date(dateString);
     
-    // Format the date and time in IST
+    // Format the date and time in IST using Indian locale
     const formattedDate = date.toLocaleDateString('en-IN', {
       day: '2-digit',
       month: '2-digit',
