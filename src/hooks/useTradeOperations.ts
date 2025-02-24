@@ -5,30 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Trade } from "@/types/trade";
 import { transformTradeData } from "@/utils/trade-form/transformations";
-
-const formatToIST = (date: Date, includeSeconds = false) => {
-  const options: Intl.DateTimeFormatOptions = {
-    timeZone: 'Asia/Kolkata',
-    hour12: false,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  };
-
-  if (includeSeconds) {
-    options.second = '2-digit';
-  }
-
-  const parts = new Intl.DateTimeFormat('en-IN', options).formatToParts(date);
-  const values: { [key: string]: string } = {};
-  parts.forEach(part => {
-    values[part.type] = part.value;
-  });
-
-  return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}${includeSeconds ? `:${values.second}` : ''}`;
-};
+import { dateToISTString } from "@/utils/datetime";
 
 export function useTradeOperations() {
   const { toast } = useToast();
@@ -73,12 +50,10 @@ export function useTradeOperations() {
     enabled: !!userId,
   });
 
-  const checkTradeLimit = useCallback(async (date: string) => {
-    if (!userId) {
-      console.error('No user ID available');
-      return false;
-    }
+  const checkTradeLimit = useCallback(async (entryTime: string) => {
+    if (!userId) return false;
     
+    const date = new Date(entryTime);
     const dayStart = new Date(date);
     dayStart.setHours(0, 0, 0, 0);
     
@@ -88,8 +63,9 @@ export function useTradeOperations() {
     const { data: existingTrades, error } = await supabase
       .from('trades')
       .select('id')
-      .gte('entry_time', formatToIST(dayStart))
-      .lte('entry_time', formatToIST(dayEnd));
+      .gte('entry_time', dateToISTString(dayStart))
+      .lte('entry_time', dateToISTString(dayEnd))
+      .eq('user_id', userId);
     
     if (error) {
       console.error('Error checking trade limit:', error);
@@ -109,9 +85,9 @@ export function useTradeOperations() {
       const tradeData = {
         ...newTrade,
         user_id: userId,
-        entry_time: newTrade.entry_time ? newTrade.entry_time : formatToIST(now),
-        exit_time: newTrade.exit_time ? newTrade.exit_time : null,
-        timestamp: formatToIST(now)
+        entry_time: newTrade.entry_time || dateToISTString(now),
+        exit_time: newTrade.exit_time || null,
+        timestamp: dateToISTString(now)
       };
 
       console.log('Adding trade with data:', tradeData);
@@ -159,8 +135,8 @@ export function useTradeOperations() {
 
       const updates = {
         ...trade,
-        entry_time: trade.entry_time ? trade.entry_time : undefined,
-        exit_time: trade.exit_time ? trade.exit_time : null
+        entry_time: trade.entry_time || undefined,
+        exit_time: trade.exit_time || null
       };
 
       console.log('Updating trade with data:', updates);
@@ -204,3 +180,4 @@ export function useTradeOperations() {
     userId,
   };
 }
+
