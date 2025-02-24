@@ -33,16 +33,15 @@ export function DateTimeField({
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const timeValue = e.target.value.toUpperCase();
-    // Basic time format validation
-    const timeRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)?$/i;
-    if (timeRegex.test(timeValue)) {
-      // Ensure consistent AM/PM format
-      let formattedTime = timeValue;
-      if (!timeValue.includes('AM') && !timeValue.includes('PM')) {
-        formattedTime += ' AM';
-      }
-      onTimeChange(formattedTime);
+    let timeValue = e.target.value;
+    
+    // Allow typing by immediately passing the value
+    onTimeChange(timeValue);
+    
+    // Format if it matches the expected pattern
+    if (/^(0?[1-9]|1[0-2]):[0-5][0-9]$/.test(timeValue)) {
+      timeValue += ' AM';
+      onTimeChange(timeValue);
     }
   };
 
@@ -68,7 +67,7 @@ export function DateTimeField({
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(parseDate(date) || new Date(), 'dd-MM-yyyy') : "Pick a date"}
+              {date ? date : "Pick a date"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">

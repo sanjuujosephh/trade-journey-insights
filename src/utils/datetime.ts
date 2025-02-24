@@ -1,3 +1,4 @@
+
 // Basic function to get current date and time strings in required format
 export const formatToIST = (date: Date | null | undefined) => {
   if (!date) return { datePart: '', timePart: '' };
@@ -19,18 +20,9 @@ export const formatToIST = (date: Date | null | undefined) => {
   };
 };
 
-// Format date and time strings with proper validation
+// Format date and time strings - allow partial input during typing
 export const formatDateTime = (date: string, time: string): string | null => {
   if (!date || !time) return null;
-  
-  // Validate date format (DD-MM-YYYY)
-  const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-  if (!dateRegex.test(date)) return null;
-  
-  // Validate time format (HH:MM AM/PM)
-  const timeRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i;
-  if (!timeRegex.test(time)) return null;
-  
   return `${date} ${time}`;
 };
 
@@ -38,14 +30,11 @@ export const formatDateTime = (date: string, time: string): string | null => {
 export const getDateAndTime = (dateTimeStr: string | null | undefined) => {
   if (!dateTimeStr) return { date: '', time: '' };
   
-  // Split on the last space to properly handle times with spaces (e.g., "10:00 AM")
-  const lastSpaceIndex = dateTimeStr.lastIndexOf(' ');
-  if (lastSpaceIndex === -1) return { date: '', time: '' };
+  const parts = dateTimeStr.split(' ');
+  if (parts.length < 2) return { date: '', time: '' };
   
-  // Get everything before the last space as the date
-  const date = dateTimeStr.substring(0, lastSpaceIndex - 2).trim();
-  // Get everything after, including the AM/PM, as the time
-  const time = dateTimeStr.substring(lastSpaceIndex - 2).trim();
+  const date = parts[0];
+  const time = parts.slice(1).join(' ');
   
   return { date, time };
 };
@@ -60,7 +49,6 @@ export const parseISTString = (dateTimeStr: string): Date => {
   try {
     if (!dateTimeStr) return new Date();
     
-    // Expected format: "DD-MM-YYYY HH:MM AM/PM"
     const [datePart, time, period] = dateTimeStr.split(' ');
     const [day, month, year] = datePart.split('-').map(Number);
     const [hours, minutes] = time.split(':').map(Number);
