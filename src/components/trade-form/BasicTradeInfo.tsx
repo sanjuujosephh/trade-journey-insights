@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,42 +21,6 @@ interface BasicTradeInfoProps {
 
 export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: BasicTradeInfoProps) {
   const { toast } = useToast();
-
-  const generateTimeOptions = () => {
-    const options = [];
-    let currentTime = 9 * 60 + 15; // Start at 9:15 AM
-    const endTime = 15 * 60 + 25; // End at 3:25 PM
-
-    while (currentTime <= endTime) {
-      const hours = Math.floor(currentTime / 60);
-      const minutes = currentTime % 60;
-      const period = hours >= 12 ? 'PM' : 'AM';
-      const displayHours = hours > 12 ? hours - 12 : hours;
-      const timeString = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-      options.push({
-        value: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
-        label: timeString
-      });
-      currentTime += 1; // Increment by 1 minute
-    }
-    return options;
-  };
-
-  const timeOptions = generateTimeOptions();
-
-  const handleDateTimeChange = (type: 'entry' | 'exit', timeStr: string) => {
-    const currentDate = formData[`${type}_time`]?.split('T')[0] || new Date().toISOString().split('T')[0];
-    const newDateTime = `${currentDate}T${timeStr}:00Z`; // Add seconds and UTC indicator
-    
-    const syntheticEvent = {
-      target: {
-        name: `${type}_time`,
-        value: newDateTime
-      }
-    } as React.ChangeEvent<HTMLInputElement>;
-    
-    handleChange(syntheticEvent);
-  };
 
   return (
     <Card className="p-6 space-y-4 glass">
@@ -160,8 +123,16 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
       <TimeFields
         formData={formData}
         handleChange={handleChange}
-        timeOptions={timeOptions}
-        handleDateTimeChange={handleDateTimeChange}
+        handleDateTimeChange={(type, timeStr) => {
+          const currentDate = formData[`${type}_time`]?.split(' ')[0] || '';
+          const newDateTime = `${currentDate} ${timeStr}`;
+          handleChange({
+            target: {
+              name: `${type}_time`,
+              value: newDateTime
+            }
+          } as React.ChangeEvent<HTMLInputElement>);
+        }}
       />
 
       <div className="space-y-2">
