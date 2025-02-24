@@ -25,13 +25,14 @@ interface TradeHistoryProps {
 export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEditButton = false }: TradeHistoryProps) {
   const { toast } = useToast();
 
-  const formatDisplayTime = (dateString: string) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
+  const formatDisplayTime = (time: string | null) => {
+    if (!time) return "";
+    return time;
+  };
+
+  const formatDisplayDate = (date: string | null) => {
+    if (!date) return "";
+    return date;
   };
 
   const calculatePnL = (trade: Trade) => {
@@ -104,9 +105,7 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
               return (
                 <TableRow key={trade.id}>
                   <TableCell>
-                    {trade.entry_time 
-                      ? new Date(trade.entry_time).toLocaleDateString()
-                      : new Date(trade.timestamp).toLocaleDateString()}
+                    {formatDisplayDate(trade.entry_date)}
                   </TableCell>
                   <TableCell className="font-medium">{trade.symbol}</TableCell>
                   <TableCell>{trade.trade_type}</TableCell>
@@ -185,3 +184,4 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
     </Card>
   );
 }
+
