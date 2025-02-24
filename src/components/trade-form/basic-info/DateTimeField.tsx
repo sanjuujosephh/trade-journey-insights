@@ -1,7 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { formatToIST } from "@/utils/datetime";
 
 interface DateTimeFieldProps {
@@ -13,13 +13,13 @@ interface DateTimeFieldProps {
   required?: boolean;
 }
 
-export function DateTimeField({ 
+export function DateTimeField({
   label,
   date,
   time,
   onDateChange,
   onTimeChange,
-  required = false
+  required = false,
 }: DateTimeFieldProps) {
   // Initialize with current date and time if no values provided
   useEffect(() => {
@@ -33,12 +33,18 @@ export function DateTimeField({
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    onDateChange(value);
+    // Validate date format (DD-MM-YYYY)
+    if (!value || /^\d{0,2}(-\d{0,2})?(-\d{0,4})?$/.test(value)) {
+      onDateChange(value);
+    }
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    onTimeChange(value);
+    const value = e.target.value.toUpperCase();
+    // Validate time format (HH:MM AM/PM)
+    if (!value || /^\d{0,2}(:\d{0,2})?\s?(AM|PM)?$/i.test(value)) {
+      onTimeChange(value);
+    }
   };
 
   return (
