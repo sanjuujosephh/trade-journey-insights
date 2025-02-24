@@ -5,11 +5,10 @@ import { formatDateTime, getDateAndTime } from "@/utils/datetime";
 interface TimeFieldsProps {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  timeOptions: { value: string; label: string; }[];
   handleDateTimeChange: (type: 'entry' | 'exit', timeStr: string) => void;
 }
 
-export function TimeFields({ formData, handleChange, timeOptions, handleDateTimeChange }: TimeFieldsProps) {
+export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
   const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
   const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
 
@@ -58,7 +57,6 @@ export function TimeFields({ formData, handleChange, timeOptions, handleDateTime
         time={entryTime}
         onDateChange={handleDateChange('entry')}
         onTimeChange={handleTimeChange('entry')}
-        timeOptions={timeOptions}
         required
       />
       <DateTimeField
@@ -67,7 +65,6 @@ export function TimeFields({ formData, handleChange, timeOptions, handleDateTime
         time={exitTime}
         onDateChange={handleDateChange('exit')}
         onTimeChange={handleTimeChange('exit')}
-        timeOptions={timeOptions}
       />
     </div>
   );

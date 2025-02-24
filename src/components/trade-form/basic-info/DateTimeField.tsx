@@ -1,7 +1,6 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TimeSelector } from "./TimeSelector";
 
 interface DateTimeFieldProps {
   label: string;
@@ -9,7 +8,6 @@ interface DateTimeFieldProps {
   time: string;
   onDateChange: (value: string) => void;
   onTimeChange: (value: string) => void;
-  timeOptions: { value: string; label: string; }[];
   required?: boolean;
 }
 
@@ -19,7 +17,6 @@ export function DateTimeField({
   time,
   onDateChange,
   onTimeChange,
-  timeOptions,
   required = false
 }: DateTimeFieldProps) {
   return (
@@ -27,16 +24,20 @@ export function DateTimeField({
       <Label htmlFor={label}>{label} (IST)</Label>
       <div className="flex gap-2">
         <Input
-          type="date"
+          type="text"
           value={date}
           onChange={(e) => onDateChange(e.target.value)}
           required={required}
+          placeholder="YYYY-MM-DD"
           className="flex-1"
         />
-        <TimeSelector
+        <Input
+          type="text"
           value={time}
-          onValueChange={onTimeChange}
-          timeOptions={timeOptions}
+          onChange={(e) => onTimeChange(e.target.value)}
+          required={required}
+          placeholder="HH:MM"
+          className="w-[100px]"
         />
       </div>
     </div>
