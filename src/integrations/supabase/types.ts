@@ -60,12 +60,10 @@ export type Database = {
           emotional_score: number | null
           entry_emotion: string | null
           entry_price: number
-          entry_time: string | null
           exit_efficiency: number | null
           exit_emotion: string | null
           exit_price: number | null
           exit_reason: string | null
-          exit_time: string | null
           id: string
           market_condition: string | null
           notes: string | null
@@ -83,7 +81,6 @@ export type Database = {
           strike_price: number | null
           symbol: string
           timeframe: string | null
-          timestamp: string
           trade_direction: string | null
           trade_type: string
           user_id: string
@@ -101,12 +98,10 @@ export type Database = {
           emotional_score?: number | null
           entry_emotion?: string | null
           entry_price: number
-          entry_time?: string | null
           exit_efficiency?: number | null
           exit_emotion?: string | null
           exit_price?: number | null
           exit_reason?: string | null
-          exit_time?: string | null
           id?: string
           market_condition?: string | null
           notes?: string | null
@@ -124,7 +119,6 @@ export type Database = {
           strike_price?: number | null
           symbol: string
           timeframe?: string | null
-          timestamp?: string
           trade_direction?: string | null
           trade_type: string
           user_id: string
@@ -142,12 +136,10 @@ export type Database = {
           emotional_score?: number | null
           entry_emotion?: string | null
           entry_price?: number
-          entry_time?: string | null
           exit_efficiency?: number | null
           exit_emotion?: string | null
           exit_price?: number | null
           exit_reason?: string | null
-          exit_time?: string | null
           id?: string
           market_condition?: string | null
           notes?: string | null
@@ -165,7 +157,6 @@ export type Database = {
           strike_price?: number | null
           symbol?: string
           timeframe?: string | null
-          timestamp?: string
           trade_direction?: string | null
           trade_type?: string
           user_id?: string
@@ -179,13 +170,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      calculate_emotional_score: {
-        Args: {
-          entry_emotion: string
-          exit_emotion: string
-        }
-        Returns: number
-      }
       check_trade_limit: {
         Args: {
           entry_date: string
