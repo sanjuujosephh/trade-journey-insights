@@ -1,14 +1,15 @@
 
 import { DateTimeField } from "./DateTimeField";
 import { formatDateTime, getDateAndTime } from "@/utils/datetime";
+import { useToast } from "@/hooks/use-toast";
 
 interface TimeFieldsProps {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleDateTimeChange: (type: 'entry' | 'exit', timeStr: string) => void;
 }
 
 export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
+  const { toast } = useToast();
   const { date: entryDate, time: entryTime } = getDateAndTime(formData.entry_time);
   const { date: exitDate, time: exitTime } = getDateAndTime(formData.exit_time);
 
@@ -16,25 +17,40 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
     const time = type === 'entry' ? entryTime : exitTime;
     const formattedDateTime = formatDateTime(date, time);
     
-    handleChange({
-      target: { 
-        name: `${type}_time`, 
-        value: formattedDateTime
-      }
-    } as React.ChangeEvent<HTMLInputElement>);
+    if (formattedDateTime) {
+      handleChange({
+        target: { 
+          name: `${type}_time`, 
+          value: formattedDateTime 
+        }
+      } as React.ChangeEvent<HTMLInputElement>);
+    } else {
+      toast({
+        title: "Invalid Date",
+        description: "Please enter a valid date in DD-MM-YYYY format",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
     const date = type === 'entry' ? entryDate : exitDate;
     if (date) {
       const formattedDateTime = formatDateTime(date, time);
-      
-      handleChange({
-        target: {
-          name: `${type}_time`,
-          value: formattedDateTime
-        }
-      } as React.ChangeEvent<HTMLInputElement>);
+      if (formattedDateTime) {
+        handleChange({
+          target: {
+            name: `${type}_time`,
+            value: formattedDateTime
+          }
+        } as React.ChangeEvent<HTMLInputElement>);
+      } else {
+        toast({
+          title: "Invalid Time",
+          description: "Please enter a valid time in HH:MM AM/PM format",
+          variant: "destructive"
+        });
+      }
     }
   };
 
