@@ -35,25 +35,26 @@ export const formatDateTime = (date: string, time: string): string => {
 
     // Parse time
     const [timePart, meridiem] = time.split(' ');
-    const [hours12, minutes] = timePart.split(':').map(Number);
-    if (isNaN(hours12) || isNaN(minutes)) return '';
+    const [hours12, mins] = timePart.split(':').map(Number);
+    if (isNaN(hours12) || isNaN(mins)) return '';
 
     // Convert to 24-hour format
     let hours24 = hours12;
+    let finalMinutes = mins;
     if (meridiem === 'PM' && hours12 !== 12) hours24 += 12;
     if (meridiem === 'AM' && hours12 === 12) hours24 = 0;
 
     // Ensure trading hours (9 AM to 3:59 PM)
     if (hours24 < 9) {
       hours24 = 9;
-      minutes = 0;
+      finalMinutes = 0;
     } else if (hours24 >= 16) {
       hours24 = 15;
-      minutes = 59;
+      finalMinutes = 59;
     }
 
     // Format for database
-    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${String(hours24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${String(hours24).padStart(2, '0')}:${String(finalMinutes).padStart(2, '0')}:00`;
   } catch (error) {
     console.error('Error formatting datetime:', error);
     return '';
@@ -78,3 +79,33 @@ export const getDateAndTime = (dateTimeStr: string | null | undefined) => {
     return { date: '', time: '' };
   }
 };
+
+// Convert Date to IST string format
+export const dateToISTString = (date: Date): string => {
+  const { datePart, timePart } = formatToIST(date);
+  return `${datePart} ${timePart}`;
+};
+
+// Parse IST string to Date object
+export const parseISTString = (dateTimeStr: string): Date => {
+  try {
+    const [datePart, timePart] = dateTimeStr.split(' ');
+    const [day, month, year] = datePart.split('-').map(Number);
+    const [time, meridiem] = timePart.split(' ');
+    const [hours12, minutes] = time.split(':').map(Number);
+
+    let hours24 = hours12;
+    if (meridiem === 'PM' && hours12 !== 12) hours24 += 12;
+    if (meridiem === 'AM' && hours12 === 12) hours24 = 0;
+
+    const date = new Date(year, month - 1, day, hours24, minutes);
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date');
+    }
+    return date;
+  } catch (error) {
+    console.error('Error parsing IST string:', error);
+    throw error;
+  }
+};
+
