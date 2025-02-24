@@ -1,6 +1,6 @@
 
 import { DateTimeField } from "./DateTimeField";
-import { getDateAndTime } from "@/utils/datetime";
+import { getDateAndTime, formatDateTime } from "@/utils/datetime";
 
 interface TimeFieldsProps {
   formData: any;
@@ -13,20 +13,24 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
 
   const handleDateChange = (type: 'entry' | 'exit') => (date: string) => {
     const currentTime = type === 'entry' ? entryTime : exitTime;
+    const formattedDateTime = formatDateTime(date, currentTime);
+    
     handleChange({
       target: { 
         name: `${type}_time`, 
-        value: date && currentTime ? `${date} ${currentTime}` : date
+        value: formattedDateTime || ''
       }
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
     const currentDate = type === 'entry' ? entryDate : exitDate;
+    const formattedDateTime = formatDateTime(currentDate, time);
+    
     handleChange({
       target: {
         name: `${type}_time`,
-        value: currentDate && time ? `${currentDate} ${time}` : time
+        value: formattedDateTime || ''
       }
     } as React.ChangeEvent<HTMLInputElement>);
   };

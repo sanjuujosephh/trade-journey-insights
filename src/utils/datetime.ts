@@ -1,4 +1,3 @@
-
 // Basic function to get current date and time strings in required format
 export const formatToIST = (date: Date | null | undefined) => {
   if (!date) return { datePart: '', timePart: '' };
@@ -20,19 +19,35 @@ export const formatToIST = (date: Date | null | undefined) => {
   };
 };
 
-// Simple string formatting functions
+// Format date and time strings with proper validation
 export const formatDateTime = (date: string, time: string): string | null => {
-  if (!date && !time) return null;
-  return date && time ? `${date} ${time}` : null;
+  if (!date || !time) return null;
+  
+  // Validate date format (DD-MM-YYYY)
+  const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+  if (!dateRegex.test(date)) return null;
+  
+  // Validate time format (HH:MM AM/PM)
+  const timeRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i;
+  if (!timeRegex.test(time)) return null;
+  
+  return `${date} ${time}`;
 };
 
+// Safely split datetime string into date and time parts
 export const getDateAndTime = (dateTimeStr: string | null | undefined) => {
   if (!dateTimeStr) return { date: '', time: '' };
-  const [datePart, ...timeParts] = dateTimeStr.split(' ');
-  return {
-    date: datePart || '',
-    time: timeParts.join(' ') || ''
-  };
+  
+  // Split on the last space to properly handle times with spaces (e.g., "10:00 AM")
+  const lastSpaceIndex = dateTimeStr.lastIndexOf(' ');
+  if (lastSpaceIndex === -1) return { date: '', time: '' };
+  
+  // Get everything before the last space as the date
+  const date = dateTimeStr.substring(0, lastSpaceIndex - 2).trim();
+  // Get everything after, including the AM/PM, as the time
+  const time = dateTimeStr.substring(lastSpaceIndex - 2).trim();
+  
+  return { date, time };
 };
 
 export const dateToISTString = (date: Date): string => {
@@ -61,4 +76,3 @@ export const parseISTString = (dateTimeStr: string): Date => {
     return new Date();
   }
 };
-

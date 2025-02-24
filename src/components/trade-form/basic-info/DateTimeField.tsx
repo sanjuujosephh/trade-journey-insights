@@ -33,8 +33,17 @@ export function DateTimeField({
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = e.target.value;
-    onTimeChange(newTime);
+    const timeValue = e.target.value.toUpperCase();
+    // Basic time format validation
+    const timeRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)?$/i;
+    if (timeRegex.test(timeValue)) {
+      // Ensure consistent AM/PM format
+      let formattedTime = timeValue;
+      if (!timeValue.includes('AM') && !timeValue.includes('PM')) {
+        formattedTime += ' AM';
+      }
+      onTimeChange(formattedTime);
+    }
   };
 
   // Parse the date string to a Date object for the calendar
