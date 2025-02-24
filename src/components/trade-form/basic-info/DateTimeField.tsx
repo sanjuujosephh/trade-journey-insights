@@ -33,25 +33,34 @@ export function DateTimeField({
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
+    const dateDigits = value.replace(/\D/g, '');
     
-    // Allow typing and deleting
-    if (!value || value.length <= 10) {
-      // Automatically add hyphens
-      value = value.replace(/\D/g, '').replace(/(\d{2})(?=\d)/g, '$1-');
+    if (dateDigits.length <= 8) {
+      // Format with hyphens as user types
+      if (dateDigits.length > 4) {
+        value = `${dateDigits.slice(0, 2)}-${dateDigits.slice(2, 4)}-${dateDigits.slice(4)}`;
+      } else if (dateDigits.length > 2) {
+        value = `${dateDigits.slice(0, 2)}-${dateDigits.slice(2)}`;
+      } else {
+        value = dateDigits;
+      }
+      
       onDateChange(value);
     }
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.toUpperCase();
+    const timeDigits = value.replace(/\D/g, '');
+    const meridiem = value.match(/(AM|PM)$/i)?.[0] || '';
     
-    // Allow typing and deleting
-    if (!value || value.length <= 8) {
-      // Format time input
-      value = value
-        .replace(/[^\d\s:AMP]/g, '')
-        .replace(/(\d{2})(?=\d)/g, '$1:')
-        .replace(/:([^\d]|$)/, ':');
+    if (timeDigits.length <= 4) {
+      // Format with colon as user types
+      if (timeDigits.length > 2) {
+        value = `${timeDigits.slice(0, 2)}:${timeDigits.slice(2)} ${meridiem}`;
+      } else {
+        value = `${timeDigits} ${meridiem}`;
+      }
       
       onTimeChange(value);
     }

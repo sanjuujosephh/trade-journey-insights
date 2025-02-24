@@ -1,4 +1,3 @@
-
 // Helper function to format date and time consistently in IST
 export const formatToIST = (date: Date | null | undefined) => {
   if (!date) return { datePart: '', timePart: '' };
@@ -26,52 +25,37 @@ export const formatToIST = (date: Date | null | undefined) => {
 
 // Format datetime for database (text format)
 export const formatDateTime = (date: string, time: string): string | null => {
-  if (!date || !time) return null;
-  
-  // Allow incomplete inputs
-  if (date.length < 10 || !date.includes('-')) return null;
+  if (!date && !time) return null;
   
   try {
-    // Parse date
-    const [day, month, year] = date.split('-').map(Number);
-    if (!day || !month || !year) return null;
-
-    // Parse time
-    const timeParts = time.trim().split(' ');
-    if (timeParts.length !== 2) return null;
+    // Format date
+    let formattedDate = date;
+    if (date) {
+      const dateDigits = date.replace(/\D/g, '');
+      if (dateDigits.length === 8) {
+        formattedDate = `${dateDigits.slice(0, 2)}-${dateDigits.slice(2, 4)}-${dateDigits.slice(4)}`;
+      }
+    }
     
-    const [timeValue, meridiem] = timeParts;
-    if (!timeValue || !meridiem) return null;
-    
-    const [hours12, minutes] = timeValue.split(':').map(Number);
-    if (isNaN(hours12) || isNaN(minutes)) return null;
-
-    // Validate meridiem
-    if (!['AM', 'PM'].includes(meridiem)) return null;
-
-    // Convert to 24-hour format
-    let hours24 = hours12;
-    if (meridiem === 'PM' && hours12 !== 12) hours24 += 12;
-    if (meridiem === 'AM' && hours12 === 12) hours24 = 0;
-
-    // Ensure trading hours (9 AM to 3:59 PM)
-    let adjustedHours = hours24;
-    let adjustedMinutes = minutes;
-    
-    if (hours24 < 9) {
-      adjustedHours = 9;
-      adjustedMinutes = 0;
-    } else if (hours24 >= 16) {
-      adjustedHours = 15;
-      adjustedMinutes = 59;
+    // Format time
+    let formattedTime = time;
+    if (time) {
+      const timeParts = time.trim().toUpperCase().split(' ');
+      const timeDigits = timeParts[0].replace(/\D/g, '');
+      const meridiem = timeParts[1] || '';
+      
+      if (timeDigits.length === 4 && ['AM', 'PM'].includes(meridiem)) {
+        formattedTime = `${timeDigits.slice(0, 2)}:${timeDigits.slice(2)} ${meridiem}`;
+      }
     }
 
-    // Format final datetime string
-    const formattedHours = String(adjustedHours % 12 || 12).padStart(2, '0');
-    const formattedMinutes = String(adjustedMinutes).padStart(2, '0');
-    const ampm = adjustedHours >= 12 ? 'PM' : 'AM';
-
-    return `${date} ${formattedHours}:${formattedMinutes} ${ampm}`;
+    // Return combined datetime if both parts are valid
+    if (formattedDate && formattedTime) {
+      return `${formattedDate} ${formattedTime}`;
+    }
+    
+    // Return partial datetime
+    return date && time ? `${date} ${time}` : null;
   } catch (error) {
     console.error('Error formatting datetime:', error);
     return null;
