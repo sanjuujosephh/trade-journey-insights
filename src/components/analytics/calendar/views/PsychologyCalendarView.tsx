@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { CalendarGrid } from "../CalendarGrid";
 import { TradeDay } from "../calendarUtils";
 
@@ -19,7 +18,7 @@ export function PsychologyCalendarView({
   onDateSelect,
 }: PsychologyCalendarViewProps) {
   return (
-    <div className="bg-background rounded-lg p-6">
+    <div className="rounded-lg p-6">
       <h3 className="text-lg font-semibold mb-4">Psychology Tracker</h3>
       <CalendarGrid
         days={days}

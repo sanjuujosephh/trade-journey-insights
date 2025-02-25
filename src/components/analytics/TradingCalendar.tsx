@@ -20,19 +20,15 @@ export function TradingCalendar() {
   });
 
   const handlePreviousMonth = () => {
-    setCurrentDate(date => {
-      const newDate = new Date(date);
-      newDate.setMonth(date.getMonth() - 1);
-      return newDate;
-    });
+    const newDate = new Date(currentDate);
+    newDate.setMonth(currentDate.getMonth() - 1);
+    setCurrentDate(newDate);
   };
 
   const handleNextMonth = () => {
-    setCurrentDate(date => {
-      const newDate = new Date(date);
-      newDate.setMonth(date.getMonth() + 1);
-      return newDate;
-    });
+    const newDate = new Date(currentDate);
+    newDate.setMonth(currentDate.getMonth() + 1);
+    setCurrentDate(newDate);
   };
 
   const handleToday = () => {

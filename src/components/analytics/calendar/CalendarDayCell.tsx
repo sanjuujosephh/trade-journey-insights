@@ -22,8 +22,6 @@ export function CalendarDayCell({
   isSelected,
   onSelect 
 }: CalendarDayCellProps) {
-  const dayKey = format(day, "yyyy-MM-dd");
-
   const renderContent = () => {
     switch (view) {
       case 'options':
@@ -83,7 +81,7 @@ export function CalendarDayCell({
         return dayStats && (
           <>
             <div className="font-medium mb-1">{format(day, "d")}</div>
-            <div className="text-[10px] font-medium">
+            <div className="text-xs font-medium">
               {formatPnL(dayStats.totalPnL)}
             </div>
           </>
@@ -133,13 +131,13 @@ export function CalendarDayCell({
           <button
             onClick={() => onSelect(day)}
             className={cn(
-              "p-2 rounded-md text-xs transition-colors min-h-[75px] w-full",
+              "p-2 rounded-md transition-colors min-h-[75px] w-full",
               !isSameMonth(day, currentDate) && "opacity-50",
               isToday(day) && "ring-1 ring-primary",
               isSelected && "ring-1 ring-primary ring-offset-2",
               dayStats
                 ? getPnLColor(dayStats.totalPnL)
-                : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                : "hover:bg-gray-100"
             )}
           >
             {renderContent() || <div className="font-medium">{format(day, "d")}</div>}
