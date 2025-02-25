@@ -10,6 +10,7 @@ interface TimeFieldsProps {
 
 export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
   const handleDateChange = (date: string) => {
+    // Set the same date for both entry and exit
     handleChange({
       target: { 
         name: 'entry_date', 
@@ -26,6 +27,7 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
+    // Allow typing at all times
     handleChange({
       target: {
         name: `${type}_time`,
@@ -33,7 +35,8 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
       }
     } as React.ChangeEvent<HTMLInputElement>);
 
-    if (time.length >= 8) {
+    // Only validate completed time strings
+    if (time.length >= 8) {  // Length of "HH:MM AM" or "HH:MM PM"
       const validTime = parseTimeString(time);
       if (!validTime && time !== '') {
         console.log('Invalid time format:', time);
@@ -54,28 +57,24 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
           required
         />
       </div>
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
-          <DateTimeField
-            label="Entry Time"
-            date=""
-            time={formData.entry_time || ''}
-            onDateChange={() => {}}
-            onTimeChange={handleTimeChange('entry')}
-            hideDate
-            required
-          />
-        </div>
-        <div className="flex-1">
-          <DateTimeField
-            label="Exit Time"
-            date=""
-            time={formData.exit_time || ''}
-            onDateChange={() => {}}
-            onTimeChange={handleTimeChange('exit')}
-            hideDate
-          />
-        </div>
+      <div className="grid grid-cols-2 gap-4">
+        <DateTimeField
+          label="Entry Time"
+          date=""
+          time={formData.entry_time || ''}
+          onDateChange={() => {}}
+          onTimeChange={handleTimeChange('entry')}
+          hideDate
+          required
+        />
+        <DateTimeField
+          label="Exit Time"
+          date=""
+          time={formData.exit_time || ''}
+          onDateChange={() => {}}
+          onTimeChange={handleTimeChange('exit')}
+          hideDate
+        />
       </div>
     </div>
   );

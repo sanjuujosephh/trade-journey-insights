@@ -93,9 +93,7 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
               <TableHead>Symbol</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Entry</TableHead>
-              <TableHead>Time</TableHead>
               <TableHead>Exit</TableHead>
-              <TableHead>Exit Time</TableHead>
               <TableHead>P/L</TableHead>
               <TableHead>Outcome</TableHead>
               <TableHead>Actions</TableHead>
@@ -111,12 +109,26 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
                   </TableCell>
                   <TableCell className="font-medium">{trade.symbol}</TableCell>
                   <TableCell>{trade.trade_type}</TableCell>
-                  <TableCell>₹{trade.entry_price}</TableCell>
-                  <TableCell>{formatDisplayTime(trade.entry_time)}</TableCell>
                   <TableCell>
-                    {trade.exit_price ? `₹${trade.exit_price}` : '-'}
+                    ₹{trade.entry_price}
+                    {trade.entry_time && (
+                      <div className="text-xs text-muted-foreground">
+                        {formatDisplayTime(trade.entry_time)}
+                      </div>
+                    )}
                   </TableCell>
-                  <TableCell>{formatDisplayTime(trade.exit_time)}</TableCell>
+                  <TableCell>
+                    {trade.exit_price ? (
+                      <>
+                        ₹{trade.exit_price}
+                        {trade.exit_time && (
+                          <div className="text-xs text-muted-foreground">
+                            {formatDisplayTime(trade.exit_time)}
+                          </div>
+                        )}
+                      </>
+                    ) : '-'}
+                  </TableCell>
                   <TableCell>
                     {formatPnL(pnl)}
                   </TableCell>
