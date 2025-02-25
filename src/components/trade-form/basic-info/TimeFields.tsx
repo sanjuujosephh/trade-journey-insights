@@ -54,24 +54,28 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
           required
         />
       </div>
-      <div className="flex flex-row items-end space-x-4">
-        <DateTimeField
-          label="Entry Time"
-          date=""
-          time={formData.entry_time || ''}
-          onDateChange={() => {}}
-          onTimeChange={handleTimeChange('entry')}
-          hideDate
-          required
-        />
-        <DateTimeField
-          label="Exit Time"
-          date=""
-          time={formData.exit_time || ''}
-          onDateChange={() => {}}
-          onTimeChange={handleTimeChange('exit')}
-          hideDate
-        />
+      <div className="flex items-center gap-4">
+        <div className="flex-1">
+          <DateTimeField
+            label="Entry Time"
+            date=""
+            time={formData.entry_time || ''}
+            onDateChange={() => {}}
+            onTimeChange={handleTimeChange('entry')}
+            hideDate
+            required
+          />
+        </div>
+        <div className="flex-1">
+          <DateTimeField
+            label="Exit Time"
+            date=""
+            time={formData.exit_time || ''}
+            onDateChange={() => {}}
+            onTimeChange={handleTimeChange('exit')}
+            hideDate
+          />
+        </div>
       </div>
     </div>
   );
