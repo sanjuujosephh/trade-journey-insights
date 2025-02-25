@@ -14,34 +14,35 @@ export function TradeFlowChart({ trades }: TradeFlowChartProps) {
   const tradingData = validTrades.map(trade => {
     if (!trade.entry_time) return null;
 
-    // Parse the time from the DD-MM-YYYY HH:mm format
-    const [datePart, timePart] = trade.entry_time.split(' ');
-    if (!datePart || !timePart) return null;
+    try {
+      // Parse just the time portion
+      const timePart = trade.entry_time.split(' ')[1];
+      if (!timePart) return null;
 
-    const [day, month, year] = datePart.split('-').map(Number);
-    const timeStr = timePart.toLowerCase();
-    const [hours, minutes] = timeStr.replace(/[ap]m/, '').split(':').map(Number);
-    
-    let adjustedHours = hours;
-    if (timeStr.includes('pm') && hours !== 12) {
-      adjustedHours += 12;
-    } else if (timeStr.includes('am') && hours === 12) {
-      adjustedHours = 0;
+      return {
+        time: timePart,  // Use the raw time string directly
+        entryPrice: trade.entry_price,
+        exitPrice: trade.exit_price,
+        pnl: (trade.exit_price! - trade.entry_price) * (trade.quantity || 1),
+        type: trade.trade_type
+      };
+    } catch (error) {
+      console.error('Error parsing trade time:', error);
+      return null;
     }
-
-    const entryDate = new Date(year, month - 1, day, adjustedHours, minutes);
-    
-    return {
-      time: formatDate(entryDate, 'HH:mm'),
-      entryPrice: trade.entry_price,
-      exitPrice: trade.exit_price,
-      pnl: (trade.exit_price! - trade.entry_price) * (trade.quantity || 1),
-      type: trade.trade_type
-    };
   }).filter(Boolean).sort((a, b) => {
-    const timeA = a!.time.split(':').map(Number);
-    const timeB = b!.time.split(':').map(Number);
-    return (timeA[0] * 60 + timeA[1]) - (timeB[0] * 60 + timeB[1]);
+    // Convert time strings to minutes for comparison
+    const getMinutes = (timeStr: string) => {
+      const [time, period] = timeStr.split(' ');
+      let [hours, minutes] = time.split(':').map(Number);
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      return hours * 60 + minutes;
+    };
+
+    const timeA = getMinutes(a!.time);
+    const timeB = getMinutes(b!.time);
+    return timeA - timeB;
   });
 
   return (
@@ -100,4 +101,3 @@ export function TradeFlowChart({ trades }: TradeFlowChartProps) {
     </Card>
   );
 }
-
