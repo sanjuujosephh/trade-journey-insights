@@ -31,7 +31,7 @@ export default function TradeEntry() {
   if (isLoading) return <LoadingSpinner />;
 
   const handleEdit = (trade: Trade) => {
-    console.log('Raw trade data:', trade);
+    console.log('Raw trade data for edit:', trade);
     
     const formDataUpdate: FormData = {
       entry_price: trade.entry_price.toString(),
@@ -70,7 +70,7 @@ export default function TradeEntry() {
       option_type: trade.option_type ?? ""
     };
     
-    console.log('Setting form data:', formDataUpdate);
+    console.log('Setting form data for edit:', formDataUpdate);
     setFormData(formDataUpdate);
     setEditingId(trade.id);
   };

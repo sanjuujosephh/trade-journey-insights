@@ -138,22 +138,27 @@ export function useTradeOperations() {
   });
 
   const updateTrade = useMutation({
-    mutationFn: async ({ id, ...trade }: Partial<Trade> & { id: string }) => {
+    mutationFn: async ({ id, ...tradeData }: Partial<Trade> & { id: string }) => {
       if (!userId) {
         throw new Error("User not authenticated");
       }
 
-      console.log('Updating trade with data:', trade);
+      console.log('Raw update data:', tradeData);
+      
+      // Ensure date fields are preserved
+      const updatedTrade = {
+        ...transformTradeData(tradeData),
+        entry_date: tradeData.entry_date,
+        entry_time: tradeData.entry_time,
+        exit_date: tradeData.exit_date,
+        exit_time: tradeData.exit_time
+      };
+
+      console.log('Processed update data:', updatedTrade);
 
       const { data, error } = await supabase
         .from('trades')
-        .update({
-          ...trade,
-          entry_date: trade.entry_date,
-          entry_time: trade.entry_time,
-          exit_date: trade.exit_date,
-          exit_time: trade.exit_time
-        })
+        .update(updatedTrade)
         .eq('id', id)
         .select()
         .single();
