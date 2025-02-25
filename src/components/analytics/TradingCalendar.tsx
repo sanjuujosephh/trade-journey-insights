@@ -12,7 +12,7 @@ export function TradingCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const { data: tradeDays = {} } = useTradeDays(currentDate);
+  const { data: tradeDays = {}, isLoading } = useTradeDays(currentDate);
 
   const daysInMonth = eachDayOfInterval({
     start: startOfMonth(currentDate),
@@ -38,6 +38,10 @@ export function TradingCalendar() {
   const handleToday = () => {
     setCurrentDate(new Date());
   };
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading calendar data...</div>;
+  }
 
   return (
     <div className="space-y-8">

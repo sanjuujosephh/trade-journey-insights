@@ -20,6 +20,13 @@ export function CalendarGrid({
   selectedDate,
   onDateSelect
 }: CalendarGridProps) {
+  const formatDateKey = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${day}-${month}-${year}`;
+  };
+
   return (
     <div className="grid grid-cols-7 gap-2">
       {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
@@ -35,9 +42,9 @@ export function CalendarGrid({
           key={day.toString()}
           day={day}
           currentDate={currentDate}
-          dayStats={tradeDays[day.toISOString().split('T')[0]]}
+          dayStats={tradeDays[formatDateKey(day)]}
           view={view}
-          isSelected={selectedDate ? selectedDate.toISOString().split('T')[0] === day.toISOString().split('T')[0] : false}
+          isSelected={selectedDate ? formatDateKey(selectedDate) === formatDateKey(day) : false}
           onSelect={onDateSelect}
         />
       ))}

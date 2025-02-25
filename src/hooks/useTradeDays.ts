@@ -5,24 +5,10 @@ import { format } from "date-fns";
 import { TradeDay } from "@/components/analytics/calendar/calendarUtils";
 
 const formatToIST = (date: Date) => {
-  const options: Intl.DateTimeFormatOptions = {
-    timeZone: 'Asia/Kolkata',
-    hour12: false,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  };
-
-  const parts = new Intl.DateTimeFormat('en-IN', options).formatToParts(date);
-  const values: { [key: string]: string } = {};
-  parts.forEach(part => {
-    values[part.type] = part.value;
-  });
-
-  return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}:${values.second}`;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${day}-${month}-${year}`;
 };
 
 export function useTradeDays(currentDate: Date) {
@@ -46,8 +32,8 @@ export function useTradeDays(currentDate: Date) {
       const { data: trades, error } = await supabase
         .from("trades")
         .select("*")
-        .gte("entry_time", formatToIST(monthStart))
-        .lte("entry_time", formatToIST(monthEnd))
+        .gte("entry_date", formatToIST(monthStart))
+        .lte("entry_date", formatToIST(monthEnd))
         .order("entry_time");
       
       if (error) {
@@ -62,16 +48,13 @@ export function useTradeDays(currentDate: Date) {
       const tradeDays: TradeDay = {};
       
       trades.forEach((trade) => {
-        if (!trade.entry_time) {
-          console.log("Trade missing entry_time:", trade);
+        if (!trade.entry_date) {
+          console.log("Trade missing entry_date:", trade);
           return;
         }
         
-        const dayKey = format(new Date(trade.entry_time), "yyyy-MM-dd");
-        console.log("Processing trade for day:", dayKey, trade);
-
-        if (!tradeDays[dayKey]) {
-          tradeDays[dayKey] = {
+        if (!tradeDays[trade.entry_date]) {
+          tradeDays[trade.entry_date] = {
             totalPnL: 0,
             tradeCount: 0,
             vix: trade.vix || undefined,
@@ -91,38 +74,38 @@ export function useTradeDays(currentDate: Date) {
         }
         
         if (trade.exit_price && trade.entry_price && trade.quantity) {
-          tradeDays[dayKey].totalPnL += (trade.exit_price - trade.entry_price) * trade.quantity;
+          tradeDays[trade.entry_date].totalPnL += (trade.exit_price - trade.entry_price) * trade.quantity;
         }
-        tradeDays[dayKey].tradeCount += 1;
+        tradeDays[trade.entry_date].tradeCount += 1;
 
         if (trade.actual_risk_reward !== null && trade.actual_risk_reward !== undefined) {
-          tradeDays[dayKey].riskReward = Number(trade.actual_risk_reward);
+          tradeDays[trade.entry_date].riskReward = Number(trade.actual_risk_reward);
         } else if (
           trade.planned_risk_reward !== null && 
           trade.planned_risk_reward !== undefined && 
-          tradeDays[dayKey].riskReward === undefined
+          tradeDays[trade.entry_date].riskReward === undefined
         ) {
-          tradeDays[dayKey].riskReward = Number(trade.planned_risk_reward);
+          tradeDays[trade.entry_date].riskReward = Number(trade.planned_risk_reward);
         } else if (
           trade.exit_price && 
           trade.entry_price && 
           trade.stop_loss && 
-          tradeDays[dayKey].riskReward === undefined
+          tradeDays[trade.entry_date].riskReward === undefined
         ) {
           const reward = Number(trade.exit_price) - Number(trade.entry_price);
           const risk = Math.abs(Number(trade.entry_price) - Number(trade.stop_loss));
           if (risk !== 0) {
-            tradeDays[dayKey].riskReward = Number((reward / risk).toFixed(2));
+            tradeDays[trade.entry_date].riskReward = Number((reward / risk).toFixed(2));
           }
         }
 
-        if (trade.vix) tradeDays[dayKey].vix = trade.vix;
-        if (trade.call_iv) tradeDays[dayKey].callIv = trade.call_iv;
-        if (trade.put_iv) tradeDays[dayKey].putIv = trade.put_iv;
-        if (trade.vwap_position) tradeDays[dayKey].vwapPosition = trade.vwap_position;
-        if (trade.ema_position) tradeDays[dayKey].emaPosition = trade.ema_position;
-        if (trade.option_type) tradeDays[dayKey].option_type = trade.option_type;
-        if (trade.trade_direction) tradeDays[dayKey].trade_direction = trade.trade_direction;
+        if (trade.vix) tradeDays[trade.entry_date].vix = trade.vix;
+        if (trade.call_iv) tradeDays[trade.entry_date].callIv = trade.call_iv;
+        if (trade.put_iv) tradeDays[trade.entry_date].putIv = trade.put_iv;
+        if (trade.vwap_position) tradeDays[trade.entry_date].vwapPosition = trade.vwap_position;
+        if (trade.ema_position) tradeDays[trade.entry_date].emaPosition = trade.ema_position;
+        if (trade.option_type) tradeDays[trade.entry_date].option_type = trade.option_type;
+        if (trade.trade_direction) tradeDays[trade.entry_date].trade_direction = trade.trade_direction;
       });
 
       console.log("Final tradeDays object:", tradeDays);
