@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine, Scatter } from "recharts";
-import { format } from "date-fns";
+import { parseISO, format as formatDate } from "date-fns";
 
 interface TradeFlowChartProps {
   trades: Trade[];
@@ -12,18 +12,37 @@ export function TradeFlowChart({ trades }: TradeFlowChartProps) {
   const validTrades = trades.filter(t => t.entry_time && t.exit_time && t.exit_price);
   
   const tradingData = validTrades.map(trade => {
-    const entryTime = new Date(trade.entry_time!);
-    const exitTime = new Date(trade.exit_time!);
-    const pnl = (trade.exit_price! - trade.entry_price) * (trade.quantity || 1);
+    if (!trade.entry_time) return null;
+
+    // Parse the time from the DD-MM-YYYY HH:mm format
+    const [datePart, timePart] = trade.entry_time.split(' ');
+    if (!datePart || !timePart) return null;
+
+    const [day, month, year] = datePart.split('-').map(Number);
+    const timeStr = timePart.toLowerCase();
+    const [hours, minutes] = timeStr.replace(/[ap]m/, '').split(':').map(Number);
+    
+    let adjustedHours = hours;
+    if (timeStr.includes('pm') && hours !== 12) {
+      adjustedHours += 12;
+    } else if (timeStr.includes('am') && hours === 12) {
+      adjustedHours = 0;
+    }
+
+    const entryDate = new Date(year, month - 1, day, adjustedHours, minutes);
     
     return {
-      time: format(entryTime, 'HH:mm'),
+      time: formatDate(entryDate, 'HH:mm'),
       entryPrice: trade.entry_price,
       exitPrice: trade.exit_price,
-      pnl,
+      pnl: (trade.exit_price! - trade.entry_price) * (trade.quantity || 1),
       type: trade.trade_type
     };
-  }).sort((a, b) => new Date('1970/01/01 ' + a.time).getTime() - new Date('1970/01/01 ' + b.time).getTime());
+  }).filter(Boolean).sort((a, b) => {
+    const timeA = a!.time.split(':').map(Number);
+    const timeB = b!.time.split(':').map(Number);
+    return (timeA[0] * 60 + timeA[1]) - (timeB[0] * 60 + timeB[1]);
+  });
 
   return (
     <Card className="p-4">
@@ -69,8 +88,8 @@ export function TradeFlowChart({ trades }: TradeFlowChartProps) {
             {tradingData.map((trade, index) => (
               <ReferenceLine
                 key={index}
-                x={trade.time}
-                stroke={trade.pnl > 0 ? "#10b981" : "#ef4444"}
+                x={trade!.time}
+                stroke={trade!.pnl > 0 ? "#10b981" : "#ef4444"}
                 strokeDasharray="3 3"
                 strokeWidth={1}
               />
@@ -81,3 +100,4 @@ export function TradeFlowChart({ trades }: TradeFlowChartProps) {
     </Card>
   );
 }
+

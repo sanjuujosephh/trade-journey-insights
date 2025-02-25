@@ -2,7 +2,6 @@
 import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import { ResponsiveContainer, Tooltip, XAxis, YAxis, ScatterChart, Scatter, Cell } from "recharts";
-import { format } from "date-fns";
 
 interface TimePerformanceHeatmapProps {
   trades: Trade[];
@@ -12,20 +11,31 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
   const validTrades = trades.filter(t => t.exit_price && t.quantity && t.entry_time);
 
   const performanceData = validTrades.map(trade => {
-    const entryTime = new Date(trade.entry_time!);
-    const date = format(entryTime, 'yyyy-MM-dd');
-    const hour = entryTime.getHours();
-    const minutes = entryTime.getMinutes();
-    const time = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    if (!trade.entry_time) return null;
+
+    const [datePart, timePart] = trade.entry_time.split(' ');
+    if (!datePart || !timePart) return null;
+
+    const [day, month, year] = datePart.split('-').map(Number);
+    const timeStr = timePart.toLowerCase();
+    const [hours, minutes] = timeStr.replace(/[ap]m/, '').split(':').map(Number);
+    
+    let adjustedHours = hours;
+    if (timeStr.includes('pm') && hours !== 12) {
+      adjustedHours += 12;
+    } else if (timeStr.includes('am') && hours === 12) {
+      adjustedHours = 0;
+    }
+
     const pnl = (trade.exit_price! - trade.entry_price) * trade.quantity!;
     
     return {
-      date,
-      time,
+      date: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+      time: `${String(adjustedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
       pnl,
-      hour: hour + minutes / 60 // Convert to decimal hours for y-axis
+      hour: adjustedHours + minutes / 60
     };
-  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }).filter(Boolean).sort((a, b) => new Date(a!.date).getTime() - new Date(b!.date).getTime());
 
   return (
     <Card className="p-4">
@@ -51,7 +61,7 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
               tickFormatter={(value) => {
                 const hours = Math.floor(value);
                 const minutes = Math.round((value - hours) * 60);
-                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
               }}
               tick={{ fontSize: 11, fill: '#6b7280' }}
               tickLine={{ stroke: '#9ca3af' }}
@@ -68,18 +78,17 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
                 if (name === "Time") {
                   const hours = Math.floor(value);
                   const minutes = Math.round((value - hours) * 60);
-                  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
                 }
                 if (name === "P&L") return `₹${props.payload.pnl.toFixed(2)}`;
                 return value;
               }}
-              labelFormatter={(label) => format(new Date(label), 'MMM dd, yyyy')}
             />
             <Scatter data={performanceData} shape="circle">
               {performanceData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.pnl > 0 ? "#10B981" : "#EF4444"}
+                  fill={entry!.pnl > 0 ? "#10B981" : "#EF4444"}
                   opacity={0.7}
                   r={10}
                 />
@@ -94,3 +103,4 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
     </Card>
   );
 }
+
