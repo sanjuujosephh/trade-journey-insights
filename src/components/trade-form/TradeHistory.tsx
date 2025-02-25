@@ -92,6 +92,7 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
               <TableHead>Date</TableHead>
               <TableHead>Symbol</TableHead>
               <TableHead>Type</TableHead>
+              <TableHead>Time</TableHead>
               <TableHead>Entry</TableHead>
               <TableHead>Exit</TableHead>
               <TableHead>P/L</TableHead>
@@ -110,24 +111,19 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
                   <TableCell className="font-medium">{trade.symbol}</TableCell>
                   <TableCell>{trade.trade_type}</TableCell>
                   <TableCell>
-                    ₹{trade.entry_price}
-                    {trade.entry_time && (
-                      <div className="text-xs text-muted-foreground">
-                        {formatDisplayTime(trade.entry_time)}
-                      </div>
-                    )}
+                    <div className="text-sm">
+                      <span>Entry: {formatDisplayTime(trade.entry_time)}</span>
+                      {trade.exit_time && (
+                        <>
+                          <br />
+                          <span>Exit: {formatDisplayTime(trade.exit_time)}</span>
+                        </>
+                      )}
+                    </div>
                   </TableCell>
+                  <TableCell>₹{trade.entry_price}</TableCell>
                   <TableCell>
-                    {trade.exit_price ? (
-                      <>
-                        ₹{trade.exit_price}
-                        {trade.exit_time && (
-                          <div className="text-xs text-muted-foreground">
-                            {formatDisplayTime(trade.exit_time)}
-                          </div>
-                        )}
-                      </>
-                    ) : '-'}
+                    {trade.exit_price ? `₹${trade.exit_price}` : '-'}
                   </TableCell>
                   <TableCell>
                     {formatPnL(pnl)}
