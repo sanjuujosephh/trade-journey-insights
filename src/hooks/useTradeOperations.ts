@@ -145,9 +145,50 @@ export function useTradeOperations() {
 
       console.log('Raw update data:', tradeData);
       
-      // Ensure date fields are preserved
+      // Create a minimal FormData object with required fields
+      const formDataForTransform = {
+        symbol: tradeData.symbol || '', // Ensure symbol is always present
+        entry_price: tradeData.entry_price?.toString() || '',
+        exit_price: tradeData.exit_price?.toString() || '',
+        quantity: tradeData.quantity?.toString() || '',
+        trade_type: tradeData.trade_type || 'options',
+        stop_loss: tradeData.stop_loss?.toString() || '',
+        strategy: tradeData.strategy || '',
+        outcome: tradeData.outcome || 'profit',
+        notes: tradeData.notes || '',
+        entry_date: tradeData.entry_date || '',
+        entry_time: tradeData.entry_time || '',
+        exit_date: tradeData.exit_date || '',
+        exit_time: tradeData.exit_time || '',
+        chart_link: tradeData.chart_link || '',
+        vix: tradeData.vix?.toString() || '',
+        call_iv: tradeData.call_iv?.toString() || '',
+        put_iv: tradeData.put_iv?.toString() || '',
+        vwap_position: tradeData.vwap_position || '',
+        ema_position: tradeData.ema_position || '',
+        strike_price: tradeData.strike_price?.toString() || '',
+        option_type: tradeData.option_type || '',
+        market_condition: tradeData.market_condition || '',
+        timeframe: tradeData.timeframe || '',
+        trade_direction: tradeData.trade_direction || '',
+        planned_risk_reward: tradeData.planned_risk_reward?.toString() || '',
+        actual_risk_reward: tradeData.actual_risk_reward?.toString() || '',
+        planned_target: tradeData.planned_target?.toString() || '',
+        exit_reason: tradeData.exit_reason || '',
+        slippage: tradeData.slippage?.toString() || '',
+        post_exit_price: tradeData.post_exit_price?.toString() || '',
+        exit_efficiency: tradeData.exit_efficiency?.toString() || '',
+        confidence_level: tradeData.confidence_level?.toString() || '',
+        entry_emotion: tradeData.entry_emotion || '',
+        exit_emotion: tradeData.exit_emotion || '',
+      };
+
+      // Transform the data using the properly formatted FormData object
+      const transformedData = transformTradeData(formDataForTransform);
+
+      // Combine with original date fields to ensure they're preserved
       const updatedTrade = {
-        ...transformTradeData(tradeData),
+        ...transformedData,
         entry_date: tradeData.entry_date,
         entry_time: tradeData.entry_time,
         exit_date: tradeData.exit_date,
