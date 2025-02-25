@@ -9,10 +9,18 @@ interface TimeFieldsProps {
 }
 
 export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
-  const handleDateChange = (type: 'entry' | 'exit') => (date: string) => {
+  const handleDateChange = (date: string) => {
+    // Set the same date for both entry and exit
     handleChange({
       target: { 
-        name: `${type}_date`, 
+        name: 'entry_date', 
+        value: date
+      }
+    } as React.ChangeEvent<HTMLInputElement>);
+    
+    handleChange({
+      target: {
+        name: 'exit_date',
         value: date
       }
     } as React.ChangeEvent<HTMLInputElement>);
@@ -37,23 +45,37 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <DateTimeField
-        label="Entry Time"
-        date={formData.entry_date || ''}
-        time={formData.entry_time || ''}
-        onDateChange={handleDateChange('entry')}
-        onTimeChange={handleTimeChange('entry')}
-        required
-      />
-      <DateTimeField
-        label="Exit Time"
-        date={formData.exit_date || ''}
-        time={formData.exit_time || ''}
-        onDateChange={handleDateChange('exit')}
-        onTimeChange={handleTimeChange('exit')}
-      />
+    <div className="space-y-4">
+      <div className="w-full">
+        <DateTimeField
+          label="Trade Date"
+          date={formData.entry_date || ''}
+          time=""
+          onDateChange={handleDateChange}
+          onTimeChange={() => {}}
+          hideTime
+          required
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <DateTimeField
+          label="Entry Time"
+          date=""
+          time={formData.entry_time || ''}
+          onDateChange={() => {}}
+          onTimeChange={handleTimeChange('entry')}
+          hideDate
+          required
+        />
+        <DateTimeField
+          label="Exit Time"
+          date=""
+          time={formData.exit_time || ''}
+          onDateChange={() => {}}
+          onTimeChange={handleTimeChange('exit')}
+          hideDate
+        />
+      </div>
     </div>
   );
 }
-

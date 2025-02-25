@@ -15,6 +15,8 @@ interface DateTimeFieldProps {
   onDateChange: (value: string) => void;
   onTimeChange: (value: string) => void;
   required?: boolean;
+  hideDate?: boolean;
+  hideTime?: boolean;
 }
 
 export function DateTimeField({
@@ -24,6 +26,8 @@ export function DateTimeField({
   onDateChange,
   onTimeChange,
   required = false,
+  hideDate = false,
+  hideTime = false,
 }: DateTimeFieldProps) {
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
@@ -64,38 +68,41 @@ export function DateTimeField({
     <div className="space-y-2">
       <Label htmlFor={label}>{label}</Label>
       <div className="flex gap-2">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !date && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? date : "Pick a date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={parseDate(date)}
-              onSelect={handleDateSelect}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-        <Input
-          type="text"
-          value={time}
-          onChange={handleTimeChange}
-          placeholder="HH:MM"
-          required={required}
-          className="w-[120px]"
-        />
+        {!hideDate && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? date : "Pick a date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={parseDate(date)}
+                onSelect={handleDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        )}
+        {!hideTime && (
+          <Input
+            type="text"
+            value={time}
+            onChange={handleTimeChange}
+            placeholder="HH:MM"
+            required={required}
+            className="w-[120px]"
+          />
+        )}
       </div>
     </div>
   );
 }
-
