@@ -1,9 +1,8 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Trade } from "@/types/trade";
+import { Trade, FormData } from "@/types/trade";
 import { transformTradeData } from "@/utils/trade-form/transformations";
 import { formatToIST, parseDateString, parseTimeString } from "@/utils/datetime";
 
@@ -146,8 +145,8 @@ export function useTradeOperations() {
       console.log('Raw update data:', tradeData);
       
       // Create a minimal FormData object with required fields
-      const formDataForTransform = {
-        symbol: tradeData.symbol || '', // Ensure symbol is always present
+      const formDataForTransform: FormData = {
+        symbol: tradeData.symbol || '',
         entry_price: tradeData.entry_price?.toString() || '',
         exit_price: tradeData.exit_price?.toString() || '',
         quantity: tradeData.quantity?.toString() || '',
@@ -164,23 +163,23 @@ export function useTradeOperations() {
         vix: tradeData.vix?.toString() || '',
         call_iv: tradeData.call_iv?.toString() || '',
         put_iv: tradeData.put_iv?.toString() || '',
-        vwap_position: tradeData.vwap_position || '',
-        ema_position: tradeData.ema_position || '',
+        vwap_position: (tradeData.vwap_position || '') as "" | "above_vwap" | "below_vwap",
+        ema_position: (tradeData.ema_position || '') as "" | "above_20ema" | "below_20ema",
         strike_price: tradeData.strike_price?.toString() || '',
-        option_type: tradeData.option_type || '',
-        market_condition: tradeData.market_condition || '',
-        timeframe: tradeData.timeframe || '',
-        trade_direction: tradeData.trade_direction || '',
+        option_type: (tradeData.option_type || '') as "" | "call" | "put",
+        market_condition: (tradeData.market_condition || '') as "" | "trending" | "ranging" | "news_driven" | "volatile",
+        timeframe: (tradeData.timeframe || '') as "" | "1min" | "5min" | "15min" | "1hr",
+        trade_direction: (tradeData.trade_direction || '') as "" | "long" | "short",
         planned_risk_reward: tradeData.planned_risk_reward?.toString() || '',
         actual_risk_reward: tradeData.actual_risk_reward?.toString() || '',
         planned_target: tradeData.planned_target?.toString() || '',
-        exit_reason: tradeData.exit_reason || '',
+        exit_reason: (tradeData.exit_reason || '') as "" | "stop_loss" | "target" | "manual" | "time_based",
         slippage: tradeData.slippage?.toString() || '',
         post_exit_price: tradeData.post_exit_price?.toString() || '',
         exit_efficiency: tradeData.exit_efficiency?.toString() || '',
         confidence_level: tradeData.confidence_level?.toString() || '',
-        entry_emotion: tradeData.entry_emotion || '',
-        exit_emotion: tradeData.exit_emotion || '',
+        entry_emotion: (tradeData.entry_emotion || '') as "" | "fear" | "greed" | "fomo" | "revenge" | "neutral",
+        exit_emotion: (tradeData.exit_emotion || '') as "" | "satisfied" | "regretful" | "relieved" | "frustrated",
       };
 
       // Transform the data using the properly formatted FormData object
