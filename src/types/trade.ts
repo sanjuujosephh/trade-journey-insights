@@ -1,3 +1,4 @@
+
 export interface Trade {
   id: string;
   entry_price: number;
@@ -21,7 +22,7 @@ export interface Trade {
   call_iv?: number | null;
   put_iv?: number | null;
   
-  // New Option Price Position fields
+  // Option Price Position fields
   vwap_position?: 'above_vwap' | 'below_vwap' | null;
   ema_position?: 'above_20ema' | 'below_20ema' | null;
   
@@ -33,19 +34,11 @@ export interface Trade {
   market_condition?: 'trending' | 'ranging' | 'news_driven' | 'volatile' | null;
   timeframe?: '1min' | '5min' | '15min' | '1hr' | null;
   trade_direction?: 'long' | 'short' | null;
-  planned_risk_reward?: number | null;
-  actual_risk_reward?: number | null;
   
   // Risk Management & Exit Details
-  planned_target?: number | null;
   exit_reason?: 'stop_loss' | 'target' | 'manual' | 'time_based' | null;
   
   // Trade Behavior Tracking
-  slippage?: number | null;
-  post_exit_price?: number | null;
-  exit_efficiency?: number | null;
-  
-  // Psychological & Behavioral Data
   confidence_level?: number | null;
   confidence_level_score?: number | null;
   entry_emotion?: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | null;
@@ -78,7 +71,7 @@ export interface FormData {
   call_iv: string;
   put_iv: string;
   
-  // New Option Price Position fields
+  // Option Price Position fields
   vwap_position: 'above_vwap' | 'below_vwap' | '';
   ema_position: 'above_20ema' | 'below_20ema' | '';
   
@@ -87,13 +80,7 @@ export interface FormData {
   market_condition: 'trending' | 'ranging' | 'news_driven' | 'volatile' | '';
   timeframe: '1min' | '5min' | '15min' | '1hr' | '';
   trade_direction: 'long' | 'short' | '';
-  planned_risk_reward: string;
-  actual_risk_reward: string;
-  planned_target: string;
   exit_reason: 'stop_loss' | 'target' | 'manual' | 'time_based' | '';
-  slippage: string;
-  post_exit_price: string;
-  exit_efficiency: string;
   confidence_level: string;
   entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
   exit_emotion: 'satisfied' | 'regretful' | 'relieved' | 'frustrated' | '';

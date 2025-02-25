@@ -50,7 +50,6 @@ export type Database = {
       }
       trades: {
         Row: {
-          actual_risk_reward: number | null
           ai_feedback: string | null
           call_iv: number | null
           chart_link: string | null
@@ -62,8 +61,6 @@ export type Database = {
           entry_emotion: string | null
           entry_price: number
           entry_time: string | null
-          exit_date: string | null
-          exit_efficiency: number | null
           exit_emotion: string | null
           exit_price: number | null
           exit_reason: string | null
@@ -74,12 +71,8 @@ export type Database = {
           option_type: string | null
           outcome: string
           overall_emotional_state: string | null
-          planned_risk_reward: number | null
-          planned_target: number | null
-          post_exit_price: number | null
           put_iv: number | null
           quantity: number | null
-          slippage: number | null
           stop_loss: number | null
           strategy: string | null
           strike_price: number | null
@@ -93,7 +86,6 @@ export type Database = {
           vwap_position: string | null
         }
         Insert: {
-          actual_risk_reward?: number | null
           ai_feedback?: string | null
           call_iv?: number | null
           chart_link?: string | null
@@ -105,8 +97,6 @@ export type Database = {
           entry_emotion?: string | null
           entry_price: number
           entry_time?: string | null
-          exit_date?: string | null
-          exit_efficiency?: number | null
           exit_emotion?: string | null
           exit_price?: number | null
           exit_reason?: string | null
@@ -117,12 +107,8 @@ export type Database = {
           option_type?: string | null
           outcome: string
           overall_emotional_state?: string | null
-          planned_risk_reward?: number | null
-          planned_target?: number | null
-          post_exit_price?: number | null
           put_iv?: number | null
           quantity?: number | null
-          slippage?: number | null
           stop_loss?: number | null
           strategy?: string | null
           strike_price?: number | null
@@ -136,7 +122,6 @@ export type Database = {
           vwap_position?: string | null
         }
         Update: {
-          actual_risk_reward?: number | null
           ai_feedback?: string | null
           call_iv?: number | null
           chart_link?: string | null
@@ -148,8 +133,6 @@ export type Database = {
           entry_emotion?: string | null
           entry_price?: number
           entry_time?: string | null
-          exit_date?: string | null
-          exit_efficiency?: number | null
           exit_emotion?: string | null
           exit_price?: number | null
           exit_reason?: string | null
@@ -160,12 +143,8 @@ export type Database = {
           option_type?: string | null
           outcome?: string
           overall_emotional_state?: string | null
-          planned_risk_reward?: number | null
-          planned_target?: number | null
-          post_exit_price?: number | null
           put_iv?: number | null
           quantity?: number | null
-          slippage?: number | null
           stop_loss?: number | null
           strategy?: string | null
           strike_price?: number | null
