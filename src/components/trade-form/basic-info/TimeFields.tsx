@@ -46,7 +46,7 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
 
   return (
     <div className="space-y-4">
-      <div className="w-full">
+      <div className="grid grid-cols-3 gap-4">
         <DateTimeField
           label="Trade Date"
           date={formData.entry_date || ''}
@@ -56,8 +56,6 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
           hideTime
           required
         />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
         <DateTimeField
           label="Entry Time"
           date=""
@@ -79,3 +77,4 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
     </div>
   );
 }
+
