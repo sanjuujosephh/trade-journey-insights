@@ -17,16 +17,6 @@ export interface Trade {
   notes?: string | null;
   chart_link?: string | null;
   
-  // Risk management fields
-  planned_risk_reward?: number | null;
-  actual_risk_reward?: number | null;
-  planned_target?: number | null;
-  
-  // Performance metrics
-  slippage?: number | null;
-  post_exit_price?: number | null;
-  exit_efficiency?: number | null;
-  
   // VIX and IV fields
   vix?: number | null;
   call_iv?: number | null;
@@ -77,16 +67,6 @@ export interface FormData {
   entry_time: string;
   exit_time: string;
   chart_link: string;
-  
-  // Risk management fields
-  planned_risk_reward: string;
-  actual_risk_reward: string;
-  planned_target: string;
-  
-  // Performance metrics
-  slippage: string;
-  post_exit_price: string;
-  exit_efficiency: string;
   
   // Market fields
   vix: string;
