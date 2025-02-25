@@ -147,7 +147,13 @@ export function useTradeOperations() {
 
       const { data, error } = await supabase
         .from('trades')
-        .update(trade)
+        .update({
+          ...trade,
+          entry_date: trade.entry_date,
+          entry_time: trade.entry_time,
+          exit_date: trade.exit_date,
+          exit_time: trade.exit_time
+        })
         .eq('id', id)
         .select()
         .single();
@@ -184,4 +190,3 @@ export function useTradeOperations() {
     userId,
   };
 }
-

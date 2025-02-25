@@ -70,6 +70,7 @@ export default function TradeEntry() {
       option_type: trade.option_type ?? ""
     };
     
+    console.log('Setting form data:', formDataUpdate);
     setFormData(formDataUpdate);
     setEditingId(trade.id);
   };
