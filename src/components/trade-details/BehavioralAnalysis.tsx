@@ -6,6 +6,7 @@ interface BehavioralAnalysisProps {
 }
 
 export function BehavioralAnalysis({ trade }: BehavioralAnalysisProps) {
+  // Safely determine if plan was followed based on exit reason
   const followedPlan = trade.exit_reason === 'target' || trade.exit_reason === 'stop_loss';
   const isImpulsive = trade.exit_reason === 'manual';
 
@@ -17,7 +18,7 @@ export function BehavioralAnalysis({ trade }: BehavioralAnalysisProps) {
           <span className="text-sm text-muted-foreground">Followed Plan:</span>
           <p className="font-medium">{followedPlan ? 'Yes' : 'No'}</p>
         </div>
-        {!followedPlan && (
+        {!followedPlan && trade.exit_reason && (
           <div>
             <span className="text-sm text-muted-foreground">Deviation Type:</span>
             <p className="font-medium">{trade.exit_reason}</p>

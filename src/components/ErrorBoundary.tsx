@@ -11,6 +11,7 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+  errorInfo?: ErrorInfo;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -23,7 +24,13 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    console.error('Uncaught error:', error);
+    console.error('Error info:', errorInfo);
+    this.setState({
+      hasError: true,
+      error,
+      errorInfo
+    });
   }
 
   public render() {
@@ -33,7 +40,14 @@ export class ErrorBoundary extends Component<Props, State> {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Something went wrong</AlertTitle>
           <AlertDescription>
-            {this.state.error?.message}
+            <div className="mt-2 text-sm">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </div>
+            {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
+              <pre className="mt-2 text-xs overflow-auto max-h-[200px] bg-secondary p-2 rounded">
+                {this.state.errorInfo.componentStack}
+              </pre>
+            )}
             <div className="mt-4">
               <Button
                 onClick={() => {
@@ -41,7 +55,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   window.location.reload();
                 }}
               >
-                Try again
+                Reload Page
               </Button>
             </div>
           </AlertDescription>

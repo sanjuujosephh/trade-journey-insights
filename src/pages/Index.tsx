@@ -19,29 +19,45 @@ export default function Index() {
     queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return null;
+        }
+        return data;
+      } catch (error) {
+        console.error('Error in profile query:', error);
+        return null;
+      }
     },
     enabled: !!user?.id
   });
 
-  const { data: trades = [], isLoading } = useQuery({
-    queryKey: ['trades'],
+  const { data: trades = [], isLoading: isTradesLoading } = useQuery({
+    queryKey: ['trades', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('trades')
-        .select('*')
-        .order('entry_time', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
+      try {
+        const { data, error } = await supabase
+          .from('trades')
+          .select('*')
+          .order('entry_time', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching trades:', error);
+          return [];
+        }
+        return data || [];
+      } catch (error) {
+        console.error('Error in trades query:', error);
+        return [];
+      }
     },
     enabled: !!user?.id
   });
@@ -54,6 +70,7 @@ export default function Index() {
       });
 
       if (response.error) {
+        console.error('AI Analysis error:', response.error);
         throw new Error(response.error.message || 'Failed to analyze trades');
       }
 
@@ -71,7 +88,7 @@ export default function Index() {
   }
 
   return (
-    <div className="bg-background h-full">
+    <div className="bg-background min-h-screen">
       <div className="container py-4">
         <DashboardHeader profile={profile} user={user} />
         <div className="mt-8">
