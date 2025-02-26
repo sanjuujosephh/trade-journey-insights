@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      products: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          image_url: string
+          price: number
+          title: string
+          type: Database["public"]["Enums"]["product_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          image_url: string
+          price: number
+          title: string
+          type: Database["public"]["Enums"]["product_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          image_url?: string
+          price?: number
+          title?: string
+          type?: Database["public"]["Enums"]["product_type"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -216,6 +249,7 @@ export type Database = {
       }
     }
     Enums: {
+      product_type: "chart" | "poster"
       subscription_status: "active" | "cancelled" | "past_due" | "unpaid"
     }
     CompositeTypes: {
