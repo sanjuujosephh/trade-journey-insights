@@ -84,9 +84,29 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-const App = () => {
+function AppRoutes() {
   const { user } = useAuth();
   
+  return (
+    <Routes>
+      <Route 
+        path="/" 
+        element={
+          user ? (
+            <AuthGuard requireSubscription={true}>
+              <Index />
+            </AuthGuard>
+          ) : (
+            <Index />
+          )
+        } 
+      />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -94,21 +114,7 @@ const App = () => {
           <Toaster />
           <BrowserRouter>
             <Layout>
-              <Routes>
-                <Route 
-                  path="/" 
-                  element={
-                    user ? (
-                      <AuthGuard requireSubscription={true}>
-                        <Index />
-                      </AuthGuard>
-                    ) : (
-                      <Index />
-                    )
-                  } 
-                />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <AppRoutes />
             </Layout>
           </BrowserRouter>
         </TooltipProvider>
