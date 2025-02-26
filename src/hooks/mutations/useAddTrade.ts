@@ -24,7 +24,6 @@ export function useAddTrade(userId: string | null) {
         user_id: userId,
         entry_date: newTrade.entry_date || datePart,
         entry_time: newTrade.entry_time || timePart,
-        exit_date: newTrade.exit_date || null,
         exit_time: newTrade.exit_time || null,
         timestamp: now
       };
