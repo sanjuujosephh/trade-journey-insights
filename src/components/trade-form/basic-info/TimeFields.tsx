@@ -18,17 +18,20 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
   };
 
   const handleTimeChange = (type: 'entry' | 'exit') => (time: string) => {
-    // Validate time format before updating
-    const isValidTime = parseTimeString(time);
-    if (isValidTime || time === '') {
-      handleChange({
-        target: {
-          name: `${type}_time`,
-          value: time
-        }
-      } as React.ChangeEvent<HTMLInputElement>);
-    } else if (time.length >= 8) { // Length of "HH:MM AM" or "HH:MM PM"
-      console.warn('Invalid time format:', time);
+    // Always update the form data with the current input
+    handleChange({
+      target: {
+        name: `${type}_time`,
+        value: time
+      }
+    } as React.ChangeEvent<HTMLInputElement>);
+
+    // Only validate when we have a complete time string
+    if (time.length >= 8) { // Length of "HH:MM AM" or "HH:MM PM"
+      const isValidTime = parseTimeString(time);
+      if (!isValidTime) {
+        console.warn('Invalid time format:', time);
+      }
     }
   };
 
