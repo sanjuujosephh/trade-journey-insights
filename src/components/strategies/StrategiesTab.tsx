@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -109,8 +110,8 @@ export function StrategiesTab() {
   const handlePayment = async (item: any, isFullPackage = false) => {
     try {
       const options = {
-        key: "rzp_test_fV1qsPBOPvFCLe",
-        amount: (isFullPackage ? 4999 : item.price) * 100,
+        key: "rzp_test_fV1qsPBOPvFCLe", // This is a test key
+        amount: (isFullPackage ? 499 : item.price) * 100,
         currency: "INR",
         name: "Trading Resources",
         description: isFullPackage ? "Unlock All Trading Strategies" : `Purchase ${item.title}`,
@@ -141,7 +142,7 @@ export function StrategiesTab() {
           <div className="col-span-full flex justify-between items-center mb-4">
             <div className="flex-grow" />
             <Button onClick={() => handlePayment(null, true)} size="lg">
-              Unlock All Strategies (₹4999)
+              Unlock All Strategies (₹499)
             </Button>
           </div>
           {tradingStrategies.map((strategy) => (

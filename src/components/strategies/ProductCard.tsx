@@ -22,11 +22,11 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <Card className="overflow-hidden">
-      <div className="aspect-video relative">
+      <div className="relative" style={{ paddingBottom: "150%" }}>
         <img 
           src={image} 
           alt={title}
-          className="object-cover w-full h-full"
+          className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
       <div className="p-4 space-y-4">
@@ -50,4 +50,3 @@ export function ProductCard({
     </Card>
   );
 }
-
