@@ -3,38 +3,20 @@
 export const formatToIST = (date: Date | null | undefined) => {
   if (!date) return { datePart: '', timePart: '' };
   
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
   
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, '0');
   const isPM = hours >= 12;
   const formattedHours = String(hours % 12 || 12).padStart(2, '0');
-  const formattedMinutes = String(minutes).padStart(2, '0');
   const ampm = isPM ? 'PM' : 'AM';
   
   return {
     datePart: `${day}-${month}-${year}`,
-    timePart: `${formattedHours}:${formattedMinutes} ${ampm}`
+    timePart: `${formattedHours}:${minutes} ${ampm}`
   };
-};
-
-// Convert Date object to IST string format
-export const dateToISTString = (date: Date): string => {
-  const { datePart, timePart } = formatToIST(date);
-  return `${datePart} ${timePart}`;
-};
-
-// Parse date string in DD-MM-YYYY format
-export const parseDateString = (dateStr: string): Date | null => {
-  if (!dateStr) return null;
-  
-  const [day, month, year] = dateStr.split('-').map(Number);
-  if (!day || !month || !year) return null;
-  
-  const date = new Date(year, month - 1, day);
-  return isNaN(date.getTime()) ? null : date;
 };
 
 // Parse time string in HH:MM AM/PM format
@@ -58,9 +40,45 @@ export const parseTimeString = (timeStr: string): Date | null => {
   return isNaN(date.getTime()) ? null : date;
 };
 
-// Validate the full date-time combination
+// Validate date string (DD-MM-YYYY format)
+export const isValidDate = (dateStr: string): boolean => {
+  if (!dateStr) return false;
+  
+  const [day, month, year] = dateStr.split('-').map(Number);
+  if (!day || !month || !year) return false;
+  
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getDate() === day &&
+    date.getMonth() === month - 1 &&
+    date.getFullYear() === year
+  );
+};
+
+// Validate time string (HH:MM AM/PM format)
+export const isValidTime = (timeStr: string): boolean => {
+  if (!timeStr) return false;
+  return parseTimeString(timeStr) !== null;
+};
+
+// Validate the combination of date and time
 export const isValidDateTime = (date: string, time: string): boolean => {
-  const parsedDate = parseDateString(date);
-  const parsedTime = parseTimeString(time);
-  return parsedDate !== null && parsedTime !== null;
+  return isValidDate(date) && isValidTime(time);
+};
+
+// Parse date string in DD-MM-YYYY format
+export const parseDateString = (dateStr: string): Date | null => {
+  if (!dateStr) return null;
+  
+  const [day, month, year] = dateStr.split('-').map(Number);
+  if (!day || !month || !year) return null;
+  
+  const date = new Date(year, month - 1, day);
+  return isNaN(date.getTime()) ? null : date;
+};
+
+// Convert Date object to IST string format
+export const dateToISTString = (date: Date): string => {
+  const { datePart, timePart } = formatToIST(date);
+  return `${datePart} ${timePart}`;
 };
