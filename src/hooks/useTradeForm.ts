@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { FormData, Trade } from "@/types/trade";
 import { AVAILABLE_SYMBOLS } from "@/constants/tradeConstants";
@@ -31,6 +32,12 @@ const emptyFormData: FormData = {
   confidence_level: "",
   entry_emotion: "",
   exit_emotion: "",
+  planned_risk_reward: "",
+  actual_risk_reward: "",
+  planned_target: "",
+  slippage: "",
+  post_exit_price: "",
+  exit_efficiency: "",
 };
 
 export function useTradeForm() {

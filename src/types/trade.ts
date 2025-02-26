@@ -34,8 +34,9 @@ export interface Trade {
   market_condition?: 'trending' | 'ranging' | 'news_driven' | 'volatile' | null;
   timeframe?: '1min' | '5min' | '15min' | '1hr' | null;
   trade_direction?: 'long' | 'short' | null;
-  
-  // Risk Management & Performance Metrics
+
+  // Risk Management & Exit Details
+  exit_reason?: 'stop_loss' | 'target' | 'manual' | 'time_based' | null;
   planned_risk_reward?: number | null;
   actual_risk_reward?: number | null;
   planned_target?: number | null;
@@ -100,4 +101,3 @@ export interface FormData {
   post_exit_price: string;
   exit_efficiency: string;
 }
-
