@@ -15,6 +15,7 @@ export function useTradeDays(currentDate: Date) {
   return useQuery({
     queryKey: ["calendar-trades", format(currentDate, "yyyy-MM")],
     queryFn: async () => {
+      // Create dates for first and last day of the month, ensuring correct day calculations
       const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
@@ -74,11 +75,7 @@ export function useTradeDays(currentDate: Date) {
 
         if (trade.actual_risk_reward !== null && trade.actual_risk_reward !== undefined) {
           tradeDays[trade.entry_date].riskReward = Number(trade.actual_risk_reward);
-        } else if (
-          trade.planned_risk_reward !== null && 
-          trade.planned_risk_reward !== undefined && 
-          tradeDays[trade.entry_date].riskReward === undefined
-        ) {
+        } else if (trade.planned_risk_reward !== null && trade.planned_risk_reward !== undefined) {
           tradeDays[trade.entry_date].riskReward = Number(trade.planned_risk_reward);
         }
       });

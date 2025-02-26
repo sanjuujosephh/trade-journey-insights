@@ -1,9 +1,9 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { AvatarSection } from "./profile/AvatarSection";
 import { PersonalInfoSection } from "./profile/PersonalInfoSection";
@@ -102,7 +102,7 @@ export function ProfileSettings() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Card className="p-6">
+      <div className="rounded-lg bg-card text-card-foreground shadow-sm p-6">
         <AvatarSection
           userId={user.id}
           avatarUrl={profile.avatar_url}
@@ -130,7 +130,7 @@ export function ProfileSettings() {
             {isLoading ? "Saving..." : "Save Changes"}
           </Button>
         </form>
-      </Card>
+      </div>
     </div>
   );
 }

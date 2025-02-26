@@ -1,8 +1,6 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Card } from "@/components/ui/card";
 import { Upload, Download } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -112,7 +110,7 @@ export function ImportTrades() {
   };
 
   return (
-    <Card className="p-6">
+    <div className="rounded-lg bg-card text-card-foreground shadow-sm p-6 mt-5 mb-[50px]">
       <div className="flex flex-col items-center gap-4">
         <h3 className="text-lg font-medium">Import/Export Trades</h3>
         <p className="text-sm text-muted-foreground text-center">
@@ -142,6 +140,6 @@ export function ImportTrades() {
           />
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
