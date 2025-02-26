@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useSupabaseClient } from "@supabase/supabase-js";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -44,7 +43,7 @@ export function StrategiesTab() {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [selectedStrategy, setSelectedStrategy] = useState<typeof strategies[0] | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const supabase = useSupabaseClient();
+  const supabase = createClientComponentClient();
 
   const handlePayment = async () => {
     try {
