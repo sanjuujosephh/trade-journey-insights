@@ -15,14 +15,8 @@ export function useTradeDays(currentDate: Date) {
   return useQuery({
     queryKey: ["calendar-trades", format(currentDate, "yyyy-MM")],
     queryFn: async () => {
-      const monthStart = new Date(currentDate);
-      monthStart.setDate(1);
-      monthStart.setHours(0, 0, 0, 0);
-      
-      const monthEnd = new Date(currentDate);
-      monthEnd.setMonth(monthEnd.getMonth() + 1);
-      monthEnd.setDate(0);
-      monthEnd.setHours(23, 59, 59, 999);
+      const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
       console.log("Fetching trades for:", {
         monthStart: formatToIST(monthStart),
@@ -86,30 +80,11 @@ export function useTradeDays(currentDate: Date) {
           tradeDays[trade.entry_date].riskReward === undefined
         ) {
           tradeDays[trade.entry_date].riskReward = Number(trade.planned_risk_reward);
-        } else if (
-          trade.exit_price && 
-          trade.entry_price && 
-          trade.stop_loss && 
-          tradeDays[trade.entry_date].riskReward === undefined
-        ) {
-          const reward = Number(trade.exit_price) - Number(trade.entry_price);
-          const risk = Math.abs(Number(trade.entry_price) - Number(trade.stop_loss));
-          if (risk !== 0) {
-            tradeDays[trade.entry_date].riskReward = Number((reward / risk).toFixed(2));
-          }
         }
-
-        if (trade.vix) tradeDays[trade.entry_date].vix = trade.vix;
-        if (trade.call_iv) tradeDays[trade.entry_date].callIv = trade.call_iv;
-        if (trade.put_iv) tradeDays[trade.entry_date].putIv = trade.put_iv;
-        if (trade.vwap_position) tradeDays[trade.entry_date].vwapPosition = trade.vwap_position;
-        if (trade.ema_position) tradeDays[trade.entry_date].emaPosition = trade.ema_position;
-        if (trade.option_type) tradeDays[trade.entry_date].option_type = trade.option_type;
-        if (trade.trade_direction) tradeDays[trade.entry_date].trade_direction = trade.trade_direction;
       });
 
-      console.log("Final tradeDays object:", tradeDays);
       return tradeDays;
     },
+    refetchOnWindowFocus: false,
   });
 }

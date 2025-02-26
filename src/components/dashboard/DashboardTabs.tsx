@@ -87,9 +87,9 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="calendar" className="mt-0 h-full">
-            <Card className="p-1 sm:p-2">
+            <div className="p-1 sm:p-2">
               <TradingCalendar />
-            </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="analysis" className="mt-0 h-full">

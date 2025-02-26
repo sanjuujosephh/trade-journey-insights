@@ -137,7 +137,7 @@ export function CalendarDayCell({
               isSelected && "ring-1 ring-primary ring-offset-2",
               dayStats
                 ? getPnLColor(dayStats.totalPnL)
-                : "hover:bg-gray-100"
+                : "bg-gray-50 hover:bg-gray-100"
             )}
           >
             {renderContent() || <div className="font-medium">{format(day, "d")}</div>}
