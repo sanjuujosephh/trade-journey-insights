@@ -36,7 +36,6 @@ export function usePayment() {
         .from('subscriptions')
         .insert({
           user_id: user.id,
-          plan_type: 'premium',
           status: 'active',
           price: 499,
           end_date: endDate.toISOString(),
