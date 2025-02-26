@@ -23,6 +23,9 @@ export const formatToIST = (date: Date | null | undefined) => {
 export const parseTimeString = (timeStr: string): Date | null => {
   if (!timeStr) return null;
   
+  // Allow partial input while typing
+  if (timeStr.length < 8) return null;
+  
   const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
   if (!match) return null;
   
