@@ -2,14 +2,28 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { usePayment } from "@/components/strategies/hooks/usePayment";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { handlePayment, subscription } = usePayment();
 
-  const handleSubscribe = () => {
-    // We'll implement this later with Razorpay integration
-    console.log("Subscribe clicked");
+  const handleSubscribe = async () => {
+    if (!user) {
+      toast.error("Please login to subscribe");
+      return;
+    }
+
+    try {
+      // Initialize payment with the full package price
+      await handlePayment(null, true);
+    } catch (error) {
+      console.error("Subscription error:", error);
+      toast.error("Failed to process subscription. Please try again.");
+    }
   };
 
   return (
