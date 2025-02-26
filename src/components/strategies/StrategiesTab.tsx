@@ -6,37 +6,44 @@ import { supabase } from "@/lib/supabase";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Lock } from "lucide-react";
 
 const strategies = [
   {
     id: 1,
     title: "Momentum Scalping Strategy",
-    description: "A short-term trading strategy that capitalizes on intraday price movements",
+    description: "A dynamic short-term trading strategy that capitalizes on intraday price movements. Perfect for day traders seeking quick profits.",
     content: "Detailed momentum scalping strategy content..."
   },
   {
     id: 2,
     title: "Option Chain Analysis",
-    description: "Learn to analyze option chains for better trade entries and exits",
+    description: "Master the art of analyzing option chains for better trade entries and exits. Learn to identify high-probability setups.",
     content: "Detailed option chain analysis strategy content..."
   },
   {
     id: 3,
     title: "Price Action Trading",
-    description: "Master the art of reading price action without indicators",
+    description: "Learn to read price action without indicators. Develop skills to interpret market psychology and price movements.",
     content: "Detailed price action trading strategy content..."
   },
   {
     id: 4,
     title: "Gap Trading Strategy",
-    description: "Capitalize on market gaps with this systematic approach",
+    description: "Systematic approach to capitalize on market gaps. Understand pre-market analysis and gap fill probability patterns.",
     content: "Detailed gap trading strategy content..."
   },
   {
     id: 5,
     title: "Volatility Trading",
-    description: "Learn to trade market volatility effectively",
+    description: "Advanced techniques for trading market volatility effectively. Master VIX analysis and volatility-based indicators.",
     content: "Detailed volatility trading strategy content..."
+  },
+  {
+    id: 6,
+    title: "Mean Reversion Strategy",
+    description: "Capitalize on market overreactions using statistical analysis. Learn to identify and trade mean reversion opportunities.",
+    content: "Detailed mean reversion strategy content..."
   }
 ];
 
@@ -48,13 +55,12 @@ export function StrategiesTab() {
   const handlePayment = async () => {
     try {
       const options = {
-        key: "rzp_test_fV1qsPBOPvFCLe", // Replace with your actual test key
-        amount: 50000, // Amount in paise (500 INR)
+        key: "rzp_test_fV1qsPBOPvFCLe",
+        amount: 49900, // Amount in paise (499 INR)
         currency: "INR",
         name: "Trading Strategies",
         description: "One-time payment to unlock all strategies",
         handler: function(response: any) {
-          // Verify payment on your backend
           setIsUnlocked(true);
           setIsPaymentDialogOpen(false);
           toast.success("Payment successful! Strategies unlocked.");
@@ -90,7 +96,7 @@ export function StrategiesTab() {
         <h2 className="text-2xl font-bold">Trading Strategies</h2>
         {!isUnlocked && (
           <Button onClick={() => setIsPaymentDialogOpen(true)} variant="default">
-            Unlock All Strategies (₹500)
+            Unlock All Strategies (₹499)
           </Button>
         )}
       </div>
@@ -99,13 +105,18 @@ export function StrategiesTab() {
         {strategies.map((strategy) => (
           <Card key={strategy.id} className="p-4">
             <h3 className="text-lg font-semibold mb-2">{strategy.title}</h3>
-            <p className="text-sm text-muted-foreground mb-4">{strategy.description}</p>
+            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{strategy.description}</p>
             <Button 
               variant={isUnlocked ? "default" : "secondary"}
               className="w-full"
               onClick={() => handleStrategyClick(strategy)}
             >
-              {isUnlocked ? "View Strategy" : "Unlock to View"}
+              {isUnlocked ? "View Strategy" : (
+                <>
+                  <Lock className="w-4 h-4 mr-2" />
+                  Locked
+                </>
+              )}
             </Button>
           </Card>
         ))}
@@ -116,12 +127,12 @@ export function StrategiesTab() {
           <DialogHeader>
             <DialogTitle>Unlock All Trading Strategies</DialogTitle>
             <DialogDescription>
-              Get lifetime access to all 5 premium trading strategies for a one-time payment of ₹500.
+              Get lifetime access to all 6 premium trading strategies for a one-time payment of ₹499.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4">
             <Button onClick={handlePayment} className="w-full">
-              Pay ₹500 to Unlock
+              Pay ₹499 to Unlock
             </Button>
           </div>
         </DialogContent>
@@ -145,3 +156,4 @@ export function StrategiesTab() {
     </div>
   );
 }
+
