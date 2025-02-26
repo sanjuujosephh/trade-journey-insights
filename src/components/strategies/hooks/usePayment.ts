@@ -29,15 +29,21 @@ export function usePayment() {
       return;
     }
 
+    if (!(window as any).Razorpay) {
+      console.error('Razorpay SDK not loaded');
+      toast.error("Payment system is not ready. Please try again later.");
+      return;
+    }
+
     try {
       console.log('Initializing payment with key:', razorpayKey);
       
       const options = {
         key: razorpayKey,
-        amount: (isFullPackage ? 499 : item.price) * 100, // Amount in paise
+        amount: (isFullPackage ? 499 : item?.price || 499) * 100, // Amount in paise
         currency: "INR",
         name: "Trading Resources",
-        description: isFullPackage ? "Unlock All Trading Strategies" : `Purchase ${item.title}`,
+        description: isFullPackage ? "Unlock All Trading Strategies" : item?.title ? `Purchase ${item.title}` : "Purchase",
         handler: function(response: any) {
           console.log('Payment success:', response);
           toast.success("Payment successful! Your purchase is complete.");
@@ -63,4 +69,3 @@ export function usePayment() {
 
   return { handlePayment };
 }
-
