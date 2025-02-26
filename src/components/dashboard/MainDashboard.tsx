@@ -7,7 +7,9 @@ import { DashboardTabs } from "./DashboardTabs";
 import { AIAnalysisPanel } from "@/components/AIAnalysisPanel";
 import { RequireSubscription } from "@/components/subscription/RequireSubscription";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export function MainDashboard() {
   const [activeTab, setActiveTab] = useState("trade-entry");
@@ -15,21 +17,26 @@ export function MainDashboard() {
   const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { user } = useAuth();
+  const { hasActiveSubscription, isLoading: isSubscriptionLoading } = useSubscription();
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile'],
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
+    queryKey: ['profile', user?.id],
     queryFn: async () => {
       try {
+        console.log('Fetching profile for user:', user?.id);
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .single();
+          .eq('id', user?.id)
+          .maybeSingle();
         
         if (error) {
           console.error('Error fetching profile:', error);
           toast.error('Failed to load profile');
           return null;
         }
+
+        console.log('Profile data:', data);
         return data;
       } catch (error) {
         console.error('Error in profile query:', error);
@@ -37,16 +44,18 @@ export function MainDashboard() {
         return null;
       }
     },
-    enabled: !!user
+    enabled: !!user?.id
   });
 
   const { data: trades = [], isLoading: isTradesLoading } = useQuery({
-    queryKey: ['trades'],
+    queryKey: ['trades', user?.id],
     queryFn: async () => {
       try {
+        console.log('Fetching trades for user:', user?.id);
         const { data, error } = await supabase
           .from('trades')
           .select('*')
+          .eq('user_id', user?.id)
           .order('entry_time', { ascending: false });
         
         if (error) {
@@ -54,6 +63,8 @@ export function MainDashboard() {
           toast.error('Failed to load trades');
           return [];
         }
+        
+        console.log('Trades data:', data);
         return data || [];
       } catch (error) {
         console.error('Error in trades query:', error);
@@ -61,7 +72,7 @@ export function MainDashboard() {
         return [];
       }
     },
-    enabled: !!user
+    enabled: !!user?.id
   });
 
   const analyzeTradesWithAI = async (options: { days?: number }) => {
@@ -86,6 +97,21 @@ export function MainDashboard() {
       setIsAnalyzing(false);
     }
   };
+
+  if (!user) {
+    console.log('No user found in MainDashboard');
+    return null;
+  }
+
+  if (isProfileLoading || isTradesLoading || isSubscriptionLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  console.log('Rendering MainDashboard with subscription status:', hasActiveSubscription);
 
   return (
     <RequireSubscription>

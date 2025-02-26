@@ -34,7 +34,7 @@ function App() {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <BrowserRouter>
-        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <ThemeProvider>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <SubscriptionProvider>
