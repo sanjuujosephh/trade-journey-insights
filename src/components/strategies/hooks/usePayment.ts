@@ -4,6 +4,16 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => reject(false);
+    document.body.appendChild(script);
+  });
+};
+
 export function usePayment() {
   const { user } = useAuth();
 
@@ -69,13 +79,12 @@ export function usePayment() {
       return;
     }
 
-    if (!(window as any).Razorpay) {
-      console.error('Razorpay SDK not loaded');
-      toast.error("Payment system is not ready. Please try again later.");
-      return;
-    }
-
     try {
+      // Load Razorpay script if not already loaded
+      if (!(window as any).Razorpay) {
+        await loadRazorpayScript();
+      }
+
       console.log('Initializing payment with key:', razorpayKey);
       const amount = (isFullPackage ? 499 : item?.price || 499) * 100; // Amount in paise
       
@@ -90,6 +99,8 @@ export function usePayment() {
           try {
             await createSubscription(response.razorpay_payment_id, amount);
             toast.success("Subscription activated successfully!");
+            // Reload the page to refresh subscription status
+            window.location.reload();
           } catch (error) {
             console.error('Error activating subscription:', error);
             toast.error("Payment processed but subscription activation failed. Please contact support.");
