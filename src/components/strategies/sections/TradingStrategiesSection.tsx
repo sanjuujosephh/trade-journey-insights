@@ -10,7 +10,7 @@ interface TradingStrategiesSectionProps {
 
 export function TradingStrategiesSection({ onUnlockAll }: TradingStrategiesSectionProps) {
   return (
-    <ProductSection title="Trading Strategies">
+    <ProductSection title="Trading Strategies" columns={3}>
       <div className="col-span-full flex justify-between items-center mb-4">
         <div className="flex-grow max-w-2xl">
           <p className="text-muted-foreground">

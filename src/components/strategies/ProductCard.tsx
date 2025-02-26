@@ -20,6 +20,8 @@ export function ProductCard({
   onPreview, 
   onBuy 
 }: ProductCardProps) {
+  const originalPrice = Math.round(price * 1.4); // 40% higher original price
+
   return (
     <Card className="overflow-hidden">
       <div className="relative" style={{ paddingBottom: "150%" }}>
@@ -34,8 +36,14 @@ export function ProductCard({
           <h4 className="font-semibold">{title}</h4>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        <div className="flex justify-between items-center">
-          <p className="font-semibold">₹{price}</p>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <p className="font-semibold text-lg">₹{price}</p>
+            <p className="text-sm text-muted-foreground line-through">₹{originalPrice}</p>
+            <span className="text-sm text-green-600 font-medium">
+              {Math.round(((originalPrice - price) / originalPrice) * 100)}% off
+            </span>
+          </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={onPreview}>
               <Eye className="w-4 h-4 mr-1" />
