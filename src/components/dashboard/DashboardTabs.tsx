@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, PenLine, BarChart2, Calendar, Brain, Bot, GraduationCap, History, Settings } from "lucide-react";
+import { Loader2, PenLine, BarChart2, Calendar, Brain, Bot, GraduationCap, History, Settings, BookText } from "lucide-react";
 import TradeEntry from "@/components/TradeEntry";
 import { FOTradeTable } from "@/components/analytics/FOTradeTable";
 import { TradeFlowChart } from "@/components/analytics/TradeFlowChart";
@@ -11,6 +11,7 @@ import { TradingCalendar } from "@/components/analytics/TradingCalendar";
 import LearningCenter from "@/components/LearningCenter";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { PerformanceMetrics } from "@/components/analytics/PerformanceMetrics";
+import { StrategiesTab } from "@/components/strategies/StrategiesTab";
 import { Trade } from "@/types/trade";
 import { cn } from "@/lib/utils";
 
@@ -24,15 +25,16 @@ interface DashboardTabsProps {
 }
 
 const tabColors = {
-  "trade-entry": "bg-[#D3E4FD]", // Soft Blue
-  "performance": "bg-[#E5DEFF]", // Soft Purple
-  "calendar": "bg-[#FFDEE2]", // Soft Pink
-  "analysis": "bg-[#F2FCE2]", // Soft Green
-  "ai-analysis": "bg-[#FEF7CD]", // Soft Yellow
-  "learning": "bg-[#FEC6A1]", // Soft Orange
-  "history": "bg-[#FDE1D3]", // Soft Peach
-  "profile": "bg-[#F1F0FB]", // Soft Gray
-};
+  "trade-entry": "bg-[#D3E4FD]",
+  "performance": "bg-[#E5DEFF]",
+  "calendar": "bg-[#FFDEE2]",
+  "analysis": "bg-[#F2FCE2]",
+  "ai-analysis": "bg-[#FEF7CD]",
+  "learning": "bg-[#FEC6A1]",
+  "history": "bg-[#FDE1D3]",
+  "strategies": "bg-[#E0F2FE]",
+  "profile": "bg-[#F1F0FB]",
+} as const;
 
 export function DashboardTabs({
   trades,
@@ -50,6 +52,7 @@ export function DashboardTabs({
     "ai-analysis": { label: "AI Analysis", icon: Bot },
     "learning": { label: "Learning Center", icon: GraduationCap },
     "history": { label: "Trade History", icon: History },
+    "strategies": { label: "Strategies", icon: BookText },
     "profile": { label: "Profile", icon: Settings }
   } as const;
 
@@ -142,6 +145,10 @@ export function DashboardTabs({
 
           <TabsContent value="learning" className="mt-0 h-full">
             <LearningCenter />
+          </TabsContent>
+
+          <TabsContent value="strategies" className="mt-0 h-full">
+            <StrategiesTab />
           </TabsContent>
 
           <TabsContent value="profile" className="mt-0 h-full">
