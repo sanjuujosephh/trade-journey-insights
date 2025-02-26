@@ -14,6 +14,16 @@ const loadRazorpayScript = () => {
   });
 };
 
+type SubscriptionData = {
+  id: string;
+  user_id: string;
+  status: string;
+  current_period_start: string;
+  current_period_end: string;
+  payment_id: string;
+  amount: number;
+};
+
 export function usePayment() {
   const { user } = useAuth();
 
@@ -29,7 +39,7 @@ export function usePayment() {
         console.error('Error fetching Razorpay key:', error);
         throw error;
       }
-      return razorpay_key || "rzp_test_fV1qsPBOPvFCLe"; // Fallback to test key
+      return razorpay_key;
     }
   });
 
@@ -42,13 +52,13 @@ export function usePayment() {
         .select('*')
         .eq('user_id', user.id)
         .eq('status', 'active')
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      if (error) {
         console.error('Error fetching subscription:', error);
         throw error;
       }
-      return data;
+      return data as SubscriptionData | null;
     },
     enabled: !!user?.id
   });
@@ -83,6 +93,11 @@ export function usePayment() {
       // Load Razorpay script if not already loaded
       if (!(window as any).Razorpay) {
         await loadRazorpayScript();
+      }
+
+      if (!razorpayKey) {
+        toast.error("Payment system is not configured. Please try again later.");
+        return;
       }
 
       console.log('Initializing payment with key:', razorpayKey);

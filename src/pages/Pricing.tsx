@@ -11,20 +11,34 @@ export default function Pricing() {
   const navigate = useNavigate();
   const { handlePayment, subscription } = usePayment();
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = () => {
     if (!user) {
       toast.error("Please login to subscribe");
       return;
     }
 
-    try {
-      // Initialize payment with the full package price
-      await handlePayment(null, true);
-    } catch (error) {
-      console.error("Subscription error:", error);
-      toast.error("Failed to process subscription. Please try again.");
-    }
+    // Initialize payment with the full package price
+    handlePayment(null, true);
   };
+
+  // If user already has an active subscription, show different content
+  if (subscription) {
+    return (
+      <div className="container max-w-6xl py-12">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold tracking-tight mb-4">
+            You're already subscribed!
+          </h1>
+          <p className="text-xl text-muted-foreground mb-8">
+            You have access to all premium features
+          </p>
+          <Button onClick={() => navigate('/')}>
+            Go to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-6xl py-12">
