@@ -34,14 +34,21 @@ export function usePayment() {
         .from('secrets')
         .select('value')
         .eq('name', 'RAZORPAY_KEY')
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error('Error fetching Razorpay key:', error);
         throw error;
       }
-      return data?.value;
-    }
+
+      if (!data) {
+        console.error('Razorpay key not found in secrets');
+        throw new Error('Razorpay key not configured');
+      }
+
+      return data.value;
+    },
+    retry: false // Don't retry if the key is not found
   });
 
   const { data: subscription } = useQuery({
