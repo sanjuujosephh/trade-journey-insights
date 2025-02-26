@@ -6,27 +6,72 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { Store, Eye } from "lucide-react";
 
+const tradingStrategies = [
+  {
+    id: 1,
+    title: "Price Action Strategy",
+    description: "Master the art of reading price action and market structure",
+    price: 4999,
+    image: "/Trading Chart"
+  },
+  {
+    id: 2,
+    title: "Options Trading Strategy",
+    description: "Learn advanced options trading strategies for consistent profits",
+    price: 4999,
+    image: "/Trading Chart"
+  },
+  {
+    id: 3,
+    title: "Momentum Trading Strategy",
+    description: "Capitalize on market momentum with proven strategies",
+    price: 4999,
+    image: "/Trading Chart"
+  },
+  {
+    id: 4,
+    title: "Breakout Trading Strategy",
+    description: "Identify and trade breakout patterns effectively",
+    price: 4999,
+    image: "/Trading Chart"
+  },
+  {
+    id: 5,
+    title: "Swing Trading Strategy",
+    description: "Master the art of swing trading for better returns",
+    price: 4999,
+    image: "/Trading Chart"
+  },
+  {
+    id: 6,
+    title: "Gap Trading Strategy",
+    description: "Learn to trade gaps for profitable opportunities",
+    price: 4999,
+    image: "/Trading Chart"
+  }
+];
+
 const tradingCharts = [
   {
     id: 1,
     title: "Candlestick Patterns Guide",
     description: "Complete guide to candlestick patterns for price action trading",
     price: 1499,
-    image: "/lovable-uploads/4d1e41fd-61c9-4177-b3e9-ab9fcc924095.png"
+    image: "/Trading Chart"
   },
   {
     id: 2,
     title: "Chart Pattern Analysis",
     description: "Advanced chart patterns for technical analysis",
     price: 1499,
-    image: "/lovable-uploads/b789d466-1a53-4f97-a532-cb7566e9594d.png"
+    image: "/Trading Chart"
   },
   {
     id: 3,
     title: "Trading Entry & Exit Guide",
     description: "Chart patterns with entry, exit and stop loss levels",
     price: 1499,
-    image: "/lovable-uploads/962cf5f2-824a-4a96-98c0-39943e994b68.png"
+    image: "/Trading Chart"
   }
 ];
 
@@ -36,21 +81,21 @@ const tradingPosters = [
     title: "Bull vs Bear Market",
     description: "Artistic visualization of market psychology",
     price: 999,
-    image: "/lovable-uploads/c0e5341f-5de0-4c37-ae64-0e7cb273aec2.png"
+    image: "/Trading Poster"
   },
   {
     id: 5,
     title: "Trading Psychology",
     description: "Wall Street wisdom in artistic form",
     price: 999,
-    image: "/lovable-uploads/0ba9828a-f1ce-4d95-9477-ed38dda44998.png"
+    image: "/Trading Poster"
   },
   {
     id: 6,
     title: "Market Wolf",
     description: "Inspiring trading motivation poster",
     price: 999,
-    image: "/lovable-uploads/efeac548-d785-4806-bb14-d51c4f29e5e3.png"
+    image: "/Trading Poster"
   }
 ];
 
@@ -91,6 +136,43 @@ export function StrategiesTab() {
     setIsPreviewOpen(true);
   };
 
+  const renderProductGrid = (products: any[], title: string) => (
+    <section>
+      <h3 className="text-xl font-semibold mb-4">{title}</h3>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {products.map((product) => (
+          <Card key={product.id} className="overflow-hidden">
+            <div className="aspect-[4/3] relative">
+              <img 
+                src={product.image} 
+                alt={product.title}
+                className="object-cover w-full h-full"
+              />
+            </div>
+            <div className="p-4 space-y-4">
+              <div>
+                <h4 className="font-semibold">{product.title}</h4>
+                <p className="text-sm text-muted-foreground">{product.description}</p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="font-semibold">₹{product.price}</p>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => handlePreview(product)}>
+                    <Eye className="w-4 h-4 mr-1" />
+                    Preview
+                  </Button>
+                  <Button size="sm" onClick={() => handlePayment(product)}>
+                    Buy Now
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </section>
+  );
+
   return (
     <div className="p-6 space-y-8">
       <div className="flex items-center gap-2 mb-8">
@@ -99,75 +181,9 @@ export function StrategiesTab() {
       </div>
 
       <div className="space-y-8">
-        <section>
-          <h3 className="text-xl font-semibold mb-4">Trading Charts</h3>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {tradingCharts.map((chart) => (
-              <Card key={chart.id} className="overflow-hidden">
-                <div className="aspect-[4/3] relative">
-                  <img 
-                    src={chart.image} 
-                    alt={chart.title}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-                <div className="p-4 space-y-4">
-                  <div>
-                    <h4 className="font-semibold">{chart.title}</h4>
-                    <p className="text-sm text-muted-foreground">{chart.description}</p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <p className="font-semibold">₹{chart.price}</p>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handlePreview(chart)}>
-                        <Eye className="w-4 h-4 mr-1" />
-                        Preview
-                      </Button>
-                      <Button size="sm" onClick={() => handlePayment(chart)}>
-                        Buy Now
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h3 className="text-xl font-semibold mb-4">Trading Posters</h3>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {tradingPosters.map((poster) => (
-              <Card key={poster.id} className="overflow-hidden">
-                <div className="aspect-[4/3] relative">
-                  <img 
-                    src={poster.image} 
-                    alt={poster.title}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-                <div className="p-4 space-y-4">
-                  <div>
-                    <h4 className="font-semibold">{poster.title}</h4>
-                    <p className="text-sm text-muted-foreground">{poster.description}</p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <p className="font-semibold">₹{poster.price}</p>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handlePreview(poster)}>
-                        <Eye className="w-4 h-4 mr-1" />
-                        Preview
-                      </Button>
-                      <Button size="sm" onClick={() => handlePayment(poster)}>
-                        Buy Now
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </section>
+        {renderProductGrid(tradingStrategies, "Trading Strategies")}
+        {renderProductGrid(tradingCharts, "Trading Charts")}
+        {renderProductGrid(tradingPosters, "Trading Posters")}
       </div>
 
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
