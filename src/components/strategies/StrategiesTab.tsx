@@ -1,12 +1,13 @@
-
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Store, Eye, Lock } from "lucide-react";
+import { Store } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { StrategyCard } from "./StrategyCard";
+import { ProductCard } from "./ProductCard";
+import { ProductSection } from "./ProductSection";
+import { PreviewDialog } from "./PreviewDialog";
 
 const tradingStrategies = [
   {
@@ -110,7 +111,7 @@ export function StrategiesTab() {
     try {
       const options = {
         key: "rzp_test_fV1qsPBOPvFCLe",
-        amount: (isFullPackage ? 4999 : item.price) * 100, // Amount in paise
+        amount: (isFullPackage ? 4999 : item.price) * 100,
         currency: "INR",
         name: "Trading Resources",
         description: isFullPackage ? "Unlock All Trading Strategies" : `Purchase ${item.title}`,
@@ -134,72 +135,6 @@ export function StrategiesTab() {
     }
   };
 
-  const handlePreview = (item: any) => {
-    setSelectedItem(item);
-    setIsPreviewOpen(true);
-  };
-
-  const renderStrategiesSection = () => (
-    <section className="mb-8">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Trading Strategies</h3>
-        <Button onClick={() => handlePayment(null, true)} size="lg">
-          Unlock All Strategies (₹4999)
-        </Button>
-      </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {tradingStrategies.map((strategy) => (
-          <Card key={strategy.id} className="overflow-hidden">
-            <div className="p-6 space-y-4">
-              <div className="flex justify-between items-start">
-                <h4 className="font-semibold">{strategy.title}</h4>
-                <Lock className="w-5 h-5 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-muted-foreground">{strategy.description}</p>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </section>
-  );
-
-  const renderProductGrid = (products: any[], title: string) => (
-    <section className="mb-8">
-      <h3 className="text-xl font-semibold mb-4">{title}</h3>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
-          <Card key={product.id} className="overflow-hidden">
-            <div className="aspect-video relative">
-              <img 
-                src={product.image} 
-                alt={product.title}
-                className="object-cover w-full h-full"
-              />
-            </div>
-            <div className="p-4 space-y-4">
-              <div>
-                <h4 className="font-semibold">{product.title}</h4>
-                <p className="text-sm text-muted-foreground">{product.description}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="font-semibold">₹{product.price}</p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handlePreview(product)}>
-                    <Eye className="w-4 h-4 mr-1" />
-                    Preview
-                  </Button>
-                  <Button size="sm" onClick={() => handlePayment(product)}>
-                    Buy Now
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </section>
-  );
-
   return (
     <div className="p-6 space-y-8">
       <div className="flex items-center gap-2 mb-8">
@@ -208,28 +143,56 @@ export function StrategiesTab() {
       </div>
 
       <div className="space-y-8">
-        {renderStrategiesSection()}
-        {renderProductGrid(tradingCharts, "Trading Charts")}
-        {renderProductGrid(tradingPosters, "Trading Posters")}
+        <ProductSection title="Trading Strategies">
+          <div className="col-span-full flex justify-between items-center mb-4">
+            <div className="flex-grow" />
+            <Button onClick={() => handlePayment(null, true)} size="lg">
+              Unlock All Strategies (₹4999)
+            </Button>
+          </div>
+          {tradingStrategies.map((strategy) => (
+            <StrategyCard
+              key={strategy.id}
+              title={strategy.title}
+              description={strategy.description}
+            />
+          ))}
+        </ProductSection>
+
+        <ProductSection title="Trading Charts">
+          {tradingCharts.map((chart) => (
+            <ProductCard
+              key={chart.id}
+              {...chart}
+              onPreview={() => {
+                setSelectedItem(chart);
+                setIsPreviewOpen(true);
+              }}
+              onBuy={() => handlePayment(chart)}
+            />
+          ))}
+        </ProductSection>
+
+        <ProductSection title="Trading Posters">
+          {tradingPosters.map((poster) => (
+            <ProductCard
+              key={poster.id}
+              {...poster}
+              onPreview={() => {
+                setSelectedItem(poster);
+                setIsPreviewOpen(true);
+              }}
+              onBuy={() => handlePayment(poster)}
+            />
+          ))}
+        </ProductSection>
       </div>
 
-      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>{selectedItem?.title}</DialogTitle>
-          </DialogHeader>
-          {selectedItem && (
-            <div className="mt-4">
-              <img 
-                src={selectedItem.image} 
-                alt={selectedItem.title}
-                className="w-full rounded-lg"
-              />
-              <p className="mt-4 text-muted-foreground">{selectedItem.description}</p>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <PreviewDialog
+        isOpen={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+        item={selectedItem}
+      />
     </div>
   );
 }
