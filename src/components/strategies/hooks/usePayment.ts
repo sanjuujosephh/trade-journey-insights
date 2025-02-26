@@ -2,8 +2,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function usePayment() {
+  const { user } = useAuth();
+
   const { data: razorpayKey } = useQuery({
     queryKey: ['razorpay-key'],
     queryFn: async () => {
@@ -12,25 +15,38 @@ export function usePayment() {
         .select('razorpay_key')
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching Razorpay key:', error);
+        throw error;
+      }
       return razorpay_key || "rzp_test_fV1qsPBOPvFCLe"; // Fallback to test key
     }
   });
 
   const handlePayment = async (item: any, isFullPackage = false) => {
+    if (!user) {
+      toast.error("Please login to make a purchase");
+      return;
+    }
+
     try {
+      console.log('Initializing payment with key:', razorpayKey);
+      
       const options = {
         key: razorpayKey,
-        amount: (isFullPackage ? 499 : item.price) * 100,
+        amount: (isFullPackage ? 499 : item.price) * 100, // Amount in paise
         currency: "INR",
         name: "Trading Resources",
         description: isFullPackage ? "Unlock All Trading Strategies" : `Purchase ${item.title}`,
         handler: function(response: any) {
+          console.log('Payment success:', response);
           toast.success("Payment successful! Your purchase is complete.");
+          // Here you would typically call your backend to verify the payment
+          // and grant access to the purchased content
         },
         prefill: {
-          name: "Trader",
-          email: "trader@example.com"
+          name: user?.email?.split('@')[0] || "Trader",
+          email: user?.email || "trader@example.com"
         },
         theme: {
           color: "#6366f1"
@@ -47,3 +63,4 @@ export function usePayment() {
 
   return { handlePayment };
 }
+
