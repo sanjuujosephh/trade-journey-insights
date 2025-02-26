@@ -23,6 +23,46 @@ export function usePayment() {
     }
   });
 
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        console.error('Error fetching subscription:', error);
+        throw error;
+      }
+      return data;
+    },
+    enabled: !!user?.id
+  });
+
+  const createSubscription = async (paymentId: string, amount: number) => {
+    if (!user?.id) return;
+
+    const { error } = await supabase
+      .from('subscriptions')
+      .insert([{
+        user_id: user.id,
+        payment_id: paymentId,
+        amount: amount,
+        status: 'active',
+        current_period_start: new Date().toISOString(),
+        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
+      }]);
+
+    if (error) {
+      console.error('Error creating subscription:', error);
+      throw error;
+    }
+  };
+
   const handlePayment = async (item: any, isFullPackage = false) => {
     if (!user) {
       toast.error("Please login to make a purchase");
@@ -37,18 +77,23 @@ export function usePayment() {
 
     try {
       console.log('Initializing payment with key:', razorpayKey);
+      const amount = (isFullPackage ? 499 : item?.price || 499) * 100; // Amount in paise
       
       const options = {
         key: razorpayKey,
-        amount: (isFullPackage ? 499 : item?.price || 499) * 100, // Amount in paise
+        amount: amount,
         currency: "INR",
         name: "Trading Resources",
-        description: isFullPackage ? "Unlock All Trading Strategies" : item?.title ? `Purchase ${item.title}` : "Purchase",
-        handler: function(response: any) {
+        description: isFullPackage ? "Monthly Subscription - All Trading Strategies" : item?.title ? `Monthly Subscription - ${item.title}` : "Monthly Subscription",
+        handler: async function(response: any) {
           console.log('Payment success:', response);
-          toast.success("Payment successful! Your purchase is complete.");
-          // Here you would typically call your backend to verify the payment
-          // and grant access to the purchased content
+          try {
+            await createSubscription(response.razorpay_payment_id, amount);
+            toast.success("Subscription activated successfully!");
+          } catch (error) {
+            console.error('Error activating subscription:', error);
+            toast.error("Payment processed but subscription activation failed. Please contact support.");
+          }
         },
         prefill: {
           name: user?.email?.split('@')[0] || "Trader",
@@ -67,5 +112,5 @@ export function usePayment() {
     }
   };
 
-  return { handlePayment };
+  return { handlePayment, subscription };
 }
