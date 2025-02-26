@@ -2,68 +2,72 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Lock } from "lucide-react";
+import { Store, Eye } from "lucide-react";
 
-const strategies = [
+const tradingCharts = [
   {
     id: 1,
-    title: "Momentum Scalping Strategy",
-    description: "A dynamic short-term trading strategy that capitalizes on intraday price movements. Perfect for day traders seeking quick profits.",
-    content: "Detailed momentum scalping strategy content..."
+    title: "Candlestick Patterns Guide",
+    description: "Complete guide to candlestick patterns for price action trading",
+    price: 1499,
+    image: "/lovable-uploads/4d1e41fd-61c9-4177-b3e9-ab9fcc924095.png"
   },
   {
     id: 2,
-    title: "Option Chain Analysis",
-    description: "Master the art of analyzing option chains for better trade entries and exits. Learn to identify high-probability setups.",
-    content: "Detailed option chain analysis strategy content..."
+    title: "Chart Pattern Analysis",
+    description: "Advanced chart patterns for technical analysis",
+    price: 1499,
+    image: "/lovable-uploads/b789d466-1a53-4f97-a532-cb7566e9594d.png"
   },
   {
     id: 3,
-    title: "Price Action Trading",
-    description: "Learn to read price action without indicators. Develop skills to interpret market psychology and price movements.",
-    content: "Detailed price action trading strategy content..."
-  },
+    title: "Trading Entry & Exit Guide",
+    description: "Chart patterns with entry, exit and stop loss levels",
+    price: 1499,
+    image: "/lovable-uploads/962cf5f2-824a-4a96-98c0-39943e994b68.png"
+  }
+];
+
+const tradingPosters = [
   {
     id: 4,
-    title: "Gap Trading Strategy",
-    description: "Systematic approach to capitalize on market gaps. Understand pre-market analysis and gap fill probability patterns.",
-    content: "Detailed gap trading strategy content..."
+    title: "Bull vs Bear Market",
+    description: "Artistic visualization of market psychology",
+    price: 999,
+    image: "/lovable-uploads/c0e5341f-5de0-4c37-ae64-0e7cb273aec2.png"
   },
   {
     id: 5,
-    title: "Volatility Trading",
-    description: "Advanced techniques for trading market volatility effectively. Master VIX analysis and volatility-based indicators.",
-    content: "Detailed volatility trading strategy content..."
+    title: "Trading Psychology",
+    description: "Wall Street wisdom in artistic form",
+    price: 999,
+    image: "/lovable-uploads/0ba9828a-f1ce-4d95-9477-ed38dda44998.png"
   },
   {
     id: 6,
-    title: "Mean Reversion Strategy",
-    description: "Capitalize on market overreactions using statistical analysis. Learn to identify and trade mean reversion opportunities.",
-    content: "Detailed mean reversion strategy content..."
+    title: "Market Wolf",
+    description: "Inspiring trading motivation poster",
+    price: 999,
+    image: "/lovable-uploads/efeac548-d785-4806-bb14-d51c4f29e5e3.png"
   }
 ];
 
 export function StrategiesTab() {
-  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
-  const [selectedStrategy, setSelectedStrategy] = useState<typeof strategies[0] | null>(null);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const handlePayment = async () => {
+  const handlePayment = async (item: any) => {
     try {
       const options = {
         key: "rzp_test_fV1qsPBOPvFCLe",
-        amount: 49900, // Amount in paise (499 INR)
+        amount: item.price * 100, // Amount in paise
         currency: "INR",
-        name: "Trading Strategies",
-        description: "One-time payment to unlock all strategies",
+        name: "Trading Resources",
+        description: `Purchase ${item.title}`,
         handler: function(response: any) {
-          setIsUnlocked(true);
-          setIsPaymentDialogOpen(false);
-          toast.success("Payment successful! Strategies unlocked.");
+          toast.success("Payment successful! Your purchase is complete.");
         },
         prefill: {
           name: "Trader",
@@ -82,78 +86,107 @@ export function StrategiesTab() {
     }
   };
 
-  const handleStrategyClick = (strategy: typeof strategies[0]) => {
-    if (!isUnlocked) {
-      setIsPaymentDialogOpen(true);
-      return;
-    }
-    setSelectedStrategy(strategy);
+  const handlePreview = (item: any) => {
+    setSelectedItem(item);
+    setIsPreviewOpen(true);
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Trading Strategies</h2>
-        {!isUnlocked && (
-          <Button onClick={() => setIsPaymentDialogOpen(true)} variant="default">
-            Unlock All Strategies (₹499)
-          </Button>
-        )}
+    <div className="p-6 space-y-8">
+      <div className="flex items-center gap-2 mb-8">
+        <Store className="w-6 h-6" />
+        <h2 className="text-2xl font-bold">Trading Resources Shop</h2>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {strategies.map((strategy) => (
-          <Card key={strategy.id} className="p-4">
-            <h3 className="text-lg font-semibold mb-2">{strategy.title}</h3>
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{strategy.description}</p>
-            <Button 
-              variant={isUnlocked ? "default" : "secondary"}
-              className="w-full"
-              onClick={() => handleStrategyClick(strategy)}
-            >
-              {isUnlocked ? "View Strategy" : (
-                <>
-                  <Lock className="w-4 h-4 mr-2" />
-                  Locked
-                </>
-              )}
-            </Button>
-          </Card>
-        ))}
-      </div>
-
-      <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Unlock All Trading Strategies</DialogTitle>
-            <DialogDescription>
-              Get lifetime access to all 6 premium trading strategies for a one-time payment of ₹499.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4">
-            <Button onClick={handlePayment} className="w-full">
-              Pay ₹499 to Unlock
-            </Button>
+      <div className="space-y-8">
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Trading Charts</h3>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {tradingCharts.map((chart) => (
+              <Card key={chart.id} className="overflow-hidden">
+                <div className="aspect-[4/3] relative">
+                  <img 
+                    src={chart.image} 
+                    alt={chart.title}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <div className="p-4 space-y-4">
+                  <div>
+                    <h4 className="font-semibold">{chart.title}</h4>
+                    <p className="text-sm text-muted-foreground">{chart.description}</p>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold">₹{chart.price}</p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handlePreview(chart)}>
+                        <Eye className="w-4 h-4 mr-1" />
+                        Preview
+                      </Button>
+                      <Button size="sm" onClick={() => handlePayment(chart)}>
+                        Buy Now
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
+        </section>
+
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Trading Posters</h3>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {tradingPosters.map((poster) => (
+              <Card key={poster.id} className="overflow-hidden">
+                <div className="aspect-[4/3] relative">
+                  <img 
+                    src={poster.image} 
+                    alt={poster.title}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <div className="p-4 space-y-4">
+                  <div>
+                    <h4 className="font-semibold">{poster.title}</h4>
+                    <p className="text-sm text-muted-foreground">{poster.description}</p>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold">₹{poster.price}</p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handlePreview(poster)}>
+                        <Eye className="w-4 h-4 mr-1" />
+                        Preview
+                      </Button>
+                      <Button size="sm" onClick={() => handlePayment(poster)}>
+                        Buy Now
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{selectedItem?.title}</DialogTitle>
+          </DialogHeader>
+          {selectedItem && (
+            <div className="mt-4">
+              <img 
+                src={selectedItem.image} 
+                alt={selectedItem.title}
+                className="w-full rounded-lg"
+              />
+              <p className="mt-4 text-muted-foreground">{selectedItem.description}</p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
-
-      <Sheet open={!!selectedStrategy} onOpenChange={() => setSelectedStrategy(null)}>
-        <SheetContent side="left" className="w-[90vw] sm:w-[540px]">
-          <SheetHeader>
-            <SheetTitle>{selectedStrategy?.title}</SheetTitle>
-            <SheetDescription>
-              {selectedStrategy?.description}
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-6">
-            <p className="text-sm leading-relaxed">
-              {selectedStrategy?.content}
-            </p>
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
-
