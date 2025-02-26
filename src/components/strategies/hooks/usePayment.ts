@@ -29,6 +29,9 @@ export function usePayment() {
     if (!user?.id) return;
     
     try {
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 1);
+
       const { error } = await supabase
         .from('subscriptions')
         .insert({
@@ -36,6 +39,7 @@ export function usePayment() {
           plan_type: 'premium',
           status: 'active',
           price: 499,
+          end_date: endDate.toISOString(),
         });
 
       if (error) throw error;

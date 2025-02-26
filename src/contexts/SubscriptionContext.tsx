@@ -9,7 +9,6 @@ interface Subscription {
   id: string;
   status: "active" | "pending" | "cancelled";
   end_date: string;
-  plan_type: string;
   price: number;
 }
 
@@ -37,7 +36,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching subscription:', error);
