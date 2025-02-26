@@ -247,6 +247,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_active_subscription: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       product_type: "chart" | "poster"

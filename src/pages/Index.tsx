@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +6,7 @@ import { LandingPage } from "@/components/landing/LandingPage";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { AIAnalysisPanel } from "@/components/AIAnalysisPanel";
+import { RequireSubscription } from "@/components/subscription/RequireSubscription";
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
@@ -88,26 +88,28 @@ export default function Index() {
   }
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="container py-4">
-        <DashboardHeader profile={profile} user={user} />
-        <div className="mt-8">
-          <DashboardTabs
-            trades={trades}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            isAnalyzing={isAnalyzing}
-            currentAnalysis={currentAnalysis}
-            analyzeTradesWithAI={analyzeTradesWithAI}
-          />
+    <RequireSubscription>
+      <div className="bg-background min-h-screen">
+        <div className="container py-4">
+          <DashboardHeader profile={profile} user={user} />
+          <div className="mt-8">
+            <DashboardTabs
+              trades={trades}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              isAnalyzing={isAnalyzing}
+              currentAnalysis={currentAnalysis}
+              analyzeTradesWithAI={analyzeTradesWithAI}
+            />
+          </div>
         </div>
-      </div>
 
-      <AIAnalysisPanel
-        isOpen={isAnalysisPanelOpen}
-        onClose={() => setIsAnalysisPanelOpen(false)}
-        analysis={currentAnalysis}
-      />
-    </div>
+        <AIAnalysisPanel 
+          isOpen={isAnalysisPanelOpen}
+          onClose={() => setIsAnalysisPanelOpen(false)}
+          analysis={currentAnalysis}
+        />
+      </div>
+    </RequireSubscription>
   );
 }

@@ -1,103 +1,48 @@
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import React from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { UserMenu } from "./components/auth/UserMenu";
-import { useAuth } from "./contexts/AuthContext";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import { Button } from "./components/ui/button";
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "./contexts/ThemeProvider";
-import { TraderInfo } from "./components/TraderInfo";
-import { AuthModal } from "./components/auth/AuthModal";
-import { Footer } from "./components/Footer";
-import { MonthlyPnL } from "./components/MonthlyPnL";
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ErrorBoundary } from 'react-error-boundary';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Index from './pages/Index';
+import ResetPassword from './pages/ResetPassword';
+import AuthCallback from './pages/AuthCallback';
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  
+function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
   return (
-    <div data-theme-toggle>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      >
-        {theme === "light" ? (
-          <Moon className="h-5 w-5" />
-        ) : (
-          <Sun className="h-5 w-5" />
-        )}
-      </Button>
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: 'red' }}>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Try again</button>
     </div>
   );
 }
 
-function Navigation() {
-  const { user } = useAuth();
-  
+function App() {
   return (
-    <div className="h-16 border-b bg-background sticky top-0 z-10">
-      <div className="flex h-full items-center px-4 container mx-auto">
-        <div className="flex-1 md:block hidden">
-          <TraderInfo />
-        </div>
-        <div className="flex-1 flex md:justify-center justify-start">
-          <Link to="/" className="text-xl font-medium hover:opacity-80 transition-opacity">
-            Onetradejournal
-          </Link>
-        </div>
-        <div className="flex-1 flex justify-end items-center gap-2">
-          {user && <MonthlyPnL />}
-          <ThemeToggle />
-          <div data-user-nav>
-            {user ? <UserMenu /> : <AuthModal />}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navigation />
-      <main className="flex-1">
-        {children}
-      </main>
-      <Footer />
-    </div>
-  );
-}
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <AuthProvider>
+            <SubscriptionProvider>
+              <Router>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                </Routes>
+              </Router>
+            </SubscriptionProvider>
+          </AuthProvider>
+        </ThemeProvider>
         <Toaster />
-        <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
+}
 
 export default App;
