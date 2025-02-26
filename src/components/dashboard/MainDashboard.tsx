@@ -6,12 +6,14 @@ import { DashboardHeader } from "./DashboardHeader";
 import { DashboardTabs } from "./DashboardTabs";
 import { AIAnalysisPanel } from "@/components/AIAnalysisPanel";
 import { RequireSubscription } from "@/components/subscription/RequireSubscription";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function MainDashboard() {
   const [activeTab, setActiveTab] = useState("trade-entry");
   const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { user } = useAuth();
 
   const { data: profile } = useQuery({
     queryKey: ['profile'],
@@ -80,7 +82,7 @@ export function MainDashboard() {
     <RequireSubscription>
       <div className="bg-background min-h-screen">
         <div className="container py-4">
-          <DashboardHeader profile={profile} />
+          <DashboardHeader profile={profile} user={user} />
           <div className="mt-8">
             <DashboardTabs
               trades={trades}
