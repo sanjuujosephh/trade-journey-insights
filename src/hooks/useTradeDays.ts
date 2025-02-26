@@ -4,11 +4,6 @@ import { supabase } from "@/lib/supabase";
 import dayjs from "dayjs";
 import { TradeDay } from "@/components/analytics/calendar/calendarUtils";
 
-const formatToIST = (date: Date) => {
-  const d = dayjs(date).format('YYYY-MM-DD');
-  return d;
-};
-
 export function useTradeDays(currentDate: Date) {
   return useQuery({
     queryKey: ["calendar-trades", dayjs(currentDate).format("YYYY-MM")],
@@ -17,16 +12,20 @@ export function useTradeDays(currentDate: Date) {
       const monthStart = dayjs(currentDate).startOf('month');
       const monthEnd = dayjs(currentDate).endOf('month');
 
-      console.log("Fetching trades for:", {
-        monthStart: formatToIST(monthStart.toDate()),
-        monthEnd: formatToIST(monthEnd.toDate())
+      // Format dates as DD-MM-YYYY to match database format
+      const startDate = monthStart.format('DD-MM-YYYY');
+      const endDate = monthEnd.format('DD-MM-YYYY');
+
+      console.log("Fetching trades between:", {
+        monthStart: startDate,
+        monthEnd: endDate
       });
 
       const { data: trades, error } = await supabase
         .from("trades")
         .select("*")
-        .gte("entry_date", formatToIST(monthStart.toDate()))
-        .lte("entry_date", formatToIST(monthEnd.toDate()))
+        .gte("entry_date", startDate)
+        .lte("entry_date", endDate)
         .order("entry_time");
       
       if (error) {
@@ -46,7 +45,9 @@ export function useTradeDays(currentDate: Date) {
           return;
         }
         
-        const formattedDate = trade.entry_date;
+        // Convert DD-MM-YYYY to YYYY-MM-DD for internal calendar use
+        const dateParts = trade.entry_date.split('-');
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
         
         if (!tradeDays[formattedDate]) {
           tradeDays[formattedDate] = {
