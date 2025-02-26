@@ -7,6 +7,7 @@ import { DashboardTabs } from "./DashboardTabs";
 import { AIAnalysisPanel } from "@/components/AIAnalysisPanel";
 import { RequireSubscription } from "@/components/subscription/RequireSubscription";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export function MainDashboard() {
   const [activeTab, setActiveTab] = useState("trade-entry");
@@ -26,14 +27,17 @@ export function MainDashboard() {
         
         if (error) {
           console.error('Error fetching profile:', error);
+          toast.error('Failed to load profile');
           return null;
         }
         return data;
       } catch (error) {
         console.error('Error in profile query:', error);
+        toast.error('Failed to load profile');
         return null;
       }
-    }
+    },
+    enabled: !!user
   });
 
   const { data: trades = [], isLoading: isTradesLoading } = useQuery({
@@ -47,14 +51,17 @@ export function MainDashboard() {
         
         if (error) {
           console.error('Error fetching trades:', error);
+          toast.error('Failed to load trades');
           return [];
         }
         return data || [];
       } catch (error) {
         console.error('Error in trades query:', error);
+        toast.error('Failed to load trades');
         return [];
       }
-    }
+    },
+    enabled: !!user
   });
 
   const analyzeTradesWithAI = async (options: { days?: number }) => {
@@ -66,6 +73,7 @@ export function MainDashboard() {
 
       if (response.error) {
         console.error('AI Analysis error:', response.error);
+        toast.error('Failed to analyze trades');
         throw new Error(response.error.message || 'Failed to analyze trades');
       }
 
@@ -73,6 +81,7 @@ export function MainDashboard() {
       setIsAnalysisPanelOpen(true);
     } catch (error) {
       console.error('AI Analysis error:', error);
+      toast.error('Failed to analyze trades');
     } finally {
       setIsAnalyzing(false);
     }
