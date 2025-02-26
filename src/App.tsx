@@ -1,58 +1,103 @@
-
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "@/contexts/ThemeProvider";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
-import { ErrorBoundary } from 'react-error-boundary';
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { UserMenu } from "./components/auth/UserMenu";
+import { useAuth } from "./contexts/AuthContext";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import { Button } from "./components/ui/button";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "./contexts/ThemeProvider";
+import { TraderInfo } from "./components/TraderInfo";
+import { AuthModal } from "./components/auth/AuthModal";
+import { Footer } from "./components/Footer";
+import { MonthlyPnL } from "./components/MonthlyPnL";
 
-import Index from "@/pages/Index";
-import AuthCallback from "@/pages/AuthCallback";
-import Shop from "@/pages/Shop";
-import NotFound from "@/pages/NotFound";
-import ResetPassword from "@/pages/ResetPassword";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-const queryClient = new QueryClient();
-
-function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  
   return (
-    <div role="alert" className="p-4">
-      <p className="text-red-500 font-bold">Something went wrong:</p>
-      <pre className="mt-2 text-red-400 bg-red-50 p-2 rounded">{error.message}</pre>
-      <button 
-        onClick={resetErrorBoundary}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+    <div data-theme-toggle>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       >
-        Try again
-      </button>
+        {theme === "light" ? (
+          <Moon className="h-5 w-5" />
+        ) : (
+          <Sun className="h-5 w-5" />
+        )}
+      </Button>
     </div>
   );
 }
 
-function App() {
+function Navigation() {
+  const { user } = useAuth();
+  
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <BrowserRouter>
-        <ThemeProvider>
-          <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-              <SubscriptionProvider>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth/callback" element={<AuthCallback />} />
-                  <Route path="/shop" element={<Shop />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                <Toaster />
-              </SubscriptionProvider>
-            </AuthProvider>
-          </QueryClientProvider>
-        </ThemeProvider>
-      </BrowserRouter>
-    </ErrorBoundary>
+    <div className="h-16 border-b bg-background sticky top-0 z-10">
+      <div className="flex h-full items-center px-4 container mx-auto">
+        <div className="flex-1 md:block hidden">
+          <TraderInfo />
+        </div>
+        <div className="flex-1 flex md:justify-center justify-start">
+          <Link to="/" className="text-xl font-medium hover:opacity-80 transition-opacity">
+            Onetradejournal
+          </Link>
+        </div>
+        <div className="flex-1 flex justify-end items-center gap-2">
+          {user && <MonthlyPnL />}
+          <ThemeToggle />
+          <div data-user-nav>
+            {user ? <UserMenu /> : <AuthModal />}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
+
+function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navigation />
+      <main className="flex-1">
+        {children}
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;

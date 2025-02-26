@@ -86,7 +86,6 @@ export type Database = {
           created_at: string | null
           current_period_end: string | null
           current_period_start: string | null
-          end_date: string | null
           id: string
           razorpay_customer_id: string | null
           razorpay_subscription_id: string | null
@@ -98,7 +97,6 @@ export type Database = {
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
-          end_date?: string | null
           id?: string
           razorpay_customer_id?: string | null
           razorpay_subscription_id?: string | null
@@ -110,7 +108,6 @@ export type Database = {
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
-          end_date?: string | null
           id?: string
           razorpay_customer_id?: string | null
           razorpay_subscription_id?: string | null
@@ -246,12 +243,6 @@ export type Database = {
       check_trade_limit: {
         Args: {
           entry_date: string
-          user_id: string
-        }
-        Returns: boolean
-      }
-      has_active_subscription: {
-        Args: {
           user_id: string
         }
         Returns: boolean

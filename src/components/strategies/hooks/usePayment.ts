@@ -3,11 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { useSubscription } from "@/contexts/SubscriptionContext";
 
 export function usePayment() {
   const { user } = useAuth();
-  const { refetchSubscription } = useSubscription();
 
   const { data: razorpayKey } = useQuery({
     queryKey: ['razorpay-key'],
@@ -25,32 +23,6 @@ export function usePayment() {
     }
   });
 
-  const createSubscription = async () => {
-    if (!user?.id) return;
-    
-    try {
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 1);
-
-      const { error } = await supabase
-        .from('subscriptions')
-        .insert({
-          user_id: user.id,
-          status: 'active',
-          price: 499,
-          end_date: endDate.toISOString(),
-        });
-
-      if (error) throw error;
-      
-      await refetchSubscription();
-      toast.success("Subscription activated successfully!");
-    } catch (error) {
-      console.error('Error creating subscription:', error);
-      toast.error("Failed to create subscription");
-    }
-  };
-
   const handlePayment = async (item: any, isFullPackage = false) => {
     if (!user) {
       toast.error("Please login to make a purchase");
@@ -66,12 +38,11 @@ export function usePayment() {
         currency: "INR",
         name: "Trading Resources",
         description: isFullPackage ? "Unlock All Trading Strategies" : `Purchase ${item.title}`,
-        handler: async function(response: any) {
+        handler: function(response: any) {
           console.log('Payment success:', response);
-          if (isFullPackage) {
-            await createSubscription();
-          }
-          toast.success("Payment successful!");
+          toast.success("Payment successful! Your purchase is complete.");
+          // Here you would typically call your backend to verify the payment
+          // and grant access to the purchased content
         },
         prefill: {
           name: user?.email?.split('@')[0] || "Trader",
@@ -92,3 +63,4 @@ export function usePayment() {
 
   return { handlePayment };
 }
+
