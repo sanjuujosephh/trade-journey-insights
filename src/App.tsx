@@ -53,7 +53,7 @@ function Navigation() {
     <div className="h-16 border-b bg-background sticky top-0 z-10">
       <div className="flex h-full items-center px-4 container mx-auto">
         <div className="flex-1 md:block hidden">
-          {user && <TraderInfo />}
+          <TraderInfo />
         </div>
         <div className="flex-1 flex md:justify-center justify-start">
           <Link to="/" className="text-xl font-medium hover:opacity-80 transition-opacity">
