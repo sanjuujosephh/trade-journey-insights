@@ -1,34 +1,32 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import { TradeDay } from "@/components/analytics/calendar/calendarUtils";
 
 const formatToIST = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  const d = dayjs(date).format('YYYY-MM-DD');
+  return d;
 };
 
 export function useTradeDays(currentDate: Date) {
   return useQuery({
-    queryKey: ["calendar-trades", format(currentDate, "yyyy-MM")],
+    queryKey: ["calendar-trades", dayjs(currentDate).format("YYYY-MM")],
     queryFn: async () => {
-      // Create dates for first and last day of the month
-      const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      // Create dates for first and last day of the month using dayjs
+      const monthStart = dayjs(currentDate).startOf('month');
+      const monthEnd = dayjs(currentDate).endOf('month');
 
       console.log("Fetching trades for:", {
-        monthStart: formatToIST(monthStart),
-        monthEnd: formatToIST(monthEnd)
+        monthStart: formatToIST(monthStart.toDate()),
+        monthEnd: formatToIST(monthEnd.toDate())
       });
 
       const { data: trades, error } = await supabase
         .from("trades")
         .select("*")
-        .gte("entry_date", formatToIST(monthStart))
-        .lte("entry_date", formatToIST(monthEnd))
+        .gte("entry_date", formatToIST(monthStart.toDate()))
+        .lte("entry_date", formatToIST(monthEnd.toDate()))
         .order("entry_time");
       
       if (error) {

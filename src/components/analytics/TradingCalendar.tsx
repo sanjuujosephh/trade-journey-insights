@@ -1,6 +1,8 @@
 
 import { useState } from "react";
-import { startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { useTradeDays } from "@/hooks/useTradeDays";
 import { CalendarHeader } from "./calendar/CalendarHeader";
 import { PnLCalendarView } from "./calendar/views/PnLCalendarView";
@@ -8,31 +10,38 @@ import { OptionsCalendarView } from "./calendar/views/OptionsCalendarView";
 import { PsychologyCalendarView } from "./calendar/views/PsychologyCalendarView";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
+// Initialize dayjs plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// Set default timezone to user's local timezone
+dayjs.tz.setDefault(dayjs.tz.guess());
+
 export function TradingCalendar() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [currentDate, setCurrentDate] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
 
-  const { data: tradeDays = {}, isLoading } = useTradeDays(currentDate);
+  const { data: tradeDays = {}, isLoading } = useTradeDays(currentDate.toDate());
 
-  const daysInMonth = eachDayOfInterval({
-    start: startOfMonth(currentDate),
-    end: endOfMonth(currentDate),
+  // Generate days in the current month
+  const daysInMonth = Array.from({ length: currentDate.daysInMonth() }, (_, i) => {
+    return currentDate.startOf('month').add(i, 'day').toDate();
   });
 
   const handlePreviousMonth = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(currentDate.getMonth() - 1);
-    setCurrentDate(newDate);
+    setCurrentDate(currentDate.subtract(1, 'month'));
   };
 
   const handleNextMonth = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(currentDate.getMonth() + 1);
-    setCurrentDate(newDate);
+    setCurrentDate(currentDate.add(1, 'month'));
   };
 
   const handleToday = () => {
-    setCurrentDate(new Date());
+    setCurrentDate(dayjs());
+  };
+
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(dayjs(date));
   };
 
   if (isLoading) {
@@ -42,7 +51,7 @@ export function TradingCalendar() {
   return (
     <div className="space-y-8">
       <CalendarHeader
-        currentDate={currentDate}
+        currentDate={currentDate.toDate()}
         onPreviousMonth={handlePreviousMonth}
         onNextMonth={handleNextMonth}
         onToday={handleToday}
@@ -52,30 +61,30 @@ export function TradingCalendar() {
         <ErrorBoundary>
           <PnLCalendarView
             days={daysInMonth}
-            currentDate={currentDate}
+            currentDate={currentDate.toDate()}
             tradeDays={tradeDays}
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
+            selectedDate={selectedDate?.toDate() || null}
+            onDateSelect={handleDateSelect}
           />
         </ErrorBoundary>
 
         <ErrorBoundary>
           <OptionsCalendarView
             days={daysInMonth}
-            currentDate={currentDate}
+            currentDate={currentDate.toDate()}
             tradeDays={tradeDays}
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
+            selectedDate={selectedDate?.toDate() || null}
+            onDateSelect={handleDateSelect}
           />
         </ErrorBoundary>
 
         <ErrorBoundary>
           <PsychologyCalendarView
             days={daysInMonth}
-            currentDate={currentDate}
+            currentDate={currentDate.toDate()}
             tradeDays={tradeDays}
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
+            selectedDate={selectedDate?.toDate() || null}
+            onDateSelect={handleDateSelect}
           />
         </ErrorBoundary>
       </div>

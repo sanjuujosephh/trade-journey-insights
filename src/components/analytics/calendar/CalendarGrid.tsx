@@ -1,5 +1,7 @@
 
+import dayjs from "dayjs";
 import { DayStats, TradeDay } from "./calendarUtils";
+import { CalendarDayCell } from "./CalendarDayCell";
 
 interface CalendarGridProps {
   days: Date[];
@@ -10,8 +12,6 @@ interface CalendarGridProps {
   onDateSelect: (date: Date) => void;
 }
 
-import { CalendarDayCell } from "./CalendarDayCell";
-
 export function CalendarGrid({ 
   days, 
   currentDate, 
@@ -21,11 +21,15 @@ export function CalendarGrid({
   onDateSelect
 }: CalendarGridProps) {
   const formatDateKey = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${day}-${month}-${year}`;
+    return dayjs(date).format('YYYY-MM-DD');
   };
+
+  // Get the day of week for the first day of the month
+  const firstDayOfMonth = dayjs(currentDate).startOf('month');
+  const startingDayOfWeek = firstDayOfMonth.day();
+
+  // Create array for empty cells before the first day
+  const emptyCells = Array(startingDayOfWeek).fill(null);
 
   return (
     <div className="grid grid-cols-7 gap-2">
@@ -36,6 +40,9 @@ export function CalendarGrid({
         >
           {day}
         </div>
+      ))}
+      {emptyCells.map((_, index) => (
+        <div key={`empty-${index}`} className="min-h-[75px]" />
       ))}
       {days.map((day) => (
         <CalendarDayCell
