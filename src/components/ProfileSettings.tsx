@@ -1,15 +1,9 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { AvatarSection } from "./profile/AvatarSection";
-import { PersonalInfoSection } from "./profile/PersonalInfoSection";
-import { SocialMediaSection } from "./profile/SocialMediaSection";
-import { CalendarDays, CreditCard } from "lucide-react";
-import { format } from "date-fns";
+import { ProfileForm } from "./profile/ProfileForm";
+import { SubscriptionInfoSection } from "./profile/SubscriptionInfoSection";
 
 type Profile = {
   username: string | null;
@@ -30,7 +24,6 @@ type Subscription = {
 
 export function ProfileSettings() {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [profile, setProfile] = useState<Profile>({
     username: "",
     first_name: "",
@@ -40,7 +33,6 @@ export function ProfileSettings() {
     telegram_id: "",
     avatar_url: null,
   });
-  const [isLoading, setIsLoading] = useState(false);
 
   const { data: profileData, refetch } = useQuery({
     queryKey: ["profile", user?.id],
@@ -73,48 +65,6 @@ export function ProfileSettings() {
     enabled: !!user?.id,
   });
 
-  const handleProfileChange = (field: keyof Profile, value: string) => {
-    setProfile(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user?.id) return;
-
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          username: profile.username,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          phone_number: profile.phone_number,
-          twitter_id: profile.twitter_id,
-          telegram_id: profile.telegram_id,
-        })
-        .eq("id", user.id);
-
-      if (error) throw error;
-
-      await refetch();
-      
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive",
-      });
-      console.error("Error updating profile:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useState(() => {
     if (profileData) {
       setProfile(profileData);
@@ -123,109 +73,15 @@ export function ProfileSettings() {
 
   if (!user) return null;
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "N/A";
-    return format(new Date(dateString), "dd MMM yyyy");
-  };
-
-  const getStatusBadgeColor = (status: string | undefined) => {
-    switch (status) {
-      case "active":
-        return "bg-emerald-50 text-emerald-700 border border-emerald-200";
-      case "canceled":
-        return "bg-red-50 text-red-700 border border-red-200";
-      case "paused":
-        return "bg-yellow-50 text-yellow-700 border border-yellow-200";
-      default:
-        return "bg-gray-50 text-gray-700 border border-gray-200";
-    }
-  };
-
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Profile Information Column */}
-        <div className="space-y-8">
-          <div className="rounded-lg bg-white p-6 border">
-            <AvatarSection
-              userId={user.id}
-              avatarUrl={profile.avatar_url}
-              username={profile.username}
-              email={user.email}
-              refetch={refetch}
-            />
-
-            <form onSubmit={handleSubmit} className="space-y-6 mt-8">
-              <PersonalInfoSection
-                firstName={profile.first_name}
-                lastName={profile.last_name}
-                username={profile.username}
-                phoneNumber={profile.phone_number}
-                onChange={handleProfileChange}
-              />
-
-              <SocialMediaSection
-                twitterId={profile.twitter_id}
-                telegramId={profile.telegram_id}
-                onChange={handleProfileChange}
-              />
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save Changes"}
-              </Button>
-            </form>
-          </div>
-        </div>
-
-        {/* Subscription Information Column */}
-        <div className="rounded-lg bg-white p-6 border">
-          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Subscription Information
-          </h2>
-
-          <div className="space-y-6">
-            <div>
-              <div className="text-sm text-gray-500 mb-2">Subscription Status</div>
-              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(subscription?.status)}`}>
-                {subscription?.status || "No active subscription"}
-              </span>
-            </div>
-
-            {subscription?.razorpay_subscription_id && (
-              <div>
-                <div className="text-sm text-gray-500 mb-2">Subscription ID</div>
-                <div className="font-mono text-sm bg-gray-50 p-2 rounded border">
-                  {subscription.razorpay_subscription_id}
-                </div>
-              </div>
-            )}
-
-            <div className="border-t pt-4">
-              <div className="grid gap-4">
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <CalendarDays className="h-4 w-4" />
-                    Current Period
-                  </div>
-                  <div className="text-sm">
-                    {formatDate(subscription?.current_period_start)} - {formatDate(subscription?.current_period_end)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {subscription?.status === "active" && (
-              <Button 
-                variant="outline"
-                className="w-full mt-4"
-                onClick={() => window.open("https://dashboard.razorpay.com/subscriptions", "_blank")}
-              >
-                Manage Subscription
-              </Button>
-            )}
-          </div>
-        </div>
+        <ProfileForm
+          profile={profile}
+          setProfile={setProfile}
+          refetch={refetch}
+        />
+        <SubscriptionInfoSection subscription={subscription} />
       </div>
     </div>
   );
