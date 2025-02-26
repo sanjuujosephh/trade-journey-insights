@@ -30,16 +30,17 @@ export function usePayment() {
   const { data: razorpayKey } = useQuery({
     queryKey: ['razorpay-key'],
     queryFn: async () => {
-      const { data: { razorpay_key }, error } = await supabase
+      const { data, error } = await supabase
         .from('secrets')
-        .select('razorpay_key')
+        .select('value')
+        .eq('name', 'RAZORPAY_KEY')
         .single();
       
       if (error) {
         console.error('Error fetching Razorpay key:', error);
         throw error;
       }
-      return razorpay_key;
+      return data?.value;
     }
   });
 
