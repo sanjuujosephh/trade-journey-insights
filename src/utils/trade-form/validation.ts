@@ -15,6 +15,9 @@ export const validateTradeForm = (formData: FormData) => {
     }
   }
   
+  if (formData.planned_risk_reward && parseFloat(formData.planned_risk_reward) <= 0) {
+    errors.push("Planned risk/reward ratio must be greater than 0");
+  }
+  
   return errors;
 };
-
