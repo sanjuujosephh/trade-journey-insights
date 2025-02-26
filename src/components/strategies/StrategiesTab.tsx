@@ -93,6 +93,19 @@ const tradingPosters = [
 export function StrategiesTab() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  
+  const { data: razorpayKey } = useQuery({
+    queryKey: ['razorpay-key'],
+    queryFn: async () => {
+      const { data: { razorpay_key }, error } = await supabase
+        .from('secrets')
+        .select('razorpay_key')
+        .single();
+      
+      if (error) throw error;
+      return razorpay_key || "rzp_test_fV1qsPBOPvFCLe"; // Fallback to test key
+    }
+  });
 
   const { data: products = [] } = useQuery({
     queryKey: ['products'],
@@ -110,7 +123,7 @@ export function StrategiesTab() {
   const handlePayment = async (item: any, isFullPackage = false) => {
     try {
       const options = {
-        key: "rzp_test_fV1qsPBOPvFCLe", // This is a test key
+        key: razorpayKey,
         amount: (isFullPackage ? 499 : item.price) * 100,
         currency: "INR",
         name: "Trading Resources",
@@ -140,7 +153,12 @@ export function StrategiesTab() {
       <div className="space-y-8">
         <ProductSection title="Trading Strategies">
           <div className="col-span-full flex justify-between items-center mb-4">
-            <div className="flex-grow" />
+            <div className="flex-grow max-w-2xl">
+              <p className="text-muted-foreground">
+                Unlock access to our comprehensive collection of proven trading strategies. 
+                Learn advanced techniques for consistent profits in any market condition.
+              </p>
+            </div>
             <Button onClick={() => handlePayment(null, true)} size="lg">
               Unlock All Strategies (₹499)
             </Button>

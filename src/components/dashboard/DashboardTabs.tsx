@@ -52,7 +52,7 @@ export function DashboardTabs({
     "ai-analysis": { label: "AI Analysis", icon: Bot },
     "learning": { label: "Learning Center", icon: GraduationCap },
     "history": { label: "Trade History", icon: History },
-    "shop": { label: "Shop", icon: Store },
+    "shop": { label: "Collections", icon: Store },
     "profile": { label: "Profile", icon: Settings }
   } as const;
 
