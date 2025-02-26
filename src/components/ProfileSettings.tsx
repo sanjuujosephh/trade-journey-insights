@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -65,7 +66,7 @@ export function ProfileSettings() {
       return {
         status: 'active',
         current_period_start: new Date().toISOString(),
-        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         razorpay_subscription_id: 'sub_test_123456',
       };
     },
@@ -130,22 +131,22 @@ export function ProfileSettings() {
   const getStatusBadgeColor = (status: string | undefined) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-50 text-emerald-700 border border-emerald-200";
       case "canceled":
-        return "bg-red-100 text-red-800";
+        return "bg-red-50 text-red-700 border border-red-200";
       case "paused":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-50 text-yellow-700 border border-yellow-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-50 text-gray-700 border border-gray-200";
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Profile Information Column */}
-        <div className="space-y-6">
-          <div className="rounded-lg bg-card text-card-foreground shadow-sm p-6">
+        <div className="space-y-8">
+          <div className="rounded-lg bg-white p-6 border">
             <AvatarSection
               userId={user.id}
               avatarUrl={profile.avatar_url}
@@ -154,7 +155,7 @@ export function ProfileSettings() {
               refetch={refetch}
             />
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 mt-8">
               <PersonalInfoSection
                 firstName={profile.first_name}
                 lastName={profile.last_name}
@@ -169,7 +170,7 @@ export function ProfileSettings() {
                 onChange={handleProfileChange}
               />
 
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Saving..." : "Save Changes"}
               </Button>
             </form>
@@ -177,7 +178,7 @@ export function ProfileSettings() {
         </div>
 
         {/* Subscription Information Column */}
-        <div className="rounded-lg bg-card text-card-foreground shadow-sm p-6">
+        <div className="rounded-lg bg-white p-6 border">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
             Subscription Information
@@ -185,23 +186,25 @@ export function ProfileSettings() {
 
           <div className="space-y-6">
             <div>
-              <div className="text-sm text-muted-foreground mb-2">Subscription Status</div>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${getStatusBadgeColor(subscription?.status)}`}>
+              <div className="text-sm text-gray-500 mb-2">Subscription Status</div>
+              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(subscription?.status)}`}>
                 {subscription?.status || "No active subscription"}
               </span>
             </div>
 
             {subscription?.razorpay_subscription_id && (
               <div>
-                <div className="text-sm text-muted-foreground mb-2">Subscription ID</div>
-                <div className="font-mono text-sm">{subscription.razorpay_subscription_id}</div>
+                <div className="text-sm text-gray-500 mb-2">Subscription ID</div>
+                <div className="font-mono text-sm bg-gray-50 p-2 rounded border">
+                  {subscription.razorpay_subscription_id}
+                </div>
               </div>
             )}
 
             <div className="border-t pt-4">
               <div className="grid gap-4">
                 <div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                     <CalendarDays className="h-4 w-4" />
                     Current Period
                   </div>
@@ -215,7 +218,7 @@ export function ProfileSettings() {
             {subscription?.status === "active" && (
               <Button 
                 variant="outline"
-                className="w-full"
+                className="w-full mt-4"
                 onClick={() => window.open("https://dashboard.razorpay.com/subscriptions", "_blank")}
               >
                 Manage Subscription
