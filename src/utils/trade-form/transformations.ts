@@ -34,12 +34,7 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     confidence_level: sanitizeNumber(formData.confidence_level),
     entry_emotion: formData.entry_emotion || null,
     exit_emotion: formData.exit_emotion || null,
-    symbol: formData.symbol,
-    planned_risk_reward: sanitizeNumber(formData.planned_risk_reward),
-    actual_risk_reward: sanitizeNumber(formData.actual_risk_reward),
-    planned_target: sanitizeNumber(formData.planned_target),
-    slippage: sanitizeNumber(formData.slippage),
-    post_exit_price: sanitizeNumber(formData.post_exit_price),
-    exit_efficiency: sanitizeNumber(formData.exit_efficiency)
+    symbol: formData.symbol
   };
 };
+

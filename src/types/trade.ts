@@ -37,12 +37,6 @@ export interface Trade {
   
   // Risk Management & Exit Details
   exit_reason?: 'stop_loss' | 'target' | 'manual' | 'time_based' | null;
-  planned_risk_reward?: number | null;
-  actual_risk_reward?: number | null;
-  planned_target?: number | null;
-  slippage?: number | null;
-  post_exit_price?: number | null;
-  exit_efficiency?: number | null;
   
   // Trade Behavior Tracking
   confidence_level?: number | null;
@@ -92,12 +86,5 @@ export interface FormData {
   confidence_level: string;
   entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
   exit_emotion: 'satisfied' | 'regretful' | 'relieved' | 'frustrated' | '';
-  
-  // Risk and Performance fields
-  planned_risk_reward: string;
-  actual_risk_reward: string;
-  planned_target: string;
-  slippage: string;
-  post_exit_price: string;
-  exit_efficiency: string;
 }
+
