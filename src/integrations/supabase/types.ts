@@ -48,6 +48,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          razorpay_customer_id: string | null
+          razorpay_subscription_id: string | null
+          status: Database["public"]["Enums"]["subscription_status"] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          razorpay_customer_id?: string | null
+          razorpay_subscription_id?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          razorpay_customer_id?: string | null
+          razorpay_subscription_id?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       trades: {
         Row: {
           ai_feedback: string | null
@@ -180,7 +216,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      subscription_status: "active" | "cancelled" | "past_due" | "unpaid"
     }
     CompositeTypes: {
       [_ in never]: never
