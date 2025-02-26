@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Store } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { StrategyCard } from "./StrategyCard";
@@ -137,11 +136,6 @@ export function StrategiesTab() {
 
   return (
     <div className="p-6 space-y-8">
-      <div className="flex items-center gap-2 mb-8">
-        <Store className="w-6 h-6" />
-        <h2 className="text-2xl font-bold">Trading Resources Shop</h2>
-      </div>
-
       <div className="space-y-8">
         <ProductSection title="Trading Strategies">
           <div className="col-span-full flex justify-between items-center mb-4">
