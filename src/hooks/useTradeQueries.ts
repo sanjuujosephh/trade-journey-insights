@@ -1,28 +1,33 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Trade } from "@/types/trade";
+import type { Trade } from "@/types/trade";
 
-export function useTradeQueries(userId: string | null) {
-  const { data: trades = [], isLoading } = useQuery({
-    queryKey: ['trades', userId],
+export function useTradeQueries(userId: string | null, options = {}) {
+  const {
+    data: trades = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["trades", userId],
     queryFn: async () => {
       if (!userId) return [];
-      
       const { data, error } = await supabase
-        .from('trades')
-        .select('*')
-        .order('entry_time', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching trades:', error);
-        throw error;
-      }
-      
+        .from("trades")
+        .select("*")
+        .eq("user_id", userId)
+        .order("entry_date", { ascending: false });
+
+      if (error) throw error;
       return data as Trade[];
     },
     enabled: !!userId,
+    ...options,
   });
 
-  return { trades, isLoading };
+  return {
+    trades,
+    isLoading,
+    error,
+  };
 }
