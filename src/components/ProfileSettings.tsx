@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { ProfileForm } from "./profile/ProfileForm";
 import { SubscriptionInfoSection } from "./profile/SubscriptionInfoSection";
+import { supabase } from "@/lib/supabase";
 
 type Profile = {
   username: string | null;

@@ -53,7 +53,7 @@ function Navigation() {
     <div className="h-16 border-b bg-background sticky top-0 z-10">
       <div className="flex h-full items-center px-4 container mx-auto">
         <div className="flex-1 md:block hidden">
-          <TraderInfo />
+          {user && <TraderInfo />}
         </div>
         <div className="flex-1 flex md:justify-center justify-start">
           <Link to="/" className="text-xl font-medium hover:opacity-80 transition-opacity">
@@ -84,29 +84,37 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route 
-                path="/" 
-                element={
-                  <AuthGuard requireSubscription={true}>
-                    <Index />
-                  </AuthGuard>
-                } 
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const { user } = useAuth();
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <BrowserRouter>
+            <Layout>
+              <Routes>
+                <Route 
+                  path="/" 
+                  element={
+                    user ? (
+                      <AuthGuard requireSubscription={true}>
+                        <Index />
+                      </AuthGuard>
+                    ) : (
+                      <Index />
+                    )
+                  } 
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
