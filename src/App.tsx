@@ -8,6 +8,7 @@ import { UserMenu } from "./components/auth/UserMenu";
 import { useAuth } from "./contexts/AuthContext";
 import { AuthGuard } from "./components/auth/AuthGuard";
 import Index from "./pages/Index";
+import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 import { Button } from "./components/ui/button";
 import { Moon, Sun } from "lucide-react";
@@ -101,6 +102,7 @@ function AppRoutes() {
           )
         } 
       />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
