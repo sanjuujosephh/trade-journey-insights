@@ -47,7 +47,7 @@ export interface Trade {
   // Trade Behavior Tracking
   confidence_level?: number | null;
   confidence_level_score?: number | null;
-  entry_emotion?: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | null;
+  entry_emotion?: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | 'confident' | null;
   exit_emotion?: 'satisfied' | 'regretful' | 'relieved' | 'frustrated' | null;
   emotional_score?: number | null;
   overall_emotional_state?: 'positive' | 'negative' | 'neutral' | null;
@@ -90,7 +90,7 @@ export interface FormData {
   trade_direction: 'long' | 'short' | '';
   exit_reason: 'stop_loss' | 'target' | 'manual' | 'time_based' | '';
   confidence_level: string;
-  entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | '';
+  entry_emotion: 'fear' | 'greed' | 'fomo' | 'revenge' | 'neutral' | 'confident' | '';
   exit_emotion: 'satisfied' | 'regretful' | 'relieved' | 'frustrated' | '';
   
   // Risk Management & Performance Metrics

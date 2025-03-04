@@ -29,7 +29,7 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <DateTimeField
           label="Trade Date"
           date={formData.entry_date || ''}

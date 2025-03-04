@@ -39,6 +39,7 @@ export function EmotionSelects({
             <SelectItem value="fomo">FOMO</SelectItem>
             <SelectItem value="revenge">Revenge</SelectItem>
             <SelectItem value="neutral">Neutral</SelectItem>
+            <SelectItem value="confident">Confident</SelectItem>
           </SelectContent>
         </Select>
       </div>
