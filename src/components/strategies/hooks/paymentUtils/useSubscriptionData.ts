@@ -11,6 +11,7 @@ export type SubscriptionData = {
   current_period_end: string;
   payment_id: string;
   amount: number;
+  plan_type?: 'monthly' | 'lifetime'; // Added plan_type property
 };
 
 /**
