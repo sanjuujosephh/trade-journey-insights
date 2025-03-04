@@ -8,7 +8,7 @@ interface TradeFormActionsProps {
 export function TradeFormActions({ isEditing }: TradeFormActionsProps) {
   return (
     <div className="flex justify-center">
-      <Button type="submit" className="w-full sm:w-auto text-[14px] px-6 py-3">
+      <Button type="submit" className="w-full sm:w-auto text-[14px] px-8 py-4 text-base">
         {isEditing ? "Update Trade" : "Log New Trade"}
       </Button>
     </div>

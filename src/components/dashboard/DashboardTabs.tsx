@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ const tabColors = {
   "calendar": "bg-[#FFDEE2]",
   "analysis": "bg-[#F2FCE2]",
   "ai-analysis": "bg-[#FEF7CD]",
-  "learning": "bg-[#FEC6A1]",
+  "learning": "bg-[#F2FCE2]", // Updated to be consistent with "analysis" tab
   "history": "bg-[#FDE1D3]",
   "shop": "bg-[#E0F2FE]",
   "profile": "bg-[#F1F0FB]",
