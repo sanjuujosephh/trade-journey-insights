@@ -28,14 +28,14 @@ export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
       <div className="flex flex-col gap-2 w-full sm:w-auto self-center">
         <Button 
           variant="outline" 
-          className="gap-2 bg-[#D3E4FD] border-[#D3E4FD] hover:bg-[#C2D6F2] hover:border-[#C2D6F2] text-blue-700"
+          className="gap-2 bg-[#e5f0ff] border-[#e5f0ff] text-[#001d6c]"
         >
           <Video className="h-4 w-4" />
           <span>Watch Journal Overview</span>
         </Button>
         <Button 
           variant="outline" 
-          className="gap-2 bg-[#FFDEE2] border-[#FFDEE2] hover:bg-[#FFCFD5] hover:border-[#FFCFD5] text-rose-700"
+          className="gap-2 bg-[#ffeaec] border-[#ffeaec] text-[#8f0527]"
         >
           <Youtube className="h-4 w-4" />
           <span>Subscribe To Daily Shorts</span>

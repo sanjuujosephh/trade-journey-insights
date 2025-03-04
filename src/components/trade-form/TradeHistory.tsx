@@ -134,7 +134,7 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs ${getOutcomeStyle(pnl)}`}
+                      className={`inline-block px-2 py-1 rounded-[3px] text-xs ${getOutcomeStyle(pnl)}`}
                     >
                       {getOutcomeText(pnl)}
                     </span>
