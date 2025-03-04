@@ -4,21 +4,44 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { usePayment } from "@/components/strategies/hooks/usePayment";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { handlePayment, subscription } = usePayment();
+  const { handlePayment, subscription, isPaymentConfigured, paymentConfigError } = usePayment();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubscribe = () => {
+  useEffect(() => {
+    if (paymentConfigError) {
+      console.error("Payment configuration error:", paymentConfigError);
+    }
+  }, [paymentConfigError]);
+
+  const handleSubscribe = async () => {
     if (!user) {
       toast.error("Please login to subscribe");
       return;
     }
 
-    // Initialize payment with the full package price
-    handlePayment(null, true);
+    if (!isPaymentConfigured) {
+      toast.error("Payment system is not configured properly");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // Initialize payment with the full package price
+      await handlePayment(null, true);
+    } catch (error) {
+      console.error("Subscription error:", error);
+      toast.error("Could not process subscription request");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // If user already has an active subscription, show different content
@@ -26,12 +49,19 @@ export default function Pricing() {
     return (
       <div className="container max-w-6xl py-12">
         <div className="text-center">
+          <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">
+            <CheckCircle2 className="h-6 w-6 text-green-600" />
+          </div>
           <h1 className="text-4xl font-bold tracking-tight mb-4">
             You're already subscribed!
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
             You have access to all premium features
           </p>
+          <div className="mb-8 p-4 bg-green-50 border border-green-100 rounded-lg text-green-800">
+            <p className="font-medium">Subscription details:</p>
+            <p className="text-sm">Active until: {new Date(subscription.current_period_end).toLocaleDateString()}</p>
+          </div>
           <Button onClick={() => navigate('/')}>
             Go to Dashboard
           </Button>
@@ -49,6 +79,15 @@ export default function Pricing() {
         <p className="text-xl text-muted-foreground mb-8">
           Start your trading journey with our premium features
         </p>
+        
+        {paymentConfigError && (
+          <Alert variant="destructive" className="mb-6 max-w-md mx-auto">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Payment system is currently unavailable. Please try again later.
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
 
       <div className="max-w-md mx-auto border rounded-lg p-8 shadow-sm">
@@ -89,9 +128,16 @@ export default function Pricing() {
           className="w-full"
           size="lg" 
           onClick={handleSubscribe}
+          disabled={isLoading || !isPaymentConfigured}
         >
-          Subscribe Now
+          {isLoading ? "Processing..." : "Subscribe Now"}
         </Button>
+        
+        {!user && (
+          <p className="text-sm text-center mt-4 text-muted-foreground">
+            Please <a href="/auth" className="text-primary hover:underline">login</a> to subscribe
+          </p>
+        )}
       </div>
     </div>
   );
