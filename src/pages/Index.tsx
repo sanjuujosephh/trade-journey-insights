@@ -89,7 +89,7 @@ export default function Index() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container py-6 max-w-5xl mx-auto">
+      <div className="container py-6">
         <DashboardHeader profile={profile} user={user} />
         <div className="mt-4">
           <DashboardTabs

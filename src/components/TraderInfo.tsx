@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 // Function to generate random seed
 const generateRandomSeed = () => Math.random().toString(36).substring(7);
 
-// Soft pastel colors that work well with the design
+// Complementary background colors that match the dashboard header
 const bgColors = [
-  "bg-blue-100", // Soft Blue
-  "bg-purple-100", // Soft Purple
-  "bg-pink-100", // Soft Pink
+  "bg-[#D3E4FD]", // Soft Blue
+  "bg-[#FFDEE2]", // Soft Pink
+  "bg-[#E5DEFF]", // Soft Purple
 ];
 
 export function TraderInfo() {
@@ -25,12 +25,12 @@ export function TraderInfo() {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 py-1">
+    <div className="flex items-center gap-2">
       <div className="flex -space-x-3">
         {seeds.map((seed, index) => (
           <Avatar 
             key={seed} 
-            className={`border-2 border-background ${bgColors[index]} transition-transform hover:scale-110`}
+            className={`border-2 border-background ${bgColors[index]} transition-transform hover:scale-105`}
           >
             <img 
               src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`} 
@@ -40,7 +40,7 @@ export function TraderInfo() {
         ))}
       </div>
       <div className="text-xs leading-tight">
-        <p className="text-muted-foreground">Built using inputs from</p>
+        <p>Built using inputs from</p>
         <p className="font-medium">45+ Intraday traders</p>
       </div>
     </div>
