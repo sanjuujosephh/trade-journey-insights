@@ -67,7 +67,7 @@ export function DateTimeField({
   return (
     <div className="space-y-2">
       <Label htmlFor={label}>{label}</Label>
-      <div className="flex gap-2">
+      <div className="flex gap-2 w-full">
         {!hideDate && (
           <Popover>
             <PopoverTrigger asChild>
@@ -99,7 +99,7 @@ export function DateTimeField({
             onChange={handleTimeChange}
             placeholder="HH:MM"
             required={required}
-            className="w-[120px]"
+            className="w-full"
           />
         )}
       </div>
