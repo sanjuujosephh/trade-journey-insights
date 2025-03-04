@@ -6,15 +6,14 @@ import { usePayment } from "@/components/strategies/hooks/usePayment";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle2, Info } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertCircle, CheckCircle2, Info, Check } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { handlePayment, subscription, isPaymentConfigured, paymentConfigError, isTestMode } = usePayment();
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("monthly");
 
   useEffect(() => {
     if (paymentConfigError) {
@@ -106,51 +105,41 @@ export default function Pricing() {
         )}
       </div>
 
-      <Tabs 
-        defaultValue="monthly" 
-        className="max-w-3xl mx-auto"
-        onValueChange={(value) => setActiveTab(value as 'monthly' | 'lifetime')}
-      >
-        <TabsList className="grid grid-cols-2 w-[400px] mx-auto mb-8">
-          <TabsTrigger value="monthly">Monthly</TabsTrigger>
-          <TabsTrigger value="lifetime">Lifetime</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="monthly">
-          <div className="max-w-md mx-auto border rounded-lg p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold mb-4">Monthly Subscription</h2>
-            <div className="mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {/* Monthly Subscription Card */}
+        <Card className="border rounded-lg shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-2xl font-semibold">Monthly Subscription</CardTitle>
+            <div className="mt-2">
               <span className="text-4xl font-bold">₹199</span>
               <span className="text-muted-foreground">/month</span>
             </div>
-            
-            <ul className="space-y-3 mb-8">
+          </CardHeader>
+          <CardContent className="pb-6">
+            <ul className="space-y-3">
               <li className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Unlimited Trade Entries
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Unlimited Trade Entries</span>
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Advanced Analytics
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Advanced Analytics</span>
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                AI-Powered Trade Analysis
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>AI-Powered Trade Analysis</span>
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Priority Support
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Behaviour Analysis</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Custom Feature Requests</span>
               </li>
             </ul>
-
+          </CardContent>
+          <CardFooter>
             <Button 
               className="w-full"
               size="lg" 
@@ -159,47 +148,54 @@ export default function Pricing() {
             >
               {isLoading ? "Processing..." : isTestMode ? "Subscribe (Test Mode)" : "Subscribe Now"}
             </Button>
+          </CardFooter>
+        </Card>
+
+        {/* Lifetime Subscription Card */}
+        <Card className="border rounded-lg shadow-sm border-primary/20 bg-primary/5 relative">
+          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
+            Best Value
           </div>
-        </TabsContent>
-        
-        <TabsContent value="lifetime">
-          <div className="max-w-md mx-auto border rounded-lg p-8 shadow-sm border-primary/20 bg-primary/5">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
-              Best Value
-            </div>
-            <h2 className="text-2xl font-semibold mb-4">Lifetime Access</h2>
-            <div className="mb-6">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-2xl font-semibold">Lifetime Access</CardTitle>
+            <div className="mt-2">
               <span className="text-4xl font-bold">₹2499</span>
               <span className="text-muted-foreground"> one-time</span>
             </div>
-            
-            <ul className="space-y-3 mb-8">
+          </CardHeader>
+          <CardContent className="pb-6">
+            <ul className="space-y-3">
               <li className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-medium">Everything in Monthly</span>
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Everything in Monthly</span>
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Never Pay Again
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Never Pay Again</span>
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Future Feature Updates
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Future Feature Updates</span>
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Premium Support
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Access To Trading Strategies</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Access To JOT Indicator Suite</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Access To Trading Templates</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                <span>Priority Feature Requests</span>
               </li>
             </ul>
-
+          </CardContent>
+          <CardFooter>
             <Button 
               className="w-full"
               size="lg" 
@@ -209,9 +205,9 @@ export default function Pricing() {
             >
               {isLoading ? "Processing..." : isTestMode ? "Get Lifetime Access (Test)" : "Get Lifetime Access"}
             </Button>
-          </div>
-        </TabsContent>
-      </Tabs>
+          </CardFooter>
+        </Card>
+      </div>
 
       {!user && (
         <p className="text-sm text-center mt-8 text-muted-foreground">
