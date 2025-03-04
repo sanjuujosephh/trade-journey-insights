@@ -12,8 +12,8 @@ import { preparePaymentData } from "./paymentDataPreparer";
 export function usePaymentProcessor(razorpayKey: string | undefined, refetchSubscription: () => Promise<any>) {
   const { user } = useAuth();
   
-  const handlePayment = async (item: any, isFullPackage = false) => {
-    console.log('Payment initiated for:', isFullPackage ? 'Full Package' : item?.title);
+  const handlePayment = async (item: any, isFullPackage = false, planType = 'monthly') => {
+    console.log('Payment initiated for:', isFullPackage ? 'Full Package' : item?.title, 'Plan type:', planType);
     
     if (!user) {
       toast.error("Please login to make a purchase");
@@ -23,12 +23,12 @@ export function usePaymentProcessor(razorpayKey: string | undefined, refetchSubs
 
     try {
       // Prepare payment data
-      const { amount, userName, userEmail, description } = preparePaymentData(user, item, isFullPackage);
+      const { amount, userName, userEmail, description } = preparePaymentData(user, item, isFullPackage, planType);
       console.log('Is Razorpay key available:', !!razorpayKey);
       
       // If Razorpay key is not available, use mock payment for testing
       if (!razorpayKey) {
-        await handleTestPayment(userName, userEmail, amount, description, user.id);
+        await handleTestPayment(userName, userEmail, amount, description, user.id, planType);
         
         // Refetch subscription status
         await refetchSubscription();
@@ -52,7 +52,8 @@ export function usePaymentProcessor(razorpayKey: string | undefined, refetchSubs
         userEmail,
         amount,
         description,
-        user.id
+        user.id,
+        planType
       );
       
       // Reload the page to refresh subscription status

@@ -11,7 +11,8 @@ export const handleRazorpayPayment = async (
   userEmail: string,
   amount: number,
   description: string,
-  userId: string
+  userId: string,
+  planType = 'monthly'
 ) => {
   console.log('Initializing Razorpay payment with key:', razorpayKey);
   
@@ -26,7 +27,7 @@ export const handleRazorpayPayment = async (
         handler: async function(response: any) {
           console.log('Payment success, payment ID:', response.razorpay_payment_id);
           try {
-            await createSubscriptionRecord(userId, response.razorpay_payment_id, amount);
+            await createSubscriptionRecord(userId, response.razorpay_payment_id, amount, planType);
             toast.success("Subscription activated successfully!");
             resolve(response.razorpay_payment_id);
           } catch (error) {

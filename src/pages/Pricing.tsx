@@ -7,12 +7,14 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2, Info } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { handlePayment, subscription, isPaymentConfigured, paymentConfigError, isTestMode } = usePayment();
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("monthly");
 
   useEffect(() => {
     if (paymentConfigError) {
@@ -20,7 +22,7 @@ export default function Pricing() {
     }
   }, [paymentConfigError]);
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = async (planType: 'monthly' | 'lifetime') => {
     if (!user) {
       toast.error("Please login to subscribe");
       return;
@@ -34,8 +36,8 @@ export default function Pricing() {
     setIsLoading(true);
     
     try {
-      // Initialize payment with the full package price
-      await handlePayment(null, true);
+      // Initialize payment with the selected plan type
+      await handlePayment(null, true, planType);
     } catch (error) {
       console.error("Subscription error:", error);
       toast.error("Could not process subscription request");
@@ -62,6 +64,7 @@ export default function Pricing() {
             <p className="font-medium">Subscription details:</p>
             <p className="text-sm">Active until: {new Date(subscription.current_period_end).toLocaleDateString()}</p>
             <p className="text-sm">Payment ID: {subscription.payment_id}</p>
+            <p className="text-sm">Plan type: {subscription.plan_type || "monthly"}</p>
             {subscription.amount && (
               <p className="text-sm">Amount: ₹{subscription.amount / 100}</p>
             )}
@@ -103,55 +106,118 @@ export default function Pricing() {
         )}
       </div>
 
-      <div className="max-w-md mx-auto border rounded-lg p-8 shadow-sm">
-        <h2 className="text-2xl font-semibold mb-4">Premium Plan</h2>
-        <div className="mb-6">
-          <span className="text-4xl font-bold">₹499</span>
-          <span className="text-muted-foreground">/month</span>
-        </div>
+      <Tabs 
+        defaultValue="monthly" 
+        className="max-w-3xl mx-auto"
+        onValueChange={(value) => setActiveTab(value as 'monthly' | 'lifetime')}
+      >
+        <TabsList className="grid grid-cols-2 w-[400px] mx-auto mb-8">
+          <TabsTrigger value="monthly">Monthly</TabsTrigger>
+          <TabsTrigger value="lifetime">Lifetime</TabsTrigger>
+        </TabsList>
         
-        <ul className="space-y-3 mb-8">
-          <li className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Unlimited Trade Entries
-          </li>
-          <li className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Advanced Analytics
-          </li>
-          <li className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            AI-Powered Trade Analysis
-          </li>
-          <li className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Priority Support
-          </li>
-        </ul>
+        <TabsContent value="monthly">
+          <div className="max-w-md mx-auto border rounded-lg p-8 shadow-sm">
+            <h2 className="text-2xl font-semibold mb-4">Monthly Subscription</h2>
+            <div className="mb-6">
+              <span className="text-4xl font-bold">₹199</span>
+              <span className="text-muted-foreground">/month</span>
+            </div>
+            
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Unlimited Trade Entries
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Advanced Analytics
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                AI-Powered Trade Analysis
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Priority Support
+              </li>
+            </ul>
 
-        <Button 
-          className="w-full"
-          size="lg" 
-          onClick={handleSubscribe}
-          disabled={isLoading || !isPaymentConfigured}
-        >
-          {isLoading ? "Processing..." : isTestMode ? "Subscribe (Test Mode)" : "Subscribe Now"}
-        </Button>
+            <Button 
+              className="w-full"
+              size="lg" 
+              onClick={() => handleSubscribe('monthly')}
+              disabled={isLoading || !isPaymentConfigured}
+            >
+              {isLoading ? "Processing..." : isTestMode ? "Subscribe (Test Mode)" : "Subscribe Now"}
+            </Button>
+          </div>
+        </TabsContent>
         
-        {!user && (
-          <p className="text-sm text-center mt-4 text-muted-foreground">
-            Please <a href="/auth" className="text-primary hover:underline">login</a> to subscribe
-          </p>
-        )}
-      </div>
+        <TabsContent value="lifetime">
+          <div className="max-w-md mx-auto border rounded-lg p-8 shadow-sm border-primary/20 bg-primary/5">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
+              Best Value
+            </div>
+            <h2 className="text-2xl font-semibold mb-4">Lifetime Access</h2>
+            <div className="mb-6">
+              <span className="text-4xl font-bold">₹2499</span>
+              <span className="text-muted-foreground"> one-time</span>
+            </div>
+            
+            <ul className="space-y-3 mb-8">
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="font-medium">Everything in Monthly</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Never Pay Again
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Future Feature Updates
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Premium Support
+              </li>
+            </ul>
+
+            <Button 
+              className="w-full"
+              size="lg" 
+              onClick={() => handleSubscribe('lifetime')}
+              disabled={isLoading || !isPaymentConfigured}
+              variant="default"
+            >
+              {isLoading ? "Processing..." : isTestMode ? "Get Lifetime Access (Test)" : "Get Lifetime Access"}
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {!user && (
+        <p className="text-sm text-center mt-8 text-muted-foreground">
+          Please <a href="/auth" className="text-primary hover:underline">login</a> to subscribe
+        </p>
+      )}
     </div>
   );
 }

@@ -10,7 +10,8 @@ export const handleTestPayment = async (
   userEmail: string,
   amount: number,
   description: string,
-  userId: string
+  userId: string,
+  planType = 'monthly'
 ) => {
   console.log('Using mock payment process since Razorpay key is unavailable');
   
@@ -21,7 +22,7 @@ export const handleTestPayment = async (
     const paymentId = await processTestPayment(userName, userEmail, amount, description);
     
     // Create subscription record
-    await createSubscriptionRecord(userId, paymentId, amount);
+    await createSubscriptionRecord(userId, paymentId, amount, planType);
     
     toast.dismiss();
     toast.success("Subscription activated successfully!");

@@ -65,15 +65,32 @@ export const processTestPayment = async (
  * @param userId User ID
  * @param paymentId Payment ID
  * @param amount Amount in paise
+ * @param planType Type of plan (monthly or lifetime)
  * @returns Created subscription data
  */
-export const createSubscriptionRecord = async (userId: string, paymentId: string, amount: number) => {
+export const createSubscriptionRecord = async (
+  userId: string, 
+  paymentId: string, 
+  amount: number, 
+  planType = 'monthly'
+) => {
   console.log('Creating subscription record for user:', userId);
   console.log('Payment ID:', paymentId);
   console.log('Amount:', amount/100, 'INR');
+  console.log('Plan type:', planType);
   
   if (!userId) {
     throw new Error('User ID is required to create a subscription');
+  }
+
+  // Set end date based on plan type
+  let endDate;
+  if (planType === 'lifetime') {
+    // For lifetime plans, set a far future date (50 years from now)
+    endDate = new Date(Date.now() + 50 * 365 * 24 * 60 * 60 * 1000);
+  } else {
+    // For monthly plans, set to 30 days from now
+    endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   }
 
   const { data, error } = await supabase
@@ -83,9 +100,10 @@ export const createSubscriptionRecord = async (userId: string, paymentId: string
       payment_id: paymentId,
       amount: amount,
       status: 'active',
+      plan_type: planType,
       current_period_start: new Date().toISOString(),
-      current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-      end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
+      current_period_end: endDate.toISOString(),
+      end_date: endDate.toISOString()
     }])
     .select();
 
@@ -97,4 +115,3 @@ export const createSubscriptionRecord = async (userId: string, paymentId: string
   console.log('Subscription created successfully:', data);
   return data;
 };
-

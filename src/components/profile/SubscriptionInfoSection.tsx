@@ -10,6 +10,7 @@ type Subscription = {
   payment_id: string | null;
   razorpay_subscription_id: string | null;
   amount: number | null;
+  plan_type?: 'monthly' | 'lifetime';
 };
 
 interface SubscriptionInfoSectionProps {
@@ -50,6 +51,8 @@ export function SubscriptionInfoSection({ subscription }: SubscriptionInfoSectio
 
   const supportEmail = "support@tradingresources.com";
 
+  const isLifetime = subscription?.plan_type === 'lifetime';
+
   return (
     <div className="rounded-lg bg-white p-6 border">
       <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
@@ -60,9 +63,16 @@ export function SubscriptionInfoSection({ subscription }: SubscriptionInfoSectio
       <div className="space-y-6">
         <div>
           <div className="text-sm text-gray-500 mb-2">Subscription Status</div>
-          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(subscription?.status)}`}>
-            {subscription?.status || "No active subscription"}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(subscription?.status)}`}>
+              {subscription?.status || "No active subscription"}
+            </span>
+            {isLifetime && subscription?.status === 'active' && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                Lifetime
+              </span>
+            )}
+          </div>
         </div>
 
         {subscription?.payment_id && (
@@ -79,6 +89,7 @@ export function SubscriptionInfoSection({ subscription }: SubscriptionInfoSectio
             <div className="text-sm text-gray-500 mb-2">Subscription Amount</div>
             <div className="font-medium">
               {formatAmount(subscription.amount)}
+              {subscription.plan_type === 'monthly' ? ' / month' : ' (one-time)'}
             </div>
           </div>
         )}
@@ -88,10 +99,14 @@ export function SubscriptionInfoSection({ subscription }: SubscriptionInfoSectio
             <div>
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                 <CalendarDays className="h-4 w-4" />
-                Current Period
+                {isLifetime ? "Access Period" : "Current Period"}
               </div>
               <div className="text-sm">
-                {formatDate(subscription?.current_period_start)} - {formatDate(subscription?.current_period_end)}
+                {isLifetime ? (
+                  <>From {formatDate(subscription?.current_period_start)} (Lifetime)</>
+                ) : (
+                  <>{formatDate(subscription?.current_period_start)} - {formatDate(subscription?.current_period_end)}</>
+                )}
               </div>
             </div>
           </div>

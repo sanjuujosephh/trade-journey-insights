@@ -5,21 +5,34 @@
 export const preparePaymentData = (
   user: any,
   item: any,
-  isFullPackage: boolean
+  isFullPackage: boolean,
+  planType = 'monthly'
 ) => {
   if (!user) {
     throw new Error("User is required for payment");
   }
 
-  const amount = (isFullPackage ? 499 : item?.price || 499) * 100; // Amount in paise
+  // Calculate amount based on plan type
+  let amount: number;
+  if (planType === 'lifetime') {
+    amount = 2499 * 100; // Lifetime plan costs ₹2499 (amount in paise)
+  } else {
+    // Default to monthly
+    amount = (isFullPackage ? 199 : item?.price || 199) * 100; // Monthly plan costs ₹199 (amount in paise)
+  }
+  
   const userName = user?.email?.split('@')[0] || "Trader";
   const userEmail = user?.email || "trader@example.com";
+  
+  // Create description based on plan type
+  const planTypeText = planType === 'lifetime' ? 'Lifetime' : 'Monthly';
   const description = isFullPackage ? 
-    "Monthly Subscription - All Trading Strategies" : 
-    item?.title ? `Monthly Subscription - ${item.title}` : "Monthly Subscription";
+    `${planTypeText} Subscription - All Trading Strategies` : 
+    item?.title ? `${planTypeText} Subscription - ${item.title}` : `${planTypeText} Subscription`;
 
   console.log('User details for payment:', { name: userName, email: userEmail });
   console.log('Payment amount:', amount/100, 'INR');
+  console.log('Plan type:', planType);
   
   return {
     amount,
