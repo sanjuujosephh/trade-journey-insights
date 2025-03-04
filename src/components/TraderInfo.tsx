@@ -7,9 +7,9 @@ const generateRandomSeed = () => Math.random().toString(36).substring(7);
 
 // Complementary background colors that work well with the avatars
 const bgColors = [
-  "bg-[#D3E4FD]", // Soft Blue
+  "bg-[#D3E4FD]", // Soft Blue (matching dashboard header)
   "bg-[#E5DEFF]", // Soft Purple
-  "bg-[#FFDEE2]", // Soft Pink
+  "bg-[#FFDEE2]", // Soft Pink (matching dashboard header)
 ];
 
 export function TraderInfo() {

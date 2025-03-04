@@ -10,8 +10,8 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
   return (
-    <header className="mb-2 flex flex-col sm:flex-row items-start justify-between gap-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <header className="mb-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-center gap-4">
         <Avatar className="h-28 w-28 [&_*]:scale-x-[-1]">
           <AvatarImage src={profile?.avatar_url} alt={profile?.username || 'User avatar'} />
           <AvatarFallback>
@@ -19,18 +19,24 @@ export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
           </AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-3xl font-bold tracking-tight text-center sm:text-left">
             Hey {profile?.first_name || 'There'},
           </h1>
-          <p className="text-muted-foreground mt-1">Track, analyze, and improve your trading performance</p>
+          <p className="text-muted-foreground mt-1 text-center sm:text-left">Track, analyze, and improve your trading performance</p>
         </div>
       </div>
-      <div className="flex flex-col gap-2 w-full sm:w-auto self-end sm:self-start">
-        <Button variant="outline" className="gap-2">
+      <div className="flex flex-col gap-2 w-full sm:w-auto self-center">
+        <Button 
+          variant="outline" 
+          className="gap-2 bg-[#D3E4FD] border-[#D3E4FD] hover:bg-[#C2D6F2] hover:border-[#C2D6F2] text-blue-700"
+        >
           <Video className="h-4 w-4" />
           <span>Watch Journal Overview</span>
         </Button>
-        <Button variant="outline" className="gap-2">
+        <Button 
+          variant="outline" 
+          className="gap-2 bg-[#FFDEE2] border-[#FFDEE2] hover:bg-[#FFCFD5] hover:border-[#FFCFD5] text-rose-700"
+        >
           <Youtube className="h-4 w-4" />
           <span>Subscribe To Daily Shorts</span>
         </Button>
