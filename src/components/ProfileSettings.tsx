@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ProfileForm } from "./profile/ProfileForm";
 import { SubscriptionInfoSection } from "./profile/SubscriptionInfoSection";
 import { supabase } from "@/lib/supabase";
+import { useSubscription } from "@/hooks/useSubscription";
 
 type Profile = {
   username: string | null;
@@ -21,6 +22,8 @@ type Subscription = {
   current_period_start: string | null;
   current_period_end: string | null;
   razorpay_subscription_id: string | null;
+  payment_id: string | null;
+  amount: number | null;
 };
 
 export function ProfileSettings() {
@@ -51,20 +54,8 @@ export function ProfileSettings() {
     enabled: !!user?.id,
   });
 
-  const { data: subscription } = useQuery<Subscription>({
-    queryKey: ["subscription", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      // For testing purposes, return mock subscription data
-      return {
-        status: 'active',
-        current_period_start: new Date().toISOString(),
-        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        razorpay_subscription_id: 'sub_test_123456',
-      };
-    },
-    enabled: !!user?.id,
-  });
+  // Use our useSubscription hook instead of the mock data
+  const { subscription } = useSubscription();
 
   useState(() => {
     if (profileData) {
