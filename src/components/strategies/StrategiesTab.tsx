@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { usePayment } from "./hooks/usePayment";
 import { PreviewDialog } from "./PreviewDialog";
