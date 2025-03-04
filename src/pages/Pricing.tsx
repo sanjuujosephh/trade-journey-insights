@@ -6,12 +6,12 @@ import { usePayment } from "@/components/strategies/hooks/usePayment";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { handlePayment, subscription, isPaymentConfigured, paymentConfigError } = usePayment();
+  const { handlePayment, subscription, isPaymentConfigured, paymentConfigError, isTestMode } = usePayment();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -61,6 +61,10 @@ export default function Pricing() {
           <div className="mb-8 p-4 bg-green-50 border border-green-100 rounded-lg text-green-800">
             <p className="font-medium">Subscription details:</p>
             <p className="text-sm">Active until: {new Date(subscription.current_period_end).toLocaleDateString()}</p>
+            <p className="text-sm">Payment ID: {subscription.payment_id}</p>
+            {subscription.amount && (
+              <p className="text-sm">Amount: ₹{subscription.amount / 100}</p>
+            )}
           </div>
           <Button onClick={() => navigate('/')}>
             Go to Dashboard
@@ -84,7 +88,16 @@ export default function Pricing() {
           <Alert variant="destructive" className="mb-6 max-w-md mx-auto">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Payment system is currently unavailable. Please try again later.
+              {paymentConfigError}
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {isTestMode && (
+          <Alert className="mb-6 max-w-md mx-auto bg-yellow-50 border-yellow-200">
+            <Info className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-800">
+              Using test payment mode. Subscriptions will be created without actual payment processing.
             </AlertDescription>
           </Alert>
         )}
@@ -130,7 +143,7 @@ export default function Pricing() {
           onClick={handleSubscribe}
           disabled={isLoading || !isPaymentConfigured}
         >
-          {isLoading ? "Processing..." : "Subscribe Now"}
+          {isLoading ? "Processing..." : isTestMode ? "Subscribe (Test Mode)" : "Subscribe Now"}
         </Button>
         
         {!user && (
