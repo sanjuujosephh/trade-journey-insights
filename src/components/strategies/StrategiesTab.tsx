@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { usePayment } from "./hooks/usePayment";
 import { PreviewDialog } from "./PreviewDialog";
 import { TradingStrategiesSection } from "./sections/TradingStrategiesSection";
+import { TradingIndicatorsSection } from "./sections/TradingIndicatorsSection";
 import { ProductsSection } from "./sections/ProductsSection";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -63,6 +65,10 @@ export function StrategiesTab() {
       <div className="space-y-8">
         <TradingStrategiesSection 
           onUnlockAll={handleUnlockAll} 
+        />
+
+        <TradingIndicatorsSection
+          onUnlockAll={handleUnlockAll}
         />
 
         <ProductsSection

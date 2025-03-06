@@ -31,3 +31,16 @@ export const tradingStrategies = [
     description: "Learn to trade gaps for profitable opportunities",
   }
 ];
+
+export const tradingIndicators = [
+  {
+    id: 1,
+    title: "JOT Trend Strength Indicator",
+    description: "Accurately measure trend strength and potential reversals with our custom-built indicator."
+  },
+  {
+    id: 2,
+    title: "Volume Zone Oscillator",
+    description: "Monitor buying/selling pressure with this advanced volume analysis tool."
+  }
+];
