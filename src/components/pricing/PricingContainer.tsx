@@ -6,6 +6,7 @@ import { usePayment } from "@/components/strategies/hooks/usePayment";
 import { SubscriptionInfo } from "./SubscriptionInfo";
 import { PricingPlanCard } from "./PricingPlanCard";
 import { PricingAlerts } from "./PricingAlerts";
+import { TrialRequestForm } from "./TrialRequestForm";
 import { PRICING_PLANS, PlanType } from "./constants";
 
 export function PricingContainer() {
@@ -58,7 +59,7 @@ export function PricingContainer() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {PRICING_PLANS.map((plan) => (
           <PricingPlanCard
             key={plan.id}
@@ -78,6 +79,9 @@ export function PricingContainer() {
             }
           />
         ))}
+        
+        {/* Trial Request Form */}
+        <TrialRequestForm />
       </div>
 
       {!user && (

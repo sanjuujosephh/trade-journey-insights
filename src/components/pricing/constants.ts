@@ -34,12 +34,10 @@ export const PRICING_PLANS: PricingPlan[] = [
     period: ' one-time',
     features: [
       'Everything in Monthly',
-      'Never Pay Again',
       'Future Feature Updates',
       'Access To Trading Strategies',
       'Access To JOT Indicator Suite',
-      'Access To Trading Templates',
-      'Priority Feature Requests'
+      'Access To Trading Templates'
     ],
     isBestValue: true
   }
