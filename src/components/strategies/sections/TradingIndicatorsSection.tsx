@@ -20,7 +20,7 @@ export function TradingIndicatorsSection({ onUnlockAll }: TradingIndicatorsSecti
           </p>
         </div>
         <Button onClick={onUnlockAll} size="lg">
-          <GoldenRupee className="mr-1.5" />
+          <GoldenRupee className="mr-1.5" size={18} />
           Unlock All Strategies & Indicators (₹1499)
         </Button>
       </div>
