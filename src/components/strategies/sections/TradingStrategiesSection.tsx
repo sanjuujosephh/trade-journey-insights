@@ -19,7 +19,7 @@ export function TradingStrategiesSection({ onUnlockAll }: TradingStrategiesSecti
           </p>
         </div>
         <Button onClick={onUnlockAll} size="lg">
-          Unlock All Strategies (₹499)
+          Unlock All Strategies & Indicators (₹1499)
         </Button>
       </div>
       {tradingStrategies.map((strategy) => (

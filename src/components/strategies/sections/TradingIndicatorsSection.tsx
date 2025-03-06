@@ -2,6 +2,7 @@
 import { StrategyCard } from "../StrategyCard";
 import { ProductSection } from "../ProductSection";
 import { tradingIndicators } from "../data/mockData";
+import { Button } from "@/components/ui/button";
 
 interface TradingIndicatorsSectionProps {
   onUnlockAll: () => void;
@@ -16,6 +17,11 @@ export function TradingIndicatorsSection({ onUnlockAll }: TradingIndicatorsSecti
             Premium indicators designed to give you an edge in the markets. 
             These custom-built tools help identify high-probability setups and market conditions.
           </p>
+        </div>
+        <div className="mt-2 sm:mt-0">
+          <Button onClick={onUnlockAll} size="lg">
+            Unlock All Strategies & Indicators (₹1499)
+          </Button>
         </div>
       </div>
       {tradingIndicators.map((indicator) => (
