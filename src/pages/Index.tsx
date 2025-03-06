@@ -7,6 +7,7 @@ import { LandingPage } from "@/components/landing/LandingPage";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { AIAnalysisPanel } from "@/components/AIAnalysisPanel";
+import { toast } from "sonner";
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("trade-entry");
@@ -71,6 +72,7 @@ export default function Index() {
 
       if (response.error) {
         console.error('AI Analysis error:', response.error);
+        toast.error('Failed to analyze trades');
         throw new Error(response.error.message || 'Failed to analyze trades');
       }
 
@@ -78,6 +80,7 @@ export default function Index() {
       setIsAnalysisPanelOpen(true);
     } catch (error) {
       console.error('AI Analysis error:', error);
+      toast.error('An error occurred during analysis');
     } finally {
       setIsAnalyzing(false);
     }

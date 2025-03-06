@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      credit_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          id: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           created_at: string | null
@@ -147,6 +174,7 @@ export type Database = {
       trades: {
         Row: {
           ai_feedback: string | null
+          analysis_count: number | null
           call_iv: number | null
           chart_link: string | null
           confidence_level: number | null
@@ -183,6 +211,7 @@ export type Database = {
         }
         Insert: {
           ai_feedback?: string | null
+          analysis_count?: number | null
           call_iv?: number | null
           chart_link?: string | null
           confidence_level?: number | null
@@ -219,6 +248,7 @@ export type Database = {
         }
         Update: {
           ai_feedback?: string | null
+          analysis_count?: number | null
           call_iv?: number | null
           chart_link?: string | null
           confidence_level?: number | null
@@ -252,6 +282,42 @@ export type Database = {
           user_id?: string
           vix?: number | null
           vwap_position?: string | null
+        }
+        Relationships: []
+      }
+      user_credits: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_reset_date: string | null
+          next_reset_date: string | null
+          purchased_credits: number
+          subscription_credits: number
+          total_credits_used: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_reset_date?: string | null
+          next_reset_date?: string | null
+          purchased_credits?: number
+          subscription_credits?: number
+          total_credits_used?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_reset_date?: string | null
+          next_reset_date?: string | null
+          purchased_credits?: number
+          subscription_credits?: number
+          total_credits_used?: number
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }

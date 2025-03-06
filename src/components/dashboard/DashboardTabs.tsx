@@ -1,7 +1,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Loader2, PenLine, BarChart2, Calendar, Brain, Bot, GraduationCap, History, Settings, BookText, Store } from "lucide-react";
 import TradeEntry from "@/components/TradeEntry";
 import { FOTradeTable } from "@/components/analytics/FOTradeTable";
@@ -13,6 +12,7 @@ import LearningCenter from "@/components/LearningCenter";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { PerformanceMetrics } from "@/components/analytics/PerformanceMetrics";
 import { StrategiesTab } from "@/components/strategies/StrategiesTab";
+import { AIAnalysisTab } from "@/components/analytics/AIAnalysisTab";
 import { Trade } from "@/types/trade";
 import { cn } from "@/lib/utils";
 
@@ -104,38 +104,12 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="ai-analysis" className="mt-0 h-full">
-            <div className="p-1 sm:p-2 md:p-6">
-              <div className="flex flex-col md:flex-row md:justify-end gap-4 mb-6">
-                <Button
-                  onClick={() => analyzeTradesWithAI({ days: 1 })}
-                  disabled={isAnalyzing || trades.length === 0}
-                  className="w-full md:w-auto"
-                >
-                  {isAnalyzing ? "Analyzing Today's Trades..." : "Analyze Today's Trades"}
-                </Button>
-                <Button
-                  onClick={() => analyzeTradesWithAI({ days: 7 })}
-                  disabled={isAnalyzing || trades.length === 0}
-                  className="w-full md:w-auto"
-                >
-                  Analyze Last 7 Days' Trades
-                </Button>
-                <Button
-                  onClick={() => analyzeTradesWithAI({ days: 30 })}
-                  disabled={isAnalyzing || trades.length === 0}
-                  className="w-full md:w-auto"
-                >
-                  Analyze This Month's Trades
-                </Button>
-              </div>
-              <Card className="p-2 sm:p-4 md:p-6">
-                {currentAnalysis ? (
-                  <p className="whitespace-pre-wrap text-sm md:text-base">{currentAnalysis}</p>
-                ) : (
-                  <p className="text-muted-foreground text-sm md:text-base">Select an analysis option above to get AI insights about your trades.</p>
-                )}
-              </Card>
-            </div>
+            <AIAnalysisTab 
+              trades={trades}
+              isAnalyzing={isAnalyzing}
+              currentAnalysis={currentAnalysis}
+              analyzeTradesWithAI={analyzeTradesWithAI}
+            />
           </TabsContent>
 
           <TabsContent value="history" className="mt-0 h-full">
