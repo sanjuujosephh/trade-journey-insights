@@ -2,7 +2,6 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GoldenRupee } from "@/components/ui/golden-rupee";
 
 interface PreviewDialogProps {
   isOpen: boolean;
@@ -69,7 +68,6 @@ export function PreviewDialog({ isOpen, onOpenChange, item }: PreviewDialogProps
             </div>
 
             <Button className="w-full" size="lg">
-              <GoldenRupee className="mr-1.5" />
               Buy Now - ₹{item.price}
             </Button>
           </div>

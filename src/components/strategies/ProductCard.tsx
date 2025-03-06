@@ -2,7 +2,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
-import { GoldenRupee } from "@/components/ui/golden-rupee";
 
 interface ProductCardProps {
   title: string;
@@ -51,7 +50,6 @@ export function ProductCard({
               Preview
             </Button>
             <Button size="sm" onClick={onBuy}>
-              <GoldenRupee className="mr-1" size={14} />
               Buy Now
             </Button>
           </div>

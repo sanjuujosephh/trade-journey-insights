@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/tooltip";
 import { UserCredits } from "@/hooks/useUserCredits";
 import { format } from "date-fns";
-import { GoldenRupee } from "@/components/ui/golden-rupee";
 
 interface CreditsDisplayProps {
   credits: UserCredits | null;
@@ -71,7 +70,6 @@ export function CreditsDisplay({ credits, isLoading, onPurchaseClick }: CreditsD
         size="sm" 
         className="whitespace-nowrap"
       >
-        <GoldenRupee className="mr-1" size={14} />
         <CreditCard className="mr-2 h-4 w-4" />
         Buy Credits
       </Button>

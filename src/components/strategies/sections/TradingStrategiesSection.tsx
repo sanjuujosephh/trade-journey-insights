@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { StrategyCard } from "../StrategyCard";
 import { ProductSection } from "../ProductSection";
 import { tradingStrategies } from "../data/mockData";
-import { GoldenRupee } from "@/components/ui/golden-rupee";
 
 interface TradingStrategiesSectionProps {
   onUnlockAll: () => void;
@@ -20,7 +19,6 @@ export function TradingStrategiesSection({ onUnlockAll }: TradingStrategiesSecti
           </p>
         </div>
         <Button onClick={onUnlockAll} size="lg">
-          <GoldenRupee className="mr-1.5" size={18} />
           Unlock All Strategies & Indicators (₹1499)
         </Button>
       </div>
