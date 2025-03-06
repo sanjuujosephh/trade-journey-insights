@@ -14,6 +14,23 @@ export function StrategiesTab() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const { handlePayment, isPaymentConfigured, paymentConfigError, isTestMode } = usePayment();
   
+  // Unified handler for unlocking all strategies and indicators
+  const handleUnlockAll = async () => {
+    if (!isPaymentConfigured) {
+      toast.error("Payment system is not available. Please try again later.");
+      return;
+    }
+    
+    toast.info("Initiating payment for all strategies and indicators");
+    
+    try {
+      await handlePayment(null, true);
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Could not process payment request");
+    }
+  };
+  
   const handleBuy = async (item: any) => {
     if (!isPaymentConfigured) {
       toast.error("Payment system is not available. Please try again later.");
@@ -22,20 +39,6 @@ export function StrategiesTab() {
     
     try {
       await handlePayment(item);
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Could not process payment request");
-    }
-  };
-  
-  const handleUnlockAll = async () => {
-    if (!isPaymentConfigured) {
-      toast.error("Payment system is not available. Please try again later.");
-      return;
-    }
-    
-    try {
-      await handlePayment(null, true);
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Could not process payment request");
