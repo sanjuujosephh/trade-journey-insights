@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlanFeatureList } from "./PlanFeatureList";
+import { GoldenRupee } from "@/components/ui/golden-rupee";
 
 interface PricingPlanCardProps {
   title: string;
@@ -55,9 +56,14 @@ export function PricingPlanCard({
         >
           {isLoading 
             ? "Processing..." 
-            : buttonText || (isTestMode 
-              ? `Subscribe (Test Mode)` 
-              : "Subscribe Now")}
+            : (
+              <>
+                <GoldenRupee className="mr-1.5" />
+                {buttonText || (isTestMode 
+                  ? `Subscribe (Test Mode)` 
+                  : "Subscribe Now")}
+              </>
+            )}
         </Button>
       </CardFooter>
     </Card>

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { usePayment } from "@/components/strategies/hooks/usePayment";
 import { useUserCredits } from "@/hooks/useUserCredits";
+import { GoldenRupee } from "@/components/ui/golden-rupee";
 
 interface PurchaseCreditsDialogProps {
   open: boolean;
@@ -122,6 +123,7 @@ export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDia
               </>
             ) : (
               <>
+                <GoldenRupee className="mr-2" />
                 <CreditCard className="mr-2 h-4 w-4" />
                 Buy {selectedPackage.credits} Credits
               </>
