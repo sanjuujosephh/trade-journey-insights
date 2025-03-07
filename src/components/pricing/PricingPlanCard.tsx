@@ -31,7 +31,7 @@ export function PricingPlanCard({
   return (
     <Card className={`border rounded-lg shadow-sm ${isBestValue ? 'border-primary/20 bg-primary/5 relative' : ''}`}>
       {isBestValue && (
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
+        <div className="absolute -top-4 left-6 transform -translate-x-0 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
           Best Value
         </div>
       )}
