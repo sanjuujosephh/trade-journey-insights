@@ -1,86 +1,144 @@
 
-import { Card } from "@/components/ui/card";
-import { BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { Leaderboard } from "@/components/Leaderboard";
+import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2 } from "lucide-react";
 
-interface FeatureCardProps {
+export function LandingPage() {
+  return (
+    <div className="bg-background min-h-screen">
+      {/* Hero Section */}
+      <div className="container mx-auto py-16 md:py-24">
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+            The trading journal that helps you improve
+          </h1>
+          <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+            Track your trades, analyze your performance, and become a more profitable trader with our comprehensive suite of tools.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="gap-2">
+              Get Started <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button size="lg" variant="outline">
+              View Demo
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid md:grid-cols-5 gap-6 items-start">
+          {/* Left Content - Features */}
+          <div className="md:col-span-3 space-y-8">
+            <div className="bg-card border rounded-lg p-8 shadow-sm">
+              <h2 className="text-2xl font-semibold mb-6">Why traders choose us</h2>
+              <div className="grid sm:grid-cols-2 gap-6">
+                <FeatureItem 
+                  icon={<LineChart className="h-5 w-5" />}
+                  title="Advanced Analytics"
+                  description="Visualize your performance with detailed charts and metrics" 
+                />
+                <FeatureItem 
+                  icon={<BrainCircuit className="h-5 w-5" />}
+                  title="AI-Powered Analysis"
+                  description="Get AI-generated insights to improve your trading" 
+                />
+                <FeatureItem 
+                  icon={<Clock className="h-5 w-5" />}
+                  title="Real-Time Tracking"
+                  description="Log your trades in real-time to capture all details" 
+                />
+                <FeatureItem 
+                  icon={<ChartLine className="h-5 w-5" />}
+                  title="Performance Metrics"
+                  description="Track your win rate, P/L ratio, and other key indicators" 
+                />
+              </div>
+            </div>
+            
+            {/* Testimonial Section */}
+            <div className="bg-card border rounded-lg p-8 shadow-sm">
+              <h2 className="text-2xl font-semibold mb-6">What traders are saying</h2>
+              <div className="grid gap-6">
+                <blockquote className="border-l-2 border-primary pl-4 italic">
+                  "This journal has completely transformed how I approach trading. The analytics helped me identify patterns I couldn't see before."
+                  <footer className="mt-2 text-sm font-medium">— Rajesh K, Options Trader</footer>
+                </blockquote>
+                <blockquote className="border-l-2 border-primary pl-4 italic">
+                  "Finally a trading journal that focuses on improvement, not just tracking. The AI analysis is like having a mentor review my trades."
+                  <footer className="mt-2 text-sm font-medium">— Priya S, Day Trader</footer>
+                </blockquote>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Content - Auth Form */}
+          <div className="md:col-span-2 space-y-6 sticky top-24">
+            <div className="bg-card border rounded-lg p-6 shadow-sm">
+              <h2 className="text-2xl font-bold mb-6">Start Tracking</h2>
+              <AuthForm />
+            </div>
+            <div className="bg-card border rounded-lg p-6 shadow-sm">
+              <h3 className="font-medium mb-2">Special Launch Offer</h3>
+              <p className="text-sm text-muted-foreground mb-4">Get full access to all features for only ₹199/month during our launch period.</p>
+              <div className="flex items-center gap-2 text-sm text-primary">
+                <ArrowRight className="h-3 w-3" /> Limited time offer
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary Features */}
+      <div className="bg-muted/50 py-16">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Everything you need to improve your trading</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={<BookOpenText className="h-8 w-8" />}
+              title="Learning Resources"
+              description="Access our library of trading resources and educational content to improve your skills."
+            />
+            <FeatureCard
+              icon={<BarChart3 className="h-8 w-8" />}
+              title="Pattern Recognition"
+              description="Identify recurring patterns in your trading behavior and market conditions."
+            />
+            <FeatureCard
+              icon={<Share2 className="h-8 w-8" />}
+              title="Trade Templates"
+              description="Create templates for your favorite strategies to quickly log similar trades."
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface FeatureItemProps {
   icon: React.ReactNode;
   title: string;
   description: string;
 }
 
-function FeatureCard({ icon, title, description }: FeatureCardProps) {
+function FeatureItem({ icon, title, description }: FeatureItemProps) {
   return (
-    <Card className="p-6">
-      <div className="mb-4 text-primary">{icon}</div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-muted-foreground">{description}</p>
-    </Card>
+    <div className="flex gap-4">
+      <div className="mt-1 text-primary">{icon}</div>
+      <div>
+        <h3 className="font-medium">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+    </div>
   );
 }
 
-export function LandingPage() {
+function FeatureCard({ icon, title, description }: FeatureItemProps) {
   return (
-    <div className="bg-background py-12">
-      <div className="container py-8">
-        <div className="mx-auto max-w-5xl text-center mb-16">
-          <h1 className="text-4xl font-bold tracking-tight mb-6">
-            Your Complete Trading Journal & Analytics Platform
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8">
-            Track your trades, analyze your performance, and become a better trader with
-            our comprehensive suite of tools.
-          </p>
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-2 mb-16">
-          <Card className="p-6">
-            <h2 className="text-2xl font-bold mb-6">Start Your Journey</h2>
-            <AuthForm />
-          </Card>
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Top Performers</h2>
-              <BarChart3 className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <Leaderboard />
-          </Card>
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-16">
-          <FeatureCard
-            icon={<LineChart className="h-8 w-8" />}
-            title="Advanced Analytics"
-            description="Get detailed insights into your trading patterns with our comprehensive analytics dashboard."
-          />
-          <FeatureCard
-            icon={<BrainCircuit className="h-8 w-8" />}
-            title="AI-Powered Analysis"
-            description="Leverage AI to analyze your trades and get personalized recommendations for improvement."
-          />
-          <FeatureCard
-            icon={<Clock className="h-8 w-8" />}
-            title="Real-Time Tracking"
-            description="Log your trades in real-time and keep track of your positions with ease."
-          />
-          <FeatureCard
-            icon={<ChartLine className="h-8 w-8" />}
-            title="Performance Metrics"
-            description="Track your win rate, profit/loss ratio, and other key performance indicators."
-          />
-          <FeatureCard
-            icon={<BookOpenText className="h-8 w-8" />}
-            title="Learning Resources"
-            description="Access our library of trading resources and educational content to improve your skills."
-          />
-          <FeatureCard
-            icon={<Share2 className="h-8 w-8" />}
-            title="Community Insights"
-            description="Learn from top performers and share your success with the trading community."
-          />
-        </div>
-      </div>
+    <div className="bg-card border rounded-lg p-6 flex flex-col items-center text-center shadow-sm">
+      <div className="mb-4 text-primary">{icon}</div>
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
     </div>
   );
 }
