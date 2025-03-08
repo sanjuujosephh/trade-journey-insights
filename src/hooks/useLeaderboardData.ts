@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { parseDateString, parseTimeString } from "@/utils/datetime";
 
 export interface LeaderboardEntry {
   username: string;
@@ -21,15 +21,25 @@ export function useLeaderboardData() {
       console.log("Fetching leaderboard data...");
       
       // Calculate the timestamp for 24 hours ago
-      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      console.log("Filtering trades since:", twentyFourHoursAgo);
+      const now = new Date();
+      const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
       
-      // Get all trades with both entry and exit prices (completed trades) from the last 24 hours
+      console.log("Filtering trades since:", twentyFourHoursAgo.toISOString());
+      
+      // Get all trades 
       const { data: tradesData, error: tradesError } = await supabase
         .from('trades')
-        .select('user_id, entry_price, exit_price, quantity, timestamp')
-        .not('exit_price', 'is', null)
-        .gte('timestamp', twentyFourHoursAgo);
+        .select(`
+          id,
+          user_id,
+          entry_date,
+          entry_time,
+          entry_price,
+          exit_price,
+          quantity,
+          timestamp
+        `)
+        .not('exit_price', 'is', null);
       
       if (tradesError) {
         console.error('Error fetching trades data:', tradesError);
@@ -38,18 +48,51 @@ export function useLeaderboardData() {
       }
       
       console.log(`Raw trades data fetched: ${tradesData?.length || 0} trades`);
-      console.log("Sample trade:", tradesData?.[0]);
       
       if (!tradesData || tradesData.length === 0) {
-        console.log("No trades found with exit prices in the last 24 hours");
+        console.log("No completed trades found");
         setIsLoading(false);
         return;
       }
       
-      // Calculate P&L for each trade and group by user
+      // Filter trades based on entry date and time being within last 24 hours
+      const filtered24HourTrades = tradesData.filter(trade => {
+        if (!trade.entry_date || !trade.entry_time) return false;
+        
+        // Parse entry date and time
+        const dateObj = parseDateString(trade.entry_date);
+        if (!dateObj) return false;
+        
+        const { hours, minutes } = parseTimeString(trade.entry_time);
+        if (hours === null || minutes === null) return false;
+        
+        // Set the time on the date object
+        dateObj.setHours(hours, minutes, 0, 0);
+        
+        // Check if the entry datetime is within last 24 hours
+        return dateObj >= twentyFourHoursAgo && dateObj <= now;
+      });
+      
+      console.log(`Trades in last 24 hours based on entry date/time: ${filtered24HourTrades.length}`);
+      
+      // Group trades by user and keep only the latest trade for each user
+      const userLatestTradeMap = new Map();
+      
+      filtered24HourTrades.forEach(trade => {
+        const userId = trade.user_id;
+        
+        if (!userLatestTradeMap.has(userId) || 
+            new Date(trade.timestamp) > new Date(userLatestTradeMap.get(userId).timestamp)) {
+          userLatestTradeMap.set(userId, trade);
+        }
+      });
+      
+      console.log(`Users with trades in last 24 hours: ${userLatestTradeMap.size}`);
+      
+      // Calculate P&L for each user's latest trade
       const userPnLMap = new Map();
       
-      tradesData.forEach(trade => {
+      userLatestTradeMap.forEach((trade, userId) => {
         // Ensure we're working with numbers
         const entryPrice = parseFloat(String(trade.entry_price));
         const exitPrice = parseFloat(String(trade.exit_price));
@@ -66,17 +109,10 @@ export function useLeaderboardData() {
         
         console.log(`Trade P&L calculation: (${exitPrice} - ${entryPrice}) * ${quantity} = ${pnl}`);
         
-        // Add to user's total
-        if (!userPnLMap.has(trade.user_id)) {
-          userPnLMap.set(trade.user_id, {
-            user_id: trade.user_id,
-            profit_loss: 0
-          });
-        }
-        
-        const userData = userPnLMap.get(trade.user_id);
-        userData.profit_loss += pnl;
-        userPnLMap.set(trade.user_id, userData);
+        userPnLMap.set(userId, {
+          user_id: userId,
+          profit_loss: pnl
+        });
       });
       
       // No valid trades for P&L calculation
@@ -145,8 +181,6 @@ export function useLeaderboardData() {
         .map((entry, index) => ({ ...entry, rank: index + 1 }));
       
       console.log(`Winners: ${winners.length}, Losers: ${losers.length}`);
-      console.log('Sample winner:', winners[0]);
-      console.log('Sample loser:', losers[0]);
       
       setTopTraders(winners);
       setTopLosers(losers);
