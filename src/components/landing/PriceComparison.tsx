@@ -1,8 +1,7 @@
-
 import { Utensils, BookOpenText } from "lucide-react";
 import { Card } from "../ui/card";
 export function PriceComparison() {
-  return <div className="bg-card p-6 shadow-sm rounded">
+  return <div className="bg-card p-6 shadow-sm rounded py-0 px-0">
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Trading Journal Card */}
@@ -14,9 +13,7 @@ export function PriceComparison() {
             <h4 className="font-medium">Trading Journal</h4>
           </div>
           
-          <p className="text-sm text-muted-foreground mb-3">
-            Manage your trades and track performance efficiently
-          </p>
+          <p className="text-sm text-muted-foreground mb-3">Helps building habit that assists you for a lifetime.</p>
           
           {/* Price Display */}
           <div className="flex items-baseline mb-3">
@@ -43,13 +40,11 @@ export function PriceComparison() {
             <h4 className="font-medium">Crispy Burger</h4>
           </div>
           
-          <p className="text-sm text-muted-foreground mb-3">
-            A delicious treat that comes at a slightly higher price
-          </p>
+          <p className="text-sm text-muted-foreground mb-3">A delicious treat that doesn't last more than 15-minutes.</p>
           
           {/* Price Display */}
           <div className="flex items-baseline mb-3">
-            <span className="text-2xl font-bold text-orange-600">₹200</span>
+            <span className="text-2xl font-bold text-orange-600">₹220</span>
             <span className="text-sm text-muted-foreground ml-1">/each</span>
           </div>
           
