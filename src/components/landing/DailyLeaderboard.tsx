@@ -23,73 +23,95 @@ export function DailyLeaderboard() {
       try {
         setIsLoading(true);
         
-        // Get trades from the last 24 hours directly instead of using the function
+        // Get trades from the last 24 hours
         const oneDayAgo = new Date();
         oneDayAgo.setDate(oneDayAgo.getDate() - 1);
         
-        const { data, error } = await supabase
+        // First, get the trades
+        const { data: tradesData, error: tradesError } = await supabase
           .from('trades')
           .select(`
             id,
             user_id,
             entry_price,
             exit_price,
-            quantity,
-            profiles(username, avatar_url)
+            quantity
           `)
           .gt('timestamp', oneDayAgo.toISOString())
           .not('exit_price', 'is', null);
         
-        if (error) {
-          console.error('Error fetching leaderboard data:', error);
+        if (tradesError) {
+          console.error('Error fetching trades data:', tradesError);
           return;
         }
         
-        // Process the data manually
-        if (data && data.length > 0) {
-          const userPnLMap = new Map();
-          
-          // Calculate profit/loss for each trade and group by user
-          data.forEach(trade => {
-            if (!trade.profiles) return;
-            
-            const userId = trade.user_id;
-            const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
-            
-            if (!userPnLMap.has(userId)) {
-              userPnLMap.set(userId, {
-                username: trade.profiles.username,
-                avatar_url: trade.profiles.avatar_url || '',
-                profit_loss: 0
-              });
-            }
-            
-            const userData = userPnLMap.get(userId);
-            userData.profit_loss += pnl;
-            userPnLMap.set(userId, userData);
-          });
-          
-          // Convert to array and sort
-          const leaderboardEntries = Array.from(userPnLMap.values())
-            .map((entry, index) => ({
-              ...entry,
-              rank: index + 1
-            }));
-          
-          // Separate winners and losers
-          const winners = leaderboardEntries
-            .filter(entry => entry.profit_loss > 0)
-            .sort((a, b) => b.profit_loss - a.profit_loss)
-            .map((entry, index) => ({ ...entry, rank: index + 1 }));
-            
-          const losers = leaderboardEntries
-            .filter(entry => entry.profit_loss < 0)
-            .sort((a, b) => a.profit_loss - b.profit_loss)
-            .map((entry, index) => ({ ...entry, rank: index + 1 }));
-          
-          setTopTraders(winners);
-          setTopLosers(losers);
+        if (!tradesData || tradesData.length === 0) {
+          setIsLoading(false);
+          return;
         }
+        
+        // Get unique user IDs from trades
+        const userIds = [...new Set(tradesData.map(trade => trade.user_id))];
+        
+        // Fetch profiles separately
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, username, avatar_url')
+          .in('id', userIds);
+          
+        if (profilesError) {
+          console.error('Error fetching profiles data:', profilesError);
+          return;
+        }
+        
+        // Create a map for quick lookup of profiles by ID
+        const profilesMap = new Map();
+        if (profilesData) {
+          profilesData.forEach(profile => {
+            profilesMap.set(profile.id, {
+              username: profile.username || 'Anonymous',
+              avatar_url: profile.avatar_url || ''
+            });
+          });
+        }
+        
+        // Calculate profit/loss for each user
+        const userPnLMap = new Map();
+        
+        tradesData.forEach(trade => {
+          const userId = trade.user_id;
+          const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+          
+          if (!userPnLMap.has(userId)) {
+            const profile = profilesMap.get(userId) || { username: 'Anonymous', avatar_url: '' };
+            userPnLMap.set(userId, {
+              username: profile.username,
+              avatar_url: profile.avatar_url,
+              profit_loss: 0
+            });
+          }
+          
+          const userData = userPnLMap.get(userId);
+          userData.profit_loss += pnl;
+          userPnLMap.set(userId, userData);
+        });
+        
+        // Convert to array and sort
+        const leaderboardEntries = Array.from(userPnLMap.values());
+        
+        // Separate winners and losers
+        const winners = leaderboardEntries
+          .filter(entry => entry.profit_loss > 0)
+          .sort((a, b) => b.profit_loss - a.profit_loss)
+          .map((entry, index) => ({ ...entry, rank: index + 1 }));
+          
+        const losers = leaderboardEntries
+          .filter(entry => entry.profit_loss < 0)
+          .sort((a, b) => a.profit_loss - b.profit_loss)
+          .map((entry, index) => ({ ...entry, rank: index + 1 }));
+        
+        setTopTraders(winners);
+        setTopLosers(losers);
       } catch (error) {
         console.error('Error in leaderboard fetch:', error);
       } finally {
