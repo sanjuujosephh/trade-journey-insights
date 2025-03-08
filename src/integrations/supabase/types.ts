@@ -340,6 +340,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_daily_leaderboard: {
+        Args: {
+          limit_count?: number
+        }
+        Returns: {
+          username: string
+          avatar_url: string
+          profit_loss: number
+          rank: number
+        }[]
+      }
       has_active_subscription: {
         Args: {
           user_id: string

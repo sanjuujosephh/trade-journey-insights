@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2 } from "lucide-react";
+import { DailyLeaderboard } from "./DailyLeaderboard";
 
 export function LandingPage() {
   return (
@@ -27,7 +28,7 @@ export function LandingPage() {
 
         {/* Main Content Grid */}
         <div className="grid md:grid-cols-5 gap-6 items-start">
-          {/* Left Content - Features */}
+          {/* Left Content - Features and Leaderboard */}
           <div className="md:col-span-3 space-y-8">
             <div className="bg-card border rounded-lg p-8 shadow-sm">
               <h2 className="text-2xl font-semibold mb-6">Why traders choose us</h2>
@@ -54,6 +55,9 @@ export function LandingPage() {
                 />
               </div>
             </div>
+            
+            {/* Leaderboard Section */}
+            <DailyLeaderboard />
             
             {/* Testimonial Section */}
             <div className="bg-card border rounded-lg p-8 shadow-sm">
