@@ -22,17 +22,70 @@ export function DailyLeaderboard() {
     async function fetchLeaderboardData() {
       try {
         setIsLoading(true);
-        const { data, error } = await supabase.rpc('get_daily_leaderboard', { limit_count: 20 });
+        
+        // Get trades from the last 24 hours directly instead of using the function
+        const oneDayAgo = new Date();
+        oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+        
+        const { data, error } = await supabase
+          .from('trades')
+          .select(`
+            id,
+            user_id,
+            entry_price,
+            exit_price,
+            quantity,
+            profiles(username, avatar_url)
+          `)
+          .gt('timestamp', oneDayAgo.toISOString())
+          .not('exit_price', 'is', null);
         
         if (error) {
           console.error('Error fetching leaderboard data:', error);
           return;
         }
         
-        if (data) {
-          // Split data into winners and losers
-          const winners = data.filter(entry => entry.profit_loss > 0);
-          const losers = data.filter(entry => entry.profit_loss < 0);
+        // Process the data manually
+        if (data && data.length > 0) {
+          const userPnLMap = new Map();
+          
+          // Calculate profit/loss for each trade and group by user
+          data.forEach(trade => {
+            if (!trade.profiles) return;
+            
+            const userId = trade.user_id;
+            const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+            
+            if (!userPnLMap.has(userId)) {
+              userPnLMap.set(userId, {
+                username: trade.profiles.username,
+                avatar_url: trade.profiles.avatar_url || '',
+                profit_loss: 0
+              });
+            }
+            
+            const userData = userPnLMap.get(userId);
+            userData.profit_loss += pnl;
+            userPnLMap.set(userId, userData);
+          });
+          
+          // Convert to array and sort
+          const leaderboardEntries = Array.from(userPnLMap.values())
+            .map((entry, index) => ({
+              ...entry,
+              rank: index + 1
+            }));
+          
+          // Separate winners and losers
+          const winners = leaderboardEntries
+            .filter(entry => entry.profit_loss > 0)
+            .sort((a, b) => b.profit_loss - a.profit_loss)
+            .map((entry, index) => ({ ...entry, rank: index + 1 }));
+            
+          const losers = leaderboardEntries
+            .filter(entry => entry.profit_loss < 0)
+            .sort((a, b) => a.profit_loss - b.profit_loss)
+            .map((entry, index) => ({ ...entry, rank: index + 1 }));
           
           setTopTraders(winners);
           setTopLosers(losers);
@@ -46,8 +99,8 @@ export function DailyLeaderboard() {
 
     fetchLeaderboardData();
 
-    // Set up a refresher to update every hour
-    const intervalId = setInterval(fetchLeaderboardData, 60 * 60 * 1000);
+    // Set up a refresher to update every minute
+    const intervalId = setInterval(fetchLeaderboardData, 60 * 1000);
     
     return () => clearInterval(intervalId);
   }, []);
