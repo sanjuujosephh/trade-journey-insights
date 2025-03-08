@@ -24,7 +24,8 @@ export function useLeaderboardData() {
       
       console.log("Fetching trades since:", oneDayAgo.toISOString());
       
-      // First, get the trades
+      // First, get all trades without timestamp filtering
+      // This avoids format mismatch issues and we'll filter in memory
       const { data: tradesData, error: tradesError } = await supabase
         .from('trades')
         .select(`
@@ -34,8 +35,7 @@ export function useLeaderboardData() {
           exit_price,
           quantity,
           timestamp
-        `)
-        .gt('timestamp', oneDayAgo.toISOString());
+        `);
       
       if (tradesError) {
         console.error('Error fetching trades data:', tradesError);
@@ -43,15 +43,30 @@ export function useLeaderboardData() {
         return;
       }
       
-      console.log("Trades fetched:", tradesData?.length || 0, tradesData);
+      console.log("All trades fetched:", tradesData?.length || 0);
       
       if (!tradesData || tradesData.length === 0) {
         setIsLoading(false);
         return;
       }
       
+      // Filter trades by timestamp in memory
+      // This is more reliable than using the GT operator with different timestamp formats
+      const filteredTrades = tradesData.filter(trade => {
+        if (!trade.timestamp) return false;
+        const tradeDate = new Date(trade.timestamp);
+        return tradeDate >= oneDayAgo;
+      });
+      
+      console.log("Filtered trades within timeframe:", filteredTrades.length, filteredTrades);
+      
+      if (filteredTrades.length === 0) {
+        setIsLoading(false);
+        return;
+      }
+      
       // Get unique user IDs from trades
-      const userIds = [...new Set(tradesData.map(trade => trade.user_id))];
+      const userIds = [...new Set(filteredTrades.map(trade => trade.user_id))];
       
       console.log("Unique user IDs:", userIds);
       
@@ -83,7 +98,7 @@ export function useLeaderboardData() {
       // Calculate profit/loss for each user
       const userPnLMap = new Map();
       
-      tradesData.forEach(trade => {
+      filteredTrades.forEach(trade => {
         // Skip trades with missing data
         if (!trade.exit_price || !trade.entry_price || !trade.quantity) {
           console.log("Skipping trade with missing data:", trade);
