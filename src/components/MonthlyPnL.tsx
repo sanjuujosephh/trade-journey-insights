@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { startOfMonth, endOfMonth, format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { dateToISTString } from "@/utils/datetime";
@@ -18,24 +18,14 @@ export function MonthlyPnL() {
     setIsRefreshing(true);
 
     try {
-      const currentDate = new Date();
-      const monthStart = startOfMonth(currentDate);
-      monthStart.setHours(0, 0, 0, 0);
+      console.log("Calculating monthly P&L for user:", user.id);
       
-      const monthEnd = endOfMonth(currentDate);
-      monthEnd.setHours(23, 59, 59, 999);
-      
-      const istMonthStart = dateToISTString(monthStart);
-      const istMonthEnd = dateToISTString(monthEnd);
-
-      console.log('Fetching trades between:', { istMonthStart, istMonthEnd });
-
+      // Fetch all completed trades (with exit prices) for the current user
       const { data: trades, error } = await supabase
         .from('trades')
         .select('entry_price, exit_price, quantity')
-        .gte('entry_time', istMonthStart)
-        .lte('entry_time', istMonthEnd)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .not('exit_price', 'is', null);
 
       if (error) {
         console.error('Error fetching trades:', error);
@@ -47,12 +37,31 @@ export function MonthlyPnL() {
         return;
       }
 
-      const totalPnL = trades?.reduce((sum, trade) => {
-        if (trade.exit_price && trade.entry_price && trade.quantity) {
-          return sum + ((trade.exit_price - trade.entry_price) * trade.quantity);
+      console.log(`Found ${trades?.length || 0} trades with exit prices`);
+      
+      if (!trades || trades.length === 0) {
+        console.log("No completed trades found");
+        setMonthlyPnL(0);
+        return;
+      }
+
+      // Calculate total P&L from all trades
+      const totalPnL = trades.reduce((sum, trade) => {
+        // Ensure we're working with numbers
+        const entryPrice = Number(trade.entry_price);
+        const exitPrice = Number(trade.exit_price);
+        const quantity = Number(trade.quantity);
+        
+        if (isNaN(entryPrice) || isNaN(exitPrice) || isNaN(quantity)) {
+          console.log("Skipping trade with invalid numbers:", trade);
+          return sum;
         }
-        return sum;
-      }, 0) || 0;
+        
+        const tradePnL = (exitPrice - entryPrice) * quantity;
+        console.log(`Trade P&L: ${tradePnL} (entry: ${entryPrice}, exit: ${exitPrice}, qty: ${quantity})`);
+        
+        return sum + tradePnL;
+      }, 0);
 
       setMonthlyPnL(totalPnL);
       console.log('Monthly P&L updated:', totalPnL);
@@ -125,4 +134,3 @@ export function MonthlyPnL() {
     </Button>
   );
 }
-
