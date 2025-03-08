@@ -18,12 +18,12 @@ export function useLeaderboardData() {
     try {
       setIsLoading(true);
       
-      console.log("Fetching leaderboard data directly from trades and profiles tables");
+      console.log("Fetching leaderboard data...");
       
-      // Get all trades with completed profit/loss (having both entry and exit prices)
+      // First, get all trades with both entry and exit prices (completed trades)
       const { data: tradesData, error: tradesError } = await supabase
         .from('trades')
-        .select('*')
+        .select('user_id, entry_price, exit_price, quantity')
         .not('exit_price', 'is', null);
       
       if (tradesError) {
@@ -32,8 +32,8 @@ export function useLeaderboardData() {
         return;
       }
       
-      console.log("All trades fetched:", tradesData?.length || 0);
-      console.log("Sample trade data:", tradesData?.[0]);
+      console.log(`Raw trades data fetched: ${tradesData?.length || 0} trades`);
+      console.log("Sample trade:", tradesData?.[0]);
       
       if (!tradesData || tradesData.length === 0) {
         console.log("No trades found with exit prices");
@@ -41,88 +41,92 @@ export function useLeaderboardData() {
         return;
       }
       
-      // Get unique user IDs from trades
-      const userIds = [...new Set(tradesData.map(trade => trade.user_id))];
+      // Calculate P&L for each trade and group by user
+      const userPnLMap = new Map();
       
-      console.log("Unique user IDs:", userIds);
+      tradesData.forEach(trade => {
+        // Ensure we're working with numbers
+        const entryPrice = parseFloat(String(trade.entry_price));
+        const exitPrice = parseFloat(String(trade.exit_price));
+        const quantity = parseFloat(String(trade.quantity));
+        
+        // Skip trades with invalid data
+        if (isNaN(entryPrice) || isNaN(exitPrice) || isNaN(quantity)) {
+          console.log("Skipping trade with invalid numeric data:", trade);
+          return;
+        }
+        
+        // Calculate P&L
+        const pnl = (exitPrice - entryPrice) * quantity;
+        
+        console.log(`Trade P&L calculation: (${exitPrice} - ${entryPrice}) * ${quantity} = ${pnl}`);
+        
+        // Add to user's total
+        if (!userPnLMap.has(trade.user_id)) {
+          userPnLMap.set(trade.user_id, {
+            user_id: trade.user_id,
+            profit_loss: 0
+          });
+        }
+        
+        const userData = userPnLMap.get(trade.user_id);
+        userData.profit_loss += pnl;
+        userPnLMap.set(trade.user_id, userData);
+      });
       
-      // Fetch profiles for these users
+      // No valid trades for P&L calculation
+      if (userPnLMap.size === 0) {
+        console.log("No valid trades found for P&L calculation");
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log(`User P&L map created with ${userPnLMap.size} users`);
+      
+      // Get user profiles for the users with trades
+      const userIds = Array.from(userPnLMap.keys());
+      
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
         .in('id', userIds);
-        
+      
       if (profilesError) {
         console.error('Error fetching profiles data:', profilesError);
         setIsLoading(false);
         return;
       }
       
-      console.log("Profiles fetched:", profilesData?.length || 0);
+      console.log(`Fetched ${profilesData?.length || 0} user profiles`);
       
-      // Create a map for quick lookup of profiles by ID
+      // Create a map of profiles
       const profilesMap = new Map();
-      if (profilesData) {
-        profilesData.forEach(profile => {
-          profilesMap.set(profile.id, {
-            username: profile.username || 'Anonymous',
-            avatar_url: profile.avatar_url || ''
-          });
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, {
+          username: profile.username || 'Anonymous',
+          avatar_url: profile.avatar_url || ''
         });
-      }
-      
-      // Calculate profit/loss for each user
-      const userPnLMap = new Map();
-      
-      let validTradesCount = 0;
-      let totalPnL = 0;
-      
-      tradesData.forEach(trade => {
-        // Skip trades with missing data
-        if (trade.exit_price === null || trade.entry_price === null || trade.quantity === null) {
-          console.log(`Skipping trade ${trade.id} due to missing data:`, 
-                    `exit_price=${trade.exit_price}, entry_price=${trade.entry_price}, quantity=${trade.quantity}`);
-          return;
-        }
-        
-        validTradesCount++;
-        const userId = trade.user_id;
-        // Ensure we're working with numbers
-        const entryPrice = Number(trade.entry_price);
-        const exitPrice = Number(trade.exit_price);
-        const quantity = Number(trade.quantity);
-        
-        // Calculate P&L
-        const pnl = (exitPrice - entryPrice) * quantity;
-        totalPnL += pnl;
-        
-        console.log(`Trade ${trade.id}: Entry: ${entryPrice}, Exit: ${exitPrice}, Qty: ${quantity}, P&L: ${pnl}`);
-        
-        if (!userPnLMap.has(userId)) {
-          const profile = profilesMap.get(userId) || { username: 'Anonymous', avatar_url: '' };
-          userPnLMap.set(userId, {
-            username: profile.username,
-            avatar_url: profile.avatar_url,
-            profit_loss: 0
-          });
-        }
-        
-        const userData = userPnLMap.get(userId);
-        userData.profit_loss += pnl;
-        userPnLMap.set(userId, userData);
       });
       
-      console.log(`Valid trades count: ${validTradesCount}, Total P&L across all trades: ${totalPnL}`);
+      // Combine PnL data with profile data
+      const leaderboardEntries: LeaderboardEntry[] = [];
       
-      if (validTradesCount === 0) {
-        console.log("No valid trades found with complete entry/exit data");
-        setIsLoading(false);
-        return;
-      }
+      userPnLMap.forEach((data, userId) => {
+        const profile = profilesMap.get(userId);
+        
+        if (profile) {
+          leaderboardEntries.push({
+            username: profile.username,
+            avatar_url: profile.avatar_url,
+            profit_loss: data.profit_loss,
+            rank: 0 // Will be set later
+          });
+        } else {
+          console.log(`No profile found for user ID: ${userId}`);
+        }
+      });
       
-      // Convert to array and sort
-      const leaderboardEntries = Array.from(userPnLMap.values());
-      console.log("All leaderboard entries before filtering:", leaderboardEntries);
+      console.log(`Created ${leaderboardEntries.length} leaderboard entries`);
       
       // Separate winners and losers
       const winners = leaderboardEntries
@@ -135,8 +139,9 @@ export function useLeaderboardData() {
         .sort((a, b) => a.profit_loss - b.profit_loss)
         .map((entry, index) => ({ ...entry, rank: index + 1 }));
       
-      console.log("Winners:", winners);
-      console.log("Losers:", losers);
+      console.log(`Winners: ${winners.length}, Losers: ${losers.length}`);
+      console.log('Sample winner:', winners[0]);
+      console.log('Sample loser:', losers[0]);
       
       setTopTraders(winners);
       setTopLosers(losers);

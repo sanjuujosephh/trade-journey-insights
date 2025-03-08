@@ -2,10 +2,9 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { startOfMonth, endOfMonth, format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { dateToISTString } from "@/utils/datetime";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 export function MonthlyPnL() {
   const { user } = useAuth();
@@ -47,10 +46,10 @@ export function MonthlyPnL() {
 
       // Calculate total P&L from all trades
       const totalPnL = trades.reduce((sum, trade) => {
-        // Ensure we're working with numbers
-        const entryPrice = Number(trade.entry_price);
-        const exitPrice = Number(trade.exit_price);
-        const quantity = Number(trade.quantity);
+        // Ensure we're working with numbers by explicitly parsing
+        const entryPrice = parseFloat(String(trade.entry_price));
+        const exitPrice = parseFloat(String(trade.exit_price));
+        const quantity = parseFloat(String(trade.quantity));
         
         if (isNaN(entryPrice) || isNaN(exitPrice) || isNaN(quantity)) {
           console.log("Skipping trade with invalid numbers:", trade);
@@ -63,8 +62,8 @@ export function MonthlyPnL() {
         return sum + tradePnL;
       }, 0);
 
+      console.log('Total P&L calculated:', totalPnL);
       setMonthlyPnL(totalPnL);
-      console.log('Monthly P&L updated:', totalPnL);
     } catch (err) {
       console.error('Error calculating P&L:', err);
       toast({
@@ -128,7 +127,7 @@ export function MonthlyPnL() {
       <div className="flex flex-col items-center justify-center text-center w-full leading-none">
         <span className="text-[10px] text-foreground">P&L</span>
         <span className={`text-sm ${monthlyPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-          ₹{monthlyPnL.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+          {formatCurrency(monthlyPnL)}
         </span>
       </div>
     </Button>

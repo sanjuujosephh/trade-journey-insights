@@ -14,5 +14,5 @@ export function formatCurrency(amount: number) {
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 0
-  }).format(Math.abs(numericAmount));
+  }).format(numericAmount);
 }
