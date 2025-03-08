@@ -1,5 +1,5 @@
 
-import { Burger, BookOpenText } from "lucide-react";
+import { Utensils, BookOpenText } from "lucide-react";
 import { Card } from "../ui/card";
 export function PriceComparison() {
   return <div className="bg-card p-6 shadow-sm rounded">
@@ -38,7 +38,7 @@ export function PriceComparison() {
         <Card className="p-4 bg-gradient-to-br from-orange-50 to-red-50 border-orange-200 overflow-hidden relative">
           <div className="flex items-center mb-3">
             <div className="p-2 rounded-full bg-orange-100 mr-3">
-              <Burger className="h-6 w-6 text-orange-600" />
+              <Utensils className="h-6 w-6 text-orange-600" />
             </div>
             <h4 className="font-medium">Crispy Burger</h4>
           </div>
