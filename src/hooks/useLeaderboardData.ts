@@ -18,9 +18,11 @@ export function useLeaderboardData() {
     try {
       setIsLoading(true);
       
-      // Get trades from the last 24 hours
+      // Get trades from the last 24 hours - Use a longer time window for testing
       const oneDayAgo = new Date();
-      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+      oneDayAgo.setDate(oneDayAgo.getDate() - 7); // Using 7 days instead of 1 for testing
+      
+      console.log("Fetching trades since:", oneDayAgo.toISOString());
       
       // First, get the trades
       const { data: tradesData, error: tradesError } = await supabase
@@ -30,15 +32,18 @@ export function useLeaderboardData() {
           user_id,
           entry_price,
           exit_price,
-          quantity
+          quantity,
+          timestamp
         `)
-        .gt('timestamp', oneDayAgo.toISOString())
-        .not('exit_price', 'is', null);
+        .gt('timestamp', oneDayAgo.toISOString());
       
       if (tradesError) {
         console.error('Error fetching trades data:', tradesError);
+        setIsLoading(false);
         return;
       }
+      
+      console.log("Trades fetched:", tradesData?.length || 0, tradesData);
       
       if (!tradesData || tradesData.length === 0) {
         setIsLoading(false);
@@ -48,6 +53,8 @@ export function useLeaderboardData() {
       // Get unique user IDs from trades
       const userIds = [...new Set(tradesData.map(trade => trade.user_id))];
       
+      console.log("Unique user IDs:", userIds);
+      
       // Fetch profiles separately
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
@@ -56,8 +63,11 @@ export function useLeaderboardData() {
         
       if (profilesError) {
         console.error('Error fetching profiles data:', profilesError);
+        setIsLoading(false);
         return;
       }
+      
+      console.log("Profiles fetched:", profilesData?.length || 0, profilesData);
       
       // Create a map for quick lookup of profiles by ID
       const profilesMap = new Map();
@@ -74,6 +84,12 @@ export function useLeaderboardData() {
       const userPnLMap = new Map();
       
       tradesData.forEach(trade => {
+        // Skip trades with missing data
+        if (!trade.exit_price || !trade.entry_price || !trade.quantity) {
+          console.log("Skipping trade with missing data:", trade);
+          return;
+        }
+        
         const userId = trade.user_id;
         const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
         
@@ -91,6 +107,8 @@ export function useLeaderboardData() {
         userPnLMap.set(userId, userData);
       });
       
+      console.log("User PnL calculated:", Array.from(userPnLMap.entries()));
+      
       // Convert to array and sort
       const leaderboardEntries = Array.from(userPnLMap.values());
       
@@ -104,6 +122,9 @@ export function useLeaderboardData() {
         .filter(entry => entry.profit_loss < 0)
         .sort((a, b) => a.profit_loss - b.profit_loss)
         .map((entry, index) => ({ ...entry, rank: index + 1 }));
+      
+      console.log("Winners:", winners);
+      console.log("Losers:", losers);
       
       setTopTraders(winners);
       setTopLosers(losers);

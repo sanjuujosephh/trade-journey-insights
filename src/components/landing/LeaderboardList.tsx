@@ -23,6 +23,9 @@ export function LeaderboardList({ entries, isLoading, formatAmount, isProfit }: 
     return (
       <div className="p-8 text-center">
         <div className="text-muted-foreground">No data available for the past 24 hours</div>
+        <div className="text-xs text-muted-foreground mt-2">
+          (Checking for trades in the last 7 days for testing)
+        </div>
       </div>
     );
   }
