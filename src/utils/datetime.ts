@@ -1,3 +1,4 @@
+
 export function formatToIST(date: Date): { datePart: string; timePart: string } {
   const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
   const istTime = new Date(date.getTime() + istOffset);
@@ -72,4 +73,14 @@ export function isValidDateTime(dateStr: string, timeStr: string): boolean {
   }
   
   return true;
+}
+
+/**
+ * Converts a Date object to an IST formatted string
+ * @param date The date to convert
+ * @returns IST formatted date string in the format "DD-MM-YYYY HH:MM:SS"
+ */
+export function dateToISTString(date: Date): string {
+  const { datePart, timePart } = formatToIST(date);
+  return `${datePart} ${timePart}`;
 }
