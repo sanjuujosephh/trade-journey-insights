@@ -12,10 +12,10 @@ export function LandingPage() {
             Track your trades, analyze your performance, and become a more profitable trader with our comprehensive suite of tools.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="gap-2">
+            <Button size="lg" className="gap-2 text-lg">
               Get Started <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button size="lg" variant="outline">
+            <Button size="lg" variant="outline" className="text-lg">
               View Demo
             </Button>
           </div>
@@ -61,13 +61,7 @@ export function LandingPage() {
               <h2 className="text-2xl font-bold mb-6">Start Tracking</h2>
               <AuthForm />
             </div>
-            <div className="bg-card border rounded-lg p-6 shadow-sm">
-              <h3 className="font-medium mb-2">Special Launch Offer</h3>
-              <p className="text-sm text-muted-foreground mb-4">Get full access to all features for only ₹199/month during our launch period.</p>
-              <div className="flex items-center gap-2 text-sm text-primary">
-                <ArrowRight className="h-3 w-3" /> Limited time offer
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
