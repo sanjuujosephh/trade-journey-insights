@@ -19,14 +19,23 @@ export function useAddTrade(userId: string | null) {
       const now = new Date();
       const { datePart, timePart } = formatToIST(now);
 
+      // Strip AM/PM from time fields to prevent database errors
+      const cleanEntryTime = newTrade.entry_time ? 
+        newTrade.entry_time.replace(/\s?[AP]M$/i, '') : 
+        timePart.replace(/\s?[AP]M$/i, '');
+        
+      const cleanExitTime = newTrade.exit_time ? 
+        newTrade.exit_time.replace(/\s?[AP]M$/i, '') : 
+        null;
+
       // Create a properly formatted trade object
       const tradeData = {
         ...newTrade,
         user_id: userId,
         entry_date: newTrade.entry_date || datePart,
-        // Store time values as strings, not with AM/PM format
-        entry_time: newTrade.entry_time || timePart,
-        exit_time: newTrade.exit_time || null,
+        // Store time values without AM/PM format
+        entry_time: cleanEntryTime,
+        exit_time: cleanExitTime,
         // Set the timestamp as an ISO string that Postgres can handle
         timestamp: now.toISOString()
       };

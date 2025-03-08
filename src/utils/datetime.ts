@@ -13,7 +13,7 @@ export function formatToIST(date: Date): { datePart: string; timePart: string } 
   const ampm = hours >= 12 ? 'PM' : 'AM';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
-  const timePart = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+  const timePart = `${String(hours).padStart(2, '0')}:${minutes}`;
 
   return { datePart, timePart };
 }
@@ -68,8 +68,10 @@ export function isValidDateTime(dateStr: string, timeStr: string): boolean {
   
   // If time is provided, do basic validation
   if (timeStr) {
-    // For simple time validation, just check if it has numbers and expected characters
-    return /^([0-1]?[0-9]|2[0-3]):[0-5][0-9](\s*[AP]M)?$/.test(timeStr);
+    // Extract just the HH:MM part, ignore AM/PM for database validation
+    const cleanTimeStr = timeStr.replace(/\s?[AP]M$/i, '');
+    // For simple time validation, just check if it has numbers and a colon
+    return /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(cleanTimeStr);
   }
   
   return true;
@@ -78,9 +80,20 @@ export function isValidDateTime(dateStr: string, timeStr: string): boolean {
 /**
  * Converts a Date object to an IST formatted string
  * @param date The date to convert
- * @returns IST formatted date string in the format "DD-MM-YYYY HH:MM:SS"
+ * @returns IST formatted date string in the format "DD-MM-YYYY HH:MM"
  */
 export function dateToISTString(date: Date): string {
   const { datePart, timePart } = formatToIST(date);
+  // Return without AM/PM to avoid database errors
   return `${datePart} ${timePart}`;
+}
+
+/**
+ * Formats a time string by removing AM/PM for database storage
+ * @param timeStr Time string that might include AM/PM
+ * @returns Cleaned time string without AM/PM
+ */
+export function cleanTimeFormat(timeStr: string): string {
+  if (!timeStr) return '';
+  return timeStr.replace(/\s?[AP]M$/i, '');
 }

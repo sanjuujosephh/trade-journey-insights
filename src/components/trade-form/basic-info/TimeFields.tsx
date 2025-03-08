@@ -57,6 +57,9 @@ export function TimeFields({ formData, handleChange }: TimeFieldsProps) {
           hideDate
         />
       </div>
+      <div className="text-xs text-muted-foreground">
+        Time format: HH:MM (e.g., 10:30 AM)
+      </div>
     </div>
   );
 }
