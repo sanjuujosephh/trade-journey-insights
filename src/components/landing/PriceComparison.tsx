@@ -1,8 +1,8 @@
-import { Beef, BookOpenText } from "lucide-react";
+
+import { Burger, BookOpenText } from "lucide-react";
 import { Card } from "../ui/card";
 export function PriceComparison() {
-  return <div className="bg-card border p-6 shadow-sm rounded">
-      
+  return <div className="bg-card p-6 shadow-sm rounded">
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Trading Journal Card */}
@@ -31,14 +31,14 @@ export function PriceComparison() {
           }}></div>
           </div>
           
-          <p className="text-xs text-green-600 font-medium">Lasts a whole month 😱</p>
+          <p className="text-xs text-green-600 font-medium">Lasts a whole month 😱</p>
         </Card>
         
         {/* Burger Card */}
         <Card className="p-4 bg-gradient-to-br from-orange-50 to-red-50 border-orange-200 overflow-hidden relative">
           <div className="flex items-center mb-3">
             <div className="p-2 rounded-full bg-orange-100 mr-3">
-              <Beef className="h-6 w-6 text-orange-600" />
+              <Burger className="h-6 w-6 text-orange-600" />
             </div>
             <h4 className="font-medium">Crispy Burger</h4>
           </div>
