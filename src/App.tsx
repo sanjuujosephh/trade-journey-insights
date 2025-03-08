@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { UserMenu } from "./components/auth/UserMenu";
 import { useAuth } from "./contexts/AuthContext";
 import { AuthGuard } from "./components/auth/AuthGuard";
+import { DisclaimerModal } from "./components/auth/DisclaimerModal";
 import Index from "./pages/Index";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
@@ -74,6 +75,8 @@ function Navigation() {
 }
 
 function Layout({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
@@ -81,6 +84,7 @@ function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <Footer />
+      {user && <DisclaimerModal />}
     </div>
   );
 }

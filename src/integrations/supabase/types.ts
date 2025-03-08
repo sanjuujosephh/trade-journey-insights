@@ -36,6 +36,27 @@ export type Database = {
         }
         Relationships: []
       }
+      disclaimer_acceptances: {
+        Row: {
+          accepted_at: string | null
+          disclaimer_version: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          disclaimer_version?: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          disclaimer_version?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           created_at: string | null
