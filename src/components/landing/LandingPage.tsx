@@ -28,8 +28,12 @@ export function LandingPage() {
 
         {/* Main Content Grid */}
         <div className="grid md:grid-cols-5 gap-6 items-start">
-          {/* Left Content - Features and Leaderboard */}
+          {/* Left Content - Leaderboard and Features */}
           <div className="md:col-span-3 space-y-8">
+            {/* Leaderboard Section - Moved to the top */}
+            <DailyLeaderboard />
+            
+            {/* Features Section - Moved below leaderboard */}
             <div className="bg-card border rounded-lg p-8 shadow-sm">
               <h2 className="text-2xl font-semibold mb-6">Why traders choose us</h2>
               <div className="grid sm:grid-cols-2 gap-6">
@@ -55,9 +59,6 @@ export function LandingPage() {
                 />
               </div>
             </div>
-            
-            {/* Leaderboard Section */}
-            <DailyLeaderboard />
             
             {/* Testimonial Section */}
             <div className="bg-card border rounded-lg p-8 shadow-sm">
