@@ -20,21 +20,11 @@ export function useLeaderboardData() {
       
       console.log("Fetching leaderboard data from database...");
       
-      // Implement direct query approach
+      // Updated query approach that works with the existing database structure
+      // First get all completed trades from the last 24 hours
       const { data: tradesData, error: tradesError } = await supabase
         .from('trades')
-        .select(`
-          id,
-          entry_price,
-          exit_price,
-          quantity,
-          symbol,
-          profiles:user_id (
-            id,
-            username,
-            avatar_url
-          )
-        `)
+        .select('id, entry_price, exit_price, quantity, symbol, user_id')
         .filter('exit_price', 'not.is', null)
         .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
       
@@ -52,12 +42,33 @@ export function useLeaderboardData() {
         return;
       }
       
+      // Now fetch all the profiles in a separate query
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url');
+        
+      if (profilesError) {
+        console.error('Error fetching profiles data:', profilesError);
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log(`Profiles data fetched: ${profilesData?.length || 0} entries`, profilesData);
+      
+      // Create a lookup map for profiles by user_id
+      const profilesMap = (profilesData || []).reduce((acc, profile) => {
+        acc[profile.id] = profile;
+        return acc;
+      }, {} as Record<string, any>);
+      
       // Process the data to calculate profit/loss per user
       const userProfits = tradesData.reduce((acc, trade) => {
-        const profile = trade.profiles;
+        const userId = trade.user_id;
+        const profile = profilesMap[userId];
+        
+        // Skip if no matching profile found
         if (!profile || !profile.username) return acc;
         
-        const userId = profile.id;
         const profitLoss = (trade.exit_price - trade.entry_price) * (trade.quantity || 1);
         
         if (!acc[userId]) {
