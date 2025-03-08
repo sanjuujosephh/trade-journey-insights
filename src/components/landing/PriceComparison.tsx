@@ -10,7 +10,7 @@ export function PriceComparison() {
             <div className="p-2 rounded-full bg-green-100 mr-3">
               <BookOpenText className="h-6 w-6 text-green-600" />
             </div>
-            <h4 className="font-medium">Trading Journal</h4>
+            <h4 className="font-medium">Onetradejournal</h4>
           </div>
           
           <p className="text-sm text-muted-foreground mb-3">Helps building habit that assists you for a lifetime.</p>
