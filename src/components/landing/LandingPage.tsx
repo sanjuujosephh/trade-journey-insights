@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2 } from "lucide-react";
 import { DailyLeaderboard } from "./DailyLeaderboard";
+import { PriceComparison } from "./PriceComparison";
+
 export function LandingPage() {
   return <div className="bg-background min-h-screen">
       {/* Hero Section */}
@@ -62,6 +64,8 @@ export function LandingPage() {
               <AuthForm />
             </div>
             
+            {/* Price Comparison Section - Added below auth form */}
+            <PriceComparison />
           </div>
         </div>
       </div>
@@ -79,6 +83,7 @@ export function LandingPage() {
       </div>
     </div>;
 }
+
 interface FeatureItemProps {
   icon: React.ReactNode;
   title: string;
@@ -107,4 +112,3 @@ function FeatureCard({
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
     </div>;
-}
