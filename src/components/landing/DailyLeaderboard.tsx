@@ -11,8 +11,8 @@ export function DailyLeaderboard() {
   return (
     <div className="w-full bg-card border rounded-lg shadow-sm overflow-hidden">
       <div className="p-6 bg-muted/30">
-        <h2 className="text-2xl font-bold text-center mb-2">Daily Trading Leaderboard</h2>
-        <p className="text-muted-foreground text-center">Top performers from the last 24 hours</p>
+        <h2 className="text-2xl font-bold text-center mb-2">Trading Leaderboard</h2>
+        <p className="text-muted-foreground text-center">Top performers based on all recorded trades</p>
       </div>
       
       <Tabs defaultValue="winners" className="w-full">

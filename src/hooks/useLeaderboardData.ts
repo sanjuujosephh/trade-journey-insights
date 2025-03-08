@@ -79,6 +79,9 @@ export function useLeaderboardData() {
       // Calculate profit/loss for each user
       const userPnLMap = new Map();
       
+      // Debug: check each trade to ensure valid calculations
+      let validTradesCount = 0;
+      
       tradesData.forEach(trade => {
         // Skip trades with missing data
         if (!trade.exit_price || !trade.entry_price || !trade.quantity) {
@@ -86,10 +89,11 @@ export function useLeaderboardData() {
           return;
         }
         
+        validTradesCount++;
         const userId = trade.user_id;
         const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
         
-        console.log(`Calculated PnL for trade ${trade.id}: ${pnl}`);
+        console.log(`Calculated PnL for trade ${trade.id}: ${pnl} (entry: ${trade.entry_price}, exit: ${trade.exit_price}, qty: ${trade.quantity})`);
         
         if (!userPnLMap.has(userId)) {
           const profile = profilesMap.get(userId) || { username: 'Anonymous', avatar_url: '' };
@@ -105,10 +109,12 @@ export function useLeaderboardData() {
         userPnLMap.set(userId, userData);
       });
       
+      console.log(`Valid trades count: ${validTradesCount}`);
       console.log("User PnL calculated:", Array.from(userPnLMap.entries()));
       
       // Convert to array and sort
       const leaderboardEntries = Array.from(userPnLMap.values());
+      console.log("All leaderboard entries before filtering:", leaderboardEntries);
       
       // Separate winners and losers
       const winners = leaderboardEntries
