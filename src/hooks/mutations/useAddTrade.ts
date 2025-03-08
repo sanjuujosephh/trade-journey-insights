@@ -19,13 +19,16 @@ export function useAddTrade(userId: string | null) {
       const now = new Date();
       const { datePart, timePart } = formatToIST(now);
 
+      // Create a properly formatted trade object
       const tradeData = {
         ...newTrade,
         user_id: userId,
         entry_date: newTrade.entry_date || datePart,
+        // Store time values as strings, not with AM/PM format
         entry_time: newTrade.entry_time || timePart,
         exit_time: newTrade.exit_time || null,
-        timestamp: now
+        // Set the timestamp as an ISO string that Postgres can handle
+        timestamp: now.toISOString()
       };
 
       console.log('Adding trade with data:', tradeData);
