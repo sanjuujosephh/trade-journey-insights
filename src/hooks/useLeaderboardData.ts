@@ -20,7 +20,7 @@ export function useLeaderboardData() {
       
       console.log("Fetching leaderboard data from database...");
       
-      // Implement direct query approach instead of RPC function to avoid ambiguous column issues
+      // Implement direct query approach
       const { data: tradesData, error: tradesError } = await supabase
         .from('trades')
         .select(`
@@ -44,7 +44,7 @@ export function useLeaderboardData() {
         return;
       }
       
-      console.log(`Trades data fetched: ${tradesData?.length || 0} entries`);
+      console.log(`Trades data fetched: ${tradesData?.length || 0} entries`, tradesData);
       
       if (!tradesData || tradesData.length === 0) {
         console.log("No leaderboard data available");
@@ -54,7 +54,6 @@ export function useLeaderboardData() {
       
       // Process the data to calculate profit/loss per user
       const userProfits = tradesData.reduce((acc, trade) => {
-        // Fix here: profiles is a single object, not an array
         const profile = trade.profiles;
         if (!profile || !profile.username) return acc;
         
