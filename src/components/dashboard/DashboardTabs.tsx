@@ -31,7 +31,7 @@ const tabColors = {
   "calendar": "bg-[#FFDEE2]",
   "analysis": "bg-[#F2FCE2]",
   "ai-analysis": "bg-[#FEF7CD]",
-  "learning": "bg-[#F2FCE2]", // Updated to be consistent with "analysis" tab
+  "learning": "bg-[#F2FCE2]", 
   "history": "bg-[#FDE1D3]",
   "shop": "bg-[#E0F2FE]",
   "profile": "bg-[#F1F0FB]",
@@ -69,6 +69,11 @@ export function DashboardTabs({
                 "transition-colors duration-200 flex items-center gap-2 whitespace-nowrap text-xs sm:text-sm",
                 activeTab === value && tabColors[value as keyof typeof tabColors]
               )}
+              style={{
+                backgroundColor: activeTab === value 
+                  ? `var(--tab-color-${value.replace(/-/g, '')})`
+                  : '',
+              }}
             >
               <Icon className="w-4 h-4" />
               <span className="hidden sm:inline">{label}</span>
@@ -77,12 +82,12 @@ export function DashboardTabs({
           ))}
         </TabsList>
         
-        <div className="h-[calc(100%-3rem)] overflow-y-auto">
-          <TabsContent value="trade-entry" className="mt-0 h-full p-0 sm:p-2">
+        <div className="h-[calc(100%-3rem)] overflow-y-auto scrollbar-hide shadow-none">
+          <TabsContent value="trade-entry" className="mt-0 h-full p-0 sm:p-2 shadow-none">
             <TradeEntry />
           </TabsContent>
 
-          <TabsContent value="performance" className="mt-0 h-full">
+          <TabsContent value="performance" className="mt-0 h-full shadow-none">
             <div className="p-1 sm:p-2 md:p-6 space-y-6">
               <PerformanceMetrics trades={trades} />
               <TradeFlowChart trades={trades} />
@@ -90,20 +95,20 @@ export function DashboardTabs({
             </div>
           </TabsContent>
 
-          <TabsContent value="calendar" className="mt-0 h-full">
+          <TabsContent value="calendar" className="mt-0 h-full shadow-none">
             <div className="p-1 sm:p-2">
               <TradingCalendar />
             </div>
           </TabsContent>
 
-          <TabsContent value="analysis" className="mt-0 h-full">
+          <TabsContent value="analysis" className="mt-0 h-full shadow-none">
             <div className="p-1 sm:p-2 md:p-6 space-y-6">
               <IntradayRiskMetrics trades={trades} />
               <TimePerformanceHeatmap trades={trades} />
             </div>
           </TabsContent>
 
-          <TabsContent value="ai-analysis" className="mt-0 h-full">
+          <TabsContent value="ai-analysis" className="mt-0 h-full shadow-none">
             <AIAnalysisTab 
               trades={trades}
               isAnalyzing={isAnalyzing}
@@ -112,21 +117,21 @@ export function DashboardTabs({
             />
           </TabsContent>
 
-          <TabsContent value="history" className="mt-0 h-full">
+          <TabsContent value="history" className="mt-0 h-full shadow-none">
             <div className="p-1 sm:p-2 md:p-6">
               <FOTradeTable trades={trades} />
             </div>
           </TabsContent>
 
-          <TabsContent value="learning" className="mt-0 h-full">
+          <TabsContent value="learning" className="mt-0 h-full shadow-none">
             <LearningCenter />
           </TabsContent>
 
-          <TabsContent value="shop" className="mt-0 h-full">
+          <TabsContent value="shop" className="mt-0 h-full shadow-none">
             <StrategiesTab />
           </TabsContent>
 
-          <TabsContent value="profile" className="mt-0 h-full">
+          <TabsContent value="profile" className="mt-0 h-full shadow-none">
             <div className="p-1 sm:p-2 md:p-6">
               <ProfileSettings />
             </div>

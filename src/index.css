@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
@@ -105,9 +106,16 @@
   }
 }
 
+/* Fix for tab panel scrolling shadow issue */
 [role="tabpanel"] {
   height: 100%;
   padding: 1.5rem;
+  box-shadow: none !important;
+}
+
+/* Make sure content doesn't create shadow when scrolling */
+[role="tabpanel"] > div {
+  box-shadow: none !important;
 }
 
 .chart-container {
@@ -119,12 +127,14 @@
   position: relative;
 }
 
+/* Fix for active tab background color in dashboard */
 .auth-tabs [role="tab"][data-state="active"] {
   background-color: hsl(var(--background));
 }
 
-/* Header icon styles */
+/* Fix for preserving tab background colors in dashboard */
 [data-theme-toggle] button,
 [data-user-nav] button {
   @apply border rounded border-input;
 }
+

@@ -64,7 +64,16 @@ export default {
 				info: {
 					DEFAULT: '#3B82F6',
 					foreground: '#FFFFFF'
-				}
+				},
+				'tab-tradeentry': '#D3E4FD',
+				'tab-performance': '#E5DEFF',
+				'tab-calendar': '#FFDEE2',
+				'tab-analysis': '#F2FCE2',
+				'tab-aianalysis': '#FEF7CD',
+				'tab-learning': '#F2FCE2',
+				'tab-history': '#FDE1D3',
+				'tab-shop': '#E0F2FE',
+				'tab-profile': '#F1F0FB',
 			},
 			borderRadius: {
 				lg: '3px',
