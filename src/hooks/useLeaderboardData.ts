@@ -54,6 +54,7 @@ export function useLeaderboardData() {
       
       // Process the data to calculate profit/loss per user
       const userProfits = tradesData.reduce((acc, trade) => {
+        // Fix here: profiles is a single object, not an array
         const profile = trade.profiles;
         if (!profile || !profile.username) return acc;
         
