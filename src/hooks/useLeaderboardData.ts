@@ -18,29 +18,74 @@ export function useLeaderboardData() {
     try {
       setIsLoading(true);
       
-      console.log("Fetching leaderboard data from get_daily_leaderboard function...");
+      console.log("Fetching leaderboard data from database...");
       
-      // Call the database function with explicitly qualified column names
-      const { data: leaderboardData, error } = await supabase
-        .rpc('get_daily_leaderboard', { limit_count: 10 });
+      // Implement direct query approach instead of RPC function to avoid ambiguous column issues
+      const { data: tradesData, error: tradesError } = await supabase
+        .from('trades')
+        .select(`
+          id,
+          entry_price,
+          exit_price,
+          quantity,
+          symbol,
+          profiles:user_id (
+            id,
+            username,
+            avatar_url
+          )
+        `)
+        .filter('exit_price', 'not.is', null)
+        .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
       
-      if (error) {
-        console.error('Error fetching leaderboard data:', error);
+      if (tradesError) {
+        console.error('Error fetching trades data:', tradesError);
         setIsLoading(false);
         return;
       }
       
-      console.log(`Leaderboard data fetched: ${leaderboardData?.length || 0} entries`);
+      console.log(`Trades data fetched: ${tradesData?.length || 0} entries`);
       
-      if (!leaderboardData || leaderboardData.length === 0) {
+      if (!tradesData || tradesData.length === 0) {
         console.log("No leaderboard data available");
         setIsLoading(false);
         return;
       }
       
-      // Separate winners and losers based on profit_loss
-      const winners = leaderboardData.filter(entry => entry.profit_loss > 0);
-      const losers = leaderboardData.filter(entry => entry.profit_loss < 0);
+      // Process the data to calculate profit/loss per user
+      const userProfits = tradesData.reduce((acc, trade) => {
+        const profile = trade.profiles;
+        if (!profile || !profile.username) return acc;
+        
+        const userId = profile.id;
+        const profitLoss = (trade.exit_price - trade.entry_price) * (trade.quantity || 1);
+        
+        if (!acc[userId]) {
+          acc[userId] = {
+            username: profile.username,
+            avatar_url: profile.avatar_url || '',
+            profit_loss: 0,
+            rank: 0
+          };
+        }
+        
+        acc[userId].profit_loss += profitLoss;
+        return acc;
+      }, {} as Record<string, LeaderboardEntry>);
+      
+      // Convert to array and sort
+      const usersArray = Object.values(userProfits);
+      
+      // Separate winners and losers
+      const winners = usersArray
+        .filter(entry => entry.profit_loss > 0)
+        .sort((a, b) => b.profit_loss - a.profit_loss)
+        .map((entry, index) => ({...entry, rank: index + 1}));
+      
+      const losers = usersArray
+        .filter(entry => entry.profit_loss < 0)
+        .sort((a, b) => a.profit_loss - b.profit_loss)
+        .map((entry, index) => ({...entry, rank: index + 1}));
       
       console.log(`Winners: ${winners.length}, Losers: ${losers.length}`);
       
