@@ -20,11 +20,16 @@ export function useLeaderboardData() {
       
       console.log("Fetching leaderboard data...");
       
-      // First, get all trades with both entry and exit prices (completed trades)
+      // Calculate the timestamp for 24 hours ago
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      console.log("Filtering trades since:", twentyFourHoursAgo);
+      
+      // Get all trades with both entry and exit prices (completed trades) from the last 24 hours
       const { data: tradesData, error: tradesError } = await supabase
         .from('trades')
-        .select('user_id, entry_price, exit_price, quantity')
-        .not('exit_price', 'is', null);
+        .select('user_id, entry_price, exit_price, quantity, timestamp')
+        .not('exit_price', 'is', null)
+        .gte('timestamp', twentyFourHoursAgo);
       
       if (tradesError) {
         console.error('Error fetching trades data:', tradesError);
@@ -36,7 +41,7 @@ export function useLeaderboardData() {
       console.log("Sample trade:", tradesData?.[0]);
       
       if (!tradesData || tradesData.length === 0) {
-        console.log("No trades found with exit prices");
+        console.log("No trades found with exit prices in the last 24 hours");
         setIsLoading(false);
         return;
       }

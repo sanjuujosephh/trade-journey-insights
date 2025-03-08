@@ -19,12 +19,19 @@ export function MonthlyPnL() {
     try {
       console.log("Calculating monthly P&L for user:", user.id);
       
-      // Fetch all completed trades (with exit prices) for the current user
+      // Get the first day of the current month
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      
+      console.log("Fetching trades since:", firstDayOfMonth);
+      
+      // Fetch all completed trades (with exit prices) for the current user from the current month
       const { data: trades, error } = await supabase
         .from('trades')
         .select('entry_price, exit_price, quantity')
         .eq('user_id', user.id)
-        .not('exit_price', 'is', null);
+        .not('exit_price', 'is', null)
+        .gte('timestamp', firstDayOfMonth);
 
       if (error) {
         console.error('Error fetching trades:', error);
@@ -36,10 +43,10 @@ export function MonthlyPnL() {
         return;
       }
 
-      console.log(`Found ${trades?.length || 0} trades with exit prices`);
+      console.log(`Found ${trades?.length || 0} trades with exit prices for the current month`);
       
       if (!trades || trades.length === 0) {
-        console.log("No completed trades found");
+        console.log("No completed trades found for this month");
         setMonthlyPnL(0);
         return;
       }
@@ -62,7 +69,7 @@ export function MonthlyPnL() {
         return sum + tradePnL;
       }, 0);
 
-      console.log('Total P&L calculated:', totalPnL);
+      console.log('Total monthly P&L calculated:', totalPnL);
       setMonthlyPnL(totalPnL);
     } catch (err) {
       console.error('Error calculating P&L:', err);
