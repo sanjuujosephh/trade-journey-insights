@@ -22,9 +22,9 @@ export function LeaderboardList({ entries, isLoading, formatAmount, isProfit }: 
   if (entries.length === 0) {
     return (
       <div className="p-8 text-center">
-        <div className="text-muted-foreground">No data available for the past 24 hours</div>
+        <div className="text-muted-foreground">No data available</div>
         <div className="text-xs text-muted-foreground mt-2">
-          (Checking for trades in the last 7 days for testing)
+          (Make sure there are trades with entry and exit prices in the database)
         </div>
       </div>
     );
@@ -46,7 +46,7 @@ export function LeaderboardList({ entries, isLoading, formatAmount, isProfit }: 
           </div>
           <div className={`flex items-center gap-1 ${isProfit ? 'text-green-600' : 'text-red-600'} font-semibold`}>
             {isProfit ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-            {formatAmount(entry.profit_loss)}
+            {formatAmount(Math.abs(entry.profit_loss))}
           </div>
         </div>
       ))}

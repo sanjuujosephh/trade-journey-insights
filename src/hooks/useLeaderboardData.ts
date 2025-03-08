@@ -18,14 +18,9 @@ export function useLeaderboardData() {
     try {
       setIsLoading(true);
       
-      // Get trades from the last 24 hours - Use a longer time window for testing
-      const oneDayAgo = new Date();
-      oneDayAgo.setDate(oneDayAgo.getDate() - 7); // Using 7 days instead of 1 for testing
+      console.log("Fetching all trades for leaderboard");
       
-      console.log("Fetching trades since:", oneDayAgo.toISOString());
-      
-      // First, get all trades without timestamp filtering
-      // This avoids format mismatch issues and we'll filter in memory
+      // Get all trades without time filtering
       const { data: tradesData, error: tradesError } = await supabase
         .from('trades')
         .select(`
@@ -43,30 +38,16 @@ export function useLeaderboardData() {
         return;
       }
       
-      console.log("All trades fetched:", tradesData?.length || 0);
+      console.log("All trades fetched:", tradesData?.length || 0, tradesData);
       
       if (!tradesData || tradesData.length === 0) {
-        setIsLoading(false);
-        return;
-      }
-      
-      // Filter trades by timestamp in memory
-      // This is more reliable than using the GT operator with different timestamp formats
-      const filteredTrades = tradesData.filter(trade => {
-        if (!trade.timestamp) return false;
-        const tradeDate = new Date(trade.timestamp);
-        return tradeDate >= oneDayAgo;
-      });
-      
-      console.log("Filtered trades within timeframe:", filteredTrades.length, filteredTrades);
-      
-      if (filteredTrades.length === 0) {
+        console.log("No trades found in database");
         setIsLoading(false);
         return;
       }
       
       // Get unique user IDs from trades
-      const userIds = [...new Set(filteredTrades.map(trade => trade.user_id))];
+      const userIds = [...new Set(tradesData.map(trade => trade.user_id))];
       
       console.log("Unique user IDs:", userIds);
       
@@ -98,7 +79,7 @@ export function useLeaderboardData() {
       // Calculate profit/loss for each user
       const userPnLMap = new Map();
       
-      filteredTrades.forEach(trade => {
+      tradesData.forEach(trade => {
         // Skip trades with missing data
         if (!trade.exit_price || !trade.entry_price || !trade.quantity) {
           console.log("Skipping trade with missing data:", trade);
@@ -107,6 +88,8 @@ export function useLeaderboardData() {
         
         const userId = trade.user_id;
         const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+        
+        console.log(`Calculated PnL for trade ${trade.id}: ${pnl}`);
         
         if (!userPnLMap.has(userId)) {
           const profile = profilesMap.get(userId) || { username: 'Anonymous', avatar_url: '' };
