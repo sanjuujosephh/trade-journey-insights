@@ -1,11 +1,8 @@
-
 import { Beef, BookOpenText } from "lucide-react";
 import { Card } from "../ui/card";
-
 export function PriceComparison() {
-  return (
-    <div className="bg-card border rounded-lg p-6 shadow-sm">
-      <h3 className="font-semibold text-lg mb-4 text-center">Price Comparison</h3>
+  return <div className="bg-card border p-6 shadow-sm rounded">
+      
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Trading Journal Card */}
@@ -29,10 +26,12 @@ export function PriceComparison() {
           
           {/* Progress Bar */}
           <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden mb-2">
-            <div className="h-full bg-green-500 rounded-full" style={{ width: '99.5%' }}></div>
+            <div className="h-full bg-green-500 rounded-full" style={{
+            width: '99.5%'
+          }}></div>
           </div>
           
-          <p className="text-xs text-green-600 font-medium">Better value for long-term benefits</p>
+          <p className="text-xs text-green-600 font-medium">Lasts a whole month 😱</p>
         </Card>
         
         {/* Burger Card */}
@@ -41,7 +40,7 @@ export function PriceComparison() {
             <div className="p-2 rounded-full bg-orange-100 mr-3">
               <Beef className="h-6 w-6 text-orange-600" />
             </div>
-            <h4 className="font-medium">Crispy Veggie Burger</h4>
+            <h4 className="font-medium">Crispy Burger</h4>
           </div>
           
           <p className="text-sm text-muted-foreground mb-3">
@@ -56,16 +55,17 @@ export function PriceComparison() {
           
           {/* Progress Bar */}
           <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden mb-2">
-            <div className="h-full bg-orange-500 rounded-full" style={{ width: '100%' }}></div>
+            <div className="h-full bg-orange-500 rounded-full" style={{
+            width: '100%'
+          }}></div>
           </div>
           
-          <p className="text-xs text-orange-600 font-medium">Fleeting satisfaction, gone in minutes</p>
+          <p className="text-xs text-orange-600 font-medium">Gone in minutes</p>
         </Card>
       </div>
       
       <div className="mt-4 text-center text-sm text-muted-foreground">
         <p>Invest in your trading journey for less than the cost of a burger!</p>
       </div>
-    </div>
-  );
+    </div>;
 }
