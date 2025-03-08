@@ -11,6 +11,8 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  signInWithPhone: (phone: string) => Promise<void>;
+  verifyOtp: (phone: string, token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -118,8 +120,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInWithPhone = async (phone: string) => {
+    try {
+      console.log('Attempting sign in with phone:', phone);
+      const { error, data } = await supabase.auth.signInWithOtp({
+        phone,
+      });
+      
+      if (error) throw error;
+      console.log('OTP sent successfully to phone:', phone);
+    } catch (error) {
+      handleAuthError(error as AuthError, 'Phone sign in');
+    }
+  };
+
+  const verifyOtp = async (phone: string, token: string) => {
+    try {
+      console.log('Verifying OTP for phone:', phone);
+      const { error, data } = await supabase.auth.verifyOtp({
+        phone,
+        token,
+        type: 'sms',
+      });
+      
+      if (error) throw error;
+      console.log('Phone verification successful');
+    } catch (error) {
+      handleAuthError(error as AuthError, 'OTP verification');
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, resetPassword }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      signIn, 
+      signUp, 
+      signOut, 
+      resetPassword,
+      signInWithPhone,
+      verifyOtp
+    }}>
       {!loading && children}
     </AuthContext.Provider>
   );

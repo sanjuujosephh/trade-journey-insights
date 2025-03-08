@@ -14,22 +14,57 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-type AuthMode = "login" | "signup" | "reset";
+type AuthMode = "login" | "signup" | "reset" | "phone-verify";
 
 export function AuthModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp, resetPassword, signInWithPhone, verifyOtp } = useAuth();
   const { toast } = useToast();
 
-  const validateInput = () => {
-    if (!email || !password) {
-      throw new Error("Please fill in all fields");
+  const formatPhoneNumber = (input: string): string => {
+    // Ensure phone number starts with +91 for India
+    if (!input.startsWith("+91") && input.length > 0) {
+      return "+91" + input.replace(/\D/g, '');
     }
-    if (password.length < 6) {
+    return input.replace(/\D/g, '');
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedPhone = formatPhoneNumber(e.target.value);
+    setPhone(formattedPhone);
+  };
+
+  const validateInput = () => {
+    if (mode === "phone-verify") {
+      if (!verificationCode) {
+        throw new Error("Please enter the verification code");
+      }
+      return;
+    }
+
+    if (mode === "signup" && phone) {
+      // For phone signup, we only need the phone number
+      if (!phone.startsWith("+91") || phone.length < 12) {
+        throw new Error("Please enter a valid Indian phone number");
+      }
+      return;
+    }
+
+    if (!email && !phone) {
+      throw new Error("Please enter email or phone number");
+    }
+    
+    if (mode !== "reset" && !phone && !password) {
+      throw new Error("Please enter your password");
+    }
+    
+    if (mode === "signup" && !phone && password.length < 6) {
       throw new Error("Password must be at least 6 characters long");
     }
   };
@@ -39,11 +74,19 @@ export function AuthModal() {
     setIsLoading(true);
     
     try {
-      if (mode !== "reset") {
-        validateInput();
+      validateInput();
+      
+      if (mode === "phone-verify") {
+        await verifyOtp(phone, verificationCode);
+        toast({
+          title: "Success",
+          description: "Phone verified successfully!",
+        });
+        setIsOpen(false);
+        return;
       }
       
-      console.log(`Attempting ${mode} with email: ${email}`);
+      console.log(`Attempting ${mode} with email: ${email} or phone: ${phone}`);
       
       if (mode === "login") {
         await signIn(email, password);
@@ -53,12 +96,21 @@ export function AuthModal() {
         });
         setIsOpen(false);
       } else if (mode === "signup") {
-        await signUp(email, password);
-        toast({
-          title: "Success",
-          description: "Please check your email to confirm your account.",
-        });
-        setIsOpen(false);
+        if (phone && phone.startsWith("+91")) {
+          await signInWithPhone(phone);
+          toast({
+            title: "Success",
+            description: "Verification code sent to your phone.",
+          });
+          setMode("phone-verify");
+        } else {
+          await signUp(email, password);
+          toast({
+            title: "Success",
+            description: "Please check your email to confirm your account.",
+          });
+          setIsOpen(false);
+        }
       } else if (mode === "reset") {
         await resetPassword(email);
         toast({
@@ -81,12 +133,50 @@ export function AuthModal() {
     }
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Login / Sign Up</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+  const renderAuthForm = () => {
+    if (mode === "phone-verify") {
+      return (
+        <>
+          <DialogHeader>
+            <DialogTitle>Verify Phone Number</DialogTitle>
+            <DialogDescription>
+              Enter the verification code sent to {phone}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="verification-code">Verification Code</Label>
+              <Input
+                id="verification-code"
+                type="text"
+                placeholder="Enter 6-digit code"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                required
+                disabled={isLoading}
+                maxLength={6}
+              />
+            </div>
+            <div className="space-y-2">
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Verifying..." : "Verify Phone"}
+              </Button>
+              <button
+                type="button"
+                onClick={() => setMode("signup")}
+                className="text-primary hover:underline text-sm"
+                disabled={isLoading}
+              >
+                Back to Sign Up
+              </button>
+            </div>
+          </form>
+        </>
+      );
+    }
+
+    return (
+      <>
         <DialogHeader>
           <DialogTitle>
             {mode === "login" ? "Login" : mode === "signup" ? "Sign Up" : "Reset Password"}
@@ -100,19 +190,39 @@ export function AuthModal() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
-          {mode !== "reset" && (
+          {mode !== "signup" || !phone ? (
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required={!phone}
+                disabled={isLoading}
+              />
+            </div>
+          ) : null}
+
+          {mode === "signup" && (
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone (Indian)</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+91 9999999999"
+                value={phone}
+                onChange={handlePhoneChange}
+                disabled={isLoading}
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter your Indian mobile number starting with +91
+              </p>
+            </div>
+          )}
+
+          {mode !== "reset" && (!phone || mode === "login") && (
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -121,12 +231,13 @@ export function AuthModal() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                required={!phone}
                 disabled={isLoading}
                 minLength={6}
               />
             </div>
           )}
+          
           <div className="space-y-2">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Please wait..." : mode === "login" ? "Login" : mode === "signup" ? "Sign Up" : "Reset Password"}
@@ -165,6 +276,17 @@ export function AuthModal() {
             </div>
           </div>
         </form>
+      </>
+    );
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Login / Sign Up</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        {renderAuthForm()}
       </DialogContent>
     </Dialog>
   );
