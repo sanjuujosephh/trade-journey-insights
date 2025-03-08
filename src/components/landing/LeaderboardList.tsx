@@ -31,7 +31,7 @@ export function LeaderboardList({ entries, isLoading, formatAmount, isProfit }: 
   }
 
   return (
-    <div className="divide-y">
+    <div className="divide-y h-full">
       {entries.map((entry) => (
         <div key={`${entry.username}-${entry.rank}`} className="flex items-center p-4 hover:bg-muted/30 transition-colors">
           <div className="flex-shrink-0 w-8 text-muted-foreground text-sm font-medium text-center">

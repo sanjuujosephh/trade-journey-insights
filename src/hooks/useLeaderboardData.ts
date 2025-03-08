@@ -18,9 +18,9 @@ export function useLeaderboardData() {
     try {
       setIsLoading(true);
       
-      console.log("Fetching leaderboard data using the updated get_daily_leaderboard function...");
+      console.log("Fetching leaderboard data from get_daily_leaderboard function...");
       
-      // Call the updated database function to get leaderboard data
+      // Call the database function with explicitly qualified column names
       const { data: leaderboardData, error } = await supabase
         .rpc('get_daily_leaderboard', { limit_count: 10 });
       
