@@ -52,7 +52,7 @@ export function LandingPage() {
             <DailyLeaderboard />
             
             {/* Founder's Story Section */}
-            <div className="bg-card border rounded-lg p-8 shadow-sm">
+            <div className="bg-card border rounded-lg p-8 shadow-sm border-0">
               <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 
                 <div>
