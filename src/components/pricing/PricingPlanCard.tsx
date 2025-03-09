@@ -34,6 +34,8 @@ export function PricingPlanCard({
   const getCardStyle = () => {
     if (planId === 'monthly') {
       return 'border-green-200 bg-gradient-to-br from-blue-50 to-green-50';
+    } else if (planId === 'lifetime') {
+      return 'border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-100';
     } else if (isBestValue) {
       return 'border-primary/20 bg-primary/5';
     }
