@@ -15,11 +15,6 @@ export function PricingContainer() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscribe = async (planType: PlanType) => {
-    if (!user) {
-      toast.error("Please login to subscribe");
-      return;
-    }
-
     if (!isPaymentConfigured) {
       toast.error("Payment system is not configured properly");
       return;

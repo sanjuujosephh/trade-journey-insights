@@ -35,7 +35,7 @@ export function PricingPlanCard({
     if (planId === 'monthly') {
       return 'border-green-200 bg-gradient-to-br from-blue-50 to-green-50';
     } else if (planId === 'yearly') {
-      return 'yearly-card border-none';
+      return 'yearly-card';
     } else if (isBestValue) {
       return 'border-primary/20 bg-primary/5';
     }
