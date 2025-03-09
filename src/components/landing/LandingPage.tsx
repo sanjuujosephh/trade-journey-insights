@@ -1,10 +1,8 @@
-
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2 } from "lucide-react";
 import { DailyLeaderboard } from "./DailyLeaderboard";
 import { PriceComparison } from "./PriceComparison";
-
 export function LandingPage() {
   return <div className="bg-background min-h-screen">
       {/* Hero Section */}
@@ -61,7 +59,7 @@ export function LandingPage() {
           {/* Right Content - Auth Form */}
           <div className="md:col-span-2 space-y-6 sticky top-24">
             <div className="bg-card border rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">Start Tracking</h2>
+              <h2 className="text-2xl font-bold mb-6 text-center">Start Journaling &amp; Build Habit</h2>
               <AuthForm />
             </div>
             
@@ -84,7 +82,6 @@ export function LandingPage() {
       </div>
     </div>;
 }
-
 interface FeatureItemProps {
   icon: React.ReactNode;
   title: string;
