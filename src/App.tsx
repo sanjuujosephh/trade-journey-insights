@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -59,12 +60,14 @@ function LeaderboardIcon() {
     <Tooltip>
       <TooltipTrigger asChild>
         <Link to="/leaderboard">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+          <Button 
+            variant="outline" 
+            className="h-10 min-w-[4rem] px-2 flex items-center justify-center border rounded bg-background"
           >
-            <Trophy className="h-5 w-5" />
+            <div className="flex flex-col items-center justify-center text-center w-full leading-none">
+              <span className="text-[10px] text-foreground">Rank</span>
+              <Trophy className="h-4 w-4 text-amber-500" />
+            </div>
           </Button>
         </Link>
       </TooltipTrigger>
