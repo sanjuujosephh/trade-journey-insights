@@ -74,8 +74,8 @@ export function PricingContainer() {
             isBestValue={plan.isBestValue}
             planId={plan.id}
             buttonText={
-              plan.id === 'lifetime' 
-                ? (isLoading ? "Processing..." : isTestMode ? "Get Lifetime Access (Test)" : "Get Lifetime Access")
+              plan.id === 'yearly' 
+                ? (isLoading ? "Processing..." : isTestMode ? "Subscribe Yearly (Test)" : "Subscribe Yearly")
                 : undefined
             }
           />

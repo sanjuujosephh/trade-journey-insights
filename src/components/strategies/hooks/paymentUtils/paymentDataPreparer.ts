@@ -14,8 +14,8 @@ export const preparePaymentData = (
 
   // Calculate amount based on plan type
   let amount: number;
-  if (planType === 'lifetime') {
-    amount = 2499 * 100; // Lifetime plan costs ₹2499 (amount in paise)
+  if (planType === 'yearly') {
+    amount = 1499 * 100; // Yearly plan costs ₹1499 (amount in paise)
   } else {
     // Default to monthly
     amount = (isFullPackage ? 1499 : item?.price || 199) * 100; // Full package costs ₹1499 (amount in paise)
@@ -25,7 +25,7 @@ export const preparePaymentData = (
   const userEmail = user?.email || "trader@example.com";
   
   // Create description based on plan type
-  const planTypeText = planType === 'lifetime' ? 'Lifetime' : 'Monthly';
+  const planTypeText = planType === 'yearly' ? 'Yearly' : 'Monthly';
   const description = isFullPackage ? 
     `${planTypeText} Subscription - All Trading Strategies & Indicators` : 
     item?.title ? `${planTypeText} Subscription - ${item.title}` : `${planTypeText} Subscription`;

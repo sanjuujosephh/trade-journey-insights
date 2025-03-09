@@ -1,7 +1,7 @@
 
 export type PlanFeature = string;
 
-export type PlanType = 'monthly' | 'lifetime';
+export type PlanType = 'monthly' | 'yearly';
 
 export interface PricingPlan {
   id: PlanType;
@@ -28,17 +28,16 @@ export const PRICING_PLANS: PricingPlan[] = [
     ]
   },
   {
-    id: 'lifetime',
-    title: 'Lifetime Access',
-    price: '₹2499',
-    period: ' one-time',
+    id: 'yearly',
+    title: 'Yearly Subscription',
+    price: '₹1499',
+    period: '/year',
     features: [
-      'Never Pay Again',
-      'Future Feature Updates',
+      'Save 37% vs Monthly Plan',
       'Access To Trading Strategies',
       'Access To JOT Indicator Suite',
-      'Access To Trading Templates'
-    ],
-    isBestValue: true
+      'Access To Trading Templates',
+      'Future Feature Updates'
+    ]
   }
 ];
