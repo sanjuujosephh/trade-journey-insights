@@ -20,50 +20,34 @@ import { Footer } from "./components/Footer";
 import { MonthlyPnL } from "./components/MonthlyPnL";
 import { useSubscription } from "./hooks/useSubscription";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./components/ui/tooltip";
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
+      refetchOnWindowFocus: false
+    }
+  }
 });
-
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  
-  return (
-    <div data-theme-toggle>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      >
-        {theme === "light" ? (
-          <Moon className="h-5 w-5" />
-        ) : (
-          <Sun className="h-5 w-5" />
-        )}
+  const {
+    theme,
+    setTheme
+  } = useTheme();
+  return <div data-theme-toggle>
+      <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+        {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
       </Button>
-    </div>
-  );
+    </div>;
 }
-
 function LeaderboardIcon() {
-  const { isSubscribed } = useSubscription();
-  
+  const {
+    isSubscribed
+  } = useSubscription();
   if (!isSubscribed) return null;
-  
-  return (
-    <Tooltip>
+  return <Tooltip>
       <TooltipTrigger asChild>
         <Link to="/leaderboard">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="rounded-full"
-          >
+          <Button variant="outline" size="icon" className="rounded-sm">
             <Trophy className="h-5 w-5" />
           </Button>
         </Link>
@@ -71,15 +55,13 @@ function LeaderboardIcon() {
       <TooltipContent>
         <p>Traders Leaderboard</p>
       </TooltipContent>
-    </Tooltip>
-  );
+    </Tooltip>;
 }
-
 function Navigation() {
-  const { user } = useAuth();
-  
-  return (
-    <div className="h-16 border-b bg-background sticky top-0 z-10">
+  const {
+    user
+  } = useAuth();
+  return <div className="h-16 border-b bg-background sticky top-0 z-10">
       <div className="flex h-full items-center px-4 container mx-auto">
         <div className="flex-1 md:block hidden">
           <TraderInfo />
@@ -98,59 +80,42 @@ function Navigation() {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
-
-function Layout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
-  
-  return (
-    <div className="min-h-screen flex flex-col">
+function Layout({
+  children
+}: {
+  children: React.ReactNode;
+}) {
+  const {
+    user
+  } = useAuth();
+  return <div className="min-h-screen flex flex-col">
       <Navigation />
       <main className="flex-1">
         {children}
       </main>
       <Footer />
       {user && <DisclaimerModal />}
-    </div>
-  );
+    </div>;
 }
-
 function AppRoutes() {
-  const { user } = useAuth();
-  
-  return (
-    <Routes>
-      <Route 
-        path="/" 
-        element={
-          user ? (
-            <AuthGuard requireSubscription={true}>
+  const {
+    user
+  } = useAuth();
+  return <Routes>
+      <Route path="/" element={user ? <AuthGuard requireSubscription={true}>
               <Index />
-            </AuthGuard>
-          ) : (
-            <Index />
-          )
-        } 
-      />
+            </AuthGuard> : <Index />} />
       <Route path="/pricing" element={<Pricing />} />
-      <Route 
-        path="/leaderboard" 
-        element={
-          <AuthGuard requireSubscription={true}>
+      <Route path="/leaderboard" element={<AuthGuard requireSubscription={true}>
             <LeaderboardPage />
-          </AuthGuard>
-        } 
-      />
+          </AuthGuard>} />
       <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
+    </Routes>;
 }
-
 const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
+  return <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
@@ -161,8 +126,6 @@ const App = () => {
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
-    </QueryClientProvider>
-  );
+    </QueryClientProvider>;
 };
-
 export default App;
