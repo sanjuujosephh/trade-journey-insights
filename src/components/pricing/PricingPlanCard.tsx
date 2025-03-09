@@ -35,7 +35,7 @@ export function PricingPlanCard({
     if (planId === 'monthly') {
       return 'border-green-200 bg-gradient-to-br from-blue-50 to-green-50';
     } else if (planId === 'yearly') {
-      return 'border-transparent bg-gradient-to-br from-amber-100 to-yellow-50 yearly-card';
+      return 'yearly-card border-none';
     } else if (isBestValue) {
       return 'border-primary/20 bg-primary/5';
     }
@@ -43,7 +43,7 @@ export function PricingPlanCard({
   };
 
   return (
-    <Card className={`border rounded-lg shadow-sm ${getCardStyle()} relative overflow-hidden`}>
+    <Card className={`rounded-lg shadow-sm ${getCardStyle()} relative overflow-hidden`}>
       <CardHeader className="pb-4 pt-4">
         <CardTitle className="text-2xl font-semibold">{title}</CardTitle>
         <div className="mt-2">
