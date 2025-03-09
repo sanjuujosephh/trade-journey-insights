@@ -1,11 +1,9 @@
-
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2, MessageCircleQuestion, Check } from "lucide-react";
 import { DailyLeaderboard } from "./DailyLeaderboard";
 import { PriceComparison } from "./PriceComparison";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
 export function LandingPage() {
   return <div className="bg-background min-h-screen">
       {/* Hero Section */}
@@ -19,11 +17,7 @@ export function LandingPage() {
           {/* App Screenshot with Enhanced Gradient Fade and Absolute Positioned Buttons */}
           <div className="relative w-full max-w-[133%] mx-auto mb-8">
             <div className="w-full rounded-lg overflow-hidden">
-              <img 
-                src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
-                alt="Trading Journal Dashboard" 
-                className="w-full"
-              />
+              <img src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" alt="Trading Journal Dashboard" className="w-full" />
               <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent"></div>
             </div>
             
@@ -60,13 +54,7 @@ export function LandingPage() {
             {/* Founder's Story Section */}
             <div className="bg-card border rounded-lg p-8 shadow-sm">
               <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-                <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-primary">
-                  <img 
-                    src="/lovable-uploads/aec44eeb-3f77-4f3e-ad47-ca22c8bcf96f.png" 
-                    alt="Founder" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                
                 <div>
                   <h2 className="text-2xl font-semibold mb-3">Our Journey</h2>
                   <p className="text-muted-foreground mb-4 italic">"I started onetradejournal because I was frustrated with the expensive and complicated journaling tools on the market."</p>
@@ -204,42 +192,22 @@ export function LandingPage() {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <FaqItem 
-              question="How does the daily streak system work?" 
-              answer="Our streak system tracks your consecutive days of journaling trades. Each day you log at least one trade or journal entry, your streak increases. This helps build consistency in your trading practice."
-            />
-            <FaqItem 
-              question="Can I import my trades from other platforms?" 
-              answer="Yes! You can import trades from popular brokers and platforms. We support CSV imports from most major trading platforms, making it easy to transition to our journal."
-            />
-            <FaqItem 
-              question="Is my trading data secure?" 
-              answer="Absolutely. We use bank-level encryption to protect your data. Your information is never shared with third parties, and we don't have access to your brokerage accounts."
-            />
-            <FaqItem 
-              question="What payment methods do you accept?" 
-              answer="We accept all major credit cards, PayPal, and select cryptocurrency payments. All payments are processed securely through our payment partners."
-            />
-            <FaqItem 
-              question="Can I cancel my subscription anytime?" 
-              answer="Yes, you can cancel your subscription at any time. Your access will continue until the end of your billing period, and we don't charge any cancellation fees."
-            />
-            <FaqItem 
-              question="How does the AI analysis work?" 
-              answer="Our AI analyzes your trading patterns, win/loss ratios, psychological states, and market conditions to identify correlations and opportunities for improvement in your trading approach."
-            />
+            <FaqItem question="How does the daily streak system work?" answer="Our streak system tracks your consecutive days of journaling trades. Each day you log at least one trade or journal entry, your streak increases. This helps build consistency in your trading practice." />
+            <FaqItem question="Can I import my trades from other platforms?" answer="Yes! You can import trades from popular brokers and platforms. We support CSV imports from most major trading platforms, making it easy to transition to our journal." />
+            <FaqItem question="Is my trading data secure?" answer="Absolutely. We use bank-level encryption to protect your data. Your information is never shared with third parties, and we don't have access to your brokerage accounts." />
+            <FaqItem question="What payment methods do you accept?" answer="We accept all major credit cards, PayPal, and select cryptocurrency payments. All payments are processed securely through our payment partners." />
+            <FaqItem question="Can I cancel my subscription anytime?" answer="Yes, you can cancel your subscription at any time. Your access will continue until the end of your billing period, and we don't charge any cancellation fees." />
+            <FaqItem question="How does the AI analysis work?" answer="Our AI analyzes your trading patterns, win/loss ratios, psychological states, and market conditions to identify correlations and opportunities for improvement in your trading approach." />
           </div>
         </div>
       </div>
     </div>;
 }
-
 interface FeatureItemProps {
   icon: React.ReactNode;
   title: string;
   description: string;
 }
-
 function FeatureItem({
   icon,
   title,
@@ -253,7 +221,6 @@ function FeatureItem({
       </div>
     </div>;
 }
-
 function FeatureCard({
   icon,
   title,
@@ -265,7 +232,6 @@ function FeatureCard({
       <p className="text-muted-foreground">{description}</p>
     </div>;
 }
-
 function FaqItem({
   question,
   answer
@@ -273,8 +239,7 @@ function FaqItem({
   question: string;
   answer: string;
 }) {
-  return (
-    <div className="bg-card border rounded-lg p-6 shadow-sm hover:border-primary transition-colors">
+  return <div className="bg-card border rounded-lg p-6 shadow-sm hover:border-primary transition-colors">
       <div className="flex gap-3 items-start">
         <MessageCircleQuestion className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
         <div>
@@ -282,6 +247,5 @@ function FaqItem({
           <p className="text-muted-foreground">{answer}</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
