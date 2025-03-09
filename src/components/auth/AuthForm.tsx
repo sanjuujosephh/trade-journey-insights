@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,24 +9,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export function AuthForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+91");
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<"login" | "signup" | "reset" | "phone-verify">("login");
   const [verificationCode, setVerificationCode] = useState("");
   const { signIn, signUp, resetPassword, signInWithPhone, verifyOtp } = useAuth();
   const { toast } = useToast();
 
-  const formatPhoneNumber = (input: string): string => {
-    // Ensure phone number starts with +91 for India
-    if (!input.startsWith("+91") && input.length > 0) {
-      return "+91" + input.replace(/\D/g, '');
-    }
-    return input.replace(/\D/g, '');
-  };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedPhone = formatPhoneNumber(e.target.value);
-    setPhone(formattedPhone);
+    const input = e.target.value;
+    if (input.startsWith("+91")) {
+      setPhone(input);
+    } else if (input === "") {
+      setPhone("+91");
+    } else if (!input.startsWith("+91")) {
+      setPhone("+91" + input.replace(/\D/g, ''));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,16 +47,15 @@ export function AuthForm() {
         toast({ title: "Success", description: "Phone verified successfully!" });
         setMode("login");
       } else {
-        // For signup, we now need to check if they're using phone or email
-        if (phone && phone.startsWith("+91")) {
+        await signUp(email, password);
+        if (phone.length > 3) {
           await signInWithPhone(phone);
           toast({
             title: "Success",
-            description: "Verification code sent to your phone.",
+            description: "Verification code sent to your phone. Please check your email to confirm your account.",
           });
           setMode("phone-verify");
         } else {
-          await signUp(email, password);
           toast({
             title: "Success",
             description: "Please check your email to confirm your account.",
@@ -199,37 +195,37 @@ export function AuthForm() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
               disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone-signup">Phone (Indian)</Label>
+            <Label htmlFor="password-signup">Password</Label>
+            <Input
+              id="password-signup"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isLoading}
+              minLength={6}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone-signup">Phone (WhatsApp)</Label>
             <Input
               id="phone-signup"
               type="tel"
-              placeholder="+91 9999999999"
+              placeholder="+91"
               value={phone}
               onChange={handlePhoneChange}
               disabled={isLoading}
             />
             <p className="text-xs text-muted-foreground">
-              Please enter your Indian mobile number starting with +91
+              Optional: We'll use this for WhatsApp communication
             </p>
           </div>
-          {!phone && (
-            <div className="space-y-2">
-              <Label htmlFor="password-signup">Password (for email signup)</Label>
-              <Input
-                id="password-signup"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                minLength={6}
-              />
-            </div>
-          )}
           <div className="text-sm">
             <div className="inline-flex items-center gap-2">
               <span className="font-semibold text-primary">Special Launch Offer:</span>

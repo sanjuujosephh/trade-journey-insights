@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -21,23 +20,24 @@ export function AuthModal() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+91");
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, resetPassword, signInWithPhone, verifyOtp } = useAuth();
   const { toast } = useToast();
 
-  const formatPhoneNumber = (input: string): string => {
-    // Ensure phone number starts with +91 for India
-    if (!input.startsWith("+91") && input.length > 0) {
-      return "+91" + input.replace(/\D/g, '');
-    }
-    return input.replace(/\D/g, '');
-  };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedPhone = formatPhoneNumber(e.target.value);
-    setPhone(formattedPhone);
+    const input = e.target.value;
+    // Keep +91 prefix fixed, only allow changing the part after that
+    if (input.startsWith("+91")) {
+      setPhone(input);
+    } else if (input === "") {
+      // If they delete everything, reset to just +91
+      setPhone("+91");
+    } else if (!input.startsWith("+91")) {
+      // If they try to delete or change the prefix, keep the +91 and add their input
+      setPhone("+91" + input.replace(/\D/g, ''));
+    }
   };
 
   const validateInput = () => {
@@ -48,23 +48,15 @@ export function AuthModal() {
       return;
     }
 
-    if (mode === "signup" && phone) {
-      // For phone signup, we only need the phone number
-      if (!phone.startsWith("+91") || phone.length < 12) {
-        throw new Error("Please enter a valid Indian phone number");
-      }
-      return;
-    }
-
-    if (!email && !phone) {
-      throw new Error("Please enter email or phone number");
+    if (!email) {
+      throw new Error("Please enter your email");
     }
     
-    if (mode !== "reset" && !phone && !password) {
+    if (mode !== "reset" && !password) {
       throw new Error("Please enter your password");
     }
     
-    if (mode === "signup" && !phone && password.length < 6) {
+    if (mode === "signup" && password.length < 6) {
       throw new Error("Password must be at least 6 characters long");
     }
   };
@@ -86,8 +78,6 @@ export function AuthModal() {
         return;
       }
       
-      console.log(`Attempting ${mode} with email: ${email} or phone: ${phone}`);
-      
       if (mode === "login") {
         await signIn(email, password);
         toast({
@@ -96,15 +86,17 @@ export function AuthModal() {
         });
         setIsOpen(false);
       } else if (mode === "signup") {
-        if (phone && phone.startsWith("+91")) {
+        await signUp(email, password);
+        
+        // If phone is provided (beyond the default +91), verify it
+        if (phone.length > 3) {
           await signInWithPhone(phone);
           toast({
             title: "Success",
-            description: "Verification code sent to your phone.",
+            description: "Verification code sent to your phone. Please check your email to confirm your account.",
           });
           setMode("phone-verify");
         } else {
-          await signUp(email, password);
           toast({
             title: "Success",
             description: "Please check your email to confirm your account.",
@@ -190,39 +182,20 @@ export function AuthModal() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {mode !== "signup" || !phone ? (
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required={!phone}
-                disabled={isLoading}
-              />
-            </div>
-          ) : null}
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+          </div>
 
-          {mode === "signup" && (
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone (Indian)</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+91 9999999999"
-                value={phone}
-                onChange={handlePhoneChange}
-                disabled={isLoading}
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter your Indian mobile number starting with +91
-              </p>
-            </div>
-          )}
-
-          {mode !== "reset" && (!phone || mode === "login") && (
+          {mode !== "reset" && (
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -231,10 +204,27 @@ export function AuthModal() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required={!phone}
+                required
                 disabled={isLoading}
                 minLength={6}
               />
+            </div>
+          )}
+          
+          {mode === "signup" && (
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone (WhatsApp)</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+91"
+                value={phone}
+                onChange={handlePhoneChange}
+                disabled={isLoading}
+              />
+              <p className="text-xs text-muted-foreground">
+                Optional: We'll use this for WhatsApp communication
+              </p>
             </div>
           )}
           
