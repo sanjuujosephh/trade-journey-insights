@@ -7,9 +7,7 @@ export function PriceComparison() {
         {/* Trading Journal Card */}
         <Card className="p-4 bg-gradient-to-br from-blue-50 to-green-50 border-green-200 overflow-hidden relative">
           <div className="flex items-center mb-3">
-            <div className="p-2 rounded-full bg-green-100 mr-3">
-              <BookOpenText className="h-6 w-6 text-green-600" />
-            </div>
+            
             <h4 className="font-medium">Onetradejournal</h4>
           </div>
           
@@ -18,15 +16,11 @@ export function PriceComparison() {
           {/* Price Display */}
           <div className="flex items-baseline mb-3">
             <span className="text-2xl font-bold text-primary">₹199</span>
-            <span className="text-sm text-muted-foreground ml-1">/month</span>
+            <span className="text-sm text-muted-foreground ml-1">per month</span>
           </div>
           
           {/* Progress Bar */}
-          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden mb-2">
-            <div className="h-full bg-green-500 rounded-full" style={{
-            width: '99.5%'
-          }}></div>
-          </div>
+          
           
           <p className="text-xs text-green-600 font-medium">Lasts a whole month 😱</p>
         </Card>
@@ -34,9 +28,7 @@ export function PriceComparison() {
         {/* Burger Card */}
         <Card className="p-4 bg-gradient-to-br from-orange-50 to-red-50 border-orange-200 overflow-hidden relative">
           <div className="flex items-center mb-3">
-            <div className="p-2 rounded-full bg-orange-100 mr-3">
-              <Utensils className="h-6 w-6 text-orange-600" />
-            </div>
+            
             <h4 className="font-medium">Crispy Burger</h4>
           </div>
           
@@ -45,15 +37,11 @@ export function PriceComparison() {
           {/* Price Display */}
           <div className="flex items-baseline mb-3">
             <span className="text-2xl font-bold text-orange-600">₹220</span>
-            <span className="text-sm text-muted-foreground ml-1">/each</span>
+            <span className="text-sm text-muted-foreground ml-1">for one-time</span>
           </div>
           
           {/* Progress Bar */}
-          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden mb-2">
-            <div className="h-full bg-orange-500 rounded-full" style={{
-            width: '100%'
-          }}></div>
-          </div>
+          
           
           <p className="text-xs text-orange-600 font-medium">Gone in minutes</p>
         </Card>
