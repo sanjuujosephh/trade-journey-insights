@@ -14,25 +14,26 @@ export function LandingPage() {
             Track your trades, analyze your performance, and become a more profitable trader with our comprehensive suite of tools.
           </p>
           
-          {/* App Screenshot with Gradient Fade */}
-          <div className="relative w-full max-w-3xl mx-auto mb-8">
-            <div className="w-full rounded-lg overflow-hidden shadow-lg">
-              <img 
-                src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
-                alt="Trading Journal Dashboard" 
-                className="w-full"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent"></div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Buttons repositioned above the image */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button size="lg" className="gap-2 text-lg">
               Get Started <ArrowRight className="h-4 w-4" />
             </Button>
             <Button size="lg" variant="outline" className="text-lg">
               View Demo
             </Button>
+          </div>
+          
+          {/* App Screenshot with Enhanced Gradient Fade */}
+          <div className="relative w-full max-w-4xl mx-auto mb-8">
+            <div className="w-full rounded-lg overflow-hidden">
+              <img 
+                src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
+                alt="Trading Journal Dashboard" 
+                className="w-full"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent"></div>
+            </div>
           </div>
         </div>
 
