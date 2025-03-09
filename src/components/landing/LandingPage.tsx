@@ -1,9 +1,10 @@
 
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2 } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2, MessageCircleQuestion } from "lucide-react";
 import { DailyLeaderboard } from "./DailyLeaderboard";
 import { PriceComparison } from "./PriceComparison";
+
 export function LandingPage() {
   return <div className="bg-background min-h-screen">
       {/* Hero Section */}
@@ -14,25 +15,25 @@ export function LandingPage() {
             Track your trades, analyze your performance, and become a more profitable trader with our comprehensive suite of tools.
           </p>
           
-          {/* Buttons repositioned above the image */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button size="lg" className="gap-2 text-lg">
-              Get Started <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg">
-              View Demo
-            </Button>
-          </div>
-          
-          {/* App Screenshot with Enhanced Gradient Fade */}
-          <div className="relative w-full max-w-4xl mx-auto mb-8">
+          {/* App Screenshot with Enhanced Gradient Fade and Absolute Positioned Buttons */}
+          <div className="relative w-full max-w-[110%] mx-auto mb-8">
             <div className="w-full rounded-lg overflow-hidden">
               <img 
                 src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
                 alt="Trading Journal Dashboard" 
                 className="w-full"
               />
-              <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent"></div>
+              <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-background to-transparent"></div>
+            </div>
+            
+            {/* Buttons positioned on top of the faded area */}
+            <div className="absolute bottom-20 left-0 right-0 flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="gap-2 text-lg">
+                Get Started <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button size="lg" variant="outline" className="text-lg">
+                View Demo
+              </Button>
             </div>
           </div>
         </div>
@@ -95,13 +96,54 @@ export function LandingPage() {
           </div>
         </div>
       </div>
+
+      {/* FAQ Section */}
+      <div className="py-16 bg-background">
+        <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Get answers to common questions about our trading journal platform
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <FaqItem 
+              question="How does the daily streak system work?" 
+              answer="Our streak system tracks your consecutive days of journaling trades. Each day you log at least one trade or journal entry, your streak increases. This helps build consistency in your trading practice."
+            />
+            <FaqItem 
+              question="Can I import my trades from other platforms?" 
+              answer="Yes! You can import trades from popular brokers and platforms. We support CSV imports from most major trading platforms, making it easy to transition to our journal."
+            />
+            <FaqItem 
+              question="Is my trading data secure?" 
+              answer="Absolutely. We use bank-level encryption to protect your data. Your information is never shared with third parties, and we don't have access to your brokerage accounts."
+            />
+            <FaqItem 
+              question="What payment methods do you accept?" 
+              answer="We accept all major credit cards, PayPal, and select cryptocurrency payments. All payments are processed securely through our payment partners."
+            />
+            <FaqItem 
+              question="Can I cancel my subscription anytime?" 
+              answer="Yes, you can cancel your subscription at any time. Your access will continue until the end of your billing period, and we don't charge any cancellation fees."
+            />
+            <FaqItem 
+              question="How does the AI analysis work?" 
+              answer="Our AI analyzes your trading patterns, win/loss ratios, psychological states, and market conditions to identify correlations and opportunities for improvement in your trading approach."
+            />
+          </div>
+        </div>
+      </div>
     </div>;
 }
+
 interface FeatureItemProps {
   icon: React.ReactNode;
   title: string;
   description: string;
 }
+
 function FeatureItem({
   icon,
   title,
@@ -115,6 +157,7 @@ function FeatureItem({
       </div>
     </div>;
 }
+
 function FeatureCard({
   icon,
   title,
@@ -125,4 +168,24 @@ function FeatureCard({
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
     </div>;
+}
+
+function FaqItem({
+  question,
+  answer
+}: {
+  question: string;
+  answer: string;
+}) {
+  return (
+    <div className="bg-card border rounded-lg p-6 shadow-sm hover:border-primary transition-colors">
+      <div className="flex gap-3 items-start">
+        <MessageCircleQuestion className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+        <div>
+          <h3 className="font-semibold text-lg mb-2">{question}</h3>
+          <p className="text-muted-foreground">{answer}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
