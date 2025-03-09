@@ -1,9 +1,10 @@
 
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2, MessageCircleQuestion } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2, MessageCircleQuestion, Check } from "lucide-react";
 import { DailyLeaderboard } from "./DailyLeaderboard";
 import { PriceComparison } from "./PriceComparison";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export function LandingPage() {
   return <div className="bg-background min-h-screen">
@@ -16,18 +17,18 @@ export function LandingPage() {
           </p>
           
           {/* App Screenshot with Enhanced Gradient Fade and Absolute Positioned Buttons */}
-          <div className="relative w-full max-w-[110%] mx-auto mb-8">
+          <div className="relative w-full max-w-[133%] mx-auto mb-8">
             <div className="w-full rounded-lg overflow-hidden">
               <img 
                 src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
                 alt="Trading Journal Dashboard" 
                 className="w-full"
               />
-              <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-background to-transparent"></div>
+              <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent"></div>
             </div>
             
             {/* Buttons positioned on top of the faded area */}
-            <div className="absolute bottom-20 left-0 right-0 flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="absolute bottom-32 left-0 right-0 flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="gap-2 text-lg">
                 Get Started <ArrowRight className="h-4 w-4" />
               </Button>
@@ -55,6 +56,32 @@ export function LandingPage() {
           <div className="md:col-span-3 space-y-8">
             {/* Leaderboard Section */}
             <DailyLeaderboard />
+            
+            {/* Founder's Story Section */}
+            <div className="bg-card border rounded-lg p-8 shadow-sm">
+              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-primary">
+                  <img 
+                    src="/lovable-uploads/aec44eeb-3f77-4f3e-ad47-ca22c8bcf96f.png" 
+                    alt="Founder" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-semibold mb-3">Our Journey</h2>
+                  <p className="text-muted-foreground mb-4 italic">"I started onetradejournal because I was frustrated with the expensive and complicated journaling tools on the market."</p>
+                  <p className="mb-3">
+                    As an options trader for over 5 years, I struggled to find a journaling tool that was both powerful and easy to use. Most platforms were either too complex or didn't provide the insights I needed to grow as a trader.
+                  </p>
+                  <p className="mb-3">
+                    I built onetradejournal to solve my own problems first - tracking my trades, understanding my patterns, and most importantly, building consistency through daily habits. What started as a personal project has grown into a platform that helps traders of all levels improve their performance.
+                  </p>
+                  <p className="font-medium">
+                    Our mission is simple: help traders build better habits through thoughtful journaling and powerful analytics at an affordable price.
+                  </p>
+                </div>
+              </div>
+            </div>
             
             {/* Features Section */}
             <div className="bg-card border rounded-lg p-8 shadow-sm">
@@ -93,6 +120,75 @@ export function LandingPage() {
             <FeatureCard icon={<BookOpenText className="h-8 w-8" />} title="Learning Resources" description="Access our library of trading resources and educational content to improve your skills." />
             <FeatureCard icon={<BarChart3 className="h-8 w-8" />} title="Pattern Recognition" description="Identify recurring patterns in your trading behavior and market conditions." />
             <FeatureCard icon={<Share2 className="h-8 w-8" />} title="Trade Templates" description="Create templates for your favorite strategies to quickly log similar trades." />
+          </div>
+        </div>
+      </div>
+
+      {/* Comparison Table */}
+      <div className="py-16 bg-background">
+        <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">How We Compare</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              See why onetradejournal is the best choice for serious traders
+            </p>
+          </div>
+          
+          <div className="overflow-x-auto max-w-4xl mx-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-1/4">Features</TableHead>
+                  <TableHead className="text-center w-1/4">OneTradeJournal</TableHead>
+                  <TableHead className="text-center w-1/4">TradeNote</TableHead>
+                  <TableHead className="text-center w-1/4">Tradervue</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Starting Price</TableCell>
+                  <TableCell className="text-center">₹199/month</TableCell>
+                  <TableCell className="text-center">₹999/month</TableCell>
+                  <TableCell className="text-center">₹1299/month</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Habit Building System</TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-muted-foreground">Limited</TableCell>
+                  <TableCell className="text-center text-muted-foreground">—</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">AI Analysis</TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-muted-foreground">—</TableCell>
+                  <TableCell className="text-center text-muted-foreground">—</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Options Trading Support</TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-muted-foreground">Premium Only</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Community Features</TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-muted-foreground">Limited</TableCell>
+                  <TableCell className="text-center text-muted-foreground">—</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Learning Resources</TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-muted-foreground">—</TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Trade Import</TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>
