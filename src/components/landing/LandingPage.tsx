@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2 } from "lucide-react";
@@ -12,6 +13,19 @@ export function LandingPage() {
           <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
             Track your trades, analyze your performance, and become a more profitable trader with our comprehensive suite of tools.
           </p>
+          
+          {/* App Screenshot with Gradient Fade */}
+          <div className="relative w-full max-w-2xl mx-auto mb-8">
+            <div className="w-full rounded-lg overflow-hidden">
+              <img 
+                src="/lovable-uploads/aec44eeb-3f77-4f3e-ad47-ca22c8bcf96f.png" 
+                alt="Trading Journal Dashboard" 
+                className="w-full"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent"></div>
+            </div>
+          </div>
+          
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="gap-2 text-lg">
               Get Started <ArrowRight className="h-4 w-4" />
@@ -22,14 +36,25 @@ export function LandingPage() {
           </div>
         </div>
 
-        {/* Main Content Grid */}
+        {/* Main Content Grid - Swapped positions */}
         <div className="grid md:grid-cols-5 gap-6 items-start">
-          {/* Left Content - Leaderboard and Features */}
+          {/* Auth Form - Now on the left */}
+          <div className="md:col-span-2 space-y-6 sticky top-24">
+            <div className="bg-card border rounded-lg p-6 shadow-sm">
+              <h2 className="text-2xl font-bold mb-6 text-center">Start Journaling &amp; Build Habit</h2>
+              <AuthForm />
+            </div>
+            
+            {/* Price Comparison Section - below auth form */}
+            <PriceComparison />
+          </div>
+          
+          {/* Leaderboard and Features - Now on the right */}
           <div className="md:col-span-3 space-y-8">
-            {/* Leaderboard Section - Moved to the top */}
+            {/* Leaderboard Section */}
             <DailyLeaderboard />
             
-            {/* Features Section - Moved below leaderboard */}
+            {/* Features Section */}
             <div className="bg-card border rounded-lg p-8 shadow-sm">
               <h2 className="text-2xl font-semibold mb-6">Why traders choose us</h2>
               <div className="grid sm:grid-cols-2 gap-6">
@@ -54,17 +79,6 @@ export function LandingPage() {
                 </blockquote>
               </div>
             </div>
-          </div>
-
-          {/* Right Content - Auth Form */}
-          <div className="md:col-span-2 space-y-6 sticky top-24">
-            <div className="bg-card border rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6 text-center">Start Journaling &amp; Build Habit</h2>
-              <AuthForm />
-            </div>
-            
-            {/* Price Comparison Section - Added below auth form */}
-            <PriceComparison />
           </div>
         </div>
       </div>
