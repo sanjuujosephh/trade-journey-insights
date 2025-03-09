@@ -125,14 +125,20 @@
   content: "";
   position: absolute;
   z-index: -1;
-  inset: -2px;
-  border-radius: 9px;
+  inset: -1px; /* Thinner border */
+  border-radius: inherit;
+  padding: 1px; /* Creates the border effect */
   background: linear-gradient(
     45deg, 
     #ffd700, #ffec80, #ffd700, #ffbf00, #ffaa00, #ffd700
   );
   background-size: 200% auto;
   animation: shine 3s linear infinite;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 
 /* Fix for tab panel scrolling shadow issue */
