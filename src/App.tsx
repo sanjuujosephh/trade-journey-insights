@@ -10,6 +10,7 @@ import { AuthGuard } from "./components/auth/AuthGuard";
 import { DisclaimerModal } from "./components/auth/DisclaimerModal";
 import Index from "./pages/Index";
 import Pricing from "./pages/Pricing";
+import LeaderboardPage from "./pages/LeaderboardPage";
 import NotFound from "./pages/NotFound";
 import { Button } from "./components/ui/button";
 import { Moon, Sun } from "lucide-react";
@@ -107,6 +108,14 @@ function AppRoutes() {
         } 
       />
       <Route path="/pricing" element={<Pricing />} />
+      <Route 
+        path="/leaderboard" 
+        element={
+          <AuthGuard requireSubscription={true}>
+            <LeaderboardPage />
+          </AuthGuard>
+        } 
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
