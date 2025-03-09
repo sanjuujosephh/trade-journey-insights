@@ -17,7 +17,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'monthly',
     title: 'Monthly Subscription',
-    price: '₹199',
+    price: '₹249',
     period: '/month',
     features: [
       'Unlimited Trade Entries',
@@ -30,14 +30,15 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'yearly',
     title: 'Yearly Subscription',
-    price: '₹1499',
+    price: '₹1999',
     period: '/year',
     features: [
-      'Save 37% vs Monthly Plan',
+      'Save 33% vs Monthly Plan',
+      'Everything In Monthly',
       'Access To Trading Strategies',
       'Access To JOT Indicator Suite',
-      'Access To Trading Templates',
-      'Future Feature Updates'
-    ]
+      'Future Content Access'
+    ],
+    isBestValue: true
   }
 ];

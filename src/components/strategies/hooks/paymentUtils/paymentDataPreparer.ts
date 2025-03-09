@@ -15,10 +15,10 @@ export const preparePaymentData = (
   // Calculate amount based on plan type
   let amount: number;
   if (planType === 'yearly') {
-    amount = 1499 * 100; // Yearly plan costs ₹1499 (amount in paise)
+    amount = 1999 * 100; // Yearly plan costs ₹1999 (amount in paise)
   } else {
     // Default to monthly
-    amount = (isFullPackage ? 1499 : item?.price || 199) * 100; // Full package costs ₹1499 (amount in paise)
+    amount = (isFullPackage ? 1999 : item?.price || 249) * 100; // Full package costs ₹1999 (amount in paise)
   }
   
   const userName = user?.email?.split('@')[0] || "Trader";
