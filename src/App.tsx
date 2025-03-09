@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,12 +12,14 @@ import Pricing from "./pages/Pricing";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import NotFound from "./pages/NotFound";
 import { Button } from "./components/ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Trophy } from "lucide-react";
 import { useTheme } from "./contexts/ThemeProvider";
 import { TraderInfo } from "./components/TraderInfo";
 import { AuthModal } from "./components/auth/AuthModal";
 import { Footer } from "./components/Footer";
 import { MonthlyPnL } from "./components/MonthlyPnL";
+import { useSubscription } from "./hooks/useSubscription";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./components/ui/tooltip";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +50,31 @@ function ThemeToggle() {
   );
 }
 
+function LeaderboardIcon() {
+  const { isSubscribed } = useSubscription();
+  
+  if (!isSubscribed) return null;
+  
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Link to="/leaderboard">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+          >
+            <Trophy className="h-5 w-5" />
+          </Button>
+        </Link>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Traders Leaderboard</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 function Navigation() {
   const { user } = useAuth();
   
@@ -65,6 +91,7 @@ function Navigation() {
         </div>
         <div className="flex-1 flex justify-end items-center gap-2">
           {user && <MonthlyPnL />}
+          {user && <LeaderboardIcon />}
           <ThemeToggle />
           <div data-user-nav>
             {user ? <UserMenu /> : <AuthModal />}

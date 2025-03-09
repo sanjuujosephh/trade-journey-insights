@@ -1,9 +1,7 @@
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Trophy, Video, Youtube } from "lucide-react";
-import { useSubscription } from "@/hooks/useSubscription";
-import { Link } from "react-router-dom";
+import { Video, Youtube } from "lucide-react";
 
 interface DashboardHeaderProps {
   profile: any;
@@ -11,8 +9,6 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
-  const { isSubscribed } = useSubscription();
-
   return (
     <header className="mb-2 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -30,17 +26,6 @@ export function DashboardHeader({ profile, user }: DashboardHeaderProps) {
         </div>
       </div>
       <div className="flex flex-col gap-2 w-full sm:w-auto self-center">
-        {isSubscribed && (
-          <Link to="/leaderboard">
-            <Button 
-              variant="outline" 
-              className="w-full gap-2 bg-[#fff8e1] border-[#ffe57f] text-[#ff6f00] hover:bg-[#fff8e1] hover:text-[#ff6f00] hover:border-[#ffe57f]"
-            >
-              <Trophy className="h-4 w-4" />
-              <span>Traders Leaderboard</span>
-            </Button>
-          </Link>
-        )}
         <Button 
           variant="outline" 
           className="gap-2 bg-[#e5f0ff] border-[#e5f0ff] text-[#001d6c] hover:bg-[#e5f0ff] hover:text-[#001d6c] hover:border-[#e5f0ff]"
