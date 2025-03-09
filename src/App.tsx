@@ -61,8 +61,8 @@ function LeaderboardIcon() {
         <Link to="/leaderboard">
           <Button 
             variant="outline" 
-            size="icon"
-            className="rounded-full bg-background"
+            size="icon" 
+            className="rounded-full"
           >
             <Trophy className="h-5 w-5" />
           </Button>
