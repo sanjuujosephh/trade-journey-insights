@@ -84,12 +84,6 @@ export function PricingContainer() {
         {/* Trial Request Form */}
         <TrialRequestForm />
       </div>
-
-      {!user && (
-        <p className="text-sm text-center mt-8 text-muted-foreground">
-          Please <a href="/auth" className="text-primary hover:underline">login</a> to subscribe
-        </p>
-      )}
     </div>
   );
 }
