@@ -62,10 +62,10 @@ function LeaderboardIcon() {
         <Link to="/leaderboard">
           <Button 
             variant="outline" 
-            className="h-10 min-w-[4rem] px-2 flex items-center justify-center border border-black rounded bg-background"
+            className="h-10 min-w-[2.5rem] px-2 flex items-center justify-center rounded-full bg-background"
           >
             <div className="flex items-center justify-center text-center w-full">
-              <Trophy className="h-5 w-5 text-black" />
+              <Trophy className="h-5 w-5" />
             </div>
           </Button>
         </Link>
