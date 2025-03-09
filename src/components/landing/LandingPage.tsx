@@ -15,14 +15,14 @@ export function LandingPage() {
           </p>
           
           {/* App Screenshot with Enhanced Gradient Fade and Absolute Positioned Buttons */}
-          <div className="relative w-full max-w-[133%] mx-auto mb-8">
+          <div className="relative w-full max-w-[146%] mx-auto mb-8">
             <div className="w-full rounded-lg overflow-hidden">
               <img src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" alt="Trading Journal Dashboard" className="w-full" />
-              <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent"></div>
+              <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent opacity-90"></div>
             </div>
             
             {/* Buttons positioned on top of the faded area */}
-            <div className="absolute bottom-32 left-0 right-0 flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="absolute bottom-[5rem] left-0 right-0 flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="gap-2 text-lg">
                 Get Started <ArrowRight className="h-4 w-4" />
               </Button>
