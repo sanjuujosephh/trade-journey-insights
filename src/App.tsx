@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -64,7 +65,7 @@ function LeaderboardIcon() {
             className="h-10 min-w-[4rem] px-2 flex items-center justify-center border border-black rounded bg-background"
           >
             <div className="flex items-center justify-center text-center w-full">
-              <Trophy className="h-5 w-5 text-amber-500" />
+              <Trophy className="h-5 w-5 text-black" />
             </div>
           </Button>
         </Link>
