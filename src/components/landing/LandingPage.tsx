@@ -15,10 +15,10 @@ export function LandingPage() {
           </p>
           
           {/* App Screenshot with Gradient Fade */}
-          <div className="relative w-full max-w-2xl mx-auto mb-8">
-            <div className="w-full rounded-lg overflow-hidden">
+          <div className="relative w-full max-w-3xl mx-auto mb-8">
+            <div className="w-full rounded-lg overflow-hidden shadow-lg">
               <img 
-                src="/lovable-uploads/aec44eeb-3f77-4f3e-ad47-ca22c8bcf96f.png" 
+                src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
                 alt="Trading Journal Dashboard" 
                 className="w-full"
               />
