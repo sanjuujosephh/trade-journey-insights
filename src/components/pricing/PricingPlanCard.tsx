@@ -45,11 +45,11 @@ export function PricingPlanCard({
   return (
     <Card className={`border rounded-lg shadow-sm ${getCardStyle()} relative overflow-hidden`}>
       {isBestValue && (
-        <div className="absolute -top-4 left-6 transform -translate-x-0 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
+        <div className="absolute top-0 left-0 right-0 bg-primary text-white py-1 px-4 text-center text-sm font-medium">
           Best Value
         </div>
       )}
-      <CardHeader className="pb-4">
+      <CardHeader className={`pb-4 ${isBestValue ? 'pt-8' : 'pt-4'}`}>
         <CardTitle className="text-2xl font-semibold">{title}</CardTitle>
         <div className="mt-2">
           <span className="text-4xl font-bold">{price}</span>
