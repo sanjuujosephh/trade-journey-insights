@@ -14,6 +14,7 @@ interface PricingPlanCardProps {
   isTestMode: boolean;
   isBestValue?: boolean;
   buttonText?: string;
+  planId?: string;
 }
 
 export function PricingPlanCard({
@@ -27,9 +28,20 @@ export function PricingPlanCard({
   isTestMode,
   isBestValue = false,
   buttonText,
+  planId,
 }: PricingPlanCardProps) {
+  // Determine card background style based on planId
+  const getCardStyle = () => {
+    if (planId === 'monthly') {
+      return 'border-green-200 bg-gradient-to-br from-blue-50 to-green-50';
+    } else if (isBestValue) {
+      return 'border-primary/20 bg-primary/5';
+    }
+    return '';
+  };
+
   return (
-    <Card className={`border rounded-lg shadow-sm ${isBestValue ? 'border-primary/20 bg-primary/5 relative' : ''}`}>
+    <Card className={`border rounded-lg shadow-sm ${getCardStyle()} relative overflow-hidden`}>
       {isBestValue && (
         <div className="absolute -top-4 left-6 transform -translate-x-0 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
           Best Value

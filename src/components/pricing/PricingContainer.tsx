@@ -72,6 +72,7 @@ export function PricingContainer() {
             isPaymentConfigured={isPaymentConfigured}
             isTestMode={isTestMode}
             isBestValue={plan.isBestValue}
+            planId={plan.id}
             buttonText={
               plan.id === 'lifetime' 
                 ? (isLoading ? "Processing..." : isTestMode ? "Get Lifetime Access (Test)" : "Get Lifetime Access")
