@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { OptionPricePosition } from "./behavioral/OptionPricePosition";
 import { MarketConditionSelect } from "./market-context/MarketConditionSelect";
@@ -6,11 +7,13 @@ import { TimeframeSelect } from "./market-context/TimeframeSelect";
 import { EmotionSelects } from "./market-context/EmotionSelects";
 import { ExitReasonSelect } from "./market-context/ExitReasonSelect";
 import { TradeNotes } from "./market-context/TradeNotes";
+
 interface MarketContextProps {
   formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }
+
 export function MarketContext({
   formData,
   handleChange,

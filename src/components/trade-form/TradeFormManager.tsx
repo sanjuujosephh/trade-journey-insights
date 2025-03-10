@@ -11,7 +11,7 @@ import { isValidDateTime } from "@/utils/datetime";
 
 interface TradeFormManagerProps {
   formData: FormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (name: string, value: string | boolean) => void;
   onSubmit: (e: FormEvent) => void;
   editingId: string | null;
