@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -16,10 +15,10 @@ export default function Index() {
   const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Scroll to top on component mount
+  // Scroll to top on component mount and when tab changes
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [activeTab]);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -96,8 +95,8 @@ export default function Index() {
   }
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="container py-4">
+    <div className="bg-background min-h-screen w-full overflow-x-hidden">
+      <div className="container py-4 w-full">
         <DashboardHeader profile={profile} user={user} />
         <div className="mt-8">
           <DashboardTabs
