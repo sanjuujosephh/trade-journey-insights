@@ -22,9 +22,9 @@ export function HeroSection() {
             loading="eager"
             style={{ imageRendering: 'crisp-edges' }}
           />
-          {/* Shadow overlay that fades up into the image and down into the background */}
+          {/* Shadow overlay that fades into the background */}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90 pointer-events-none"></div>
-          <div className="absolute inset-0 shadow-[inset_0_-20px_30px_rgba(0,0,0,0.5)] pointer-events-none"></div>
+          <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.2),inset_0_-40px_40px_rgba(0,0,0,0.3)] pointer-events-none"></div>
         </div>
         
         {/* Buttons positioned on top of the faded area */}
