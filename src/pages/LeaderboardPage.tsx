@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { useLeaderboardData } from "@/hooks/useLeaderboardData";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { TrendingUp, TrendingDown, ChevronDown, ChartLine, Info } from "lucide-react";
+import { TrendingUp, TrendingDown, ExternalLink, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -71,12 +72,7 @@ export default function LeaderboardPage() {
                         <AvatarImage src={entry.avatar_url} alt={entry.username} />
                         <AvatarFallback>{entry.username.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
-                      <div className="flex items-center gap-2">
-                        <div className="font-medium">{entry.username}</div>
-                        {entry.chart_link && (
-                          <ChartLine className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
+                      <div className="font-medium">{entry.username}</div>
                       <div className={`text-sm font-semibold ${isWinners ? 'text-green-600' : 'text-red-600'}`}>
                         {isWinners ? (
                           <span className="flex items-center"><TrendingUp className="h-3 w-3 mr-1" /> {formatCurrency(Math.abs(entry.profit_loss))}</span>
@@ -85,7 +81,17 @@ export default function LeaderboardPage() {
                         )}
                       </div>
                     </div>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${expandedEntries[`${entry.username}-${entry.rank}`] ? 'rotate-180' : ''}`} />
+                    {entry.chart_link && (
+                      <a 
+                        href={entry.chart_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink className="h-5 w-5" />
+                      </a>
+                    )}
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -155,7 +161,7 @@ export default function LeaderboardPage() {
           </Button>
         </div>
         <p className="text-muted-foreground">
-          Detailed insights from top performers and trading lessons from losses in the last 24 hours.
+          Detailed insights from top performers and trading lessons from losses.
           Learn what strategies are working and which mistakes to avoid.
         </p>
       </div>

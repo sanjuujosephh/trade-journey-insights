@@ -1,6 +1,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, ExternalLink } from "lucide-react";
 import { LeaderboardEntry } from "@/hooks/useLeaderboardData";
 
 interface LeaderboardListProps {
@@ -44,9 +44,21 @@ export function LeaderboardList({ entries, isLoading, formatAmount, isProfit }: 
             </Avatar>
             <span className="font-medium truncate">{entry.username}</span>
           </div>
-          <div className={`flex items-center gap-1 ${isProfit ? 'text-green-600' : 'text-red-600'} font-semibold`}>
-            {isProfit ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-            {formatAmount(Math.abs(entry.profit_loss))}
+          <div className="flex items-center space-x-3">
+            <div className={`flex items-center gap-1 ${isProfit ? 'text-green-600' : 'text-red-600'} font-semibold`}>
+              {isProfit ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+              {formatAmount(Math.abs(entry.profit_loss))}
+            </div>
+            {entry.chart_link && (
+              <a 
+                href={entry.chart_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
           </div>
         </div>
       ))}
