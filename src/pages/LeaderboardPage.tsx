@@ -62,7 +62,7 @@ export default function LeaderboardPage() {
                 onClick={() => toggleEntry(`${entry.username}-${entry.rank}`)}
                 className="w-full"
               >
-                <CardHeader className={`pb-2 ${isWinners ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}>
+                <CardHeader className={`${isWinners ? 'bg-white dark:bg-green-900/20' : 'bg-white dark:bg-red-900/20'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-white ${isWinners ? 'bg-green-600' : 'bg-red-600'}`}>
@@ -175,14 +175,14 @@ export default function LeaderboardPage() {
         <TabsList className="grid w-full grid-cols-2 mb-8">
           <TabsTrigger 
             value="winners" 
-            className="gap-2 data-[state=active]:bg-green-100 dark:data-[state=active]:bg-green-900/30"
+            className="gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-green-900/30"
           >
             <TrendingUp className="h-4 w-4 text-green-500" />
             <span>Top Winners</span>
           </TabsTrigger>
           <TabsTrigger 
             value="losers" 
-            className="gap-2 data-[state=active]:bg-red-100 dark:data-[state=active]:bg-red-900/30"
+            className="gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-red-900/30"
           >
             <TrendingDown className="h-4 w-4 text-red-500" />
             <span>Top Losers</span>
