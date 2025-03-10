@@ -14,7 +14,7 @@ export function HeroSection() {
       
       {/* App Screenshot with Enhanced Image Quality */}
       <div className="relative w-full max-w-5xl mx-auto mb-8">
-        <div className="w-full rounded-lg overflow-hidden shadow-xl">
+        <div className="w-full rounded-lg overflow-hidden">
           <img 
             src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
             alt="Trading Journal Dashboard" 
@@ -22,7 +22,9 @@ export function HeroSection() {
             loading="eager"
             style={{ imageRendering: 'crisp-edges' }}
           />
-          <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent opacity-80"></div>
+          {/* Shadow overlay that fades up into the image and down into the background */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90 pointer-events-none"></div>
+          <div className="absolute inset-0 shadow-[inset_0_-20px_30px_rgba(0,0,0,0.5)] pointer-events-none"></div>
         </div>
         
         {/* Buttons positioned on top of the faded area */}

@@ -16,7 +16,7 @@ export function AuthFormTabs({ onModeChange }: AuthFormTabsProps) {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("+91");
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup">("signup"); // Changed default to signup
   const { signIn, signUp, signInWithPhone } = useAuth();
   const { toast } = useToast();
 
@@ -63,7 +63,7 @@ export function AuthFormTabs({ onModeChange }: AuthFormTabsProps) {
   };
 
   return (
-    <Tabs defaultValue="login" className="w-full auth-tabs">
+    <Tabs defaultValue="signup" className="w-full auth-tabs"> {/* Changed default to signup */}
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="login" onClick={() => setMode("login")}>
           Login
