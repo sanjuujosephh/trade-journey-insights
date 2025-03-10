@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2, MessageCircleQuestion, Check } from "lucide-react";
@@ -15,7 +16,7 @@ export function LandingPage() {
           </p>
           
           {/* App Screenshot with Enhanced Gradient Fade and Absolute Positioned Buttons */}
-          <div className="relative w-full max-w-[146%] mx-auto mb-8">
+          <div className="relative w-full max-w-[146%] lg:max-w-[60rem] mx-auto mb-8">
             <div className="w-full rounded-lg overflow-hidden">
               <img src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" alt="Trading Journal Dashboard" className="w-full" />
               <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent opacity-90"></div>
