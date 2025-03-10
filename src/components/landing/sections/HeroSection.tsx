@@ -24,7 +24,14 @@ export function HeroSection() {
           />
           {/* Shadow overlay that fades into the background */}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90 pointer-events-none"></div>
-          <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.2),inset_0_-40px_40px_rgba(0,0,0,0.3)] pointer-events-none"></div>
+        </div>
+        
+        {/* Exterior shadow that fades into background at bottom */}
+        <div className="absolute -inset-x-6 -inset-y-6 top-0 z-[-1] rounded-lg" 
+             style={{ 
+               boxShadow: '0 10px 50px -12px rgba(0,0,0,0.25), 0 30px 60px -30px rgba(0,0,0,0.3)',
+               pointerEvents: 'none'
+             }}>
         </div>
         
         {/* Buttons positioned on top of the faded area */}
