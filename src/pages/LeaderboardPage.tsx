@@ -146,7 +146,7 @@ export default function LeaderboardPage() {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="winners" className="space-y-4 px-0 py-0">
+        <TabsContent value="winners" className="space-y-4 px-px py-px">
           {renderTraderDetails(topTraders, true)}
         </TabsContent>
         
