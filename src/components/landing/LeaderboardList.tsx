@@ -1,7 +1,10 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Image } from "lucide-react";
 import { LeaderboardEntry } from "@/hooks/useLeaderboardData";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { TradeChart } from "../trade-details/TradeChart";
 
 interface LeaderboardListProps {
   entries: LeaderboardEntry[];
@@ -11,6 +14,8 @@ interface LeaderboardListProps {
 }
 
 export function LeaderboardList({ entries, isLoading, formatAmount, isProfit }: LeaderboardListProps) {
+  const [selectedChartLink, setSelectedChartLink] = useState<string | null>(null);
+
   if (isLoading) {
     return (
       <div className="p-8 text-center">
@@ -48,6 +53,22 @@ export function LeaderboardList({ entries, isLoading, formatAmount, isProfit }: 
             {isProfit ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
             {formatAmount(Math.abs(entry.profit_loss))}
           </div>
+          
+          {entry.chart_link && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <button 
+                  className="ml-2 p-1 rounded-full hover:bg-muted/50"
+                  onClick={() => setSelectedChartLink(entry.chart_link)}
+                >
+                  <Image className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <TradeChart chartLink={selectedChartLink} />
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       ))}
     </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -7,6 +6,7 @@ export interface LeaderboardEntry {
   avatar_url: string;
   profit_loss: number;
   rank: number;
+  chart_link?: string | null;
 }
 
 export function useLeaderboardData() {
@@ -24,7 +24,7 @@ export function useLeaderboardData() {
       // First get all completed trades from the last 24 hours
       const { data: tradesData, error: tradesError } = await supabase
         .from('trades')
-        .select('id, entry_price, exit_price, quantity, symbol, user_id')
+        .select('id, entry_price, exit_price, quantity, symbol, user_id, chart_link')
         .filter('exit_price', 'not.is', null)
         .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
       
@@ -76,11 +76,18 @@ export function useLeaderboardData() {
             username: profile.username,
             avatar_url: profile.avatar_url || '',
             profit_loss: 0,
-            rank: 0
+            rank: 0,
+            chart_link: null
           };
         }
         
         acc[userId].profit_loss += profitLoss;
+        
+        // Keep track of a chart_link from one of their trades
+        if (trade.chart_link && !acc[userId].chart_link) {
+          acc[userId].chart_link = trade.chart_link;
+        }
+        
         return acc;
       }, {} as Record<string, LeaderboardEntry>);
       

@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -24,6 +23,19 @@ interface TradeHistoryProps {
 
 export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEditButton = false }: TradeHistoryProps) {
   const { toast } = useToast();
+
+  const sortedTrades = [...trades].sort((a, b) => {
+    const dateA = a.entry_date ? new Date(a.entry_date.split('-').reverse().join('-')) : new Date(0);
+    const dateB = b.entry_date ? new Date(b.entry_date.split('-').reverse().join('-')) : new Date(0);
+    
+    const dateDiff = dateB.getTime() - dateA.getTime();
+    
+    if (dateDiff !== 0) return dateDiff;
+    
+    const timeA = a.entry_time || "";
+    const timeB = b.entry_time || "";
+    return timeB.localeCompare(timeA);
+  });
 
   const formatDisplayTime = (time: string | null) => {
     if (!time) return "";
@@ -100,7 +112,7 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
             </TableRow>
           </TableHeader>
           <TableBody>
-            {trades.map((trade) => {
+            {sortedTrades.map((trade) => {
               const pnl = calculatePnL(trade);
               return (
                 <TableRow key={trade.id}>
