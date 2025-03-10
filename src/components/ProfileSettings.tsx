@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { ProfileForm } from "./profile/ProfileForm";
 import { SubscriptionInfoSection } from "./profile/SubscriptionInfoSection";
+import { FeedbackSection } from "./profile/FeedbackSection";
 import { supabase } from "@/lib/supabase";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -69,7 +70,10 @@ export function ProfileSettings() {
           setProfile={setProfile}
           refetch={refetch}
         />
-        <SubscriptionInfoSection subscription={subscription} />
+        <div className="space-y-8">
+          <SubscriptionInfoSection subscription={subscription} />
+          <FeedbackSection />
+        </div>
       </div>
     </div>
   );
