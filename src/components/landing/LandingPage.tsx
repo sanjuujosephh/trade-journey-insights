@@ -5,6 +5,7 @@ import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, Li
 import { DailyLeaderboard } from "./DailyLeaderboard";
 import { PriceComparison } from "./PriceComparison";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 export function LandingPage() {
   return <div className="bg-background min-h-screen">
       {/* Hero Section */}
@@ -14,23 +15,23 @@ export function LandingPage() {
           <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
             Track your trades, analyze your performance, and become a more profitable trader with our comprehensive suite of tools.
           </p>
+        </div>
           
-          {/* App Screenshot with Enhanced Gradient Fade and Absolute Positioned Buttons */}
-          <div className="relative w-full max-w-[146%] lg:max-w-[60rem] mx-auto mb-8">
-            <div className="w-full rounded-lg overflow-hidden">
-              <img src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" alt="Trading Journal Dashboard" className="w-full" />
-              <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent opacity-90"></div>
-            </div>
-            
-            {/* Buttons positioned on top of the faded area */}
-            <div className="absolute bottom-[5rem] left-0 right-0 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="gap-2 text-lg">
-                Get Started <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button size="lg" variant="outline" className="text-lg">
-                View Demo
-              </Button>
-            </div>
+        {/* App Screenshot with Enhanced Gradient Fade and Absolute Positioned Buttons */}
+        <div className="relative w-full max-w-5xl mx-auto mb-8">
+          <div className="w-full rounded-lg overflow-hidden">
+            <img src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" alt="Trading Journal Dashboard" className="w-full" />
+            <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent opacity-90"></div>
+          </div>
+          
+          {/* Buttons positioned on top of the faded area */}
+          <div className="absolute bottom-[5rem] left-0 right-0 flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="gap-2 text-lg">
+              Get Started <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button size="lg" variant="outline" className="text-lg">
+              View Demo
+            </Button>
           </div>
         </div>
 
@@ -196,11 +197,13 @@ export function LandingPage() {
       </div>
     </div>;
 }
+
 interface FeatureItemProps {
   icon: React.ReactNode;
   title: string;
   description: string;
 }
+
 function FeatureItem({
   icon,
   title,
@@ -214,6 +217,7 @@ function FeatureItem({
       </div>
     </div>;
 }
+
 function FeatureCard({
   icon,
   title,
@@ -225,6 +229,7 @@ function FeatureCard({
       <p className="text-muted-foreground">{description}</p>
     </div>;
 }
+
 function FaqItem({
   question,
   answer
