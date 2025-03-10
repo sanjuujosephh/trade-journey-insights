@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { AvatarSection } from "./AvatarSection";
 import { PersonalInfoSection } from "./PersonalInfoSection";
 import { SocialMediaSection } from "./SocialMediaSection";
+import { DisclaimerStatusSection } from "./DisclaimerStatusSection";
+
 type Profile = {
   username: string | null;
   first_name: string | null;
@@ -15,11 +18,13 @@ type Profile = {
   telegram_id: string | null;
   avatar_url: string | null;
 };
+
 interface ProfileFormProps {
   profile: Profile;
   setProfile: (profile: Profile) => void;
   refetch: () => Promise<any>;
 }
+
 export function ProfileForm({
   profile,
   setProfile,
@@ -32,12 +37,37 @@ export function ProfileForm({
     toast
   } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAcceptedDisclaimer, setHasAcceptedDisclaimer] = useState(false);
+
+  useEffect(() => {
+    const checkDisclaimerStatus = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("disclaimer_acceptances")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (!error && data) {
+          setHasAcceptedDisclaimer(true);
+        }
+      } catch (error) {
+        console.error("Error checking disclaimer status:", error);
+      }
+    };
+
+    checkDisclaimerStatus();
+  }, [user]);
+
   const handleProfileChange = (field: keyof Profile, value: string) => {
     setProfile({
       ...profile,
       [field]: value
     });
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.id) return;
@@ -70,7 +100,9 @@ export function ProfileForm({
       setIsLoading(false);
     }
   };
+
   if (!user) return null;
+  
   return <div className="bg-white p-6 border-none rounded-none">
       <AvatarSection userId={user.id} avatarUrl={profile.avatar_url} username={profile.username} email={user.email} refetch={refetch} />
 
@@ -78,6 +110,8 @@ export function ProfileForm({
         <PersonalInfoSection firstName={profile.first_name} lastName={profile.last_name} username={profile.username} phoneNumber={profile.phone_number} onChange={handleProfileChange} />
 
         <SocialMediaSection twitterId={profile.twitter_id} telegramId={profile.telegram_id} onChange={handleProfileChange} />
+
+        <DisclaimerStatusSection hasAccepted={hasAcceptedDisclaimer} />
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Saving..." : "Save Changes"}
