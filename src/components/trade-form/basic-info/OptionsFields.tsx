@@ -42,7 +42,7 @@ export function OptionsFields({
         <div className="space-y-2">
           <Label htmlFor="vix">VIX</Label>
           <Input id="vix" name="vix" type="number" step="0.01" placeholder="0.00" value={formData.vix} onChange={handleChange} />
-          <div className="text-xs text-muted-foreground">Market volatility index value at entry</div>
+          <div className="text-xs text-muted-foreground">Market volatility index at entry</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="call_iv">Call IV</Label>
