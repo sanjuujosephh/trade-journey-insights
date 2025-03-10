@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useLeaderboardData } from "@/hooks/useLeaderboardData";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -20,7 +19,6 @@ export default function LeaderboardPage() {
   const { isSubscribed } = useSubscription();
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({});
 
-  // Redirect non-subscribers to pricing page
   if (user && !isSubscribed) {
     navigate("/pricing");
     return null;

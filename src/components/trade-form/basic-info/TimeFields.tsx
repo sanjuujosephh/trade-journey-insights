@@ -1,3 +1,4 @@
+
 import { DateTimeField } from "./DateTimeField";
 import { parseTimeString } from "@/utils/datetime";
 interface TimeFieldsProps {
@@ -31,6 +32,6 @@ export function TimeFields({
         <DateTimeField label="Entry Time" date="" time={formData.entry_time || ''} onDateChange={() => {}} onTimeChange={handleTimeChange('entry')} hideDate required />
         <DateTimeField label="Exit Time" date="" time={formData.exit_time || ''} onDateChange={() => {}} onTimeChange={handleTimeChange('exit')} hideDate />
       </div>
-      <div className="text-xs text-muted-foreground">⚠︎ Double check time: HH:MM (e.g., 10:30 AM)</div>
+      <div className="text-xs text-muted-foreground">⚠︎ Double check time format: HH:MM (e.g., 10:30 AM) and date format: DD-MM-YYYY</div>
     </div>;
 }

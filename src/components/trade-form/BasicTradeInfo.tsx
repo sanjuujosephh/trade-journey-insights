@@ -43,6 +43,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             ))}
           </SelectContent>
         </Select>
+        <div className="text-xs text-muted-foreground">⚠︎ Select the stock or index you're trading</div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -55,6 +56,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             readOnly
             className="bg-gray-100"
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Currently limited to options trading</div>
         </div>
         
         <div className="space-y-2">
@@ -72,6 +74,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
               <SelectItem value="short">Short</SelectItem>
             </SelectContent>
           </Select>
+          <div className="text-xs text-muted-foreground">⚠︎ Long (bullish) or Short (bearish) position</div>
         </div>
       </div>
 
@@ -94,6 +97,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             onChange={handleChange}
             required
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Price at which you entered the trade</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="exit_price">Exit Price</Label>
@@ -106,6 +110,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             value={formData.exit_price}
             onChange={handleChange}
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Price at which you exited the trade</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="stop_loss">Stop Loss</Label>
@@ -118,6 +123,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
             value={formData.stop_loss}
             onChange={handleChange}
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Pre-determined exit price to limit loss</div>
         </div>
       </div>
 
@@ -136,6 +142,7 @@ export function BasicTradeInfo({ formData, handleChange, handleSelectChange }: B
           value={formData.chart_link}
           onChange={handleChange}
         />
+        <div className="text-xs text-muted-foreground">⚠︎ Link to your TradingView chart for this trade</div>
       </div>
     </Card>
   );

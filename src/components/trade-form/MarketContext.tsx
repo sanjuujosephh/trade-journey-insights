@@ -21,44 +21,63 @@ export function MarketContext({
 }: MarketContextProps) {
   return (
     <Card className="p-6 space-y-4 glass">
-      <MarketConditionSelect
-        value={formData.market_condition}
-        onValueChange={(value) => handleSelectChange("market_condition", value)}
-      />
+      <div className="space-y-2">
+        <MarketConditionSelect
+          value={formData.market_condition}
+          onValueChange={(value) => handleSelectChange("market_condition", value)}
+        />
+        <div className="text-xs text-muted-foreground">⚠︎ Overall market sentiment at time of trade</div>
+      </div>
 
-      <StrategySelect
-        value={formData.strategy}
-        onValueChange={(value) => handleSelectChange("strategy", value)}
-      />
+      <div className="space-y-2">
+        <StrategySelect
+          value={formData.strategy}
+          onValueChange={(value) => handleSelectChange("strategy", value)}
+        />
+        <div className="text-xs text-muted-foreground">⚠︎ Trading strategy you applied for this trade</div>
+      </div>
 
-      <TimeframeSelect
-        value={formData.timeframe}
-        onValueChange={(value) => handleSelectChange("timeframe", value)}
-      />
+      <div className="space-y-2">
+        <TimeframeSelect
+          value={formData.timeframe}
+          onValueChange={(value) => handleSelectChange("timeframe", value)}
+        />
+        <div className="text-xs text-muted-foreground">⚠︎ Time horizon for the trade execution</div>
+      </div>
 
       <div className="space-y-2">
         <OptionPricePosition 
           formData={formData} 
           handleSelectChange={handleSelectChange} 
         />
+        <div className="text-xs text-muted-foreground">⚠︎ Position relative to key technical indicators</div>
       </div>
 
-      <EmotionSelects
-        entryEmotion={formData.entry_emotion}
-        exitEmotion={formData.exit_emotion}
-        onEntryEmotionChange={(value) => handleSelectChange("entry_emotion", value)}
-        onExitEmotionChange={(value) => handleSelectChange("exit_emotion", value)}
-      />
+      <div className="space-y-2">
+        <EmotionSelects
+          entryEmotion={formData.entry_emotion}
+          exitEmotion={formData.exit_emotion}
+          onEntryEmotionChange={(value) => handleSelectChange("entry_emotion", value)}
+          onExitEmotionChange={(value) => handleSelectChange("exit_emotion", value)}
+        />
+        <div className="text-xs text-muted-foreground">⚠︎ Your psychological state during trade entry and exit</div>
+      </div>
 
-      <ExitReasonSelect
-        value={formData.exit_reason}
-        onValueChange={(value) => handleSelectChange("exit_reason", value)}
-      />
+      <div className="space-y-2">
+        <ExitReasonSelect
+          value={formData.exit_reason}
+          onValueChange={(value) => handleSelectChange("exit_reason", value)}
+        />
+        <div className="text-xs text-muted-foreground">⚠︎ Primary reason for exiting the trade</div>
+      </div>
 
-      <TradeNotes
-        value={formData.notes}
-        onChange={handleChange}
-      />
+      <div className="space-y-2">
+        <TradeNotes
+          value={formData.notes}
+          onChange={handleChange}
+        />
+        <div className="text-xs text-muted-foreground">⚠︎ Additional observations, learnings, or details about the trade</div>
+      </div>
     </Card>
   );
 }

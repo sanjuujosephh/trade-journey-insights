@@ -34,6 +34,7 @@ export function OptionsFields({
             value={formData.strike_price}
             onChange={handleChange}
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Price at which option can be exercised</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="quantity">Quantity</Label>
@@ -46,6 +47,7 @@ export function OptionsFields({
             value={formData.quantity}
             onChange={handleChange}
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Number of contracts traded</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="option_type">Option Type</Label>
@@ -62,6 +64,7 @@ export function OptionsFields({
               <SelectItem value="put">Put</SelectItem>
             </SelectContent>
           </Select>
+          <div className="text-xs text-muted-foreground">⚠︎ Call (right to buy) or Put (right to sell)</div>
         </div>
       </div>
 
@@ -77,6 +80,7 @@ export function OptionsFields({
             value={formData.vix}
             onChange={handleChange}
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Market volatility index value at entry</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="call_iv">Call IV</Label>
@@ -89,6 +93,7 @@ export function OptionsFields({
             value={formData.call_iv}
             onChange={handleChange}
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Implied volatility for call options (%)</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="put_iv">Put IV</Label>
@@ -101,9 +106,9 @@ export function OptionsFields({
             value={formData.put_iv}
             onChange={handleChange}
           />
+          <div className="text-xs text-muted-foreground">⚠︎ Implied volatility for put options (%)</div>
         </div>
       </div>
     </>
   );
 }
-
