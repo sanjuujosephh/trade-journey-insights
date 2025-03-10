@@ -58,6 +58,10 @@
   }
   html, body, #root {
     @apply h-full;
+    scroll-behavior: smooth;
+  }
+  html {
+    scroll-padding-top: 0;
   }
   body {
     @apply bg-background text-foreground overflow-auto;

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -15,6 +15,11 @@ export default function Index() {
   const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
