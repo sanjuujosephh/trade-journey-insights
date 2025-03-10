@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarClock, Twitter } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 
 // Create schema for form validation
 const trialRequestSchema = z.object({
@@ -19,10 +22,17 @@ const trialRequestSchema = z.object({
 });
 
 export function TrialRequestForm() {
+  const { user } = useAuth();
+  const { isSubscribed } = useSubscription();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [followedTwitter, setFollowedTwitter] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // If the user already has a subscription, don't show the trial form
+  if (isSubscribed) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,10 +43,26 @@ export function TrialRequestForm() {
       
       setIsSubmitting(true);
 
-      // TODO: In a real implementation, this would send the data to an API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      // Store the trial request in the database
+      const { error } = await supabase.from('trial_requests').insert({
+        name,
+        email: email.toLowerCase(),
+        user_id: user?.id, // Link to user if they're logged in
+        twitter_followed: followedTwitter,
+        status: 'pending' // Admin will need to review and approve
+      });
+
+      if (error) {
+        console.error('Error submitting trial request:', error);
+        if (error.code === '23505') { // Unique violation
+          toast.error("You've already submitted a trial request");
+        } else {
+          toast.error("Failed to submit trial request. Please try again.");
+        }
+        return;
+      }
       
-      toast.success("Trial request submitted successfully!");
+      toast.success("Trial request submitted successfully! We'll review it shortly.");
       
       // Reset form
       setName("");
@@ -46,6 +72,7 @@ export function TrialRequestForm() {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else {
+        console.error('Trial request error:', error);
         toast.error("Failed to submit trial request. Please try again.");
       }
     } finally {

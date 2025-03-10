@@ -11,7 +11,7 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children, requireSubscription = false }: AuthGuardProps) {
   const { user } = useAuth();
-  const { isSubscribed, isLoading } = useSubscription();
+  const { isSubscribed, isLoading, subscription } = useSubscription();
 
   if (!user) {
     return <Navigate to="/auth" replace />;
@@ -27,7 +27,13 @@ export function AuthGuard({ children, requireSubscription = false }: AuthGuardPr
     }
 
     if (!isSubscribed) {
-      return <Navigate to="/pricing" replace />;
+      // Check if the user has a trial subscription
+      const isTrial = subscription?.plan_type === 'trial';
+      
+      // If it's not a trial or no subscription at all, redirect to pricing
+      if (!isTrial) {
+        return <Navigate to="/pricing" replace />;
+      }
     }
   }
 

@@ -51,9 +51,13 @@ export function useSubscription() {
     refetchInterval: 60 * 60 * 1000, // Refetch every hour to check subscription status
   });
 
+  // Consider a user subscribed if they have an active subscription (including trial)
   const isSubscribed = !!subscription && 
     subscription.status === 'active' && 
     new Date(subscription.current_period_end) > new Date();
+
+  // Check if the user has a trial subscription
+  const isTrial = subscription?.plan_type === 'trial';
 
   return {
     subscription,
@@ -61,6 +65,7 @@ export function useSubscription() {
     isError,
     error,
     isSubscribed,
+    isTrial,
     refetchSubscription: refetch
   };
 }
