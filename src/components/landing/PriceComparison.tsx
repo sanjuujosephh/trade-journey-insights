@@ -29,7 +29,7 @@ export function PriceComparison() {
             border-radius: 9px;
             background: linear-gradient(
               45deg, 
-              #ffd700, #ffec80, #ffd700, #ffbf00, #ffaa00, #ffd700
+              #333333, #555555, #333333, #222222, #000000, #333333
             );
             background-size: 400% auto;
             animation: shine 4s linear infinite;
@@ -39,9 +39,8 @@ export function PriceComparison() {
       <div className="bg-card p-6 shadow-sm rounded py-0 px-0">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Trading Journal Card */}
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-green-50 border-green-200 overflow-hidden relative">
+          <Card className="p-4 bg-gradient-to-br from-gray-50 to-white border-gray-200 overflow-hidden relative">
             <div className="flex items-center mb-3">
-              
               <h4 className="font-medium">Onetradejournal</h4>
             </div>
             
@@ -53,16 +52,12 @@ export function PriceComparison() {
               <span className="text-sm text-muted-foreground ml-1">per month</span>
             </div>
             
-            {/* Progress Bar */}
-            
-            
-            <p className="text-xs text-green-600 font-medium">Lasts a whole month 😱</p>
+            <p className="text-xs text-gray-600 font-medium">Lasts a whole month 😱</p>
           </Card>
           
           {/* Burger Card */}
-          <Card className="p-4 bg-gradient-to-br from-orange-50 to-red-50 border-orange-200 overflow-hidden relative">
+          <Card className="p-4 bg-gradient-to-br from-gray-50 to-white border-gray-200 overflow-hidden relative">
             <div className="flex items-center mb-3">
-              
               <h4 className="font-medium">Crispy Burger</h4>
             </div>
             
@@ -70,14 +65,11 @@ export function PriceComparison() {
             
             {/* Price Display */}
             <div className="flex items-baseline mb-3">
-              <span className="text-2xl font-bold text-orange-600">₹220</span>
+              <span className="text-2xl font-bold text-gray-800">₹220</span>
               <span className="text-sm text-muted-foreground ml-1">for one-time</span>
             </div>
             
-            {/* Progress Bar */}
-            
-            
-            <p className="text-xs text-orange-600 font-medium">Gone in minutes</p>
+            <p className="text-xs text-gray-600 font-medium">Gone in minutes</p>
           </Card>
         </div>
         

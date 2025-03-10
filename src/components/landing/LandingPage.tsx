@@ -41,9 +41,6 @@ export function LandingPage() {
               <h2 className="text-2xl font-bold mb-6 text-center">Start Journaling &amp; Build Habit</h2>
               <AuthForm />
             </div>
-            
-            {/* Price Comparison Section - below auth form */}
-            <PriceComparison />
           </div>
           
           {/* Leaderboard and Features - Now on the right */}
@@ -70,6 +67,9 @@ export function LandingPage() {
                 </div>
               </div>
             </div>
+            
+            {/* Price Comparison - Moved below Our Journey section */}
+            <PriceComparison />
             
             {/* Features Section */}
             <div className="bg-card border rounded-lg p-8 shadow-sm">
@@ -126,52 +126,44 @@ export function LandingPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-1/4">Features</TableHead>
-                  <TableHead className="text-center w-1/4">OneTradeJournal</TableHead>
-                  <TableHead className="text-center w-1/4">TradeNote</TableHead>
-                  <TableHead className="text-center w-1/4">Tradervue</TableHead>
+                  <TableHead className="w-1/3">Features</TableHead>
+                  <TableHead className="text-center w-1/3">OneTradeJournal</TableHead>
+                  <TableHead className="text-center w-1/3">Others</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow>
                   <TableCell className="font-medium">Starting Price</TableCell>
                   <TableCell className="text-center">₹199/month</TableCell>
-                  <TableCell className="text-center">₹999/month</TableCell>
-                  <TableCell className="text-center">₹1299/month</TableCell>
+                  <TableCell className="text-center">₹999/month+</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Habit Building System</TableCell>
                   <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
-                  <TableCell className="text-center text-muted-foreground">Limited</TableCell>
-                  <TableCell className="text-center text-muted-foreground">—</TableCell>
+                  <TableCell className="text-center text-muted-foreground">Limited or None</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">AI Analysis</TableCell>
                   <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
-                  <TableCell className="text-center text-muted-foreground">—</TableCell>
-                  <TableCell className="text-center text-muted-foreground">—</TableCell>
+                  <TableCell className="text-center text-muted-foreground">Rare or Premium Only</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Options Trading Support</TableCell>
                   <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
-                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
-                  <TableCell className="text-center text-muted-foreground">Premium Only</TableCell>
+                  <TableCell className="text-center text-muted-foreground">Limited or Premium Only</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Community Features</TableCell>
                   <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
-                  <TableCell className="text-center text-muted-foreground">Limited</TableCell>
-                  <TableCell className="text-center text-muted-foreground">—</TableCell>
+                  <TableCell className="text-center text-muted-foreground">Limited or None</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Learning Resources</TableCell>
                   <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
-                  <TableCell className="text-center text-muted-foreground">—</TableCell>
-                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
+                  <TableCell className="text-center text-muted-foreground">Limited or Premium Only</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Trade Import</TableCell>
-                  <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
                   <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
                   <TableCell className="text-center text-green-600"><Check className="inline h-5 w-5" /></TableCell>
                 </TableRow>
@@ -249,3 +241,4 @@ function FaqItem({
       </div>
     </div>;
 }
+

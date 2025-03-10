@@ -123,20 +123,10 @@ export default function LeaderboardPage() {
                   </h4>
                   <div className="relative rounded-lg overflow-hidden border border-muted bg-muted/20 h-48 flex items-center justify-center">
                     <img 
-                      src="/placeholder.svg"
+                      src={entry.chart_link || "/placeholder.svg"}
                       alt="TradingView Chart Example"
                       className="max-h-full w-auto object-contain"
                     />
-                    <div className="absolute bottom-2 right-2">
-                      <Button 
-                        size="sm" 
-                        variant="secondary"
-                        className="text-xs"
-                        onClick={() => window.open("https://www.tradingview.com", "_blank")}
-                      >
-                        View on TradingView
-                      </Button>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -148,7 +138,7 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="max-w-3xl mx-auto py-8 px-4">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold">Trading Leaderboard</h1>
@@ -168,7 +158,7 @@ export default function LeaderboardPage() {
         onValueChange={setActiveTab} 
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2 mb-8 bg-muted">
+        <TabsList className="grid w-full grid-cols-2 mb-8">
           <TabsTrigger 
             value="winners" 
             className="gap-2 data-[state=active]:bg-green-100 dark:data-[state=active]:bg-green-900/30"
