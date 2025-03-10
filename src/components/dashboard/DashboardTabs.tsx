@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Loader2, PenLine, BarChart2, Calendar, Brain, Bot, GraduationCap, History, Settings, BookText, Store } from "lucide-react";
@@ -69,11 +68,6 @@ export function DashboardTabs({
                 "transition-colors duration-200 flex items-center gap-2 whitespace-nowrap text-xs sm:text-sm",
                 activeTab === value && tabColors[value as keyof typeof tabColors]
               )}
-              style={{
-                backgroundColor: activeTab === value 
-                  ? `var(--tab-color-${value.replace(/-/g, '')})`
-                  : '',
-              }}
             >
               <Icon className="w-4 h-4" />
               <span className="hidden sm:inline">{label}</span>
