@@ -49,10 +49,10 @@ export function LandingPage() {
             <DailyLeaderboard />
             
             {/* Founder's Story Section */}
-            <div className="bg-card border rounded-lg p-8 shadow-sm border-0">
+            <div className="bg-card border rounded-lg p-8 shadow-sm border-0 px-0 py-0">
               <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 
-                <div>
+                <div className="px-[5px] py-[5px]">
                   <h2 className="text-2xl font-semibold mb-3">Our Journey</h2>
                   <p className="text-muted-foreground mb-4 italic">"I started onetradejournal because I was frustrated with the expensive and complicated journaling tools on the market."</p>
                   <p className="mb-3">
@@ -241,4 +241,3 @@ function FaqItem({
       </div>
     </div>;
 }
-
