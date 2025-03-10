@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { ProfileForm } from "./profile/ProfileForm";
@@ -15,15 +15,6 @@ type Profile = {
   twitter_id: string | null;
   telegram_id: string | null;
   avatar_url: string | null;
-};
-
-type Subscription = {
-  status: 'active' | 'canceled' | 'paused' | 'expired';
-  current_period_start: string | null;
-  current_period_end: string | null;
-  razorpay_subscription_id: string | null;
-  payment_id: string | null;
-  amount: number | null;
 };
 
 export function ProfileSettings() {
@@ -57,11 +48,16 @@ export function ProfileSettings() {
   // Use our useSubscription hook instead of the mock data
   const { subscription } = useSubscription();
 
-  useState(() => {
+  useEffect(() => {
     if (profileData) {
       setProfile(profileData);
     }
-  });
+  }, [profileData]);
+
+  // Ensure the page scrolls to the top when component loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (!user) return null;
 

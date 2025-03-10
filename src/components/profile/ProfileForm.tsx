@@ -8,6 +8,7 @@ import { AvatarSection } from "./AvatarSection";
 import { PersonalInfoSection } from "./PersonalInfoSection";
 import { SocialMediaSection } from "./SocialMediaSection";
 import { DisclaimerStatusSection } from "./DisclaimerStatusSection";
+import { FeedbackForm } from "./FeedbackForm";
 
 type Profile = {
   username: string | null;
@@ -112,6 +113,14 @@ export function ProfileForm({
         <SocialMediaSection twitterId={profile.twitter_id} telegramId={profile.telegram_id} onChange={handleProfileChange} />
 
         <DisclaimerStatusSection hasAccepted={hasAcceptedDisclaimer} />
+
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium">Feedback</h3>
+          <div className="bg-gray-50 p-4 rounded-md">
+            <FeedbackForm type="feature_request" buttonLabel="Request a Feature" />
+            <FeedbackForm type="issue_report" buttonLabel="Report an Issue" />
+          </div>
+        </div>
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Saving..." : "Save Changes"}
