@@ -11,7 +11,7 @@ export function DisclaimerStatusSection({ hasAccepted }: DisclaimerStatusSection
     <div className="space-y-2">
       <h3 className="text-md font-medium">Disclaimer Status</h3>
       
-      <Alert variant="outline" className="bg-muted/40">
+      <Alert variant="default" className="bg-muted/40">
         <div className="flex items-center gap-2">
           {hasAccepted ? (
             <>
