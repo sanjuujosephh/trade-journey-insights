@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ArrowRight, BarChart3, BookOpenText, BrainCircuit, ChartLine, Clock, LineChart, Share2, MessageCircleQuestion, Check } from "lucide-react";
@@ -17,11 +16,17 @@ export function LandingPage() {
           </p>
         </div>
           
-        {/* App Screenshot with Enhanced Gradient Fade and Absolute Positioned Buttons */}
+        {/* App Screenshot with Enhanced Image Quality */}
         <div className="relative w-full max-w-5xl mx-auto mb-8">
-          <div className="w-full rounded-lg overflow-hidden">
-            <img src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" alt="Trading Journal Dashboard" className="w-full" />
-            <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent opacity-90"></div>
+          <div className="w-full rounded-lg overflow-hidden shadow-xl">
+            <img 
+              src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
+              alt="Trading Journal Dashboard" 
+              className="w-full object-cover object-center" 
+              loading="eager"
+              style={{ imageRendering: 'crisp-edges' }}
+            />
+            <div className="absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-background to-transparent opacity-80"></div>
           </div>
           
           {/* Buttons positioned on top of the faded area */}
