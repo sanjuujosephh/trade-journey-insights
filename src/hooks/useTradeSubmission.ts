@@ -2,24 +2,25 @@
 import { FormData, Trade } from "@/types/trade";
 import { useToast } from "@/hooks/use-toast";
 import { transformTradeData } from "@/utils/trade-form/transformations";
-import { useTradeValidation } from "./useTradeValidation";
 
 interface UseTradeSubmissionProps {
   addTrade: any;
   updateTrade: any;
   resetForm: () => void;
+  validateForm: (formData: FormData) => boolean;
 }
 
 export function useTradeSubmission({ 
   addTrade, 
   updateTrade, 
-  resetForm 
+  resetForm,
+  validateForm
 }: UseTradeSubmissionProps) {
   const { toast } = useToast();
-  const { validateForm } = useTradeValidation();
 
   const submitTrade = async (formData: FormData, editingId: string | null): Promise<boolean> => {
     try {
+      // Validate form data before submission
       if (!validateForm(formData)) {
         return false;
       }
@@ -31,11 +32,19 @@ export function useTradeSubmission({
       if (editingId) {
         console.log('Updating trade:', editingId, tradeData);
         await updateTrade.mutateAsync({ id: editingId, ...tradeData });
+        toast({
+          title: "Success",
+          description: "Trade updated successfully"
+        });
         resetForm();
         return true;
       } else {
         console.log('Adding new trade:', tradeData);
         await addTrade.mutateAsync(tradeData);
+        toast({
+          title: "Success",
+          description: "Trade added successfully"
+        });
         resetForm();
         return true;
       }

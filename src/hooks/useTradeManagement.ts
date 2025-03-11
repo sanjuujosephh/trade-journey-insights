@@ -3,8 +3,10 @@ import { useTradeForm } from "./useTradeForm";
 import { useTradeOperations } from "./useTradeOperations";
 import { useTradeSubmission } from "./useTradeSubmission";
 import { useTradeActions } from "./useTradeActions";
+import { useTradeValidation } from "./useTradeValidation";
 
 export function useTradeManagement() {
+  // Form state management
   const {
     formData,
     editingId,
@@ -19,6 +21,7 @@ export function useTradeManagement() {
     resetForm,
   } = useTradeForm();
 
+  // Trade data operations
   const {
     trades,
     isLoading,
@@ -26,12 +29,18 @@ export function useTradeManagement() {
     updateTrade,
   } = useTradeOperations();
 
+  // Form validation
+  const { validateForm } = useTradeValidation();
+
+  // Trade submission
   const { submitTrade } = useTradeSubmission({
     addTrade,
     updateTrade,
-    resetForm
+    resetForm,
+    validateForm
   });
 
+  // UI actions
   const { handleEdit, handleViewDetails, closeDialog } = useTradeActions({
     setFormData,
     setEditingId,
@@ -40,6 +49,7 @@ export function useTradeManagement() {
     resetForm
   });
 
+  // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submitTrade(formData, editingId);

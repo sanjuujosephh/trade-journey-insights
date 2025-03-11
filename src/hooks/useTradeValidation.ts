@@ -8,18 +8,14 @@ export function useTradeValidation() {
   const { toast } = useToast();
 
   const validateForm = (formData: FormData): boolean => {
-    // Validate form fields
-    const errors = validateTradeForm(formData);
-    if (errors.length > 0) {
-      toast({
-        title: "Validation Error",
-        description: errors.join(", "),
-        variant: "destructive"
-      });
+    // Basic form field validation
+    const validationErrors = validateBasicFields(formData);
+    if (validationErrors.length > 0) {
+      showValidationError(validationErrors.join(", "));
       return false;
     }
 
-    // Validate date and time formats
+    // Date/time validation
     if (!validateDateTimes(formData)) {
       return false;
     }
@@ -27,30 +23,39 @@ export function useTradeValidation() {
     return true;
   };
 
+  const validateBasicFields = (formData: FormData): string[] => {
+    return validateTradeForm(formData);
+  };
+
   const validateDateTimes = (formData: FormData): boolean => {
     // Validate entry date and time
     if (formData.entry_date && !isValidDateTime(formData.entry_date, formData.entry_time || '')) {
-      toast({
-        title: "Invalid Date/Time",
-        description: "Please enter valid entry date and time",
-        variant: "destructive"
-      });
+      showValidationError("Please enter valid entry date and time");
       return false;
     }
 
     // Validate exit date and time if provided
     if (formData.exit_date && formData.exit_time && 
         !isValidDateTime(formData.exit_date, formData.exit_time)) {
-      toast({
-        title: "Invalid Date/Time",
-        description: "Please enter valid exit date and time",
-        variant: "destructive"
-      });
+      showValidationError("Please enter valid exit date and time");
       return false;
     }
 
     return true;
   };
 
-  return { validateForm, validateDateTimes };
+  const showValidationError = (message: string) => {
+    toast({
+      title: "Validation Error",
+      description: message,
+      variant: "destructive"
+    });
+  };
+
+  return { 
+    validateForm, 
+    validateDateTimes,
+    validateBasicFields,
+    showValidationError
+  };
 }

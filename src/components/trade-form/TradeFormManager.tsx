@@ -5,7 +5,6 @@ import { BasicTradeInfo } from "./BasicTradeInfo";
 import { MarketContext } from "./MarketContext";
 import { TradeFormActions } from "./TradeFormActions";
 import { FormSection } from "./FormSection";
-import { useTradeValidation } from "@/hooks/useTradeValidation";
 
 interface TradeFormManagerProps {
   formData: FormData;
@@ -22,17 +21,8 @@ export function TradeFormManager({
   onSubmit,
   editingId,
 }: TradeFormManagerProps) {
-  const { validateForm } = useTradeValidation();
-
-  const handleFormSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (validateForm(formData)) {
-      onSubmit(e);
-    }
-  };
-
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-6">
       <FormSection>
         <BasicTradeInfo
           formData={formData}

@@ -8,7 +8,6 @@ import { TradeFormManager } from "./trade-form/TradeFormManager";
 import { useTradeManagement } from "@/hooks/useTradeManagement";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import { Trade, FormData } from "@/types/trade";
 
 export default function TradeEntry() {
   const { toast } = useToast();
@@ -21,58 +20,37 @@ export default function TradeEntry() {
     isLoading,
     setSelectedTrade,
     setIsDialogOpen,
-    setFormData,
-    setEditingId,
     handleChange,
     handleSelectChange,
     handleSubmit,
+    handleEdit,
+    handleViewDetails,
   } = useTradeManagement();
 
   if (isLoading) return <LoadingSpinner />;
 
-  const handleEdit = (trade: Trade) => {
-    console.log('Raw trade data for edit:', trade);
-    
-    const formDataUpdate: FormData = {
-      entry_price: trade.entry_price.toString(),
-      exit_price: trade.exit_price?.toString() ?? "",
-      quantity: trade.quantity?.toString() ?? "",
-      stop_loss: trade.stop_loss?.toString() ?? "",
-      strike_price: trade.strike_price?.toString() ?? "",
-      vix: trade.vix?.toString() ?? "",
-      call_iv: trade.call_iv?.toString() ?? "",
-      put_iv: trade.put_iv?.toString() ?? "",
-      planned_risk_reward: trade.planned_risk_reward?.toString() ?? "",
-      actual_risk_reward: trade.actual_risk_reward?.toString() ?? "",
-      planned_target: trade.planned_target?.toString() ?? "",
-      slippage: trade.slippage?.toString() ?? "",
-      post_exit_price: trade.post_exit_price?.toString() ?? "",
-      exit_efficiency: trade.exit_efficiency?.toString() ?? "",
-      confidence_level: trade.confidence_level?.toString() ?? "",
-      entry_time: trade.entry_time ?? "",
-      exit_time: trade.exit_time ?? "",
-      entry_date: trade.entry_date ?? "",
-      exit_date: trade.exit_date ?? "",
-      strategy: trade.strategy ?? "",
-      trade_type: trade.trade_type,
-      symbol: trade.symbol,
-      outcome: trade.outcome,
-      notes: trade.notes ?? "",
-      chart_link: trade.chart_link ?? "",
-      vwap_position: trade.vwap_position ?? "",
-      ema_position: trade.ema_position ?? "",
-      market_condition: trade.market_condition ?? "",
-      timeframe: trade.timeframe ?? "",
-      trade_direction: trade.trade_direction ?? "",
-      exit_reason: trade.exit_reason ?? "",
-      entry_emotion: trade.entry_emotion ?? "",
-      exit_emotion: trade.exit_emotion ?? "",
-      option_type: trade.option_type ?? ""
-    };
-    
-    console.log('Setting form data for edit:', formDataUpdate);
-    setFormData(formDataUpdate);
-    setEditingId(trade.id);
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('trades')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      toast({
+        title: "Success",
+        description: "Trade deleted successfully!"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete trade",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -90,30 +68,8 @@ export default function TradeEntry() {
           <TradeHistory
             trades={trades}
             onEdit={handleEdit}
-            onDelete={async (id) => {
-              const { error } = await supabase
-                .from('trades')
-                .delete()
-                .eq('id', id);
-              
-              if (error) {
-                toast({
-                  title: "Error",
-                  description: "Failed to delete trade",
-                  variant: "destructive"
-                });
-                return;
-              }
-              
-              toast({
-                title: "Success",
-                description: "Trade deleted successfully!"
-              });
-            }}
-            onViewDetails={(trade) => {
-              setSelectedTrade(trade);
-              setIsDialogOpen(true);
-            }}
+            onDelete={handleDelete}
+            onViewDetails={handleViewDetails}
             showEditButton={true}
           />
         )}
