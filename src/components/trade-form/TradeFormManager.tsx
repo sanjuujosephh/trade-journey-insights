@@ -26,7 +26,6 @@ export function TradeFormManager({
 
   const handleFormSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
     if (validateForm(formData)) {
       onSubmit(e);
     }

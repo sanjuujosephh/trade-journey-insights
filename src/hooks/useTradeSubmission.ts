@@ -2,7 +2,7 @@
 import { FormData, Trade } from "@/types/trade";
 import { useToast } from "@/hooks/use-toast";
 import { transformTradeData } from "@/utils/trade-form/transformations";
-import { isValidDateTime } from "@/utils/datetime";
+import { useTradeValidation } from "./useTradeValidation";
 
 interface UseTradeSubmissionProps {
   addTrade: any;
@@ -16,36 +16,11 @@ export function useTradeSubmission({
   resetForm 
 }: UseTradeSubmissionProps) {
   const { toast } = useToast();
-
-  const validateSubmission = (formData: FormData): boolean => {
-    // Validate entry date and time
-    if (!isValidDateTime(formData.entry_date, formData.entry_time)) {
-      toast({
-        title: "Invalid Date",
-        description: "Please enter a valid entry time",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    // Validate exit date and time if provided
-    if (formData.exit_date && formData.exit_time) {
-      if (!isValidDateTime(formData.exit_date, formData.exit_time)) {
-        toast({
-          title: "Invalid Date",
-          description: "Please enter a valid exit time",
-          variant: "destructive"
-        });
-        return false;
-      }
-    }
-    
-    return true;
-  };
+  const { validateForm } = useTradeValidation();
 
   const submitTrade = async (formData: FormData, editingId: string | null): Promise<boolean> => {
     try {
-      if (!validateSubmission(formData)) {
+      if (!validateForm(formData)) {
         return false;
       }
 

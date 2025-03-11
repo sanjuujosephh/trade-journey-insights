@@ -26,6 +26,16 @@ export function LoginTabContent({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter both email and password",
+        variant: "destructive",
+      });
+      return { success: false };
+    }
+    
     setIsLoading(true);
 
     try {

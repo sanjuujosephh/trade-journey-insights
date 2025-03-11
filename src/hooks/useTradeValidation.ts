@@ -20,6 +20,15 @@ export function useTradeValidation() {
     }
 
     // Validate date and time formats
+    if (!validateDateTimes(formData)) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const validateDateTimes = (formData: FormData): boolean => {
+    // Validate entry date and time
     if (formData.entry_date && !isValidDateTime(formData.entry_date, formData.entry_time || '')) {
       toast({
         title: "Invalid Date/Time",
@@ -29,6 +38,7 @@ export function useTradeValidation() {
       return false;
     }
 
+    // Validate exit date and time if provided
     if (formData.exit_date && formData.exit_time && 
         !isValidDateTime(formData.exit_date, formData.exit_time)) {
       toast({
@@ -42,5 +52,5 @@ export function useTradeValidation() {
     return true;
   };
 
-  return { validateForm };
+  return { validateForm, validateDateTimes };
 }
