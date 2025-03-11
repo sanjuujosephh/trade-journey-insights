@@ -12,6 +12,7 @@ interface TradeFormManagerProps {
   handleSelectChange: (name: string, value: string | boolean) => void;
   onSubmit: (e: FormEvent) => void;
   editingId: string | null;
+  isSubmitting?: boolean;
 }
 
 export function TradeFormManager({
@@ -20,7 +21,10 @@ export function TradeFormManager({
   handleSelectChange,
   onSubmit,
   editingId,
+  isSubmitting = false
 }: TradeFormManagerProps) {
+  const isEditing = !!editingId;
+  
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <FormSection>
@@ -36,7 +40,10 @@ export function TradeFormManager({
         />
       </FormSection>
 
-      <TradeFormActions isEditing={!!editingId} />
+      <TradeFormActions 
+        isEditing={isEditing} 
+        isSubmitting={isSubmitting} 
+      />
     </form>
   );
 }

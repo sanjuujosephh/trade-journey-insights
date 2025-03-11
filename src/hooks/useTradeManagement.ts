@@ -3,7 +3,6 @@ import { useTradeForm } from "./useTradeForm";
 import { useTradeOperations } from "./useTradeOperations";
 import { useTradeSubmission } from "./useTradeSubmission";
 import { useTradeActions } from "./useTradeActions";
-import { useTradeValidation } from "./useTradeValidation";
 
 export function useTradeManagement() {
   // Form state management
@@ -29,15 +28,11 @@ export function useTradeManagement() {
     updateTrade,
   } = useTradeOperations();
 
-  // Form validation
-  const { validateForm } = useTradeValidation();
-
   // Trade submission
-  const { submitTrade } = useTradeSubmission({
+  const { submitTrade, isSubmitting } = useTradeSubmission({
     addTrade,
     updateTrade,
-    resetForm,
-    validateForm
+    resetForm
   });
 
   // UI actions
@@ -61,6 +56,7 @@ export function useTradeManagement() {
     editingId,
     selectedTrade,
     isDialogOpen,
+    isSubmitting,
     
     // Data
     trades,

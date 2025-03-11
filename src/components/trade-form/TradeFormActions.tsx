@@ -1,15 +1,27 @@
 
 import { Button } from "@/components/ui/button";
+import { SaveIcon, Loader2 } from "lucide-react";
 
 interface TradeFormActionsProps {
   isEditing: boolean;
+  isSubmitting?: boolean;
 }
 
-export function TradeFormActions({ isEditing }: TradeFormActionsProps) {
+export function TradeFormActions({ isEditing, isSubmitting = false }: TradeFormActionsProps) {
   return (
-    <div className="flex justify-center">
-      <Button type="submit" className="w-full sm:w-auto text-[14px] px-8 py-4 text-base">
-        {isEditing ? "Update Trade" : "Log New Trade"}
+    <div className="flex justify-end space-x-2">
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {isEditing ? "Updating..." : "Saving..."}
+          </>
+        ) : (
+          <>
+            <SaveIcon className="mr-2 h-4 w-4" />
+            {isEditing ? "Update Trade" : "Save Trade"}
+          </>
+        )}
       </Button>
     </div>
   );

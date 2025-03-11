@@ -12,6 +12,7 @@ interface SignupTabContentProps {
   phone: string;
   setPhone: (phone: string) => void;
   onModeChange?: (mode: "phone-verify") => void;
+  onSuccess?: () => void;
 }
 
 export function SignupTabContent({
@@ -22,6 +23,7 @@ export function SignupTabContent({
   phone,
   setPhone,
   onModeChange,
+  onSuccess
 }: SignupTabContentProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { signUp, signInWithPhone } = useAuth();
@@ -46,6 +48,7 @@ export function SignupTabContent({
           title: "Success",
           description: "Please check your email to confirm your account.",
         });
+        if (onSuccess) onSuccess();
       }
       return { success: true };
     } catch (error) {

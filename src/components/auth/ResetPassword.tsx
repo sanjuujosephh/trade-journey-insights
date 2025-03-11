@@ -8,12 +8,14 @@ interface ResetPasswordProps {
   email: string;
   setEmail: (email: string) => void;
   onBackToLogin: () => void;
+  onSuccess?: () => void;
 }
 
 export function ResetPassword({ 
   email, 
   setEmail, 
-  onBackToLogin 
+  onBackToLogin,
+  onSuccess
 }: ResetPasswordProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { resetPassword } = useAuth();
@@ -39,6 +41,7 @@ export function ResetPassword({
         title: "Success",
         description: "Password reset instructions sent to your email",
       });
+      if (onSuccess) onSuccess();
     } catch (error) {
       toast({
         title: "Error",

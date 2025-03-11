@@ -6,9 +6,10 @@ import { SignupTabContent } from "./SignupTabContent";
 
 interface AuthFormTabsProps {
   onModeChange?: (mode: "reset" | "phone-verify") => void;
+  onSuccess?: () => void;
 }
 
-export function AuthFormTabs({ onModeChange }: AuthFormTabsProps) {
+export function AuthFormTabs({ onModeChange, onSuccess }: AuthFormTabsProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("+91");
@@ -20,6 +21,10 @@ export function AuthFormTabs({ onModeChange }: AuthFormTabsProps) {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value as "login" | "signup");
+  };
+
+  const handleSuccess = () => {
+    if (onSuccess) onSuccess();
   };
 
   return (
@@ -43,6 +48,7 @@ export function AuthFormTabs({ onModeChange }: AuthFormTabsProps) {
           password={password}
           setPassword={setPassword}
           onModeChange={handleForgotPassword}
+          onSuccess={handleSuccess}
         />
       </TabsContent>
       <TabsContent value="signup">
@@ -54,6 +60,7 @@ export function AuthFormTabs({ onModeChange }: AuthFormTabsProps) {
           phone={phone}
           setPhone={setPhone}
           onModeChange={onModeChange}
+          onSuccess={handleSuccess}
         />
       </TabsContent>
     </Tabs>

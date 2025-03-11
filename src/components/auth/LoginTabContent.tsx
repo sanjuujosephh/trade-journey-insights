@@ -11,6 +11,7 @@ interface LoginTabContentProps {
   password: string;
   setPassword: (password: string) => void;
   onModeChange?: () => void;
+  onSuccess?: () => void;
 }
 
 export function LoginTabContent({
@@ -18,7 +19,8 @@ export function LoginTabContent({
   setEmail,
   password,
   setPassword,
-  onModeChange
+  onModeChange,
+  onSuccess
 }: LoginTabContentProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
@@ -41,6 +43,7 @@ export function LoginTabContent({
     try {
       await signIn(email, password);
       toast({ title: "Success", description: "Logged in successfully!" });
+      if (onSuccess) onSuccess();
       return { success: true };
     } catch (error) {
       toast({

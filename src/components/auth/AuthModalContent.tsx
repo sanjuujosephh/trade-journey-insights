@@ -11,7 +11,11 @@ import {
 
 type AuthMode = "tabs" | "reset" | "phone-verify";
 
-export function AuthModalContent() {
+interface AuthModalContentProps {
+  onSuccess?: () => void;
+}
+
+export function AuthModalContent({ onSuccess }: AuthModalContentProps) {
   const [mode, setMode] = useState<AuthMode>("tabs");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +23,10 @@ export function AuthModalContent() {
   
   const handleModeChange = (newMode: AuthMode) => {
     setMode(newMode);
+  };
+  
+  const handleSuccess = () => {
+    if (onSuccess) onSuccess();
   };
   
   const renderTitle = () => {
@@ -55,6 +63,7 @@ export function AuthModalContent() {
       {mode === "tabs" && (
         <AuthFormTabs
           onModeChange={(newMode) => handleModeChange(newMode as AuthMode)}
+          onSuccess={handleSuccess}
         />
       )}
       
@@ -63,13 +72,17 @@ export function AuthModalContent() {
           email={email}
           setEmail={setEmail}
           onBackToLogin={() => handleModeChange("tabs")}
+          onSuccess={handleSuccess}
         />
       )}
       
       {mode === "phone-verify" && (
         <PhoneVerification
           phone={phone}
-          onVerificationComplete={() => handleModeChange("tabs")}
+          onVerificationComplete={() => {
+            handleSuccess();
+            handleModeChange("tabs");
+          }}
           onBackToSignup={() => handleModeChange("tabs")}
         />
       )}

@@ -1,0 +1,69 @@
+
+import { FormData } from "@/types/trade";
+import { isValidDateTime } from "@/utils/datetime";
+import { validateTradeForm } from "./validation";
+
+// Error type with structured messages for better UI integration
+export interface ValidationError {
+  field?: string;
+  message: string;
+}
+
+export class TradeValidationService {
+  
+  // Main validation method
+  static validateTradeForm(formData: FormData): ValidationError[] {
+    const errors: ValidationError[] = [];
+    
+    // Collect basic field validation errors
+    const basicErrors = validateTradeForm(formData);
+    errors.push(...basicErrors.map(msg => ({ message: msg })));
+    
+    // Validate date and time fields
+    const dateTimeErrors = this.validateDateTimes(formData);
+    errors.push(...dateTimeErrors);
+    
+    // Add more validation types as needed
+    
+    return errors;
+  }
+  
+  // Date and time validation
+  private static validateDateTimes(formData: FormData): ValidationError[] {
+    const errors: ValidationError[] = [];
+    
+    // Validate entry date and time
+    if (formData.entry_date && !isValidDateTime(formData.entry_date, formData.entry_time || '')) {
+      errors.push({
+        field: 'entry_date_time',
+        message: "Please enter valid entry date and time"
+      });
+    }
+
+    // Validate exit date and time if provided
+    if (formData.exit_date && formData.exit_time && 
+        !isValidDateTime(formData.exit_date, formData.exit_time)) {
+      errors.push({
+        field: 'exit_date_time',
+        message: "Please enter valid exit date and time"
+      });
+    }
+    
+    return errors;
+  }
+  
+  // Helper method to validate if a trade is executable based on business rules
+  static isTradeExecutable(formData: FormData): boolean {
+    // Return false if required fields are missing
+    if (!formData.symbol || !formData.entry_price) {
+      return false;
+    }
+    
+    // Add additional business logic here, for example:
+    // - Check if user has sufficient balance/permissions
+    // - Validate against market rules
+    // - Check for timing restrictions
+    
+    return true;
+  }
+}
