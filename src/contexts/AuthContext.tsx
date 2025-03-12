@@ -47,6 +47,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === 'SIGNED_OUT') {
         window.location.href = '/';
       }
+      
+      // Force scroll to top on sign in
+      if (event === 'SIGNED_IN') {
+        window.scrollTo({
+          top: 0,
+          behavior: 'instant'
+        });
+        
+        // Also use a timeout for reliability
+        setTimeout(() => {
+          window.scrollTo({
+            top: 0,
+            behavior: 'instant'
+          });
+        }, 100);
+      }
     });
 
     return () => {
