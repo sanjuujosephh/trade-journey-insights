@@ -11,7 +11,7 @@ export function AuthForm() {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("+91");
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState<"login" | "signup" | "reset" | "phone-verify">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "reset" | "phone-verify">("signup");
   const [verificationCode, setVerificationCode] = useState("");
   const { resetPassword, verifyOtp } = useAuth();
   const { toast } = useToast();
@@ -86,6 +86,6 @@ export function AuthForm() {
   }
 
   return (
-    <AuthFormTabs onModeChange={handleModeChange} />
+    <AuthFormTabs onModeChange={handleModeChange} defaultTab="signup" />
   );
 }

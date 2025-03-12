@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -35,8 +34,7 @@ function HeroShowcase() {
     <div className="relative w-full max-w-5xl mx-auto mb-8" style={{ minHeight }}>
       <div className="w-full rounded-lg overflow-hidden">
         {!isImageLoaded && (
-          <div className="absolute inset-0 bg-muted animate-pulse rounded-lg flex items-center justify-center">
-            <div className="text-muted-foreground">Loading image...</div>
+          <div className="absolute inset-0 bg-muted animate-pulse rounded-lg">
           </div>
         )}
         <img 

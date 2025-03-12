@@ -7,13 +7,18 @@ import { SignupTabContent } from "./SignupTabContent";
 interface AuthFormTabsProps {
   onModeChange?: (mode: "reset" | "phone-verify") => void;
   onSuccess?: () => void;
+  defaultTab?: "login" | "signup";
 }
 
-export function AuthFormTabs({ onModeChange, onSuccess }: AuthFormTabsProps) {
+export function AuthFormTabs({ 
+  onModeChange, 
+  onSuccess, 
+  defaultTab = "login" 
+}: AuthFormTabsProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("+91");
-  const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
+  const [activeTab, setActiveTab] = useState<"login" | "signup">(defaultTab);
 
   const handleForgotPassword = () => {
     if (onModeChange) onModeChange("reset");
@@ -29,7 +34,7 @@ export function AuthFormTabs({ onModeChange, onSuccess }: AuthFormTabsProps) {
 
   return (
     <Tabs 
-      defaultValue="login" 
+      defaultValue={defaultTab} 
       className="w-full auth-tabs"
       onValueChange={handleTabChange}
     >

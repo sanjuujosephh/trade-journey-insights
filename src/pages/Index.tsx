@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -14,11 +15,22 @@ export default function Index() {
   const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [prevUserState, setPrevUserState] = useState<boolean>(!!user);
 
-  // Scroll to top on component mount and when tab changes
+  // Scroll to top on component mount, tab changes, and when user logs in
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activeTab]);
+  
+  // Track user login state and scroll to top when user logs in
+  useEffect(() => {
+    const currentUserState = !!user;
+    // If user has just logged in (from logged out to logged in)
+    if (currentUserState && !prevUserState) {
+      window.scrollTo(0, 0);
+    }
+    setPrevUserState(currentUserState);
+  }, [user, prevUserState]);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
