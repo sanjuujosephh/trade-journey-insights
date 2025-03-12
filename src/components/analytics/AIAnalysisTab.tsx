@@ -111,7 +111,7 @@ Trades data: {{tradesData}}`);
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <p className="text-xs text-muted-foreground">
-                  Use variables: {{totalTrades}}, {{winRate}}, {{strategyPerformance}}, {{tradesData}}
+                  Use variables: &#123;&#123;totalTrades&#125;&#125;, &#123;&#123;winRate&#125;&#125;, &#123;&#123;strategyPerformance&#125;&#125;, &#123;&#123;tradesData&#125;&#125;
                 </p>
                 {isEditingPrompt ? (
                   <div className="flex space-x-2">
