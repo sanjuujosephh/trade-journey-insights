@@ -13,7 +13,7 @@ export function AuthFormTabs({ onModeChange, onSuccess }: AuthFormTabsProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("+91");
-  const [activeTab, setActiveTab] = useState<"login" | "signup">("signup");
+  const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
 
   const handleForgotPassword = () => {
     if (onModeChange) onModeChange("reset");
@@ -29,7 +29,7 @@ export function AuthFormTabs({ onModeChange, onSuccess }: AuthFormTabsProps) {
 
   return (
     <Tabs 
-      defaultValue="signup" 
+      defaultValue="login" 
       className="w-full auth-tabs"
       onValueChange={handleTabChange}
     >

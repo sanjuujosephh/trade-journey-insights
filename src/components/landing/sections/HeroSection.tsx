@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export function HeroSection() {
   return (
@@ -25,15 +26,26 @@ function HeroHeading() {
 }
 
 function HeroShowcase() {
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  
+  // Set min height to prevent layout shifts while loading
+  const minHeight = isImageLoaded ? "auto" : "300px";
+  
   return (
-    <div className="relative w-full max-w-5xl mx-auto mb-8">
+    <div className="relative w-full max-w-5xl mx-auto mb-8" style={{ minHeight }}>
       <div className="w-full rounded-lg overflow-hidden">
+        {!isImageLoaded && (
+          <div className="absolute inset-0 bg-muted animate-pulse rounded-lg flex items-center justify-center">
+            <div className="text-muted-foreground">Loading image...</div>
+          </div>
+        )}
         <img 
           src="/lovable-uploads/da846476-9055-4a83-97db-8b1e1202f77b.png" 
           alt="Trading Journal Dashboard" 
-          className="w-full object-cover object-center" 
+          className={`w-full object-cover object-center transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
           loading="eager"
           style={{ imageRendering: 'crisp-edges' }}
+          onLoad={() => setIsImageLoaded(true)}
         />
         {/* Shadow overlay that fades into the background */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90 pointer-events-none"></div>
