@@ -20,7 +20,7 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    const { trades } = await req.json();
+    const { trades, days = 1, customPrompt } = await req.json();
     
     // Calculate summary statistics
     const totalTrades = trades.length;
@@ -35,7 +35,8 @@ serve(async (req) => {
       return acc;
     }, {});
 
-    const prompt = `As a trading analyst, analyze these trading patterns:
+    // Create default prompt if no custom prompt is provided
+    const defaultPrompt = `As a trading analyst, analyze these trading patterns:
 
 Trading Summary:
 - Total Trades: ${totalTrades}
@@ -54,6 +55,22 @@ Provide specific insights on:
 
 Trades data: ${JSON.stringify(trades.slice(0, 10))}`;
 
+    // Use the custom prompt if provided, otherwise use the default
+    let finalPrompt = defaultPrompt;
+    if (customPrompt) {
+      // Replace variables in the custom prompt with actual values
+      finalPrompt = customPrompt
+        .replace('{{totalTrades}}', totalTrades.toString())
+        .replace('{{winRate}}', winRate.toString())
+        .replace('{{strategyPerformance}}', 
+          Object.entries(strategyPerformance)
+            .map(([strategy, stats]: [string, any]) => 
+              `${strategy}: ${stats.wins} wins, ${stats.losses} losses`)
+            .join('\n')
+        )
+        .replace('{{tradesData}}', JSON.stringify(trades.slice(0, 10)));
+    }
+
     console.log('Sending request to OpenAI...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -70,7 +87,7 @@ Trades data: ${JSON.stringify(trades.slice(0, 10))}`;
           },
           { 
             role: 'user', 
-            content: prompt 
+            content: finalPrompt 
           }
         ],
       }),

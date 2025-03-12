@@ -118,11 +118,15 @@ export default function Index() {
     enabled: !!user?.id
   });
 
-  const analyzeTradesWithAI = async (options: { days?: number }) => {
+  const analyzeTradesWithAI = async (options: { days?: number, customPrompt?: string }) => {
     setIsAnalyzing(true);
     try {
       const response = await supabase.functions.invoke('analyze-trades', {
-        body: { trades, days: options.days || 1 }
+        body: { 
+          trades,
+          days: options.days || 1,
+          customPrompt: options.customPrompt
+        }
       });
 
       if (response.error) {

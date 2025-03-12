@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Loader2, PenLine, BarChart2, Calendar, Brain, Bot, GraduationCap, History, Settings, BookText, Store } from "lucide-react";
@@ -21,7 +22,7 @@ interface DashboardTabsProps {
   setActiveTab: (tab: string) => void;
   isAnalyzing: boolean;
   currentAnalysis: string;
-  analyzeTradesWithAI: (options: { days?: number }) => void;
+  analyzeTradesWithAI: (options: { days?: number, customPrompt?: string }) => void;
 }
 
 const tabColors = {
