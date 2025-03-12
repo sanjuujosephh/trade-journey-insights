@@ -17,17 +17,33 @@ export default function Index() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [prevUserState, setPrevUserState] = useState<boolean>(!!user);
 
-  // Scroll to top on component mount, tab changes, and when user logs in
+  // Scroll to top on component mount and tab changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activeTab]);
   
-  // Track user login state and scroll to top when user logs in
+  // Force scroll to top immediately after render when user is logged in
+  useEffect(() => {
+    if (user) {
+      // Use setTimeout to ensure this runs after the component has rendered
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'instant'
+        });
+      }, 0);
+    }
+  }, [user]);
+  
+  // Additional effect to detect user login transition
   useEffect(() => {
     const currentUserState = !!user;
     // If user has just logged in (from logged out to logged in)
     if (currentUserState && !prevUserState) {
-      window.scrollTo(0, 0);
+      window.scrollTo({
+        top: 0,
+        behavior: 'instant'
+      });
     }
     setPrevUserState(currentUserState);
   }, [user, prevUserState]);
