@@ -30,5 +30,5 @@ export async function checkTradeLimit(userId: string | null, entryDate: string, 
     return false;
   }
   
-  return (existingTrades?.length || 0) < 1;
+  return (existingTrades?.length || 0) < 3; // Updated from 1 to 3
 }

@@ -44,7 +44,7 @@ export function useAddTrade(userId: string | null) {
 
       const canAddTrade = await checkTradeLimit(userId, tradeData.entry_date, tradeData.entry_time);
       if (!canAddTrade) {
-        throw new Error("Daily trade limit reached (1 trade per day)");
+        throw new Error("Daily trade limit reached (3 trades per day)"); // Updated from 1 to 3
       }
 
       const { data, error } = await supabase
