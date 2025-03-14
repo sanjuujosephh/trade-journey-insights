@@ -16,12 +16,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, ArrowRight } from "lucide-react";
 import { format, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
+
 export default function TradeEntry() {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  
   const {
     formData,
     editingId,
@@ -37,6 +37,7 @@ export default function TradeEntry() {
     handleEdit,
     handleViewDetails
   } = useTradeManagement();
+  
   if (isLoading) return <LoadingSpinner />;
 
   // Filter trades based on selected date or show recent 10
@@ -50,9 +51,7 @@ export default function TradeEntry() {
 
   const handleDelete = async (id: string) => {
     try {
-      const {
-        error
-      } = await supabase.from('trades').delete().eq('id', id);
+      const { error } = await supabase.from('trades').delete().eq('id', id);
       if (error) {
         throw new Error(error.message);
       }
@@ -73,6 +72,7 @@ export default function TradeEntry() {
       });
     }
   };
+  
   const clearDateFilter = () => {
     setSelectedDate(undefined);
     toast({
@@ -88,11 +88,19 @@ export default function TradeEntry() {
     }
   };
   
-  return <ErrorBoundary>
+  return (
+    <ErrorBoundary>
       <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
-        <TradeFormManager formData={formData} handleChange={handleChange} handleSelectChange={handleSelectChange} onSubmit={handleSubmit} editingId={editingId} />
+        <TradeFormManager 
+          formData={formData} 
+          handleChange={handleChange} 
+          handleSelectChange={handleSelectChange} 
+          onSubmit={handleSubmit} 
+          editingId={editingId} 
+        />
 
-        {trades.length > 0 && <div className="space-y-4 mt-8"> {/* Added mt-8 (30px margin) */}
+        {trades.length > 0 && (
+          <div className="space-y-4 mt-8">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <Popover>
@@ -107,12 +115,13 @@ export default function TradeEntry() {
                   </PopoverContent>
                 </Popover>
 
-                {selectedDate && <Button type="button" size="sm" variant="outline" onClick={clearDateFilter}>
+                {selectedDate && (
+                  <Button type="button" size="sm" variant="outline" onClick={clearDateFilter}>
                     Clear
-                  </Button>}
+                  </Button>
+                )}
               </div>
               
-              {/* View All Entries link */}
               <Button 
                 variant="ghost" 
                 onClick={navigateToHistoryTab}
@@ -123,15 +132,29 @@ export default function TradeEntry() {
               </Button>
             </div>
             
-            <TradeHistory trades={filteredTrades} onEdit={handleEdit} onDelete={handleDelete} onViewDetails={handleViewDetails} showEditButton={true} />
-          </div>}
+            <TradeHistory 
+              trades={filteredTrades} 
+              onEdit={handleEdit} 
+              onDelete={handleDelete} 
+              onViewDetails={handleViewDetails} 
+              showEditButton={true} 
+            />
+          </div>
+        )}
 
         <ImportTrades />
 
-        {selectedTrade && <TradeDetailsDialog trade={selectedTrade} open={isDialogOpen} onOpenChange={open => {
-        setIsDialogOpen(open);
-        if (!open) setSelectedTrade(null);
-      }} />}
+        {selectedTrade && (
+          <TradeDetailsDialog 
+            trade={selectedTrade} 
+            open={isDialogOpen} 
+            onOpenChange={open => {
+              setIsDialogOpen(open);
+              if (!open) setSelectedTrade(null);
+            }} 
+          />
+        )}
       </div>
-    </ErrorBoundary>;
+    </ErrorBoundary>
+  );
 }

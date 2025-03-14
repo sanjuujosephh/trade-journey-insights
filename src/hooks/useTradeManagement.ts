@@ -49,6 +49,12 @@ export function useTradeManagement() {
     await submitTrade(formData, editingId);
   };
 
+  // View details handler
+  const handleViewDetails = (trade: Trade) => {
+    setSelectedTrade(trade);
+    setIsDialogOpen(true);
+  };
+
   return {
     // Form state
     formData,
@@ -73,6 +79,7 @@ export function useTradeManagement() {
     handleSubmit,
     handleEdit,
     handleView,
+    handleViewDetails,
     closeDialog
   };
 }
