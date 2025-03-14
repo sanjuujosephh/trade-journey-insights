@@ -33,6 +33,7 @@ export function AIAnalysisTab() {
     
     if (!credits || credits.subscription_credits + credits.purchased_credits < creditCost) {
       toast.error(`You need ${creditCost} credits to analyze ${days} days of trades. You have ${(credits?.subscription_credits || 0) + (credits?.purchased_credits || 0)} credits.`);
+      setIsPurchaseDialogOpen(true);
       return;
     }
     
