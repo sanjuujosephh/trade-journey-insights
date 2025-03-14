@@ -28,15 +28,17 @@ export function PromptVariableValues({ trades }: PromptVariableValuesProps) {
   // Format sample data for display
   const strategyPerformanceSample = Object.entries(stats.strategyPerformance)
     .slice(0, 2)
-    .map(([strategy, stratStats]) => 
-      `${strategy}: ${stratStats.wins} wins, ${stratStats.losses} losses, P&L: ${stratStats.totalPnL.toFixed(2)}`
-    ).join('\n');
+    .map(([strategy, stratStats]) => {
+      const typedStats = stratStats as { wins: number; losses: number; totalPnL: number };
+      return `${strategy}: ${typedStats.wins} wins, ${typedStats.losses} losses, P&L: ${typedStats.totalPnL.toFixed(2)}`;
+    }).join('\n');
   
   const marketConditionSample = Object.entries(stats.marketConditionPerformance)
     .slice(0, 2)
-    .map(([condition, condStats]) => 
-      `${condition}: ${condStats.wins} wins, ${condStats.losses} losses`
-    ).join('\n');
+    .map(([condition, condStats]) => {
+      const typedStats = condStats as { wins: number; losses: number };
+      return `${condition}: ${typedStats.wins} wins, ${typedStats.losses} losses`;
+    }).join('\n');
   
   // Create variable-value pairs
   const variableValues = [
