@@ -3,6 +3,7 @@ import { useTradeForm } from "./useTradeForm";
 import { useTradeOperations } from "./useTradeOperations";
 import { useTradeSubmission } from "./useTradeSubmission";
 import { useTradeActions } from "./useTradeActions";
+import { Trade } from "@/types/trade";
 
 export function useTradeManagement() {
   // Form state management
