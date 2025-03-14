@@ -8,9 +8,11 @@ import { TradeFormManager } from "./trade-form/TradeFormManager";
 import { useTradeManagement } from "@/hooks/useTradeManagement";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function TradeEntry() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const {
     formData,
     editingId,
@@ -39,6 +41,9 @@ export default function TradeEntry() {
       if (error) {
         throw new Error(error.message);
       }
+      
+      // Invalidate the trades query to refresh data
+      queryClient.invalidateQueries({ queryKey: ['trades'] });
       
       toast({
         title: "Success",

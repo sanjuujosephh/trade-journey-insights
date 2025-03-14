@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -11,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Maximize2, Image, Pencil } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
 
 interface TradeHistoryProps {
   trades: Trade[];
@@ -73,18 +73,8 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('trades')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-      
+      // Call the parent's onDelete function
       onDelete(id);
-      toast({
-        title: "Success",
-        description: "Trade deleted successfully!"
-      });
     } catch (error) {
       console.error('Delete error:', error);
       toast({
