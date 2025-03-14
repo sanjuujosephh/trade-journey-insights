@@ -21,14 +21,28 @@ export function useTradeImport() {
         }
       }
       
-      return results;
+      return {
+        successful: results.length,
+        failed: errors.length,
+        firstError: errors.length > 0 ? errors[0].error : null
+      };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['trades'] });
-      toast({
-        title: "Success",
-        description: `${data.length} trades imported successfully!`
-      });
+      
+      if (data.failed > 0) {
+        toast({
+          title: "Partial Success",
+          description: `Imported ${data.successful} trades. ${data.failed} trades failed.${data.firstError ? ` Error: ${data.firstError}` : ''}`,
+          variant: data.successful > 0 ? "default" : "destructive"
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: `${data.successful} trades imported successfully!`
+        });
+      }
+      
       setIsProcessing(false);
     },
     onError: (error) => {

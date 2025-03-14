@@ -57,6 +57,63 @@ export async function processAndImportTrades(csvData: Array<Array<string>>): Pro
           const num = parseInt(row[index], 10);
           trade[header] = isNaN(num) ? 0 : num;
         }
+        // Handle enum fields that might have constraints
+        else if (header === 'market_condition') {
+          // Handle market_condition field to prevent constraint violation
+          const validConditions = ['trending', 'ranging', 'news_driven', 'volatile'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validConditions.includes(value) ? value : null;
+        }
+        else if (header === 'option_type') {
+          // Handle option_type field
+          const validTypes = ['call', 'put'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validTypes.includes(value) ? value : null;
+        }
+        else if (header === 'trade_direction') {
+          // Handle trade_direction field
+          const validDirections = ['long', 'short'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validDirections.includes(value) ? value : null;
+        }
+        else if (header === 'exit_reason') {
+          // Handle exit_reason field
+          const validReasons = ['stop_loss', 'target', 'manual', 'time_based'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validReasons.includes(value) ? value : null;
+        }
+        else if (header === 'entry_emotion') {
+          // Handle entry_emotion field
+          const validEmotions = ['fear', 'greed', 'fomo', 'revenge', 'neutral', 'confident'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validEmotions.includes(value) ? value : null;
+        }
+        else if (header === 'exit_emotion') {
+          // Handle exit_emotion field
+          const validEmotions = ['satisfied', 'regretful', 'relieved', 'frustrated'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validEmotions.includes(value) ? value : null;
+        }
+        else if (header === 'timeframe') {
+          // Handle timeframe field
+          const validTimeframes = ['1min', '5min', '15min', '1hr'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validTimeframes.includes(value) ? value : null;
+        }
+        else if (header === 'vwap_position' || header === 'ema_position') {
+          // Handle position indicator fields
+          const validPositions = header === 'vwap_position' 
+            ? ['above_vwap', 'below_vwap'] 
+            : ['above_20ema', 'below_20ema'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validPositions.includes(value) ? value : null;
+        }
+        else if (header === 'outcome') {
+          // Handle outcome field - this is required so provide a default
+          const validOutcomes = ['profit', 'loss', 'breakeven'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validOutcomes.includes(value) ? value : 'breakeven';
+        }
         else {
           trade[header] = row[index] || null;
         }
@@ -67,6 +124,10 @@ export async function processAndImportTrades(csvData: Array<Array<string>>): Pro
     if (!trade.timestamp) {
       trade.timestamp = new Date().toISOString();
     }
+
+    // Ensure required fields have default values
+    trade.outcome = trade.outcome || 'breakeven';
+    trade.trade_type = trade.trade_type || 'options';
     
     return trade;
   }).filter(trade => trade.symbol && trade.entry_price); // Filter out incomplete rows
