@@ -29,6 +29,7 @@ export function useTradeActions({
       vix: trade.vix?.toString() ?? "",
       call_iv: trade.call_iv?.toString() ?? "",
       put_iv: trade.put_iv?.toString() ?? "",
+      pcr: trade.pcr?.toString() ?? "", // Added the PCR field here
       planned_risk_reward: trade.planned_risk_reward?.toString() ?? "",
       actual_risk_reward: trade.actual_risk_reward?.toString() ?? "",
       planned_target: trade.planned_target?.toString() ?? "",
