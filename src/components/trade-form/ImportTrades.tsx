@@ -38,14 +38,44 @@ export function ImportTrades() {
         // Map each cell to its corresponding header
         headers.forEach((header, index) => {
           if (header && row[index] !== undefined) {
+            // Format time values properly
+            if (['entry_time', 'exit_time'].includes(header)) {
+              // Remove AM/PM to avoid Supabase timestamp parsing issues
+              let timeValue = row[index];
+              if (timeValue) {
+                // Strip any AM/PM indicators and standardize format
+                timeValue = timeValue.replace(/\s?[AP]M$/i, '').trim();
+                
+                // If time doesn't have seconds, add them
+                if (timeValue.split(':').length === 2) {
+                  timeValue = `${timeValue}:00`;
+                }
+                
+                trade[header] = timeValue;
+              } else {
+                trade[header] = null;
+              }
+            }
+            // Handle date fields
+            else if (['entry_date', 'exit_date'].includes(header)) {
+              // Store dates as is - they'll be processed as strings
+              trade[header] = row[index] || null;
+            }
             // Convert numeric values
-            if (
+            else if (
               ['entry_price', 'exit_price', 'quantity', 'stop_loss', 'vix', 
-               'call_iv', 'put_iv', 'confidence_level', 'strike_price'].includes(header)
+               'call_iv', 'put_iv', 'confidence_level', 'strike_price',
+               'emotional_score', 'confidence_level_score'].includes(header)
             ) {
               const num = parseFloat(row[index]);
               trade[header] = isNaN(num) ? null : num;
-            } else {
+            } 
+            // Handle the analysis_count as an integer
+            else if (header === 'analysis_count') {
+              const num = parseInt(row[index], 10);
+              trade[header] = isNaN(num) ? 0 : num;
+            }
+            else {
               trade[header] = row[index] || null;
             }
           }
@@ -58,6 +88,8 @@ export function ImportTrades() {
         
         return trade;
       }).filter(trade => trade.symbol && trade.entry_price); // Filter out incomplete rows
+      
+      console.log('Processed trades ready for insertion:', processedTrades);
       
       // Insert processed trades directly
       const { data, error } = await supabase
