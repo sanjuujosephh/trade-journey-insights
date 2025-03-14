@@ -4,6 +4,7 @@ import { AnalysisButtons } from './AnalysisButtons';
 import { AnalysisResult } from './AnalysisResult';
 import { CustomPromptAccordion } from './CustomPromptAccordion';
 import { CreditsDisplay } from './CreditsDisplay';
+import { PurchaseCreditsDialog } from './PurchaseCreditsDialog';
 import { useUserCredits } from '@/hooks/useUserCredits';
 import { useTradeQueries } from '@/hooks/useTradeQueries';
 import { useTradeAuth } from '@/hooks/useTradeAuth';
@@ -24,6 +25,7 @@ export function AIAnalysisTab() {
   const [savedPrompts, setSavedPrompts] = useState<string[]>([]);
   const [isEditingPrompt, setIsEditingPrompt] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
 
   const handleAnalyze = async (days: number, customPrompt?: string) => {
     // Credit cost based on days
@@ -74,8 +76,7 @@ export function AIAnalysisTab() {
   };
 
   const handlePurchaseClick = () => {
-    // Navigate or open purchase dialog
-    toast.info('Purchase credits feature coming soon!');
+    setIsPurchaseDialogOpen(true);
   };
 
   return (
@@ -110,6 +111,11 @@ export function AIAnalysisTab() {
           onUsePrompt={(prompt) => setCurrentAnalysis(prompt)}
         />
       )}
+
+      <PurchaseCreditsDialog 
+        open={isPurchaseDialogOpen} 
+        onOpenChange={setIsPurchaseDialogOpen} 
+      />
     </div>
   );
 }

@@ -34,6 +34,8 @@ Trading Summary:
 - Total Trades: {{totalTrades}}
 - Win Rate: {{winRate}}%
 - Total P&L: {{totalPnL}}
+- Average Trade P&L: {{avgTradePnL}}
+- Profit Factor: {{profitFactor}}
 
 Strategy Performance:
 {{strategyPerformance}}
@@ -43,6 +45,15 @@ Market Conditions:
 
 Emotional Analysis:
 {{emotionAnalysis}}
+
+Time Analysis:
+{{timeAnalysis}}
+
+Position Sizing:
+{{positionSizing}}
+
+Risk Management:
+{{riskMetrics}}
 
 Provide specific insights on:
 1. Pattern analysis of winning vs losing trades
@@ -90,9 +101,14 @@ Provide specific insights on:
               <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{totalTrades}}'}</code>
               <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{winRate}}'}</code>
               <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{totalPnL}}'}</code>
+              <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{avgTradePnL}}'}</code>
+              <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{profitFactor}}'}</code>
               <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{strategyPerformance}}'}</code>
               <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{marketConditionPerformance}}'}</code>
               <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{emotionAnalysis}}'}</code>
+              <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{timeAnalysis}}'}</code>
+              <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{positionSizing}}'}</code>
+              <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{riskMetrics}}'}</code>
               <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{tradesData}}'}</code>
             </div>
           </div>

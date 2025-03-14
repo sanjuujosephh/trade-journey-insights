@@ -35,6 +35,21 @@ serve(async (req) => {
       return sum + pnl;
     }, 0);
 
+    // New: Calculate average trade PnL
+    const avgTradePnL = totalPnL / totalTrades;
+
+    // New: Calculate profit factor (sum of profits / sum of losses)
+    let sumProfits = 0;
+    let sumLosses = 0;
+    trades.forEach((trade: any) => {
+      const pnl = trade.exit_price && trade.entry_price && trade.quantity
+        ? (trade.exit_price - trade.entry_price) * trade.quantity
+        : 0;
+      if (pnl > 0) sumProfits += pnl;
+      if (pnl < 0) sumLosses += Math.abs(pnl);
+    });
+    const profitFactor = sumLosses > 0 ? (sumProfits / sumLosses).toFixed(2) : "∞";
+
     // Analyze strategies
     const strategyPerformance = trades.reduce((acc: any, trade: any) => {
       if (!acc[trade.strategy]) {
@@ -73,6 +88,54 @@ serve(async (req) => {
       return acc;
     }, {});
 
+    // New: Time analysis - hour of day performance
+    const timeAnalysis = trades.reduce((acc: any, trade: any) => {
+      if (trade.entry_time) {
+        const hour = new Date(trade.entry_time).getHours();
+        const timeSlot = `${hour}:00-${hour+1}:00`;
+        
+        if (!acc[timeSlot]) {
+          acc[timeSlot] = { wins: 0, losses: 0, totalPnL: 0 };
+        }
+        
+        acc[timeSlot][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+        
+        if (trade.exit_price && trade.entry_price && trade.quantity) {
+          const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+          acc[timeSlot].totalPnL += pnl;
+        }
+      }
+      return acc;
+    }, {});
+
+    // New: Position sizing analysis
+    const positionSizing = trades.reduce((acc: any, trade: any) => {
+      if (trade.quantity) {
+        const size = trade.quantity;
+        const sizeCategory = size <= 10 ? 'small' : size <= 50 ? 'medium' : 'large';
+        
+        if (!acc[sizeCategory]) {
+          acc[sizeCategory] = { count: 0, wins: 0, losses: 0, totalPnL: 0 };
+        }
+        
+        acc[sizeCategory].count++;
+        acc[sizeCategory][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+        
+        if (trade.exit_price && trade.entry_price) {
+          const pnl = (trade.exit_price - trade.entry_price) * size;
+          acc[sizeCategory].totalPnL += pnl;
+        }
+      }
+      return acc;
+    }, {});
+
+    // New: Risk management metrics
+    const riskMetrics = {
+      stopLossUsage: trades.filter((t: any) => t.exit_reason === 'stop_loss').length / totalTrades * 100,
+      targetUsage: trades.filter((t: any) => t.exit_reason === 'target').length / totalTrades * 100,
+      manualOverrides: trades.filter((t: any) => t.exit_reason === 'manual').length / totalTrades * 100,
+    };
+
     // Create default prompt if no custom prompt is provided
     const defaultPrompt = `As a trading analyst, analyze these trading patterns:
 
@@ -80,6 +143,8 @@ Trading Summary:
 - Total Trades: ${totalTrades}
 - Win Rate: ${winRate}%
 - Total P&L: ${totalPnL.toFixed(2)}
+- Average Trade P&L: ${avgTradePnL.toFixed(2)}
+- Profit Factor: ${profitFactor}
 
 Strategy Performance:
 ${Object.entries(strategyPerformance).map(([strategy, stats]: [string, any]) => 
@@ -95,6 +160,21 @@ Emotional Analysis:
 ${Object.entries(emotionAnalysis).map(([emotion, stats]: [string, any]) => 
   `${emotion}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`
 ).join('\n')}
+
+Time Analysis:
+${Object.entries(timeAnalysis).map(([timeSlot, stats]: [string, any]) => 
+  `${timeSlot}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`
+).join('\n')}
+
+Position Sizing:
+${Object.entries(positionSizing).map(([size, stats]: [string, any]) => 
+  `${size}: ${stats.count} trades, Win Rate: ${stats.count > 0 ? ((stats.wins / stats.count) * 100).toFixed(1) : 0}%, P&L: ${stats.totalPnL.toFixed(2)}`
+).join('\n')}
+
+Risk Management:
+Stop loss usage: ${riskMetrics.stopLossUsage.toFixed(1)}%
+Take profit usage: ${riskMetrics.targetUsage.toFixed(1)}%
+Manual overrides: ${riskMetrics.manualOverrides.toFixed(1)}%
 
 Provide specific insights on:
 1. Pattern analysis of winning vs losing trades
@@ -113,6 +193,8 @@ Trades data (sample): ${JSON.stringify(trades.slice(0, 5))}`;
         .replace('{{totalTrades}}', totalTrades.toString())
         .replace('{{winRate}}', winRate.toString())
         .replace('{{totalPnL}}', totalPnL.toFixed(2))
+        .replace('{{avgTradePnL}}', avgTradePnL.toFixed(2))
+        .replace('{{profitFactor}}', profitFactor.toString())
         .replace('{{strategyPerformance}}', 
           Object.entries(strategyPerformance)
             .map(([strategy, stats]: [string, any]) => 
@@ -130,6 +212,21 @@ Trades data (sample): ${JSON.stringify(trades.slice(0, 5))}`;
             .map(([emotion, stats]: [string, any]) => 
               `${emotion}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`)
             .join('\n')
+        )
+        .replace('{{timeAnalysis}}',
+          Object.entries(timeAnalysis)
+            .map(([timeSlot, stats]: [string, any]) => 
+              `${timeSlot}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`)
+            .join('\n')
+        )
+        .replace('{{positionSizing}}',
+          Object.entries(positionSizing)
+            .map(([size, stats]: [string, any]) => 
+              `${size}: ${stats.count} trades, Win Rate: ${stats.count > 0 ? ((stats.wins / stats.count) * 100).toFixed(1) : 0}%, P&L: ${stats.totalPnL.toFixed(2)}`)
+            .join('\n')
+        )
+        .replace('{{riskMetrics}}',
+          `Stop loss usage: ${riskMetrics.stopLossUsage.toFixed(1)}%\nTake profit usage: ${riskMetrics.targetUsage.toFixed(1)}%\nManual overrides: ${riskMetrics.manualOverrides.toFixed(1)}%`
         )
         .replace('{{tradesData}}', JSON.stringify(trades.slice(0, 5)));
     }
