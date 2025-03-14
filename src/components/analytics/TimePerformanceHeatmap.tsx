@@ -103,4 +103,3 @@ export function TimePerformanceHeatmap({ trades }: TimePerformanceHeatmapProps) 
     </Card>
   );
 }
-
