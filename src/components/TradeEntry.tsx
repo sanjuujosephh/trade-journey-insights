@@ -1,3 +1,4 @@
+
 import { ErrorBoundary } from "./ErrorBoundary";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
 import { TradeHistory } from "./trade-form/TradeHistory";
@@ -79,31 +80,49 @@ export default function TradeEntry() {
       description: "Showing 10 most recent trades"
     });
   };
+  
+  const navigateToHistoryTab = () => {
+    const historyTabTrigger = document.querySelector('[value="history"]') as HTMLElement;
+    if (historyTabTrigger) {
+      historyTabTrigger.click();
+    }
+  };
+  
   return <ErrorBoundary>
       <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
         <TradeFormManager formData={formData} handleChange={handleChange} handleSelectChange={handleSelectChange} onSubmit={handleSubmit} editingId={editingId} />
 
-        {trades.length > 0 && <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("w-[240px] justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}>
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "dd-MM-yyyy") : "Filter by date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
-                </PopoverContent>
-              </Popover>
+        {trades.length > 0 && <div className="space-y-4 mt-8"> {/* Added mt-8 (30px margin) */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-[240px] justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "dd-MM-yyyy") : "Filter by date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
+                  </PopoverContent>
+                </Popover>
 
-              {selectedDate && <Button type="button" size="sm" variant="outline" onClick={clearDateFilter}>
-                  Clear
-                </Button>}
+                {selectedDate && <Button type="button" size="sm" variant="outline" onClick={clearDateFilter}>
+                    Clear
+                  </Button>}
+              </div>
+              
+              {/* View All Entries link */}
+              <Button 
+                variant="ghost" 
+                onClick={navigateToHistoryTab}
+                className="flex items-center gap-1 text-primary"
+              >
+                View All Entries
+                <ArrowRight className="h-4 w-4" />
+              </Button>
             </div>
             
-            
-
             <TradeHistory trades={filteredTrades} onEdit={handleEdit} onDelete={handleDelete} onViewDetails={handleViewDetails} showEditButton={true} />
           </div>}
 

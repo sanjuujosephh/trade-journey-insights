@@ -13,7 +13,7 @@ export function TradeFormActions({ isEditing, isSubmitting = false }: TradeFormA
       <Button 
         type="submit" 
         disabled={isSubmitting}
-        className="w-[120%] text-center" // Increased width by 20%
+        className="text-lg py-6 px-8" // Increased overall button size with padding and font
       >
         {isSubmitting ? (
           <>
