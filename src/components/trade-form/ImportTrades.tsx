@@ -3,10 +3,11 @@ import { useTradeImport } from "@/hooks/useTradeImport";
 import { useTradeExport } from "@/hooks/useTradeExport";
 import { ImportButton } from "./import-export/ImportButton";
 import { ExportButton } from "./import-export/ExportButton";
+import { TemplateButton } from "./import-export/TemplateButton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 export function ImportTrades() {
-  const { handleFileUpload, isProcessing } = useTradeImport();
+  const { handleFileUpload, isProcessing, downloadTemplateCSV } = useTradeImport();
   const { handleExportCSV, hasTrades } = useTradeExport();
 
   const handleUploadClick = () => {
@@ -22,12 +23,13 @@ export function ImportTrades() {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap justify-center">
           <ImportButton 
             isProcessing={isProcessing} 
             onUploadClick={handleUploadClick} 
           />
           <ExportButton onExportClick={handleExportCSV} />
+          <TemplateButton onDownloadClick={downloadTemplateCSV} />
           <input
             id="csv-upload"
             type="file"
