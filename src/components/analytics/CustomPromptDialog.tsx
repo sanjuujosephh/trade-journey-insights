@@ -13,13 +13,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Info, Wand2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { PromptVariableValues } from "./PromptVariableValues";
+import { Trade } from "@/types/trade";
 
 interface CustomPromptDialogProps {
   dayCount: number;
   onAnalyze: (customPrompt: string) => void;
+  trades: Trade[];
 }
 
-export function CustomPromptDialog({ dayCount, onAnalyze }: CustomPromptDialogProps) {
+export function CustomPromptDialog({ dayCount, onAnalyze, trades }: CustomPromptDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [customPrompt, setCustomPrompt] = useState<string>('');
 
@@ -112,6 +115,8 @@ Provide specific insights on:
               <code className="bg-muted-foreground/20 px-1 rounded text-xs">{'{{tradesData}}'}</code>
             </div>
           </div>
+          
+          <PromptVariableValues trades={trades} />
           
           <Textarea 
             placeholder="Enter your custom prompt here..." 

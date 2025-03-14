@@ -1,8 +1,9 @@
 
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Trade } from "@/types/trade";
+import { Calendar, Clock } from "lucide-react";
 import { CustomPromptDialog } from "./CustomPromptDialog";
+import { useState } from "react";
+import { Trade } from "@/types/trade";
 
 interface AnalysisButtonsProps {
   isAnalyzing: boolean;
@@ -11,54 +12,68 @@ interface AnalysisButtonsProps {
 }
 
 export function AnalysisButtons({ isAnalyzing, trades, onAnalyze }: AnalysisButtonsProps) {
-  const handleAnalyze = (days: number) => {
+  const [selectedDayCount, setSelectedDayCount] = useState<number>(0);
+  
+  const handleSelectDayCount = (days: number) => {
+    setSelectedDayCount(days);
     onAnalyze(days);
   };
-
-  const handleCustomAnalyze = (days: number) => (customPrompt: string) => {
-    onAnalyze(days, customPrompt);
+  
+  const handleCustomPromptAnalysis = (customPrompt: string) => {
+    onAnalyze(selectedDayCount || 1, customPrompt);
   };
 
   return (
-    <div className="flex flex-col md:flex-row md:justify-end gap-4 my-6">
-      <div className="flex items-center">
+    <div className="flex flex-wrap gap-2">
+      <div className="flex">
         <Button
-          onClick={() => handleAnalyze(1)}
-          disabled={isAnalyzing || trades.length === 0}
-          className="w-full md:w-auto"
+          variant="default"
+          className="rounded-r-none"
+          disabled={isAnalyzing}
+          onClick={() => handleSelectDayCount(1)}
         >
-          {isAnalyzing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyzing Today's Trades...
-            </>
-          ) : (
-            <>Analyze Today's Trades (1 Credit)</>
-          )}
+          <Clock className="mr-2 h-4 w-4" />
+          Today's Trades
         </Button>
-        <CustomPromptDialog dayCount={1} onAnalyze={handleCustomAnalyze(1)} />
+        <CustomPromptDialog 
+          dayCount={1} 
+          onAnalyze={handleCustomPromptAnalysis}
+          trades={trades}
+        />
       </div>
-      
-      <div className="flex items-center">
+
+      <div className="flex">
         <Button
-          onClick={() => handleAnalyze(7)}
-          disabled={isAnalyzing || trades.length === 0}
-          className="w-full md:w-auto"
+          variant="outline"
+          className="rounded-r-none"
+          disabled={isAnalyzing}
+          onClick={() => handleSelectDayCount(7)}
         >
-          Analyze Last 7 Days' Trades (3 Credits)
+          <Calendar className="mr-2 h-4 w-4" />
+          Last 7 Days
         </Button>
-        <CustomPromptDialog dayCount={7} onAnalyze={handleCustomAnalyze(7)} />
+        <CustomPromptDialog 
+          dayCount={7} 
+          onAnalyze={handleCustomPromptAnalysis}
+          trades={trades}
+        />
       </div>
-      
-      <div className="flex items-center">
+
+      <div className="flex">
         <Button
-          onClick={() => handleAnalyze(30)}
-          disabled={isAnalyzing || trades.length === 0}
-          className="w-full md:w-auto"
+          variant="outline"
+          className="rounded-r-none"
+          disabled={isAnalyzing}
+          onClick={() => handleSelectDayCount(30)}
         >
-          Analyze This Month's Trades (5 Credits)
+          <Calendar className="mr-2 h-4 w-4" />
+          Last 30 Days
         </Button>
-        <CustomPromptDialog dayCount={30} onAnalyze={handleCustomAnalyze(30)} />
+        <CustomPromptDialog 
+          dayCount={30} 
+          onAnalyze={handleCustomPromptAnalysis}
+          trades={trades}
+        />
       </div>
     </div>
   );

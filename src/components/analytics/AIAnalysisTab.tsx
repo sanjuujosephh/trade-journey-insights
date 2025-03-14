@@ -110,6 +110,7 @@ export function AIAnalysisTab() {
           onSavePrompt={saveChatPrompt}
           onRemovePrompt={removeSavedPrompt}
           onUsePrompt={(prompt) => setCurrentAnalysis(prompt)}
+          trades={trades}
         />
       )}
 

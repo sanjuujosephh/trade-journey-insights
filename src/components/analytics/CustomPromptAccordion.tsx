@@ -10,6 +10,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { PromptVariableValues } from "./PromptVariableValues";
+import { Trade } from "@/types/trade";
 
 interface CustomPromptAccordionProps {
   customPrompt?: string;
@@ -20,6 +22,7 @@ interface CustomPromptAccordionProps {
   onSavePrompt?: (prompt: string) => void;
   onRemovePrompt?: (index: number) => void;
   onUsePrompt?: (prompt: string) => void;
+  trades?: Trade[];
 }
 
 export function CustomPromptAccordion({
@@ -30,7 +33,8 @@ export function CustomPromptAccordion({
   savedPrompts = [],
   onSavePrompt = () => {},
   onRemovePrompt = () => {},
-  onUsePrompt = () => {}
+  onUsePrompt = () => {},
+  trades = []
 }: CustomPromptAccordionProps) {
   const resetCustomPrompt = () => {
     setIsEditingPrompt(false);
@@ -94,6 +98,10 @@ Trades data: {{tradesData}}`);
                 </Button>
               )}
             </div>
+            
+            {trades && trades.length > 0 && (
+              <PromptVariableValues trades={trades} />
+            )}
             
             {isEditingPrompt ? (
               <Textarea
