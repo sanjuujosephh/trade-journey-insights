@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { SaveIcon, Loader2 } from "lucide-react";
+import { SaveIcon, Loader2, PlusIcon } from "lucide-react";
 
 interface TradeFormActionsProps {
   isEditing: boolean;
@@ -18,8 +18,12 @@ export function TradeFormActions({ isEditing, isSubmitting = false }: TradeFormA
           </>
         ) : (
           <>
-            <SaveIcon className="mr-2 h-4 w-4" />
-            {isEditing ? "Update Trade" : "Save Trade"}
+            {isEditing ? (
+              <SaveIcon className="mr-2 h-4 w-4" />
+            ) : (
+              <PlusIcon className="mr-2 h-4 w-4" />
+            )}
+            {isEditing ? "Update Trade" : "Log New Entry"}
           </>
         )}
       </Button>
