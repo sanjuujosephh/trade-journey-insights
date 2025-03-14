@@ -1,109 +1,57 @@
 
-import { standardizeDateFormat, standardizeTimeFormat } from '../formatters/dateTimeFormatters';
-import * as fieldValidators from '../validators/fieldValidators';
-
 /**
- * Processes a date field for database storage
- * @param value The raw date string
- * @returns Standardized date string or null
+ * Process a CSV field value based on its field type
+ * @param fieldName The name of the field
+ * @param value The raw value from the CSV
+ * @returns The processed value
  */
-export function processDateField(value: string): string | null {
-  return standardizeDateFormat(value);
-}
+export function processField(fieldName: string, value: string): any {
+  // Convert empty strings to null for optional fields
+  if (value === '') {
+    // Don't return null for required fields
+    if (['symbol', 'entry_price', 'trade_type'].includes(fieldName)) {
+      return fieldName === 'trade_type' ? 'options' : value;
+    }
+    return null;
+  }
 
-/**
- * Processes a time field for database storage
- * @param value The raw time string
- * @returns Standardized time string or null
- */
-export function processTimeField(value: string): string | null {
-  return standardizeTimeFormat(value);
-}
-
-/**
- * Processes a numeric field for database storage
- * @param value The raw numeric string
- * @returns Parsed number or null
- */
-export function processNumericField(value: string): number | null {
-  if (!value) return null;
-  const num = parseFloat(value);
-  return isNaN(num) ? null : num;
-}
-
-/**
- * Processes an integer field for database storage
- * @param value The raw integer string
- * @param defaultValue The default value if parsing fails
- * @returns Parsed integer or default value
- */
-export function processIntegerField(value: string, defaultValue: number = 0): number {
-  if (!value) return defaultValue;
-  const num = parseInt(value, 10);
-  return isNaN(num) ? defaultValue : num;
-}
-
-/**
- * Processes a field based on its type
- * @param header The field name
- * @param value The raw value
- * @returns Processed value
- */
-export function processField(header: string, value: string): any {
-  // Handle date fields
-  if (['entry_date', 'exit_date'].includes(header)) {
-    return processDateField(value);
+  // Process field based on type
+  switch (fieldName) {
+    case 'entry_price':
+    case 'exit_price':
+    case 'quantity':
+    case 'stop_loss':
+    case 'strike_price':
+    case 'vix':
+    case 'call_iv':
+    case 'put_iv':
+    case 'pcr': // Added PCR field
+    case 'confidence_level':
+      return parseFloat(value);
+      
+    case 'outcome':
+      return ['profit', 'loss', 'breakeven'].includes(value) ? value : 'breakeven';
+      
+    case 'trade_type':
+      return ['options', 'futures', 'equity'].includes(value) ? value : 'options';
+      
+    case 'option_type':
+      return ['call', 'put'].includes(value) ? value : null;
+      
+    case 'trade_direction':
+      return ['long', 'short'].includes(value) ? value : null;
+      
+    case 'entry_date':
+    case 'entry_time':
+    case 'exit_time':
+      return value;
+      
+    // Add user_id field as required by Supabase RLS
+    case 'user_id':
+      return value;
+      
+    // For all other fields, just return the value as is
+    default:
+      return value;
   }
-  
-  // Handle time fields
-  if (['entry_time', 'exit_time'].includes(header)) {
-    return processTimeField(value);
-  }
-  
-  // Handle numeric fields
-  if (['entry_price', 'exit_price', 'quantity', 'stop_loss', 'vix', 
-      'call_iv', 'put_iv', 'pcr', 'confidence_level', 'strike_price',
-      'emotional_score', 'confidence_level_score'].includes(header)) {
-    return processNumericField(value);
-  }
-  
-  // Handle integer fields
-  if (header === 'analysis_count') {
-    return processIntegerField(value);
-  }
-  
-  // Handle enum fields
-  if (header === 'market_condition') {
-    return fieldValidators.validateMarketCondition(value);
-  }
-  if (header === 'option_type') {
-    return fieldValidators.validateOptionType(value);
-  }
-  if (header === 'trade_direction') {
-    return fieldValidators.validateTradeDirection(value);
-  }
-  if (header === 'exit_reason') {
-    return fieldValidators.validateExitReason(value);
-  }
-  if (header === 'entry_emotion') {
-    return fieldValidators.validateEntryEmotion(value);
-  }
-  if (header === 'exit_emotion') {
-    return fieldValidators.validateExitEmotion(value);
-  }
-  if (header === 'timeframe') {
-    return fieldValidators.validateTimeframe(value);
-  }
-  if (header === 'vwap_position' || header === 'ema_position') {
-    return fieldValidators.validatePositionIndicator(value, header as any);
-  }
-  if (header === 'outcome') {
-    return fieldValidators.validateOutcome(value);
-  }
-  if (header === 'trade_type') {
-    return fieldValidators.validateTradeType(value);
-  }
-  
-  // Default case: return the value or null if empty
-  return value || null;
 }

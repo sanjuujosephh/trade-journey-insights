@@ -27,11 +27,49 @@ serve(async (req) => {
     const winningTrades = trades.filter((t: any) => t.outcome === 'profit').length;
     const winRate = ((winningTrades / totalTrades) * 100).toFixed(1);
     
+    // Advanced statistics
+    const totalPnL = trades.reduce((sum: number, trade: any) => {
+      const pnl = trade.exit_price && trade.entry_price && trade.quantity
+        ? (trade.exit_price - trade.entry_price) * trade.quantity
+        : 0;
+      return sum + pnl;
+    }, 0);
+
+    // Analyze strategies
     const strategyPerformance = trades.reduce((acc: any, trade: any) => {
       if (!acc[trade.strategy]) {
-        acc[trade.strategy] = { wins: 0, losses: 0 };
+        acc[trade.strategy] = { wins: 0, losses: 0, totalPnL: 0 };
       }
       acc[trade.strategy][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+      
+      // Calculate PnL for strategy if possible
+      if (trade.exit_price && trade.entry_price && trade.quantity) {
+        const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+        acc[trade.strategy].totalPnL += pnl;
+      }
+      
+      return acc;
+    }, {});
+
+    // Analysis by market conditions
+    const marketConditionPerformance = trades.reduce((acc: any, trade: any) => {
+      if (trade.market_condition) {
+        if (!acc[trade.market_condition]) {
+          acc[trade.market_condition] = { wins: 0, losses: 0 };
+        }
+        acc[trade.market_condition][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+      }
+      return acc;
+    }, {});
+
+    // Analyze emotions
+    const emotionAnalysis = trades.reduce((acc: any, trade: any) => {
+      if (trade.entry_emotion) {
+        if (!acc[trade.entry_emotion]) {
+          acc[trade.entry_emotion] = { wins: 0, losses: 0 };
+        }
+        acc[trade.entry_emotion][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+      }
       return acc;
     }, {});
 
@@ -41,10 +79,21 @@ serve(async (req) => {
 Trading Summary:
 - Total Trades: ${totalTrades}
 - Win Rate: ${winRate}%
+- Total P&L: ${totalPnL.toFixed(2)}
 
 Strategy Performance:
 ${Object.entries(strategyPerformance).map(([strategy, stats]: [string, any]) => 
-  `${strategy}: ${stats.wins} wins, ${stats.losses} losses`
+  `${strategy}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`
+).join('\n')}
+
+Market Conditions:
+${Object.entries(marketConditionPerformance).map(([condition, stats]: [string, any]) => 
+  `${condition}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`
+).join('\n')}
+
+Emotional Analysis:
+${Object.entries(emotionAnalysis).map(([emotion, stats]: [string, any]) => 
+  `${emotion}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`
 ).join('\n')}
 
 Provide specific insights on:
@@ -52,8 +101,9 @@ Provide specific insights on:
 2. Strategy effectiveness
 3. Risk management suggestions
 4. Concrete recommendations for improvement
+5. How emotions are affecting trading decisions
 
-Trades data: ${JSON.stringify(trades.slice(0, 10))}`;
+Trades data (sample): ${JSON.stringify(trades.slice(0, 5))}`;
 
     // Use the custom prompt if provided, otherwise use the default
     let finalPrompt = defaultPrompt;
@@ -62,13 +112,26 @@ Trades data: ${JSON.stringify(trades.slice(0, 10))}`;
       finalPrompt = customPrompt
         .replace('{{totalTrades}}', totalTrades.toString())
         .replace('{{winRate}}', winRate.toString())
+        .replace('{{totalPnL}}', totalPnL.toFixed(2))
         .replace('{{strategyPerformance}}', 
           Object.entries(strategyPerformance)
             .map(([strategy, stats]: [string, any]) => 
-              `${strategy}: ${stats.wins} wins, ${stats.losses} losses`)
+              `${strategy}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`)
             .join('\n')
         )
-        .replace('{{tradesData}}', JSON.stringify(trades.slice(0, 10)));
+        .replace('{{marketConditionPerformance}}',
+          Object.entries(marketConditionPerformance)
+            .map(([condition, stats]: [string, any]) => 
+              `${condition}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`)
+            .join('\n')
+        )
+        .replace('{{emotionAnalysis}}',
+          Object.entries(emotionAnalysis)
+            .map(([emotion, stats]: [string, any]) => 
+              `${emotion}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`)
+            .join('\n')
+        )
+        .replace('{{tradesData}}', JSON.stringify(trades.slice(0, 5)));
     }
 
     console.log('Sending request to OpenAI...');
