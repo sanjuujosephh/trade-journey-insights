@@ -1,66 +1,7 @@
 
-import { supabase } from "@/lib/supabase";
-import { processField } from "../processors/fieldProcessors";
-
-type ImportResult = {
-  results: any[];
-  errors: Array<{ trade: Record<string, any>; error: string }>;
-};
-
-/**
- * Processes a raw CSV row into a trade object
- * @param row The CSV data row
- * @param headers The CSV header row
- * @returns Processed trade object
- */
-export function processCsvRow(row: string[], headers: string[]): Record<string, any> {
-  const trade: Record<string, any> = {};
-  
-  headers.forEach((header, index) => {
-    if (header && row[index] !== undefined) {
-      trade[header] = processField(header, row[index]);
-    }
-  });
-  
-  // Add timestamp if not present
-  if (!trade.timestamp) {
-    trade.timestamp = new Date().toISOString();
-  }
-
-  // Ensure required fields have default values
-  trade.outcome = trade.outcome || 'breakeven';
-  trade.trade_type = trade.trade_type || 'options';
-  trade.symbol = trade.symbol || 'UNKNOWN';
-  
-  return trade;
-}
-
-/**
- * Inserts a processed trade into the database
- * @param trade The processed trade object
- * @returns Result of the insert operation
- */
-export async function insertTrade(trade: Record<string, any>): Promise<{ 
-  success: boolean; 
-  error?: string;
-}> {
-  try {
-    const { data, error } = await supabase
-      .from('trades')
-      .insert([trade]);
-      
-    if (error) {
-      console.error('Error inserting trade:', error, trade);
-      return { success: false, error: error.message };
-    }
-    
-    return { success: true };
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Exception when inserting trade:', err);
-    return { success: false, error: errorMessage };
-  }
-}
+import { processCsvRow } from "../processors/csvRowProcessor";
+import { insertTrade } from "../database/tradeInserter";
+import { ImportResult } from "../types/importTypes";
 
 /**
  * Processes and imports CSV data into the trades database
