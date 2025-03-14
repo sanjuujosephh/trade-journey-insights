@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -43,7 +42,7 @@ export function OptionsFields({
         <div className="space-y-2">
           <Label htmlFor="vix">VIX</Label>
           <Input id="vix" name="vix" type="number" step="0.01" placeholder="0.00" value={formData.vix} onChange={handleChange} />
-          <div className="text-xs text-muted-foreground">Market volatility index at entry</div>
+          <div className="text-xs text-muted-foreground">Market volatility index</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="call_iv">Call IV</Label>
@@ -53,7 +52,7 @@ export function OptionsFields({
         <div className="space-y-2">
           <Label htmlFor="put_iv">Put IV</Label>
           <Input id="put_iv" name="put_iv" type="number" step="0.01" placeholder="0.00" value={formData.put_iv} onChange={handleChange} />
-          <div className="text-xs text-muted-foreground">Implied volatility for put option</div>
+          <div className="text-xs text-muted-foreground">Implied volatility</div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="pcr">PCR</Label>
