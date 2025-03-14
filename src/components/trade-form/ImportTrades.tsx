@@ -7,6 +7,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import Papa from "papaparse";
 import { Trade } from "@/types/trade";
+import { cleanTimeFormat } from "@/utils/datetime";
 
 export function ImportTrades() {
   const { toast } = useToast();
@@ -38,20 +39,21 @@ export function ImportTrades() {
         // Map each cell to its corresponding header
         headers.forEach((header, index) => {
           if (header && row[index] !== undefined) {
-            // Format time values properly
+            // Special handling for time fields to prevent database errors
             if (['entry_time', 'exit_time'].includes(header)) {
-              // Remove AM/PM to avoid Supabase timestamp parsing issues
+              // Store only HH:MM:SS format without AM/PM
               let timeValue = row[index];
               if (timeValue) {
-                // Strip any AM/PM indicators and standardize format
+                // Remove AM/PM indicators completely
                 timeValue = timeValue.replace(/\s?[AP]M$/i, '').trim();
                 
-                // If time doesn't have seconds, add them
+                // Ensure the time has seconds (HH:MM:SS)
                 if (timeValue.split(':').length === 2) {
                   timeValue = `${timeValue}:00`;
                 }
                 
-                trade[header] = timeValue;
+                // Type the empty string as null for the database
+                trade[header] = timeValue || null;
               } else {
                 trade[header] = null;
               }
@@ -91,20 +93,42 @@ export function ImportTrades() {
       
       console.log('Processed trades ready for insertion:', processedTrades);
       
-      // Insert processed trades directly
-      const { data, error } = await supabase
-        .from('trades')
-        .insert(processedTrades);
-
-      if (error) throw error;
+      // Insert trades one by one to better handle errors
+      const results = [];
+      const errors = [];
       
-      return processedTrades;
+      for (const trade of processedTrades) {
+        try {
+          const { data, error } = await supabase
+            .from('trades')
+            .insert([trade]);
+            
+          if (error) {
+            console.error('Error inserting trade:', error, trade);
+            errors.push({ trade, error: error.message });
+          } else {
+            results.push(trade);
+          }
+        } catch (err) {
+          console.error('Exception when inserting trade:', err);
+          errors.push({ trade, error: err instanceof Error ? err.message : 'Unknown error' });
+        }
+      }
+      
+      if (errors.length > 0) {
+        console.warn(`${errors.length} trades failed to import:`, errors);
+        if (results.length === 0) {
+          throw new Error(`All trades failed to import. First error: ${errors[0].error}`);
+        }
+      }
+      
+      return results;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['trades'] });
       toast({
         title: "Success",
-        description: "Trades imported successfully!"
+        description: `${data.length} trades imported successfully!`
       });
       setIsProcessing(false);
     },
@@ -112,7 +136,9 @@ export function ImportTrades() {
       console.error('Import error:', error);
       toast({
         title: "Error",
-        description: "Failed to import trades. Please check your CSV format and try again.",
+        description: error instanceof Error 
+          ? `Failed to import trades: ${error.message}` 
+          : "Failed to import trades. Please check your CSV format and try again.",
         variant: "destructive"
       });
       setIsProcessing(false);
