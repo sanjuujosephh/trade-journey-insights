@@ -10,14 +10,17 @@ import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowRight } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, ArrowRight } from "lucide-react";
+import { format, isValid } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function TradeEntry() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [searchDate, setSearchDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const {
     formData,
     editingId,
@@ -36,11 +39,16 @@ export default function TradeEntry() {
 
   if (isLoading) return <LoadingSpinner />;
 
-  // Filter trades to only show 10 most recent trades
-  // If search date is provided, filter by that date
-  const filteredTrades = searchDate
-    ? trades.filter(trade => trade.entry_date === searchDate)
-    : trades.slice(0, 10);
+  // Filter trades based on selected date or show recent 10
+  const filteredTrades = selectedDate && isValid(selectedDate)
+    ? trades.filter(trade => {
+        // Convert DD-MM-YYYY to Date object for comparison
+        if (!trade.entry_date) return false;
+        const [day, month, year] = trade.entry_date.split('-').map(Number);
+        const tradeDate = new Date(year, month - 1, day);
+        return tradeDate.toDateString() === selectedDate.toDateString();
+      })
+    : trades.slice(0, 10); // Show 10 most recent trades if no date selected
 
   const handleDelete = async (id: string) => {
     try {
@@ -69,12 +77,11 @@ export default function TradeEntry() {
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // The filtering happens automatically via the filteredTrades variable
+  const clearDateFilter = () => {
+    setSelectedDate(undefined);
     toast({
-      title: searchDate ? "Filtered Results" : "Showing Recent Trades",
-      description: searchDate ? `Showing trades for ${searchDate}` : "Showing 10 most recent trades"
+      title: "Filter Cleared",
+      description: "Showing 10 most recent trades"
     });
   };
 
@@ -91,38 +98,50 @@ export default function TradeEntry() {
 
         {trades.length > 0 && (
           <div className="space-y-4">
-            <form onSubmit={handleSearch} className="flex items-center gap-2">
-              <Input
-                type="text"
-                placeholder="Search by date (DD-MM-YYYY)"
-                value={searchDate}
-                onChange={(e) => setSearchDate(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button type="submit" size="sm" variant="secondary">
-                <Search className="h-4 w-4 mr-2" />
-                Search
-              </Button>
-              {searchDate && (
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "dd-MM-yyyy") : "Filter by date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
+              {selectedDate && (
                 <Button 
-                  type="button" 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={() => setSearchDate("")}
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={clearDateFilter}
                 >
                   Clear
                 </Button>
               )}
-            </form>
+            </div>
             
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">
-                {searchDate 
-                  ? `Trades for ${searchDate}` 
+                {selectedDate 
+                  ? `Trades for ${format(selectedDate, "dd-MM-yyyy")}` 
                   : "Recent Trades (Last 10)"}
               </h3>
               
-              {filteredTrades.length === 10 && !searchDate && (
+              {filteredTrades.length === 10 && !selectedDate && (
                 <Button 
                   variant="link" 
                   className="text-sm" 
