@@ -1,4 +1,7 @@
 
+// This Edge Function isn't needed anymore as we're handling trade processing directly in the client
+// We're leaving this file in place for now but not using it
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
 
@@ -17,48 +20,14 @@ serve(async (req) => {
   try {
     const { trades } = await req.json()
 
-    // Process each trade with AI
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a trade analysis assistant. Convert CSV trade data into structured trade entries.
-            Analyze the patterns and extract relevant information like:
-            - Entry and exit prices
-            - Trade direction (long/short)
-            - Market conditions
-            - Strategy used
-            - Risk/reward ratios
-            - Emotional state during trade
-            Return the data in a format matching the trades table schema.`
-          },
-          {
-            role: 'user',
-            content: `Process these trades and return a JSON array of trade objects: ${JSON.stringify(trades)}`
-          }
-        ],
-      }),
-    })
-
-    const aiResponse = await response.json()
-    const processedTrades = JSON.parse(aiResponse.choices[0].message.content)
-
-    // Add timestamps and ensure required fields
-    const finalTrades = processedTrades.map((trade: any) => ({
-      ...trade,
-      timestamp: new Date().toISOString(),
-      entry_time: trade.entry_time || new Date().toISOString(),
-    }))
-
+    // Note: This function is deprecated. 
+    // Trade processing is now handled directly in the client
+    
     return new Response(
-      JSON.stringify({ trades: finalTrades }),
+      JSON.stringify({ 
+        message: "This function is deprecated. Processing is now handled client-side.",
+        trades: [] 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {

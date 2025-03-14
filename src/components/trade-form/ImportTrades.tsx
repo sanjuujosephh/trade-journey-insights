@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -5,6 +6,7 @@ import { Upload, Download } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import Papa from "papaparse";
+import { Trade } from "@/types/trade";
 
 export function ImportTrades() {
   const { toast } = useToast();
@@ -26,19 +28,45 @@ export function ImportTrades() {
 
   const processTrades = useMutation({
     mutationFn: async (csvData: Array<Array<string>>) => {
-      const { data, error } = await supabase.functions.invoke('process-trades', {
-        body: { trades: csvData }
-      });
+      // Extract headers from the first row
+      const headers = csvData[0];
+      
+      // Process the rows (skip header row)
+      const processedTrades = csvData.slice(1).map(row => {
+        const trade: Record<string, any> = {};
+        
+        // Map each cell to its corresponding header
+        headers.forEach((header, index) => {
+          if (header && row[index] !== undefined) {
+            // Convert numeric values
+            if (
+              ['entry_price', 'exit_price', 'quantity', 'stop_loss', 'vix', 
+               'call_iv', 'put_iv', 'confidence_level', 'strike_price'].includes(header)
+            ) {
+              const num = parseFloat(row[index]);
+              trade[header] = isNaN(num) ? null : num;
+            } else {
+              trade[header] = row[index] || null;
+            }
+          }
+        });
+        
+        // Add timestamp if not present
+        if (!trade.timestamp) {
+          trade.timestamp = new Date().toISOString();
+        }
+        
+        return trade;
+      }).filter(trade => trade.symbol && trade.entry_price); // Filter out incomplete rows
+      
+      // Insert processed trades directly
+      const { data, error } = await supabase
+        .from('trades')
+        .insert(processedTrades);
 
       if (error) throw error;
       
-      const { error: insertError } = await supabase
-        .from('trades')
-        .insert(data.trades);
-
-      if (insertError) throw insertError;
-      
-      return data.trades;
+      return processedTrades;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trades'] });
@@ -52,7 +80,7 @@ export function ImportTrades() {
       console.error('Import error:', error);
       toast({
         title: "Error",
-        description: "Failed to import trades. Please check your CSV format.",
+        description: "Failed to import trades. Please check your CSV format and try again.",
         variant: "destructive"
       });
       setIsProcessing(false);
@@ -64,13 +92,25 @@ export function ImportTrades() {
     if (!file) return;
 
     setIsProcessing(true);
-
+    
     Papa.parse(file, {
       complete: (results) => {
-        const parsedData = results.data as Array<Array<string>>;
-        processTrades.mutate(parsedData);
+        console.log('Parsed CSV data:', results.data);
+        
+        if (!results.data.length || results.data.length < 2) {
+          toast({
+            title: "Error",
+            description: "CSV file appears to be empty or missing headers.",
+            variant: "destructive"
+          });
+          setIsProcessing(false);
+          return;
+        }
+        
+        processTrades.mutate(results.data as Array<Array<string>>);
       },
-      error: () => {
+      error: (error) => {
+        console.error('CSV parsing error:', error);
         toast({
           title: "Error",
           description: "Failed to parse CSV file. Please check the format.",
