@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Info } from "lucide-react";
+import { Info, Wand2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CustomPromptDialogProps {
   dayCount: number;
@@ -50,13 +51,23 @@ Provide specific insights on:
 4. Concrete recommendations for improvement
 5. How emotions are affecting trading decisions`;
 
+  const buttonLabel = dayCount === 1 ? "Today's" : dayCount === 7 ? "Week's" : "Month's";
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          Customize & Analyze {dayCount === 1 ? "Today's" : dayCount === 7 ? "Week's" : "Month's"} Trades
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
+              <Wand2 className="h-4 w-4" />
+              <span className="sr-only">Customize {buttonLabel} Analysis</span>
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <p>Customize {buttonLabel} Analysis</p>
+        </TooltipContent>
+      </Tooltip>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
