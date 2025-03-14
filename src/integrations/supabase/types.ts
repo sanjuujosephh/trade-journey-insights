@@ -216,6 +216,7 @@ export type Database = {
           option_type: string | null
           outcome: string
           overall_emotional_state: string | null
+          pcr: number | null
           put_iv: number | null
           quantity: number | null
           stop_loss: number | null
@@ -253,6 +254,7 @@ export type Database = {
           option_type?: string | null
           outcome: string
           overall_emotional_state?: string | null
+          pcr?: number | null
           put_iv?: number | null
           quantity?: number | null
           stop_loss?: number | null
@@ -290,6 +292,7 @@ export type Database = {
           option_type?: string | null
           outcome?: string
           overall_emotional_state?: string | null
+          pcr?: number | null
           put_iv?: number | null
           quantity?: number | null
           stop_loss?: number | null

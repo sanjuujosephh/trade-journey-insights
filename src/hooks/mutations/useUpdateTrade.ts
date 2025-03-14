@@ -35,6 +35,7 @@ export function useUpdateTrade(userId: string | null) {
         vix: tradeData.vix?.toString() || '',
         call_iv: tradeData.call_iv?.toString() || '',
         put_iv: tradeData.put_iv?.toString() || '',
+        pcr: tradeData.pcr?.toString() || '', // Added PCR field
         vwap_position: (tradeData.vwap_position || '') as "" | "above_vwap" | "below_vwap",
         ema_position: (tradeData.ema_position || '') as "" | "above_20ema" | "below_20ema",
         strike_price: tradeData.strike_price?.toString() || '',

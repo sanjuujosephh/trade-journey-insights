@@ -23,6 +23,7 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     vix: sanitizeNumber(formData.vix),
     call_iv: sanitizeNumber(formData.call_iv),
     put_iv: sanitizeNumber(formData.put_iv),
+    pcr: sanitizeNumber(formData.pcr), // Added PCR field
     strike_price: sanitizeNumber(formData.strike_price),
     option_type: formData.option_type || null,
     vwap_position: formData.vwap_position || null,

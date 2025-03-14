@@ -62,7 +62,7 @@ export function processField(header: string, value: string): any {
   
   // Handle numeric fields
   if (['entry_price', 'exit_price', 'quantity', 'stop_loss', 'vix', 
-      'call_iv', 'put_iv', 'confidence_level', 'strike_price',
+      'call_iv', 'put_iv', 'pcr', 'confidence_level', 'strike_price',
       'emotional_score', 'confidence_level_score'].includes(header)) {
     return processNumericField(value);
   }

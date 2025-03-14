@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -38,7 +39,7 @@ export function OptionsFields({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label htmlFor="vix">VIX</Label>
           <Input id="vix" name="vix" type="number" step="0.01" placeholder="0.00" value={formData.vix} onChange={handleChange} />
@@ -53,6 +54,11 @@ export function OptionsFields({
           <Label htmlFor="put_iv">Put IV</Label>
           <Input id="put_iv" name="put_iv" type="number" step="0.01" placeholder="0.00" value={formData.put_iv} onChange={handleChange} />
           <div className="text-xs text-muted-foreground">Implied volatility for put option</div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="pcr">PCR</Label>
+          <Input id="pcr" name="pcr" type="number" step="0.01" placeholder="0.00" value={formData.pcr} onChange={handleChange} />
+          <div className="text-xs text-muted-foreground">Put/Call Ratio</div>
         </div>
       </div>
     </>;

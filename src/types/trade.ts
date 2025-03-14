@@ -21,6 +21,7 @@ export interface Trade {
   vix?: number | null;
   call_iv?: number | null;
   put_iv?: number | null;
+  pcr?: number | null; // Added PCR field
   
   // Option Price Position fields
   vwap_position?: 'above_vwap' | 'below_vwap' | null;
@@ -78,6 +79,7 @@ export interface FormData {
   vix: string;
   call_iv: string;
   put_iv: string;
+  pcr: string; // Added PCR field
   
   // Option Price Position fields
   vwap_position: 'above_vwap' | 'below_vwap' | '';
