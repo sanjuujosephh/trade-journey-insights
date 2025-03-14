@@ -21,7 +21,7 @@ const emptyFormData: FormData = {
   vix: "",
   call_iv: "",
   put_iv: "",
-  pcr: "", // Added PCR field
+  pcr: "",
   strike_price: "",
   option_type: "",
   vwap_position: "",

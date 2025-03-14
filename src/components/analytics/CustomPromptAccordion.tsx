@@ -12,17 +12,25 @@ import {
 } from "@/components/ui/accordion";
 
 interface CustomPromptAccordionProps {
-  customPrompt: string;
-  setCustomPrompt: (prompt: string) => void;
-  isEditingPrompt: boolean;
-  setIsEditingPrompt: (isEditing: boolean) => void;
+  customPrompt?: string;
+  setCustomPrompt?: (prompt: string) => void;
+  isEditingPrompt?: boolean;
+  setIsEditingPrompt?: (isEditing: boolean) => void;
+  savedPrompts?: string[];
+  onSavePrompt?: (prompt: string) => void;
+  onRemovePrompt?: (index: number) => void;
+  onUsePrompt?: (prompt: string) => void;
 }
 
 export function CustomPromptAccordion({
-  customPrompt,
-  setCustomPrompt,
-  isEditingPrompt,
-  setIsEditingPrompt
+  customPrompt = "",
+  setCustomPrompt = () => {},
+  isEditingPrompt = false,
+  setIsEditingPrompt = () => {},
+  savedPrompts = [],
+  onSavePrompt = () => {},
+  onRemovePrompt = () => {},
+  onUsePrompt = () => {}
 }: CustomPromptAccordionProps) {
   const resetCustomPrompt = () => {
     setIsEditingPrompt(false);
@@ -100,6 +108,35 @@ Trades data: {{tradesData}}`);
                   {customPrompt}
                 </pre>
               </Card>
+            )}
+            
+            {savedPrompts && savedPrompts.length > 0 && (
+              <div className="mt-4">
+                <h4 className="text-sm font-medium mb-2">Saved Prompts</h4>
+                <div className="space-y-2">
+                  {savedPrompts.map((prompt, index) => (
+                    <div key={index} className="flex items-center justify-between bg-background p-2 rounded border">
+                      <p className="text-xs truncate max-w-[240px]">{prompt.substring(0, 50)}...</p>
+                      <div className="flex space-x-2">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => onUsePrompt(prompt)}
+                        >
+                          Use
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => onRemovePrompt(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </AccordionContent>

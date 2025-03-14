@@ -36,13 +36,12 @@ export function useTradeManagement() {
   });
 
   // UI actions
-  const { handleEdit, handleViewDetails, closeDialog } = useTradeActions({
-    setFormData,
-    setEditingId,
-    setSelectedTrade,
-    setIsDialogOpen,
-    resetForm
-  });
+  const { handleEdit, handleView } = useTradeActions();
+
+  // Close dialog handler
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
 
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,7 +72,7 @@ export function useTradeManagement() {
     handleSelectChange,
     handleSubmit,
     handleEdit,
-    handleViewDetails,
+    handleView,
     closeDialog
   };
 }

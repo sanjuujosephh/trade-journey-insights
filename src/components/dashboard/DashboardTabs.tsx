@@ -104,12 +104,7 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="ai-analysis" className="mt-0 h-full shadow-none">
-            <AIAnalysisTab 
-              trades={trades}
-              isAnalyzing={isAnalyzing}
-              currentAnalysis={currentAnalysis}
-              analyzeTradesWithAI={analyzeTradesWithAI}
-            />
+            <AIAnalysisTab />
           </TabsContent>
 
           <TabsContent value="history" className="mt-0 h-full shadow-none">

@@ -35,24 +35,24 @@ export function useUpdateTrade(userId: string | null) {
         vix: tradeData.vix?.toString() || '',
         call_iv: tradeData.call_iv?.toString() || '',
         put_iv: tradeData.put_iv?.toString() || '',
-        pcr: tradeData.pcr?.toString() || '', // Added PCR field
-        vwap_position: (tradeData.vwap_position || '') as "" | "above_vwap" | "below_vwap",
-        ema_position: (tradeData.ema_position || '') as "" | "above_20ema" | "below_20ema",
+        pcr: tradeData.pcr?.toString() || '',
+        vwap_position: (tradeData.vwap_position || '') as "" | "above" | "below" | "at",
+        ema_position: (tradeData.ema_position || '') as "" | "above" | "below" | "at",
         strike_price: tradeData.strike_price?.toString() || '',
         option_type: (tradeData.option_type || '') as "" | "call" | "put",
-        market_condition: (tradeData.market_condition || '') as "" | "trending" | "ranging" | "news_driven" | "volatile",
-        timeframe: (tradeData.timeframe || '') as "" | "1min" | "5min" | "15min" | "1hr",
+        market_condition: (tradeData.market_condition || '') as string,
+        timeframe: (tradeData.timeframe || '') as string,
         trade_direction: (tradeData.trade_direction || '') as "" | "long" | "short",
         planned_risk_reward: tradeData.planned_risk_reward?.toString() || '',
         actual_risk_reward: tradeData.actual_risk_reward?.toString() || '',
         planned_target: tradeData.planned_target?.toString() || '',
-        exit_reason: (tradeData.exit_reason || '') as "" | "stop_loss" | "target" | "manual" | "time_based",
+        exit_reason: (tradeData.exit_reason || '') as string,
         slippage: tradeData.slippage?.toString() || '',
         post_exit_price: tradeData.post_exit_price?.toString() || '',
         exit_efficiency: tradeData.exit_efficiency?.toString() || '',
         confidence_level: tradeData.confidence_level?.toString() || '',
-        entry_emotion: (tradeData.entry_emotion || '') as "" | "fear" | "greed" | "fomo" | "revenge" | "neutral",
-        exit_emotion: (tradeData.exit_emotion || '') as "" | "satisfied" | "regretful" | "relieved" | "frustrated",
+        entry_emotion: (tradeData.entry_emotion || '') as string,
+        exit_emotion: (tradeData.exit_emotion || '') as string,
       };
 
       const transformedData = transformTradeData(formDataForTransform);
@@ -61,7 +61,6 @@ export function useUpdateTrade(userId: string | null) {
         ...transformedData,
         entry_date: tradeData.entry_date,
         entry_time: tradeData.entry_time,
-        exit_date: tradeData.exit_date,
         exit_time: tradeData.exit_time
       };
 

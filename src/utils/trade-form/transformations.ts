@@ -23,19 +23,28 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     vix: sanitizeNumber(formData.vix),
     call_iv: sanitizeNumber(formData.call_iv),
     put_iv: sanitizeNumber(formData.put_iv),
-    pcr: sanitizeNumber(formData.pcr), // Added PCR field
+    pcr: sanitizeNumber(formData.pcr),
     strike_price: sanitizeNumber(formData.strike_price),
     option_type: formData.option_type || null,
     vwap_position: formData.vwap_position || null,
     ema_position: formData.ema_position || null,
-    market_condition: formData.market_condition || null,
+    market_condition: (formData.market_condition || null) as 'trending' | 'ranging' | 'volatile' | 'news_driven' | null,
     timeframe: formData.timeframe || null,
     trade_direction: formData.trade_direction || null,
-    exit_reason: formData.exit_reason || null,
+    exit_reason: (formData.exit_reason || null) as 'stop_loss' | 'target' | 'manual' | 'time_based' | null,
     confidence_level: sanitizeNumber(formData.confidence_level),
     entry_emotion: formData.entry_emotion || null,
     exit_emotion: formData.exit_emotion || null,
     symbol: formData.symbol,
-    entry_date: formData.entry_date || null
+    entry_date: formData.entry_date || null,
+    exit_date: formData.exit_date || null,
+    ai_feedback: null,
+    planned_risk_reward: sanitizeNumber(formData.planned_risk_reward),
+    actual_risk_reward: sanitizeNumber(formData.actual_risk_reward),
+    planned_target: sanitizeNumber(formData.planned_target),
+    slippage: sanitizeNumber(formData.slippage),
+    post_exit_price: sanitizeNumber(formData.post_exit_price),
+    exit_efficiency: sanitizeNumber(formData.exit_efficiency),
+    user_id: ""  // This will be set in the mutation
   };
 };

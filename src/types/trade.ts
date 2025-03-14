@@ -17,7 +17,7 @@ export interface Trade {
   vix: number | null;
   call_iv: number | null;
   put_iv: number | null;
-  pcr: number | null; // Added PCR field
+  pcr: number | null;
   strike_price: number | null;
   option_type: 'call' | 'put' | null;
   vwap_position: 'above' | 'below' | 'at' | null;
@@ -31,6 +31,14 @@ export interface Trade {
   exit_emotion: string | null;
   symbol: string;
   entry_date: string | null;
+  exit_date: string | null;
+  ai_feedback: string | null;
+  planned_risk_reward: number | null;
+  actual_risk_reward: number | null;
+  planned_target: number | null;
+  slippage: number | null;
+  post_exit_price: number | null;
+  exit_efficiency: number | null;
 }
 
 export interface FormData {
@@ -42,7 +50,7 @@ export interface FormData {
   vix: string;
   call_iv: string;
   put_iv: string;
-  pcr: string; // Added PCR field
+  pcr: string;
   planned_risk_reward: string;
   actual_risk_reward: string;
   strategy: string;
@@ -65,4 +73,8 @@ export interface FormData {
   entry_emotion: string;
   exit_emotion: string;
   symbol: string;
+  planned_target: string;
+  slippage: string;
+  post_exit_price: string;
+  exit_efficiency: string;
 }

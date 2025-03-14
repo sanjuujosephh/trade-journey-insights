@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { InfoCircle } from "lucide-react";
+import { Info } from "lucide-react";
 
 interface CustomPromptDialogProps {
   dayCount: number;
@@ -67,7 +67,7 @@ Provide specific insights on:
         <div className="space-y-4 my-4">
           <div className="bg-muted rounded-md p-3 text-sm">
             <p className="flex items-center mb-2">
-              <InfoCircle className="h-4 w-4 mr-2" />
+              <Info className="h-4 w-4 mr-2" />
               <span className="font-medium">Available Variables:</span>
             </p>
             <div className="grid grid-cols-2 gap-2">

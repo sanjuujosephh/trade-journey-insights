@@ -25,8 +25,14 @@ export function processField(fieldName: string, value: string): any {
     case 'vix':
     case 'call_iv':
     case 'put_iv':
-    case 'pcr': // Added PCR field
+    case 'pcr':
     case 'confidence_level':
+    case 'planned_risk_reward':
+    case 'actual_risk_reward':
+    case 'planned_target':
+    case 'slippage':
+    case 'post_exit_price':
+    case 'exit_efficiency':
       return parseFloat(value);
       
     case 'outcome':
@@ -41,7 +47,18 @@ export function processField(fieldName: string, value: string): any {
     case 'trade_direction':
       return ['long', 'short'].includes(value) ? value : null;
       
+    case 'vwap_position':
+    case 'ema_position':
+      return ['above', 'below', 'at'].includes(value) ? value : null;
+      
+    case 'market_condition':
+      return ['trending', 'ranging', 'volatile', 'news_driven'].includes(value) ? value : null;
+      
+    case 'exit_reason':
+      return ['stop_loss', 'target', 'manual', 'time_based'].includes(value) ? value : null;
+      
     case 'entry_date':
+    case 'exit_date':
     case 'entry_time':
     case 'exit_time':
       return value;
