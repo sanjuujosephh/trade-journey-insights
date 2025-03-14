@@ -114,6 +114,12 @@ export async function processAndImportTrades(csvData: Array<Array<string>>): Pro
           const value = row[index]?.toLowerCase();
           trade[header] = validOutcomes.includes(value) ? value : 'breakeven';
         }
+        else if (header === 'trade_type') {
+          // Handle trade_type field - this is required
+          const validTypes = ['options', 'stocks', 'futures', 'forex', 'crypto'];
+          const value = row[index]?.toLowerCase();
+          trade[header] = validTypes.includes(value) ? value : 'options'; // Default to options
+        }
         else {
           trade[header] = row[index] || null;
         }
@@ -128,9 +134,10 @@ export async function processAndImportTrades(csvData: Array<Array<string>>): Pro
     // Ensure required fields have default values
     trade.outcome = trade.outcome || 'breakeven';
     trade.trade_type = trade.trade_type || 'options';
+    trade.symbol = trade.symbol || 'UNKNOWN';
     
     return trade;
-  }).filter(trade => trade.symbol && trade.entry_price); // Filter out incomplete rows
+  }).filter(trade => trade.entry_price); // Only require entry_price to be valid
   
   console.log('Processed trades ready for insertion:', processedTrades);
   
