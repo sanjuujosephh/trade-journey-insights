@@ -80,8 +80,7 @@ export function AIAnalysisTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between">
-        <h2 className="text-2xl font-semibold mb-2">AI Trade Analysis</h2>
+      <div className="w-full">
         <CreditsDisplay 
           credits={credits} 
           isLoading={isLoadingCredits} 

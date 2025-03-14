@@ -33,7 +33,7 @@ export function CreditsDisplay({ credits, isLoading, onPurchaseClick }: CreditsD
     : 'No reset scheduled';
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-background p-4 rounded-lg border">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-background p-4 rounded-lg border w-full">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-medium">Your Analysis Credits</h3>

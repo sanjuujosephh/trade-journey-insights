@@ -58,7 +58,7 @@ Provide specific insights on:
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
+            <Button variant="outline" size="icon" className="h-8 w-8 ml-1 bg-white border border-input">
               <Wand2 className="h-4 w-4" />
               <span className="sr-only">Customize {buttonLabel} Analysis</span>
             </Button>
