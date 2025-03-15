@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { UserCredits, CreditTransaction } from './types';
 
 export function useCreditQueries(userId: string | null) {
-  // Fetch user credits with no caching to ensure fresh data
+  // Fetch user credits
   const { 
     data: credits, 
     isLoading, 
@@ -24,7 +24,7 @@ export function useCreditQueries(userId: string | null) {
         
       if (error) {
         console.error('Error fetching user credits:', error);
-        throw error;
+        throw error; // Throw error instead of silently returning null
       }
       
       console.log('User credits data:', data);
@@ -32,8 +32,7 @@ export function useCreditQueries(userId: string | null) {
     },
     enabled: !!userId,
     refetchOnWindowFocus: true,
-    staleTime: 0, // Consider data always stale to force refetch
-    cacheTime: 1000 // Only cache for 1 second
+    staleTime: 1000 // Consider data stale after 1 second for more frequent updates
   });
   
   // Fetch credit transactions
@@ -50,14 +49,13 @@ export function useCreditQueries(userId: string | null) {
         
       if (error) {
         console.error('Error fetching credit transactions:', error);
-        throw error;
+        throw error; // Throw error instead of silently returning empty array
       }
       
       return data as CreditTransaction[];
     },
     enabled: !!userId,
-    staleTime: 0, // Always consider stale to force refetch
-    cacheTime: 1000 // Short cache time
+    staleTime: 1000 // Reduced stale time for more frequent updates
   });
 
   return {
