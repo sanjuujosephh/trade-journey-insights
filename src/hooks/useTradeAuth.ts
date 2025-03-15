@@ -1,6 +1,6 @@
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export function useTradeAuth() {
   const [userId, setUserId] = useState<string | null>(null);

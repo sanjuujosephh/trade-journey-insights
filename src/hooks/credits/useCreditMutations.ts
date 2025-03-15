@@ -53,15 +53,6 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
         newPurchasedCredits += amount;
       }
       
-      console.log('Updating credits:', {
-        userId,
-        oldValues: { 
-          subscriptionCredits: latestCredits.subscription_credits, 
-          purchasedCredits: latestCredits.purchased_credits 
-        },
-        newValues: { newSubscriptionCredits, newPurchasedCredits, newTotalCreditsUsed }
-      });
-      
       // Insert transaction
       const { error: transactionError } = await supabase
         .from('credit_transactions')
@@ -93,11 +84,11 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
         return { success: false, message: 'Failed to update credits' };
       }
       
-      // Force invalidation of queries
+      // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['user-credits'] });
       queryClient.invalidateQueries({ queryKey: ['credit-transactions'] });
       
-      // Manual refetch to ensure updated data
+      // Manual refetch
       setTimeout(() => refetch(), 300);
       
       return { success: true, message: 'Credits updated successfully' };
@@ -171,11 +162,11 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
         return { success: false, message: 'Failed to record purchase transaction' };
       }
       
-      // Force invalidation of queries
+      // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['user-credits'] });
       queryClient.invalidateQueries({ queryKey: ['credit-transactions'] });
       
-      // Force refetch to ensure we have updated data
+      // Force refetch
       setTimeout(() => refetch(), 300);
       
       toast.success(`Successfully purchased ${amount} credits!`);

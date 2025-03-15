@@ -1,75 +1,49 @@
 
-// Call OpenAI API to get the analysis
-export async function getAnalysisFromOpenAI(prompt) {
+export async function getAnalysisFromOpenAI(prompt: string): Promise<string> {
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   
   if (!openAIApiKey) {
-    console.error('OpenAI API key not configured');
-    throw new Error('OpenAI API key not configured');
+    throw new Error('OpenAI API key is not configured');
   }
   
-  console.log('Sending request to OpenAI...');
   try {
+    console.log('Sending request to OpenAI...');
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openAIApiKey}`
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { 
-            role: 'system', 
-            content: 'You are a professional trading analyst. Provide clear, actionable insights in a concise format.'
+          {
+            role: 'system',
+            content: 'You are an expert trading analyst who can provide detailed, insightful analysis of trading data. Focus on providing actionable insights, identifying patterns, and making recommendations to improve trading performance.'
           },
-          { 
-            role: 'user', 
-            content: prompt 
+          {
+            role: 'user',
+            content: prompt
           }
         ],
         temperature: 0.7,
-        max_tokens: 1500
-      }),
+        max_tokens: 2000
+      })
     });
-
+    
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`OpenAI API error (${response.status}):`, errorText);
-      
-      // Try to parse the error response for more details
-      let errorDetails = "Unknown API error";
-      try {
-        const errorJson = JSON.parse(errorText);
-        errorDetails = errorJson.error?.message || errorJson.error?.type || errorText.substring(0, 200);
-      } catch (e) {
-        errorDetails = errorText.substring(0, 200);
-      }
-      
-      throw new Error(`OpenAI API error: ${response.status} - ${errorDetails}`);
-    }
-
-    const responseText = await response.text();
-    
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      console.error('Failed to parse OpenAI response:', e);
-      console.error('Response text:', responseText.substring(0, 500));
-      throw new Error('Invalid JSON response from OpenAI');
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
     }
     
-    console.log('Received response from OpenAI');
+    const data = await response.json();
+    const analysisText = data.choices[0].message.content;
     
-    if (!data.choices?.[0]?.message?.content) {
-      console.error('Unexpected OpenAI response format:', JSON.stringify(data).substring(0, 200));
-      throw new Error('Invalid response format from OpenAI');
-    }
-
-    return data.choices[0].message.content;
+    return analysisText;
   } catch (error) {
-    console.error('OpenAI API request failed:', error);
-    throw error; // Re-throw to be handled by the calling function
+    console.error('Error calling OpenAI:', error);
+    throw new Error(`Failed to get analysis from OpenAI: ${error.message}`);
   }
 }

@@ -5,7 +5,7 @@ import { useCreditMutations } from './credits/useCreditMutations';
 import { useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-// Re-export the types using 'export type' syntax for isolatedModules compatibility
+// Re-export the types
 export type { UserCredits, CreditTransaction } from './credits/types';
 
 export function useUserCredits() {
@@ -21,7 +21,7 @@ export function useUserCredits() {
     refetch 
   } = useCreditQueries(userId);
   
-  // Enhanced refetch function with logging and error handling
+  // Enhanced refetch function with logging
   const enhancedRefetch = useCallback(async () => {
     console.log('Explicit credit refetch for user:', userId);
     try {
@@ -33,14 +33,6 @@ export function useUserCredits() {
       throw error;
     }
   }, [userId, refetch]);
-  
-  // Log user ID and credits for debugging
-  useEffect(() => {
-    if (userId) {
-      console.log('Current user ID in useUserCredits:', userId);
-      console.log('Current credits:', credits);
-    }
-  }, [userId, credits]);
   
   // Force an initial fetch when the hook mounts
   useEffect(() => {

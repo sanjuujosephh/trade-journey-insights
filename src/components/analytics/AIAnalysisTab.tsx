@@ -1,16 +1,16 @@
 
 import { useState, useEffect } from 'react';
+import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
 import { AnalysisButtons } from './AnalysisButtons';
 import { AnalysisResult } from './AnalysisResult';
 import { CreditsDisplay } from './CreditsDisplay';
 import { PurchaseCreditsDialog } from './PurchaseCreditsDialog';
-import { useUserCredits } from '@/hooks/useUserCredits';
+import { CreditTransactionsPanel } from './CreditTransactionsPanel';
 import { useTradeQueries } from '@/hooks/useTradeQueries';
 import { useTradeAuth } from '@/hooks/useTradeAuth';
+import { useUserCredits } from '@/hooks/useUserCredits';
 import { useTradeAnalysis } from '@/hooks/useTradeAnalysis';
-import { toast } from 'sonner';
-import { Separator } from '../ui/separator';
-import { CreditTransactionsPanel } from './CreditTransactionsPanel';
 
 export function AIAnalysisTab() {
   const { userId } = useTradeAuth();
@@ -21,25 +21,21 @@ export function AIAnalysisTab() {
     isLoading: isLoadingCredits,
     refetch
   } = useUserCredits();
+  
   const {
     isAnalyzing,
     currentAnalysis,
     analyzeTradesForPeriod
   } = useTradeAnalysis();
+  
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
   
-  // Force refetch credits when component mounts and when userId changes
+  // Force refetch credits when component mounts
   useEffect(() => {
-    console.log('AIAnalysisTab mounted or userId changed, fetching credits');
     if (userId) {
       refetch();
     }
   }, [refetch, userId]);
-
-  // Log credit information for debugging
-  useEffect(() => {
-    console.log('Current credits in AIAnalysisTab:', credits);
-  }, [credits]);
 
   const handleAnalyze = async (days: number, customPrompt?: string) => {
     try {
@@ -55,22 +51,15 @@ export function AIAnalysisTab() {
         return;
       }
       
-      console.log('Starting analysis with credit cost:', creditCost);
-      
-      // The credit deduction is now handled by the edge function
-      // We just need to pass the userId to the analyzeTradesForPeriod function
+      // The credit deduction is handled by the edge function
       const analysisSuccess = await analyzeTradesForPeriod(trades, days, customPrompt, userId);
       
       // Refetch credits to update UI after analysis
       await refetch();
       
       if (!analysisSuccess) {
-        console.log('Analysis failed');
-        
-        // Credits are not deducted if analysis fails, due to edge function handling
         toast.error('Analysis failed. Please try again later.');
       } else {
-        // Analysis was successful, credits already deducted by edge function
         toast.success(`Analysis complete! Used ${creditCost} credits.`);
       }
       
@@ -80,7 +69,6 @@ export function AIAnalysisTab() {
     } catch (error) {
       console.error('Analysis failed:', error);
       toast.error('Failed to analyze trades. Please try again later.');
-      // Ensure credits are refetched in case of error
       await refetch();
     }
   };
@@ -89,9 +77,8 @@ export function AIAnalysisTab() {
     setIsPurchaseDialogOpen(true);
   };
   
-  // Refresh credits manually
+  // Manual refresh credits function
   const forceRefreshCredits = async () => {
-    console.log('Manual credit refresh requested');
     try {
       await refetch();
       toast.success('Credit information refreshed');
@@ -101,7 +88,8 @@ export function AIAnalysisTab() {
     }
   };
   
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div className="w-full">
         <CreditsDisplay 
           credits={credits} 
@@ -135,5 +123,6 @@ export function AIAnalysisTab() {
           }
         }} 
       />
-    </div>;
+    </div>
+  );
 }

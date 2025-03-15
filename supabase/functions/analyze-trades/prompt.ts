@@ -1,109 +1,108 @@
 
-// Create the default prompt or customize an existing one
-export function createAnalysisPrompt(stats, trades, customPrompt) {
-  // Create default prompt
-  const defaultPrompt = createDefaultPrompt(stats, trades);
-  
-  // Use the custom prompt if provided, otherwise use the default
-  if (!customPrompt) {
-    return defaultPrompt;
-  }
-  
-  // Replace variables in the custom prompt with actual values
-  return customizePrompt(customPrompt, stats, trades);
-}
+export function createAnalysisPrompt(statistics: any, trades: any[], customPrompt?: string): string {
+  // Base prompt template with key variables that will be populated
+  const basePrompt = `
+Analyze the following trading data and provide detailed insights:
 
-// Create the default analysis prompt
-function createDefaultPrompt(stats, trades) {
-  return `As a trading analyst, analyze these trading patterns:
+## Trading Statistics
+- Total Trades: {{totalTrades}}
+- Win Rate: {{winRate}}%
+- Total P&L: {{totalPnL}}
+- Average Trade P&L: {{avgTradePnL}}
+- Profit Factor: {{profitFactor}}
 
-Trading Summary:
-- Total Trades: ${stats.totalTrades}
-- Win Rate: ${stats.winRate}%
-- Total P&L: ${stats.totalPnL.toFixed(2)}
-- Average Trade P&L: ${stats.avgTradePnL.toFixed(2)}
-- Profit Factor: ${stats.profitFactor}
+## Strategy Performance
+{{strategyPerformance}}
 
-Strategy Performance:
-${Object.entries(stats.strategyPerformance).map(([strategy, stats]) => 
-  `${strategy}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`
-).join('\n')}
+## Market Condition Performance
+{{marketConditionPerformance}}
 
-Market Conditions:
-${Object.entries(stats.marketConditionPerformance).map(([condition, stats]) => 
-  `${condition}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`
-).join('\n')}
+## Emotional Analysis
+{{emotionAnalysis}}
 
-Emotional Analysis:
-${Object.entries(stats.emotionAnalysis).map(([emotion, stats]) => 
-  `${emotion}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`
-).join('\n')}
+## Time Analysis
+{{timeAnalysis}}
 
-Time Analysis:
-${Object.entries(stats.timeAnalysis).map(([timeSlot, stats]) => 
-  `${timeSlot}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`
-).join('\n')}
+## Position Sizing
+{{positionSizing}}
 
-Position Sizing:
-${Object.entries(stats.positionSizing).map(([size, stats]) => 
-  `${size}: ${stats.count} trades, Win Rate: ${stats.count > 0 ? ((stats.wins / stats.count) * 100).toFixed(1) : 0}%, P&L: ${stats.totalPnL.toFixed(2)}`
-).join('\n')}
+## Risk Metrics
+{{riskMetrics}}
 
-Risk Management:
-Stop loss usage: ${stats.riskMetrics.stopLossUsage.toFixed(1)}%
-Take profit usage: ${stats.riskMetrics.targetUsage.toFixed(1)}%
-Manual overrides: ${stats.riskMetrics.manualOverrides.toFixed(1)}%
+${customPrompt ? `\n## Custom Analysis Request\n${customPrompt}` : ''}
 
-Provide specific insights on:
-1. Pattern analysis of winning vs losing trades
-2. Strategy effectiveness
-3. Risk management suggestions
-4. Concrete recommendations for improvement
-5. How emotions are affecting trading decisions
+Please provide a thorough analysis including:
+1. Overall performance assessment
+2. Strengths and weaknesses identified
+3. Patterns in winning vs losing trades
+4. Emotional influences on trading decisions
+5. Specific recommendations for improvement
+6. Optimal trading conditions based on the data
 
-Trades data (sample): ${JSON.stringify(trades.slice(0, 5))}`;
-}
+Format your response with clear sections and actionable insights.
+`;
 
-// Customize a prompt by replacing variables with actual values
-function customizePrompt(customPrompt, stats, trades) {
-  return customPrompt
-    .replace('{{totalTrades}}', stats.totalTrades.toString())
-    .replace('{{winRate}}', stats.winRate.toString())
-    .replace('{{totalPnL}}', stats.totalPnL.toFixed(2))
-    .replace('{{avgTradePnL}}', stats.avgTradePnL.toFixed(2))
-    .replace('{{profitFactor}}', stats.profitFactor.toString())
-    .replace('{{strategyPerformance}}', 
-      Object.entries(stats.strategyPerformance)
-        .map(([strategy, stats]) => 
-          `${strategy}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`)
-        .join('\n')
-    )
-    .replace('{{marketConditionPerformance}}',
-      Object.entries(stats.marketConditionPerformance)
-        .map(([condition, stats]) => 
-          `${condition}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`)
-        .join('\n')
-    )
-    .replace('{{emotionAnalysis}}',
-      Object.entries(stats.emotionAnalysis)
-        .map(([emotion, stats]) => 
-          `${emotion}: ${stats.wins} wins, ${stats.losses} losses, Win Rate: ${stats.wins + stats.losses > 0 ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1) : 0}%`)
-        .join('\n')
-    )
-    .replace('{{timeAnalysis}}',
-      Object.entries(stats.timeAnalysis)
-        .map(([timeSlot, stats]) => 
-          `${timeSlot}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`)
-        .join('\n')
-    )
-    .replace('{{positionSizing}}',
-      Object.entries(stats.positionSizing)
-        .map(([size, stats]) => 
-          `${size}: ${stats.count} trades, Win Rate: ${stats.count > 0 ? ((stats.wins / stats.count) * 100).toFixed(1) : 0}%, P&L: ${stats.totalPnL.toFixed(2)}`)
-        .join('\n')
-    )
-    .replace('{{riskMetrics}}',
-      `Stop loss usage: ${stats.riskMetrics.stopLossUsage.toFixed(1)}%\nTake profit usage: ${stats.riskMetrics.targetUsage.toFixed(1)}%\nManual overrides: ${stats.riskMetrics.manualOverrides.toFixed(1)}%`
-    )
-    .replace('{{tradesData}}', JSON.stringify(trades.slice(0, 5)));
+  // Replace placeholders with actual values from the statistics
+  let finalPrompt = basePrompt
+    .replace('{{totalTrades}}', statistics.totalTrades)
+    .replace('{{winRate}}', statistics.winRate)
+    .replace('{{totalPnL}}', statistics.totalPnL.toFixed(2))
+    .replace('{{avgTradePnL}}', statistics.avgTradePnL.toFixed(2))
+    .replace('{{profitFactor}}', statistics.profitFactor);
+
+  // Format strategy performance section
+  const strategyPerformance = Object.entries(statistics.strategyPerformance)
+    .map(([strategy, stats]) => {
+      const typedStats = stats as { wins: number; losses: number; totalPnL: number };
+      return `- ${strategy}: ${typedStats.wins} wins, ${typedStats.losses} losses, P&L: ${typedStats.totalPnL.toFixed(2)}`;
+    })
+    .join('\n');
+  finalPrompt = finalPrompt.replace('{{strategyPerformance}}', strategyPerformance);
+
+  // Format market condition performance section
+  const marketConditionPerformance = Object.entries(statistics.marketConditionPerformance)
+    .map(([condition, stats]) => {
+      const typedStats = stats as { wins: number; losses: number };
+      return `- ${condition}: ${typedStats.wins} wins, ${typedStats.losses} losses`;
+    })
+    .join('\n');
+  finalPrompt = finalPrompt.replace('{{marketConditionPerformance}}', marketConditionPerformance);
+
+  // Format emotion analysis section
+  const emotionAnalysis = Object.entries(statistics.emotionAnalysis)
+    .map(([emotion, stats]) => {
+      const typedStats = stats as { wins: number; losses: number };
+      return `- ${emotion}: ${typedStats.wins} wins, ${typedStats.losses} losses`;
+    })
+    .join('\n');
+  finalPrompt = finalPrompt.replace('{{emotionAnalysis}}', emotionAnalysis);
+
+  // Format time analysis section
+  const timeAnalysis = Object.entries(statistics.timeAnalysis)
+    .map(([timeSlot, stats]) => {
+      const typedStats = stats as { wins: number; losses: number; totalPnL: number };
+      return `- ${timeSlot}: ${typedStats.wins} wins, ${typedStats.losses} losses, P&L: ${typedStats.totalPnL.toFixed(2)}`;
+    })
+    .join('\n');
+  finalPrompt = finalPrompt.replace('{{timeAnalysis}}', timeAnalysis);
+
+  // Format position sizing section
+  const positionSizing = Object.entries(statistics.positionSizing)
+    .map(([size, stats]) => {
+      const typedStats = stats as { count: number; wins: number; losses: number; totalPnL: number };
+      const winRate = typedStats.count > 0 ? (typedStats.wins / typedStats.count * 100).toFixed(1) : '0.0';
+      return `- ${size}: ${typedStats.count} trades, Win Rate: ${winRate}%, P&L: ${typedStats.totalPnL.toFixed(2)}`;
+    })
+    .join('\n');
+  finalPrompt = finalPrompt.replace('{{positionSizing}}', positionSizing);
+
+  // Format risk metrics section
+  const riskMetrics = `
+- Stop loss usage: ${statistics.riskMetrics.stopLossUsage.toFixed(1)}%
+- Take profit usage: ${statistics.riskMetrics.targetUsage.toFixed(1)}%
+- Manual overrides: ${statistics.riskMetrics.manualOverrides.toFixed(1)}%
+`;
+  finalPrompt = finalPrompt.replace('{{riskMetrics}}', riskMetrics);
+
+  return finalPrompt;
 }

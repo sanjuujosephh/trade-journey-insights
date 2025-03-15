@@ -1,16 +1,18 @@
 
+import { Trade } from "./types.ts";
+
 // Calculate all statistics from trades
-export function calculateTradeStatistics(trades) {
+export function calculateTradeStatistics(trades: Trade[]) {
   // Basic statistics
   const totalTrades = trades.length;
   const winningTrades = trades.filter((t) => t.outcome === 'profit').length;
-  const winRate = ((winningTrades / totalTrades) * 100).toFixed(1);
+  const winRate = totalTrades > 0 ? ((winningTrades / totalTrades) * 100).toFixed(1) : '0.0';
   
   // Calculate total P&L
   const totalPnL = calculateTotalPnL(trades);
 
   // Calculate average trade P&L
-  const avgTradePnL = totalPnL / totalTrades;
+  const avgTradePnL = totalTrades > 0 ? totalPnL / totalTrades : 0;
 
   // Calculate profit factor
   const { sumProfits, sumLosses } = calculateProfitsAndLosses(trades);
@@ -50,7 +52,7 @@ export function calculateTradeStatistics(trades) {
 }
 
 // Calculate total P&L from trades
-function calculateTotalPnL(trades) {
+function calculateTotalPnL(trades: Trade[]) {
   return trades.reduce((sum, trade) => {
     const pnl = trade.exit_price && trade.entry_price && trade.quantity
       ? (trade.exit_price - trade.entry_price) * trade.quantity
@@ -60,7 +62,7 @@ function calculateTotalPnL(trades) {
 }
 
 // Calculate profits and losses for profit factor
-function calculateProfitsAndLosses(trades) {
+function calculateProfitsAndLosses(trades: Trade[]) {
   let sumProfits = 0;
   let sumLosses = 0;
   
@@ -76,73 +78,77 @@ function calculateProfitsAndLosses(trades) {
 }
 
 // Analyze strategies
-function analyzeStrategies(trades) {
+function analyzeStrategies(trades: Trade[]) {
   return trades.reduce((acc, trade) => {
-    if (!acc[trade.strategy]) {
-      acc[trade.strategy] = { wins: 0, losses: 0, totalPnL: 0 };
+    const strategy = trade.strategy || "unknown";
+    if (!acc[strategy]) {
+      acc[strategy] = { wins: 0, losses: 0, totalPnL: 0 };
     }
-    acc[trade.strategy][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+    acc[strategy][trade.outcome === 'profit' ? 'wins' : 'losses']++;
     
     // Calculate PnL for strategy if possible
     if (trade.exit_price && trade.entry_price && trade.quantity) {
       const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
-      acc[trade.strategy].totalPnL += pnl;
+      acc[strategy].totalPnL += pnl;
     }
     
     return acc;
-  }, {});
+  }, {} as Record<string, { wins: number; losses: number; totalPnL: number }>);
 }
 
 // Analyze market conditions
-function analyzeMarketConditions(trades) {
+function analyzeMarketConditions(trades: Trade[]) {
   return trades.reduce((acc, trade) => {
-    if (trade.market_condition) {
-      if (!acc[trade.market_condition]) {
-        acc[trade.market_condition] = { wins: 0, losses: 0 };
-      }
-      acc[trade.market_condition][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+    const marketCondition = trade.market_condition || "unknown";
+    if (!acc[marketCondition]) {
+      acc[marketCondition] = { wins: 0, losses: 0 };
     }
+    acc[marketCondition][trade.outcome === 'profit' ? 'wins' : 'losses']++;
     return acc;
-  }, {});
+  }, {} as Record<string, { wins: number; losses: number }>);
 }
 
 // Analyze emotions
-function analyzeEmotions(trades) {
+function analyzeEmotions(trades: Trade[]) {
   return trades.reduce((acc, trade) => {
-    if (trade.entry_emotion) {
-      if (!acc[trade.entry_emotion]) {
-        acc[trade.entry_emotion] = { wins: 0, losses: 0 };
-      }
-      acc[trade.entry_emotion][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+    const emotion = trade.entry_emotion || "unknown";
+    if (!acc[emotion]) {
+      acc[emotion] = { wins: 0, losses: 0 };
     }
+    acc[emotion][trade.outcome === 'profit' ? 'wins' : 'losses']++;
     return acc;
-  }, {});
+  }, {} as Record<string, { wins: number; losses: number }>);
 }
 
 // Analyze time performance
-function analyzeTimePerformance(trades) {
+function analyzeTimePerformance(trades: Trade[]) {
   return trades.reduce((acc, trade) => {
     if (trade.entry_time) {
-      const hour = new Date(trade.entry_time).getHours();
-      const timeSlot = `${hour}:00-${hour+1}:00`;
-      
-      if (!acc[timeSlot]) {
-        acc[timeSlot] = { wins: 0, losses: 0, totalPnL: 0 };
-      }
-      
-      acc[timeSlot][trade.outcome === 'profit' ? 'wins' : 'losses']++;
-      
-      if (trade.exit_price && trade.entry_price && trade.quantity) {
-        const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
-        acc[timeSlot].totalPnL += pnl;
+      try {
+        const hour = new Date(trade.entry_time).getHours();
+        const timeSlot = `${hour}:00-${hour+1}:00`;
+        
+        if (!acc[timeSlot]) {
+          acc[timeSlot] = { wins: 0, losses: 0, totalPnL: 0 };
+        }
+        
+        acc[timeSlot][trade.outcome === 'profit' ? 'wins' : 'losses']++;
+        
+        if (trade.exit_price && trade.entry_price && trade.quantity) {
+          const pnl = (trade.exit_price - trade.entry_price) * trade.quantity;
+          acc[timeSlot].totalPnL += pnl;
+        }
+      } catch (e) {
+        // If there's an error parsing the time, skip this trade
+        console.error(`Error parsing entry_time: ${trade.entry_time}`, e);
       }
     }
     return acc;
-  }, {});
+  }, {} as Record<string, { wins: number; losses: number; totalPnL: number }>);
 }
 
 // Analyze position sizing
-function analyzePositionSizing(trades) {
+function analyzePositionSizing(trades: Trade[]) {
   return trades.reduce((acc, trade) => {
     if (trade.quantity) {
       const size = trade.quantity;
@@ -161,14 +167,14 @@ function analyzePositionSizing(trades) {
       }
     }
     return acc;
-  }, {});
+  }, {} as Record<string, { count: number; wins: number; losses: number; totalPnL: number }>);
 }
 
 // Calculate risk metrics
-function calculateRiskMetrics(trades, totalTrades) {
+function calculateRiskMetrics(trades: Trade[], totalTrades: number) {
   return {
-    stopLossUsage: trades.filter((t) => t.exit_reason === 'stop_loss').length / totalTrades * 100,
-    targetUsage: trades.filter((t) => t.exit_reason === 'target').length / totalTrades * 100,
-    manualOverrides: trades.filter((t) => t.exit_reason === 'manual').length / totalTrades * 100,
+    stopLossUsage: totalTrades > 0 ? trades.filter((t) => t.exit_reason === 'stop_loss').length / totalTrades * 100 : 0,
+    targetUsage: totalTrades > 0 ? trades.filter((t) => t.exit_reason === 'target').length / totalTrades * 100 : 0,
+    manualOverrides: totalTrades > 0 ? trades.filter((t) => t.exit_reason === 'manual').length / totalTrades * 100 : 0,
   };
 }
