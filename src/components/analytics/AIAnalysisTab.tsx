@@ -108,7 +108,7 @@ export function AIAnalysisTab() {
         onAnalyze={handleAnalyze}
       />
       
-      <AnalysisResult currentAnalysis={currentAnalysis} />
+      <AnalysisResult currentAnalysis={currentAnalysis} isAnalyzing={isAnalyzing} />
       
       <Separator className="my-6" />
       

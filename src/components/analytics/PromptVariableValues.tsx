@@ -74,7 +74,7 @@ export function PromptVariableValues({ trades }: PromptVariableValuesProps) {
             <div className="space-y-2">
               {variableValues.map((item, index) => (
                 <div key={index} className="grid grid-cols-2 gap-2 text-xs border-b pb-1 last:border-0">
-                  <div className="font-mono bg-muted p-1 rounded">{item.variable}</div>
+                  <div className="font-mono border border-border p-1 rounded">{item.variable}</div>
                   <div className="font-mono whitespace-pre-wrap overflow-x-auto">{item.value}</div>
                 </div>
               ))}
