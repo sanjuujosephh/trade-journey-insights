@@ -36,6 +36,7 @@ export function AIAnalysisTab() {
   const [isEditingPrompt, setIsEditingPrompt] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
+  const [showCustomPromptAccordion, setShowCustomPromptAccordion] = useState(false);
 
   const handleAnalyze = async (days: number, customPrompt?: string) => {
     // Credit cost based on days
@@ -93,30 +94,41 @@ export function AIAnalysisTab() {
   const handlePurchaseClick = () => {
     setIsPurchaseDialogOpen(true);
   };
+
+  const toggleCustomPromptAccordion = () => {
+    setShowCustomPromptAccordion(!showCustomPromptAccordion);
+  };
   
   return <div className="space-y-6">
       <div className="w-full">
         <CreditsDisplay credits={credits} isLoading={isLoadingCredits} onPurchaseClick={handlePurchaseClick} />
       </div>
       
-      <AnalysisButtons isAnalyzing={isAnalyzing} trades={trades} onAnalyze={handleAnalyze} />
+      <AnalysisButtons 
+        isAnalyzing={isAnalyzing} 
+        trades={trades} 
+        onAnalyze={handleAnalyze} 
+        onCustomizeClick={toggleCustomPromptAccordion}
+      />
       
       <AnalysisResult currentAnalysis={currentAnalysis} />
       
-      {currentAnalysis && <CustomPromptAccordion 
-        customPrompt={customPrompt} 
-        setCustomPrompt={setCustomPrompt} 
-        isEditingPrompt={isEditingPrompt} 
-        setIsEditingPrompt={setIsEditingPrompt} 
-        savedPrompts={savedPrompts} 
-        onSavePrompt={saveChatPrompt} 
-        onRemovePrompt={removeSavedPrompt} 
-        onUsePrompt={prompt => {
-          setCustomPrompt(prompt);
-          setCurrentAnalysis('');
-        }} 
-        trades={trades}
-      />}
+      {showCustomPromptAccordion && (
+        <CustomPromptAccordion 
+          customPrompt={customPrompt} 
+          setCustomPrompt={setCustomPrompt} 
+          isEditingPrompt={isEditingPrompt} 
+          setIsEditingPrompt={setIsEditingPrompt} 
+          savedPrompts={savedPrompts} 
+          onSavePrompt={saveChatPrompt} 
+          onRemovePrompt={removeSavedPrompt} 
+          onUsePrompt={prompt => {
+            setCustomPrompt(prompt);
+            setCurrentAnalysis('');
+          }} 
+          trades={trades}
+        />
+      )}
       
       <Separator className="my-6" />
       
