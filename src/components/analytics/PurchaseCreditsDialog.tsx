@@ -16,6 +16,7 @@ import { useUserCredits } from "@/hooks/useUserCredits";
 interface PurchaseCreditsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onPurchaseComplete?: () => void;
 }
 
 const CREDIT_PACKAGES = [
@@ -24,11 +25,15 @@ const CREDIT_PACKAGES = [
   { id: 'max', credits: 1000, price: 699 },
 ];
 
-export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDialogProps) {
+export function PurchaseCreditsDialog({ 
+  open, 
+  onOpenChange, 
+  onPurchaseComplete 
+}: PurchaseCreditsDialogProps) {
   const [selectedPackage, setSelectedPackage] = useState(CREDIT_PACKAGES[1]);
   const [isProcessing, setIsProcessing] = useState(false);
   const { handlePayment, isPaymentConfigured } = usePayment();
-  const { purchaseCredits } = useUserCredits();
+  const { purchaseCredits, refetch } = useUserCredits();
 
   const handlePurchase = async () => {
     if (!isPaymentConfigured) return;
@@ -44,7 +49,17 @@ export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDia
       }, false);
       
       // Then update the credits in the database
-      await purchaseCredits.mutateAsync({ amount: selectedPackage.credits });
+      const result = await purchaseCredits.mutateAsync({ amount: selectedPackage.credits });
+      
+      if (result.success) {
+        // Force an immediate refetch to update UI
+        await refetch();
+        
+        // Call onPurchaseComplete callback if provided
+        if (onPurchaseComplete) {
+          onPurchaseComplete();
+        }
+      }
       
       // Close the dialog
       onOpenChange(false);

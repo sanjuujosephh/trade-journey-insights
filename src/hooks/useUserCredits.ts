@@ -12,7 +12,7 @@ export function useUserCredits() {
   const { userId } = useTradeAuth();
   const queryClient = useQueryClient();
   
-  // Use the query hook
+  // Use the query hook with no caching
   const { 
     credits, 
     transactions, 
@@ -21,10 +21,15 @@ export function useUserCredits() {
     refetch 
   } = useCreditQueries(userId);
   
-  // Enhanced refetch function with logging and error handling
+  // Enhanced refetch function with logging and forced invalidation
   const enhancedRefetch = useCallback(async () => {
     console.log('Explicit credit refetch for user:', userId);
     try {
+      // First invalidate the queries
+      queryClient.invalidateQueries({ queryKey: ['user-credits', userId] });
+      queryClient.invalidateQueries({ queryKey: ['credit-transactions', userId] });
+      
+      // Then perform the refetch
       const result = await refetch();
       console.log('Credit refetch result:', result);
       return result;
@@ -32,7 +37,7 @@ export function useUserCredits() {
       console.error('Credit refetch error:', error);
       throw error;
     }
-  }, [userId, refetch]);
+  }, [userId, refetch, queryClient]);
   
   // Log user ID and credits for debugging
   useEffect(() => {
@@ -52,18 +57,19 @@ export function useUserCredits() {
     }
   }, [userId, enhancedRefetch]);
   
-  // Set up interval to refresh credits
+  // Set up interval to refresh credits - shorter interval for more responsiveness
   useEffect(() => {
     if (!userId) return;
     
     const intervalId = setInterval(() => {
       console.log('Refreshing credits on interval');
-      queryClient.invalidateQueries({ queryKey: ['user-credits', userId] });
-      queryClient.invalidateQueries({ queryKey: ['credit-transactions', userId] });
-    }, 5000); // Refresh every 5 seconds
+      enhancedRefetch().catch(err => 
+        console.error('Error during interval refresh:', err)
+      );
+    }, 3000); // Refresh every 3 seconds instead of 5
     
     return () => clearInterval(intervalId);
-  }, [userId, queryClient]);
+  }, [userId, enhancedRefetch]);
   
   // Use the mutations hook
   const { 

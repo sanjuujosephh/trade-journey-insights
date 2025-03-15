@@ -1,150 +1,58 @@
 
 import { useState } from "react";
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit, Save, Trash, X } from "lucide-react";
-import { PromptVariableValues } from "./PromptVariableValues";
-import { Trade } from "@/types/trade";
-import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface CustomPromptAccordionProps {
-  customPrompt?: string;
-  setCustomPrompt?: (prompt: string) => void;
-  isEditingPrompt?: boolean;
-  setIsEditingPrompt?: (isEditing: boolean) => void;
-  savedPrompts?: string[];
-  onSavePrompt?: (prompt: string) => void;
-  onRemovePrompt?: (index: number) => void;
-  onUsePrompt?: (prompt: string) => void;
-  trades?: Trade[];
+  onCustomAnalysis: (prompt: string) => Promise<void>;
+  isLoading: boolean;
 }
 
-export function CustomPromptAccordion({
-  customPrompt = "",
-  setCustomPrompt = () => {},
-  isEditingPrompt = false,
-  setIsEditingPrompt = () => {},
-  savedPrompts = [],
-  onSavePrompt = () => {},
-  onRemovePrompt = () => {},
-  onUsePrompt = () => {},
-  trades = []
+export function CustomPromptAccordion({ 
+  onCustomAnalysis,
+  isLoading 
 }: CustomPromptAccordionProps) {
-  const resetCustomPrompt = () => {
-    setIsEditingPrompt(false);
-    setCustomPrompt(`As a trading analyst, analyze these trading patterns:
-
-Trading Summary:
-- Total Trades: {{totalTrades}}
-- Win Rate: {{winRate}}%
-
-Strategy Performance:
-{{strategyPerformance}}
-
-Provide specific insights on:
-1. Pattern analysis of winning vs losing trades
-2. Strategy effectiveness
-3. Risk management suggestions
-4. Concrete recommendations for improvement
-
-Trades data: {{tradesData}}`);
+  const [customPrompt, setCustomPrompt] = useState("");
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!customPrompt.trim()) return;
+    
+    await onCustomAnalysis(customPrompt);
   };
-
+  
   return (
-    <div className="my-4">
-      <h3 className="font-medium mb-4">Customize AI Analysis</h3>
-      <div className="space-y-4 pb-4">
-        {isEditingPrompt ? (
-          <div className="space-y-4">
-            <PromptVariableValues trades={trades} />
-            
-            <Textarea 
+    <Accordion type="single" collapsible className="border rounded-md">
+      <AccordionItem value="custom-prompt">
+        <AccordionTrigger className="px-4">Custom Analysis Prompt</AccordionTrigger>
+        <AccordionContent className="px-4 pb-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <Textarea
+              placeholder="Enter your custom AI analysis prompt..."
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
-              className="min-h-[200px] text-sm"
-              placeholder="Enter your custom analysis prompt here..."
+              className="min-h-[100px]"
             />
-            
-            <div className="flex items-center justify-between">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={resetCustomPrompt}
-              >
-                Reset to Default
-              </Button>
-              
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditingPrompt(false)}
-                >
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
-                </Button>
-                
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => {
-                    onSavePrompt(customPrompt);
-                    setIsEditingPrompt(false);
-                  }}
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Prompt
-                </Button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditingPrompt(true)}
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Custom Prompt
+            <Button type="submit" disabled={isLoading || !customPrompt.trim()}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                "Run Analysis"
+              )}
             </Button>
-            
-            {savedPrompts.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Saved Prompts</h4>
-                
-                <div className="grid gap-2">
-                  {savedPrompts.map((prompt, index) => (
-                    <Card key={index} className="p-3 text-sm">
-                      <div className="mb-2 truncate">{prompt.substring(0, 100)}...</div>
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onRemovePrompt(index)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            onUsePrompt(prompt);
-                            toast.success("Custom prompt applied!");
-                          }}
-                        >
-                          Use
-                        </Button>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+          </form>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 }

@@ -29,12 +29,12 @@ export function CreditsDisplay({
     );
   }
 
-  if (!credits) {
-    return null;
-  }
-
-  const totalCredits = (credits.subscription_credits || 0) + (credits.purchased_credits || 0);
-  const nextResetDate = credits.next_reset_date 
+  // Ensure we handle null credits properly
+  const subscriptionCredits = credits?.subscription_credits ?? 0;
+  const purchasedCredits = credits?.purchased_credits ?? 0;
+  const totalCredits = subscriptionCredits + purchasedCredits;
+  
+  const nextResetDate = credits?.next_reset_date 
     ? format(new Date(credits.next_reset_date), "dd MMM yyyy")
     : 'No reset scheduled';
 
@@ -72,7 +72,17 @@ export function CreditsDisplay({
             <span className="text-sm text-muted-foreground">credits remaining</span>
           </div>
           
-          {credits.subscription_credits > 0 && (
+          <div className="flex flex-col sm:flex-row sm:gap-6">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <span>Subscription: {subscriptionCredits}</span>
+            </div>
+            
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <span>Purchased: {purchasedCredits}</span>
+            </div>
+          </div>
+          
+          {credits?.subscription_credits > 0 && credits?.next_reset_date && (
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <CalendarClock className="h-3.5 w-3.5" />
               <span>Resets: {nextResetDate}</span>

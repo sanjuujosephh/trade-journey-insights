@@ -11,6 +11,7 @@ import { useTradeAnalysis } from '@/hooks/useTradeAnalysis';
 import { toast } from 'sonner';
 import { Separator } from '../ui/separator';
 import { CreditTransactionsPanel } from './CreditTransactionsPanel';
+import { CustomPromptAccordion } from './CustomPromptAccordion';
 
 export function AIAnalysisTab() {
   const { userId } = useTradeAuth();
@@ -130,6 +131,27 @@ export function AIAnalysisTab() {
     }
   };
   
+  // Handle various analysis types
+  const handleAnalyzePerformance = async () => {
+    await handleAnalyze(30, "Analyze my trading performance metrics in detail");
+  };
+  
+  const handleAnalyzeRiskProfile = async () => {
+    await handleAnalyze(30, "Evaluate my risk management and provide suggestions");
+  };
+  
+  const handleAnalyzeImprovements = async () => {
+    await handleAnalyze(30, "Identify areas of improvement in my trading strategy");
+  };
+  
+  const handleAnalyzePsychology = async () => {
+    await handleAnalyze(30, "Analyze my trading psychology and emotional patterns");
+  };
+  
+  const handleCustomAnalysis = async (prompt: string) => {
+    await handleAnalyze(30, prompt);
+  };
+  
   return <div className="space-y-6">
       <div className="w-full">
         <CreditsDisplay 
@@ -142,8 +164,17 @@ export function AIAnalysisTab() {
       
       <AnalysisButtons 
         isAnalyzing={isAnalyzing} 
-        trades={trades} 
+        trades={trades}
         onAnalyze={handleAnalyze}
+        onAnalyzePerformance={handleAnalyzePerformance}
+        onAnalyzeRiskProfile={handleAnalyzeRiskProfile}
+        onAnalyzeImprovements={handleAnalyzeImprovements}
+        onAnalyzePsychology={handleAnalyzePsychology}
+      />
+      
+      <CustomPromptAccordion 
+        onCustomAnalysis={handleCustomAnalysis}
+        isLoading={isAnalyzing}
       />
       
       <AnalysisResult currentAnalysis={currentAnalysis} />
@@ -163,6 +194,7 @@ export function AIAnalysisTab() {
             refetch();
           }
         }} 
+        onPurchaseComplete={refetch}
       />
     </div>;
 }
