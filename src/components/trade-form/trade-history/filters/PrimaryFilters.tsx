@@ -16,7 +16,7 @@ interface PrimaryFiltersProps {
   tradeTypeFilter: string;
   setTradeTypeFilter: (value: string) => void;
   uniqueSymbols: string[];
-  showClearFiltersButton: boolean;
+  showClearFiltersButton: boolean; // Ensuring this is explicitly typed as boolean
   resetFilters: () => void;
 }
 

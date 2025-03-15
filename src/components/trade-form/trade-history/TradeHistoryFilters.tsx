@@ -60,7 +60,8 @@ export function TradeHistoryFilters({
   tradesCount
 }: TradeHistoryFiltersProps) {
   
-  const showClearFiltersButton = 
+  // Fix: Ensure this is a boolean by using Boolean() or a comparison
+  const showClearFiltersButton = Boolean(
     searchTerm || 
     outcomeFilter !== "all" || 
     symbolFilter !== "all" || 
@@ -70,7 +71,8 @@ export function TradeHistoryFilters({
     timeframeFilter !== "all" ||
     marketConditionFilter !== "all" ||
     entryEmotionFilter !== "all" ||
-    exitEmotionFilter !== "all";
+    exitEmotionFilter !== "all"
+  );
   
   return (
     <div className="mb-4 space-y-4">
