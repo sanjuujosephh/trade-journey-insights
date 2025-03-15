@@ -6,6 +6,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  ArrowUpDown,
+  Activity,
+  Clock,
+  Gauge,
+  Smile,
+  SmileOff
+} from "lucide-react";
 
 interface AdvancedFiltersProps {
   directionFilter: string;
@@ -39,8 +47,9 @@ export function AdvancedFilters({
   return (
     <div className="flex flex-wrap gap-2">
       <Select value={directionFilter} onValueChange={setDirectionFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Direction" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <ArrowUpDown className="h-4 w-4" />
+          <span className="sr-only">Direction Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Direction</SelectItem>
@@ -50,8 +59,9 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={optionTypeFilter} onValueChange={setOptionTypeFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Option" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <Activity className="h-4 w-4" />
+          <span className="sr-only">Option Type Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Option</SelectItem>
@@ -61,8 +71,9 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={timeframeFilter} onValueChange={setTimeframeFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Timeframe" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <Clock className="h-4 w-4" />
+          <span className="sr-only">Timeframe Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Timeframe</SelectItem>
@@ -77,8 +88,9 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={marketConditionFilter} onValueChange={setMarketConditionFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Market" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <Gauge className="h-4 w-4" />
+          <span className="sr-only">Market Condition Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Market</SelectItem>
@@ -90,8 +102,9 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={entryEmotionFilter} onValueChange={setEntryEmotionFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Entry Emotion" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <Smile className="h-4 w-4" />
+          <span className="sr-only">Entry Emotion Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Emotion</SelectItem>
@@ -105,8 +118,9 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={exitEmotionFilter} onValueChange={setExitEmotionFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Exit Emotion" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <SmileOff className="h-4 w-4" />
+          <span className="sr-only">Exit Emotion Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Emotion</SelectItem>

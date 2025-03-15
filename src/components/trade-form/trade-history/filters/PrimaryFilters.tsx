@@ -6,6 +6,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { 
+  BarChart3, 
+  TrendingUp,
+  DollarSign,
+} from "lucide-react";
 
 interface PrimaryFiltersProps {
   symbolFilter: string;
@@ -29,8 +34,9 @@ export function PrimaryFilters({
   return (
     <>
       <Select value={symbolFilter} onValueChange={setSymbolFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Symbol" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <BarChart3 className="h-4 w-4" />
+          <span className="sr-only">Symbol Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Symbol</SelectItem>
@@ -41,8 +47,9 @@ export function PrimaryFilters({
       </Select>
       
       <Select value={outcomeFilter} onValueChange={setOutcomeFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Outcome" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <TrendingUp className="h-4 w-4" />
+          <span className="sr-only">Outcome Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Outcome</SelectItem>
@@ -53,8 +60,9 @@ export function PrimaryFilters({
       </Select>
       
       <Select value={tradeTypeFilter} onValueChange={setTradeTypeFilter}>
-        <SelectTrigger className="w-[160px]">
-          <SelectValue placeholder="Any Type" />
+        <SelectTrigger className="w-[45px] justify-center p-0">
+          <DollarSign className="h-4 w-4" />
+          <span className="sr-only">Trade Type Filter</span>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Type</SelectItem>
