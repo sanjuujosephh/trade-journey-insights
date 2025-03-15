@@ -20,7 +20,6 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
   const [outcomeFilter, setOutcomeFilter] = useState<string>("");
   const [symbolFilter, setSymbolFilter] = useState<string>("");
   const [tradeTypeFilter, setTradeTypeFilter] = useState<string>("");
-  const [showFilters, setShowFilters] = useState(false);
 
   // Get unique symbols for filter dropdown
   const uniqueSymbols = useMemo(() => {
@@ -108,8 +107,6 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
         setSymbolFilter={setSymbolFilter}
         tradeTypeFilter={tradeTypeFilter}
         setTradeTypeFilter={setTradeTypeFilter}
-        showFilters={showFilters}
-        setShowFilters={setShowFilters}
         uniqueSymbols={uniqueSymbols}
         resetFilters={resetFilters}
         tradesCount={{ filtered: sortedTrades.length, total: trades.length }}
