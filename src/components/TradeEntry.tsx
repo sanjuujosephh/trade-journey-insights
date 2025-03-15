@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, ArrowRight, XCircle } from "lucide-react";
+import { CalendarIcon, ArrowRight } from "lucide-react";
 import { format, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -108,20 +108,6 @@ export default function TradeEntry() {
   return (
     <ErrorBoundary>
       <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
-        {editingId && (
-          <div className="flex justify-end mb-2">
-            <Button 
-              onClick={cancelEditing} 
-              variant="outline" 
-              size="sm"
-              className="flex items-center gap-1"
-            >
-              <XCircle className="w-4 h-4 mr-1" />
-              Cancel Editing
-            </Button>
-          </div>
-        )}
-        
         <TradeFormManager 
           formData={formData} 
           handleChange={handleChange} 
@@ -129,6 +115,7 @@ export default function TradeEntry() {
           onSubmit={handleSubmit} 
           editingId={editingId}
           isSubmitting={isSubmitting} 
+          onCancelEditing={cancelEditing}
         />
 
         {trades.length > 0 && (
