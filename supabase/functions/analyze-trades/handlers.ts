@@ -97,11 +97,11 @@ export async function handleAnalyzeTradesRequest(req) {
         );
       }
       
-      // Call the PostgreSQL function to deduct credits
+      // Call the PostgreSQL function to deduct credits - fixing the ambiguous column issue
       const { data, error } = await supabase.rpc(
         'deduct_credits',
         { 
-          user_id: userId, 
+          user_id_param: userId, // Use a different parameter name to avoid ambiguity
           credits_to_deduct: creditCost 
         }
       );
