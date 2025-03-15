@@ -80,7 +80,7 @@ export function TradeHistoryFilters({
   return (
     <div className="mb-4 space-y-4">
       {/* Search and Filter UI */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="relative w-full sm:w-3/5 md:w-2/5">
           <Input
             placeholder="Search by symbol or notes..."
@@ -144,7 +144,7 @@ export function TradeHistoryFilters({
               variant="outline" 
               size="sm"
               onClick={resetFilters}
-              className="h-10"
+              className="h-10 ml-auto"
             >
               Clear filters
             </Button>
