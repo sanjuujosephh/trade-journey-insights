@@ -1,33 +1,35 @@
 
-export function createAnalysisPrompt(statistics: any, trades: any[], customPrompt?: string): string {
+import { Trade } from "./types.ts";
+
+export function createAnalysisPrompt(statistics: any, trades: Trade[], customPrompt?: string): string {
   // Base prompt template with key variables that will be populated
   const basePrompt = `
 Analyze the following trading data and provide detailed insights:
 
 ## Trading Statistics
-- Total Trades: {{totalTrades}}
-- Win Rate: {{winRate}}%
-- Total P&L: {{totalPnL}}
-- Average Trade P&L: {{avgTradePnL}}
-- Profit Factor: {{profitFactor}}
+- Total Trades: ${statistics.totalTrades}
+- Win Rate: ${statistics.winRate}%
+- Total P&L: ${statistics.totalPnL.toFixed(2)}
+- Average Trade P&L: ${statistics.avgTradePnL.toFixed(2)}
+- Profit Factor: ${statistics.profitFactor}
 
 ## Strategy Performance
-{{strategyPerformance}}
+${formatStrategyPerformance(statistics.strategyPerformance)}
 
 ## Market Condition Performance
-{{marketConditionPerformance}}
+${formatMarketConditionPerformance(statistics.marketConditionPerformance)}
 
 ## Emotional Analysis
-{{emotionAnalysis}}
+${formatEmotionAnalysis(statistics.emotionAnalysis)}
 
 ## Time Analysis
-{{timeAnalysis}}
+${formatTimeAnalysis(statistics.timeAnalysis)}
 
 ## Position Sizing
-{{positionSizing}}
+${formatPositionSizing(statistics.positionSizing)}
 
 ## Risk Metrics
-{{riskMetrics}}
+${formatRiskMetrics(statistics.riskMetrics)}
 
 ${customPrompt ? `\n## Custom Analysis Request\n${customPrompt}` : ''}
 
@@ -42,67 +44,55 @@ Please provide a thorough analysis including:
 Format your response with clear sections and actionable insights.
 `;
 
-  // Replace placeholders with actual values from the statistics
-  let finalPrompt = basePrompt
-    .replace('{{totalTrades}}', statistics.totalTrades)
-    .replace('{{winRate}}', statistics.winRate)
-    .replace('{{totalPnL}}', statistics.totalPnL.toFixed(2))
-    .replace('{{avgTradePnL}}', statistics.avgTradePnL.toFixed(2))
-    .replace('{{profitFactor}}', statistics.profitFactor);
+  return basePrompt;
+}
 
-  // Format strategy performance section
-  const strategyPerformance = Object.entries(statistics.strategyPerformance)
+// Helper functions to format each section
+function formatStrategyPerformance(strategyPerformance: Record<string, { wins: number; losses: number; totalPnL: number }>) {
+  return Object.entries(strategyPerformance)
     .map(([strategy, stats]) => {
-      const typedStats = stats as { wins: number; losses: number; totalPnL: number };
-      return `- ${strategy}: ${typedStats.wins} wins, ${typedStats.losses} losses, P&L: ${typedStats.totalPnL.toFixed(2)}`;
+      return `- ${strategy}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`;
     })
     .join('\n');
-  finalPrompt = finalPrompt.replace('{{strategyPerformance}}', strategyPerformance);
+}
 
-  // Format market condition performance section
-  const marketConditionPerformance = Object.entries(statistics.marketConditionPerformance)
+function formatMarketConditionPerformance(marketConditionPerformance: Record<string, { wins: number; losses: number }>) {
+  return Object.entries(marketConditionPerformance)
     .map(([condition, stats]) => {
-      const typedStats = stats as { wins: number; losses: number };
-      return `- ${condition}: ${typedStats.wins} wins, ${typedStats.losses} losses`;
+      return `- ${condition}: ${stats.wins} wins, ${stats.losses} losses`;
     })
     .join('\n');
-  finalPrompt = finalPrompt.replace('{{marketConditionPerformance}}', marketConditionPerformance);
+}
 
-  // Format emotion analysis section
-  const emotionAnalysis = Object.entries(statistics.emotionAnalysis)
+function formatEmotionAnalysis(emotionAnalysis: Record<string, { wins: number; losses: number }>) {
+  return Object.entries(emotionAnalysis)
     .map(([emotion, stats]) => {
-      const typedStats = stats as { wins: number; losses: number };
-      return `- ${emotion}: ${typedStats.wins} wins, ${typedStats.losses} losses`;
+      return `- ${emotion}: ${stats.wins} wins, ${stats.losses} losses`;
     })
     .join('\n');
-  finalPrompt = finalPrompt.replace('{{emotionAnalysis}}', emotionAnalysis);
+}
 
-  // Format time analysis section
-  const timeAnalysis = Object.entries(statistics.timeAnalysis)
+function formatTimeAnalysis(timeAnalysis: Record<string, { wins: number; losses: number; totalPnL: number }>) {
+  return Object.entries(timeAnalysis)
     .map(([timeSlot, stats]) => {
-      const typedStats = stats as { wins: number; losses: number; totalPnL: number };
-      return `- ${timeSlot}: ${typedStats.wins} wins, ${typedStats.losses} losses, P&L: ${typedStats.totalPnL.toFixed(2)}`;
+      return `- ${timeSlot}: ${stats.wins} wins, ${stats.losses} losses, P&L: ${stats.totalPnL.toFixed(2)}`;
     })
     .join('\n');
-  finalPrompt = finalPrompt.replace('{{timeAnalysis}}', timeAnalysis);
+}
 
-  // Format position sizing section
-  const positionSizing = Object.entries(statistics.positionSizing)
+function formatPositionSizing(positionSizing: Record<string, { count: number; wins: number; losses: number; totalPnL: number }>) {
+  return Object.entries(positionSizing)
     .map(([size, stats]) => {
-      const typedStats = stats as { count: number; wins: number; losses: number; totalPnL: number };
-      const winRate = typedStats.count > 0 ? (typedStats.wins / typedStats.count * 100).toFixed(1) : '0.0';
-      return `- ${size}: ${typedStats.count} trades, Win Rate: ${winRate}%, P&L: ${typedStats.totalPnL.toFixed(2)}`;
+      const winRate = stats.count > 0 ? (stats.wins / stats.count * 100).toFixed(1) : '0.0';
+      return `- ${size}: ${stats.count} trades, Win Rate: ${winRate}%, P&L: ${stats.totalPnL.toFixed(2)}`;
     })
     .join('\n');
-  finalPrompt = finalPrompt.replace('{{positionSizing}}', positionSizing);
+}
 
-  // Format risk metrics section
-  const riskMetrics = `
-- Stop loss usage: ${statistics.riskMetrics.stopLossUsage.toFixed(1)}%
-- Take profit usage: ${statistics.riskMetrics.targetUsage.toFixed(1)}%
-- Manual overrides: ${statistics.riskMetrics.manualOverrides.toFixed(1)}%
+function formatRiskMetrics(riskMetrics: { stopLossUsage: number; targetUsage: number; manualOverrides: number }) {
+  return `
+- Stop loss usage: ${riskMetrics.stopLossUsage.toFixed(1)}%
+- Take profit usage: ${riskMetrics.targetUsage.toFixed(1)}%
+- Manual overrides: ${riskMetrics.manualOverrides.toFixed(1)}%
 `;
-  finalPrompt = finalPrompt.replace('{{riskMetrics}}', riskMetrics);
-
-  return finalPrompt;
 }

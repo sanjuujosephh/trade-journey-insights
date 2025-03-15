@@ -4,7 +4,6 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleAnalyzeTradesRequest } from "./handlers.ts";
 import { corsHeaders } from "./cors.ts";
 
-// Main serve function
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {

@@ -12,6 +12,7 @@ export interface Trade {
   quantity?: number;
   direction?: string;
   trade_type?: string;
+  trade_direction?: string;
   timeframe?: string;
   strategy?: string;
   market_condition?: string;

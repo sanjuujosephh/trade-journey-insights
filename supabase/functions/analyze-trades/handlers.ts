@@ -5,16 +5,16 @@ import { createAnalysisPrompt } from "./prompt.ts";
 import { getAnalysisFromOpenAI } from "./openai.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.31.0";
 
-// Initialize Supabase client with SERVICE_ROLE key for admin privileges
+// Initialize Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function handleAnalyzeTradesRequest(req) {
-  // Ensure CORS headers are added to all responses
+  // Set CORS headers for all responses
   const headers = { ...corsHeaders, 'Content-Type': 'application/json' };
 
-  // Check for required env variables
+  // Validate required environment variables
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   if (!openAIApiKey) {
     console.error('OpenAI API key is not configured');
@@ -24,7 +24,6 @@ export async function handleAnalyzeTradesRequest(req) {
     );
   }
 
-  // Check if service role key is set
   if (!supabaseServiceKey) {
     console.error('SUPABASE_SERVICE_ROLE_KEY is not configured');
     return new Response(
@@ -34,16 +33,16 @@ export async function handleAnalyzeTradesRequest(req) {
   }
 
   try {
-    // Extract request data
-    const requestData = await req.json();
-    const { trades, days = 1, customPrompt, userId } = requestData;
+    // Parse request data
+    const { trades, days = 1, customPrompt, userId } = await req.json();
     
-    console.log(`Received request to analyze ${trades?.length || 0} trades over ${days} days for user ${userId || 'unknown'}`);
+    console.log(`Processing analysis request: ${trades?.length || 0} trades over ${days} days for user ${userId}`);
     
+    // Validate request data
     if (!userId) {
       console.error('Missing user ID in request');
       return new Response(
-        JSON.stringify({ error: "User ID is required for credit validation", success: false }),
+        JSON.stringify({ error: "User ID is required", success: false }),
         { status: 400, headers }
       );
     }
@@ -59,132 +58,136 @@ export async function handleAnalyzeTradesRequest(req) {
     // Determine credit cost based on days
     const creditCost = days === 1 ? 1 : days === 7 ? 3 : 5;
     
-    console.log(`Attempting to deduct ${creditCost} credits for user ${userId} for analysis of ${days} days`);
+    console.log(`Credit cost for analysis: ${creditCost}`);
     
-    // Deduct credits using service role for full permissions
-    let deductResult;
-    try {
-      // Verify user exists and has sufficient credits before attempting deduction
-      const { data: userData, error: userError } = await supabase
-        .from('user_credits')
-        .select('subscription_credits, purchased_credits')
-        .eq('user_id', userId)
-        .single();
-      
-      if (userError) {
-        console.error('Error fetching user credits:', userError);
-        return new Response(
-          JSON.stringify({ 
-            error: "Failed to verify user credits", 
-            message: userError.message,
-            success: false 
-          }),
-          { status: 403, headers }
-        );
-      }
-      
-      const totalAvailableCredits = (userData.subscription_credits || 0) + (userData.purchased_credits || 0);
-      
-      if (totalAvailableCredits < creditCost) {
-        console.error(`Insufficient credits. Required: ${creditCost}, Available: ${totalAvailableCredits}`);
-        return new Response(
-          JSON.stringify({ 
-            error: "Insufficient credits", 
-            message: `You need ${creditCost} credits for this analysis. You have ${totalAvailableCredits} credits available.`,
-            success: false 
-          }),
-          { status: 403, headers }
-        );
-      }
-      
-      // Call the PostgreSQL function to deduct credits - fixing the ambiguous column issue
-      const { data, error } = await supabase.rpc(
-        'deduct_credits',
-        { 
-          user_id_param: userId, // Use a different parameter name to avoid ambiguity
-          credits_to_deduct: creditCost 
-        }
-      );
-      
-      if (error) {
-        console.error('Error deducting credits:', error);
-        return new Response(
-          JSON.stringify({ 
-            error: "Credit deduction failed", 
-            message: error.message,
-            success: false 
-          }),
-          { status: 403, headers }
-        );
-      }
-      
-      deductResult = data;
-      console.log(`Successfully deducted ${creditCost} credits. Remaining credits: ${deductResult}`);
-      
-    } catch (creditError) {
-      console.error('Error in credit deduction:', creditError);
+    // Get user credit information
+    const { data: userData, error: userError } = await supabase
+      .from('user_credits')
+      .select('subscription_credits, purchased_credits')
+      .eq('user_id', userId)
+      .single();
+    
+    if (userError) {
+      console.error('Error fetching user credits:', userError);
       return new Response(
         JSON.stringify({ 
-          error: "Credit operation failed", 
-          message: creditError.message || "Unknown error during credit operation",
+          error: "Failed to verify user credits", 
+          message: userError.message,
+          success: false 
+        }),
+        { status: 403, headers }
+      );
+    }
+    
+    // Calculate total available credits
+    const subscriptionCredits = userData.subscription_credits || 0;
+    const purchasedCredits = userData.purchased_credits || 0;
+    const totalAvailableCredits = subscriptionCredits + purchasedCredits;
+    
+    // Check if user has enough credits
+    if (totalAvailableCredits < creditCost) {
+      console.error(`Insufficient credits. Available: ${totalAvailableCredits}, Required: ${creditCost}`);
+      return new Response(
+        JSON.stringify({ 
+          error: "Insufficient credits", 
+          message: `You need ${creditCost} credits for this analysis. You have ${totalAvailableCredits} credits available.`,
+          success: false 
+        }),
+        { status: 403, headers }
+      );
+    }
+    
+    // Process deduction logic
+    let fromSubscription = 0;
+    let fromPurchased = 0;
+    
+    // Calculate deduction source
+    if (subscriptionCredits >= creditCost) {
+      fromSubscription = creditCost;
+    } else {
+      fromSubscription = subscriptionCredits;
+      fromPurchased = creditCost - fromSubscription;
+    }
+    
+    // Update user credits
+    const { error: updateError } = await supabase
+      .from('user_credits')
+      .update({
+        subscription_credits: subscriptionCredits - fromSubscription,
+        purchased_credits: purchasedCredits - fromPurchased,
+        total_credits_used: (userData.total_credits_used || 0) + creditCost,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId);
+    
+    if (updateError) {
+      console.error('Error updating user credits:', updateError);
+      return new Response(
+        JSON.stringify({ 
+          error: "Failed to update credits", 
+          message: updateError.message,
           success: false 
         }),
         { status: 500, headers }
       );
     }
     
-    // Process trades and generate analysis
+    // Record the transaction
+    const { error: transactionError } = await supabase
+      .from('credit_transactions')
+      .insert({
+        user_id: userId,
+        amount: -creditCost,
+        transaction_type: 'deduction',
+        description: days === 1 
+          ? 'Used for risk profile analysis' 
+          : days === 7 
+          ? 'Analysis of 7 days of trades' 
+          : 'Analysis of 30 days of trades'
+      });
+    
+    if (transactionError) {
+      console.error('Error recording transaction:', transactionError);
+      // Continue even if transaction logging fails
+    }
+    
+    // Calculate statistics and generate analysis
+    const statistics = calculateTradeStatistics(trades);
+    const prompt = createAnalysisPrompt(statistics, trades, customPrompt);
+    
+    console.log('Requesting analysis from OpenAI');
+    
     try {
-      // Calculate all trade statistics
-      const statistics = calculateTradeStatistics(trades);
+      // Get analysis from OpenAI
+      const analysis = await getAnalysisFromOpenAI(prompt);
       
-      // Generate the analysis prompt
-      const finalPrompt = createAnalysisPrompt(statistics, trades, customPrompt);
+      console.log('Analysis received successfully');
       
-      console.log('Prompt created, requesting analysis from OpenAI...');
-
-      try {
-        // Get analysis from OpenAI
-        const analysis = await getAnalysisFromOpenAI(finalPrompt);
-        
-        console.log('Analysis received successfully from OpenAI');
-        
-        return new Response(
-          JSON.stringify({ 
-            analysis, 
-            success: true,
-            creditsUsed: creditCost,
-            remainingCredits: deductResult 
-          }), 
-          { headers }
-        );
-      } catch (openaiError) {
-        console.error('OpenAI API error:', openaiError);
-        
-        // Return error response with CORS headers
-        return new Response(
-          JSON.stringify({ 
-            error: "OpenAI analysis failed", 
-            message: openaiError.message || "Failed to generate analysis",
-            success: false 
-          }),
-          { status: 500, headers }
-        );
-      }
-    } catch (processingError) {
-      console.error('Error processing trades or creating prompt:', processingError);
+      const remainingCredits = totalAvailableCredits - creditCost;
+      
       return new Response(
         JSON.stringify({ 
-          error: "Failed to process trades", 
-          message: processingError.message || "Error processing trade data",
+          analysis, 
+          success: true,
+          creditsUsed: creditCost,
+          remainingCredits
+        }), 
+        { headers }
+      );
+    } catch (openaiError) {
+      console.error('OpenAI API error:', openaiError);
+      return new Response(
+        JSON.stringify({ 
+          error: "OpenAI analysis failed", 
+          message: openaiError.message || "Failed to generate analysis",
           success: false 
         }),
         { status: 500, headers }
       );
     }
+    
   } catch (error) {
-    console.error('Error in analyze trades function:', error);
-    
+    console.error('Unhandled error in analyze trades function:', error);
     return new Response(
       JSON.stringify({ 
         error: "Analysis failed", 

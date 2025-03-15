@@ -62,7 +62,9 @@ export function useTradeAnalysis() {
         return false;
       }
 
-      // Call the Supabase Edge Function with userId for credit deduction
+      console.log(`Analyzing ${filteredTrades.length} trades for the last ${days} days...`);
+
+      // Call the analyze-trades edge function
       const { data, error } = await supabase.functions.invoke('analyze-trades', {
         body: {
           trades: filteredTrades,
@@ -72,48 +74,40 @@ export function useTradeAnalysis() {
         }
       });
 
-      // Check for errors
       if (error) {
-        console.error('Supabase function error:', error);
-        
-        if (error.message && (error.message.includes('403') || error.message.includes('Forbidden'))) {
-          throw new Error('Access denied. You may not have enough credits, or there might be an authentication issue.');
-        }
-        
+        console.error('Edge function error:', error);
         throw new Error(error.message || 'Failed to analyze trades');
       }
 
-      // Check for credit-related issues or other errors
-      if (data && !data.success) {
-        console.error('Analysis failed:', data.error || data.message || 'Unknown error');
-        throw new Error(data.message || data.error || "Failed to analyze trades");
+      if (!data?.success) {
+        console.error('Analysis failed:', data?.error || data?.message);
+        throw new Error(data?.message || data?.error || 'Analysis failed');
       }
 
-      // Set the analysis text
-      const analysisText = data?.analysis || '';
+      // Set the analysis results
+      setCurrentAnalysis(data.analysis || '');
       
-      setCurrentAnalysis(analysisText);
-      
-      // Consider analysis successful if it has meaningful content
-      const isSuccessful = analysisText.trim().length > 50;
-      
-      if (!isSuccessful) {
-        toast({
-          title: "Analysis returned insufficient result",
-          description: "The AI couldn't generate a meaningful analysis.",
-          variant: "destructive",
-        });
-      }
-
-      return isSuccessful;
-
+      return true;
     } catch (error) {
       console.error('Analysis error:', error);
+      
+      let errorMessage = 'Failed to analyze trades';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Handle specific error cases
+        if (errorMessage.includes('Insufficient credits')) {
+          errorMessage = 'You don\'t have enough credits for this analysis.';
+        }
+      }
+      
       toast({
         title: "Analysis failed",
-        description: error instanceof Error ? error.message : "Failed to analyze trades",
+        description: errorMessage,
         variant: "destructive",
       });
+      
       setCurrentAnalysis('');
       return false;
     } finally {

@@ -39,32 +39,35 @@ export function AIAnalysisTab() {
 
   const handleAnalyze = async (days: number, customPrompt?: string) => {
     try {
+      if (!userId) {
+        toast.error('You must be logged in to analyze trades');
+        return;
+      }
+      
       // Credit cost based on days
       const creditCost = days === 1 ? 1 : days === 7 ? 3 : 5;
       
       // Ensure we have the latest credit data
       await refetch();
       
-      if (!credits || credits.subscription_credits + credits.purchased_credits < creditCost) {
-        toast.error(`You need ${creditCost} credits to analyze ${days} days of trades. You have ${(credits?.subscription_credits || 0) + (credits?.purchased_credits || 0)} credits.`);
+      const totalAvailableCredits = (credits?.subscription_credits || 0) + (credits?.purchased_credits || 0);
+      
+      if (totalAvailableCredits < creditCost) {
+        toast.error(`You need ${creditCost} credits to analyze ${days} days of trades. You have ${totalAvailableCredits} credits.`);
         setIsPurchaseDialogOpen(true);
         return;
       }
       
-      // The credit deduction is handled by the edge function
-      const analysisSuccess = await analyzeTradesForPeriod(trades, days, customPrompt, userId);
+      console.log(`Attempting to analyze ${trades.length} trades over ${days} days`);
       
-      // Refetch credits to update UI after analysis
+      const success = await analyzeTradesForPeriod(trades, days, customPrompt, userId);
+      
+      // Refetch credits regardless of outcome to update UI
       await refetch();
       
-      if (!analysisSuccess) {
-        toast.error('Analysis failed. Please try again later.');
-      } else {
+      if (success) {
         toast.success(`Analysis complete! Used ${creditCost} credits.`);
       }
-      
-      // Final refetch to ensure UI is up-to-date
-      await refetch();
       
     } catch (error) {
       console.error('Analysis failed:', error);
