@@ -14,7 +14,7 @@ export function useTradeAnalysis() {
     trades: Trade[],
     days: number,
     customPrompt?: string
-  ) => {
+  ): Promise<boolean> => {
     if (trades.length === 0) {
       toast({
         title: "No trades to analyze",
@@ -51,6 +51,8 @@ export function useTradeAnalysis() {
         return false;
       }
 
+      console.log(`Analyzing ${filteredTrades.length} trades for the last ${days} days`);
+
       // Call the Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('analyze-trades', {
         body: {
@@ -61,27 +63,32 @@ export function useTradeAnalysis() {
       });
 
       if (error) {
+        console.error('Supabase function error:', error);
         throw new Error(error.message);
       }
 
       // Set the analysis text
-      const analysisText = data.analysis || '';
+      const analysisText = data?.analysis || '';
+      console.log('Analysis result length:', analysisText.length);
+      
       setCurrentAnalysis(analysisText);
       
-      // Return true if analysis was successful (has content)
-      const isSuccessful = analysisText.trim().length > 0;
+      // Consider analysis successful if it has meaningful content (more than just whitespace)
+      const isSuccessful = analysisText.trim().length > 100;
       
       if (isSuccessful) {
         toast({
           title: "Analysis complete",
           description: `Successfully analyzed ${filteredTrades.length} trades.`,
         });
+        console.log('Analysis successful');
       } else {
         toast({
-          title: "Analysis returned empty result",
+          title: "Analysis returned insufficient result",
           description: "The AI couldn't generate a meaningful analysis.",
           variant: "destructive",
         });
+        console.log('Analysis failed - insufficient content');
       }
 
       return isSuccessful;

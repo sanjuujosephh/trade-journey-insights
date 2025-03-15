@@ -13,12 +13,8 @@ import { Separator } from '../ui/separator';
 import { CreditTransactionsPanel } from './CreditTransactionsPanel';
 
 export function AIAnalysisTab() {
-  const {
-    userId
-  } = useTradeAuth();
-  const {
-    trades
-  } = useTradeQueries(userId);
+  const { userId } = useTradeAuth();
+  const { trades } = useTradeQueries(userId);
   const {
     credits,
     transactions,
@@ -34,10 +30,18 @@ export function AIAnalysisTab() {
   } = useTradeAnalysis();
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
   
-  // Force refetch credits when component mounts
+  // Force refetch credits when component mounts and when userId changes
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    console.log('AIAnalysisTab mounted or userId changed, fetching credits');
+    if (userId) {
+      refetch();
+    }
+  }, [refetch, userId]);
+
+  // Log credit information for debugging
+  useEffect(() => {
+    console.log('Current credits in AIAnalysisTab:', credits);
+  }, [credits]);
 
   const handleAnalyze = async (days: number, customPrompt?: string) => {
     try {
@@ -49,6 +53,8 @@ export function AIAnalysisTab() {
         setIsPurchaseDialogOpen(true);
         return;
       }
+      
+      console.log('Starting analysis with credit cost:', creditCost);
       
       // First deduct the credits to ensure they're available
       const creditResult = await useCredits.mutateAsync({
@@ -64,6 +70,7 @@ export function AIAnalysisTab() {
       
       // Immediately refetch credits to update UI
       await refetch();
+      console.log('Credits deducted, balance updated');
       
       // Proceed with analysis after credits are successfully deducted
       const analysisSuccess = await analyzeTradesForPeriod(trades, days, customPrompt);
@@ -71,7 +78,7 @@ export function AIAnalysisTab() {
       // Refetch credits again to ensure the UI is up-to-date
       await refetch();
       
-      // If analysis was not successful, refund the credits
+      // If analysis was not successful (empty result), refund the credits
       if (!analysisSuccess) {
         console.log('Analysis failed, refunding credits...');
         
@@ -89,9 +96,12 @@ export function AIAnalysisTab() {
         
         // Refetch credits to update UI after refund
         await refetch();
+        console.log('Credits refunded, balance updated');
       } else {
         // Analysis was successful
         toast.success(`Analysis complete! Used ${creditCost} credits.`);
+        // Refetch one more time to be sure UI is updated
+        await refetch();
       }
     } catch (error) {
       console.error('Analysis failed:', error);
@@ -105,13 +115,20 @@ export function AIAnalysisTab() {
     setIsPurchaseDialogOpen(true);
   };
   
+  // Refresh credits manually
+  const forceRefreshCredits = async () => {
+    console.log('Manual credit refresh requested');
+    await refetch();
+    toast.success('Credit information refreshed');
+  };
+  
   return <div className="space-y-6">
       <div className="w-full">
         <CreditsDisplay 
           credits={credits} 
           isLoading={isLoadingCredits} 
           onPurchaseClick={handlePurchaseClick} 
-          onRefresh={() => refetch()}
+          onRefresh={forceRefreshCredits}
         />
       </div>
       

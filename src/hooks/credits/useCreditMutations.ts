@@ -1,6 +1,6 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { UserCredits, UseCreditsParams, PurchaseCreditsParams, CreditOperationResult } from './types';
 
@@ -46,6 +46,12 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
         // For additions (purchase, refund, reset), add to purchased credits
         newPurchasedCredits += amount;
       }
+      
+      console.log('Updating credits:', {
+        userId,
+        oldValues: { subscriptionCredits: credits.subscription_credits, purchasedCredits: credits.purchased_credits },
+        newValues: { newSubscriptionCredits, newPurchasedCredits }
+      });
       
       // Insert transaction
       const { error: transactionError } = await supabase

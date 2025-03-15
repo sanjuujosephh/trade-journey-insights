@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { UserCredits, CreditTransaction } from './types';
 
 export function useCreditQueries(userId: string | null) {
@@ -15,6 +15,7 @@ export function useCreditQueries(userId: string | null) {
     queryFn: async () => {
       if (!userId) return null;
       
+      console.log('Fetching credits for user:', userId);
       const { data, error } = await supabase
         .from('user_credits')
         .select('*')
@@ -26,9 +27,12 @@ export function useCreditQueries(userId: string | null) {
         return null;
       }
       
+      console.log('User credits data:', data);
       return data as UserCredits;
     },
-    enabled: !!userId
+    enabled: !!userId,
+    refetchOnWindowFocus: true,
+    staleTime: 30000 // Consider data stale after 30 seconds
   });
   
   // Fetch credit transactions
