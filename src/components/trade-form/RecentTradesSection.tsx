@@ -1,8 +1,6 @@
-
 import { Trade } from "@/types/trade";
 import { TradeHistory } from "./TradeHistory";
 import { DateFilterControls } from "./DateFilterControls";
-
 interface RecentTradesSectionProps {
   trades: Trade[];
   filteredTrades: Trade[];
@@ -14,7 +12,6 @@ interface RecentTradesSectionProps {
   onViewDetails: (trade: Trade) => void;
   navigateToHistoryTab: () => void;
 }
-
 export function RecentTradesSection({
   trades,
   filteredTrades,
@@ -27,23 +24,9 @@ export function RecentTradesSection({
   navigateToHistoryTab
 }: RecentTradesSectionProps) {
   if (trades.length === 0) return null;
-
-  return (
-    <div className="space-y-4 mt-12 pt-8 border-t border-gray-200">
-      <DateFilterControls
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        clearDateFilter={clearDateFilter}
-        navigateToHistoryTab={navigateToHistoryTab}
-      />
+  return <div className="space-y-4 mt-12 pt-8 border-none border-gray-200 my-[71px]">
+      <DateFilterControls selectedDate={selectedDate} setSelectedDate={setSelectedDate} clearDateFilter={clearDateFilter} navigateToHistoryTab={navigateToHistoryTab} />
       
-      <TradeHistory 
-        trades={filteredTrades} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-        onViewDetails={onViewDetails} 
-        showEditButton={true} 
-      />
-    </div>
-  );
+      <TradeHistory trades={filteredTrades} onEdit={onEdit} onDelete={onDelete} onViewDetails={onViewDetails} showEditButton={true} />
+    </div>;
 }

@@ -25,7 +25,7 @@ export function TradeFormManager({
   onCancelEditing
 }: TradeFormManagerProps) {
   const isEditing = !!editingId;
-  return <form onSubmit={onSubmit} className="space-y-6">
+  return <form onSubmit={onSubmit} className="space-y-6 py-[20px] my-[20px]">
       {isEditing && <div className="mb-4 p-3 border-none border-primary rounded-md px-[23px] mx-[25px] flex justify-between items-center my-[40px] py-[6px] bg-gray-100">
           <p className="text-sm text-primary font-medium">
             Editing trade: {formData.symbol} {formData.entry_date}
