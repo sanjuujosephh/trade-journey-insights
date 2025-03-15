@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
@@ -71,17 +71,15 @@ Provide specific insights on:
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <DialogTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="ml-1 bg-white border border-input" 
-              style={{ height: '2.6rem', width: '3rem' }}
-            >
-              <Wand2 className="h-4 w-4" />
-              <span className="sr-only">Customize {buttonLabel} Analysis</span>
-            </Button>
-          </DialogTrigger>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="ml-1 bg-white border border-input" 
+            style={{ height: '2.6rem', width: '3rem' }}
+          >
+            <Wand2 className="h-4 w-4" />
+            <span className="sr-only">Customize {buttonLabel} Analysis</span>
+          </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">
           <p>Customize {buttonLabel} Analysis</p>
@@ -92,6 +90,9 @@ Provide specific insights on:
           <DialogTitle>
             Customize AI Analysis Prompt
           </DialogTitle>
+          <DialogDescription>
+            Customize the prompt for {buttonLabel.toLowerCase()} analysis (costs {dayCount === 1 ? 1 : dayCount === 7 ? 3 : 5} credits)
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 my-4">
@@ -142,7 +143,7 @@ Provide specific insights on:
             Cancel
           </Button>
           <Button onClick={handleAnalyze}>
-            Run Analysis
+            Run Analysis ({dayCount === 1 ? 1 : dayCount === 7 ? 3 : 5} credits)
           </Button>
         </DialogFooter>
       </DialogContent>
