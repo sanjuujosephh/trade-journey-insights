@@ -1,5 +1,4 @@
 
-import { Filter } from "lucide-react";
 import { SearchBar } from "./filters/SearchBar";
 import { PrimaryFilters } from "./filters/PrimaryFilters";
 import { AdvancedFilters } from "./filters/AdvancedFilters";
@@ -60,7 +59,7 @@ export function TradeHistoryFilters({
   tradesCount
 }: TradeHistoryFiltersProps) {
   
-  // Fix: Ensure this is a boolean by using Boolean() or a comparison
+  // Ensure this is a boolean by using Boolean() or a comparison
   const showClearFiltersButton = Boolean(
     searchTerm || 
     outcomeFilter !== "all" || 
@@ -76,45 +75,52 @@ export function TradeHistoryFilters({
   
   return (
     <div className="mb-4 space-y-4">
-      {/* Search and Filter UI */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <SearchBar 
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
+      {/* Top row with search and primary filters */}
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="w-full lg:w-1/3">
+          <SearchBar 
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
+        </div>
         
-        {/* Primary Filters */}
-        <PrimaryFilters
-          symbolFilter={symbolFilter}
-          setSymbolFilter={setSymbolFilter}
-          outcomeFilter={outcomeFilter}
-          setOutcomeFilter={setOutcomeFilter}
-          tradeTypeFilter={tradeTypeFilter}
-          setTradeTypeFilter={setTradeTypeFilter}
-          uniqueSymbols={uniqueSymbols}
-          showClearFiltersButton={showClearFiltersButton}
-          resetFilters={resetFilters}
+        <div className="w-full lg:w-2/3">
+          <PrimaryFilters
+            symbolFilter={symbolFilter}
+            setSymbolFilter={setSymbolFilter}
+            outcomeFilter={outcomeFilter}
+            setOutcomeFilter={setOutcomeFilter}
+            tradeTypeFilter={tradeTypeFilter}
+            setTradeTypeFilter={setTradeTypeFilter}
+            uniqueSymbols={uniqueSymbols}
+            showClearFiltersButton={showClearFiltersButton}
+            resetFilters={resetFilters}
+          />
+        </div>
+      </div>
+      
+      {/* Advanced Filters row */}
+      <div className="w-full">
+        <AdvancedFilters
+          directionFilter={directionFilter}
+          setDirectionFilter={setDirectionFilter}
+          optionTypeFilter={optionTypeFilter}
+          setOptionTypeFilter={setOptionTypeFilter}
+          timeframeFilter={timeframeFilter}
+          setTimeframeFilter={setTimeframeFilter}
+          marketConditionFilter={marketConditionFilter}
+          setMarketConditionFilter={setMarketConditionFilter}
+          entryEmotionFilter={entryEmotionFilter}
+          setEntryEmotionFilter={setEntryEmotionFilter}
+          exitEmotionFilter={exitEmotionFilter}
+          setExitEmotionFilter={setExitEmotionFilter}
         />
       </div>
       
-      {/* Advanced Filters */}
-      <AdvancedFilters
-        directionFilter={directionFilter}
-        setDirectionFilter={setDirectionFilter}
-        optionTypeFilter={optionTypeFilter}
-        setOptionTypeFilter={setOptionTypeFilter}
-        timeframeFilter={timeframeFilter}
-        setTimeframeFilter={setTimeframeFilter}
-        marketConditionFilter={marketConditionFilter}
-        setMarketConditionFilter={setMarketConditionFilter}
-        entryEmotionFilter={entryEmotionFilter}
-        setEntryEmotionFilter={setEntryEmotionFilter}
-        exitEmotionFilter={exitEmotionFilter}
-        setExitEmotionFilter={setExitEmotionFilter}
-      />
-      
-      {/* Results count */}
-      <FilterResults tradesCount={tradesCount} />
+      {/* Results count row */}
+      <div className="w-full">
+        <FilterResults tradesCount={tradesCount} />
+      </div>
     </div>
   );
 }

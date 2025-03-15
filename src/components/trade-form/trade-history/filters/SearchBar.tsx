@@ -10,7 +10,7 @@ interface SearchBarProps {
 
 export function SearchBar({ searchTerm, setSearchTerm }: SearchBarProps) {
   return (
-    <div className="relative w-full sm:w-3/5 md:w-2/5">
+    <div className="relative w-full">
       <Input
         placeholder="Search by symbol or notes..."
         value={searchTerm}
