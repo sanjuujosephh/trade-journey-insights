@@ -1,27 +1,19 @@
 
 import { ErrorBoundary } from "./ErrorBoundary";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
-import { TradeHistory } from "./trade-form/TradeHistory";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ImportTrades } from "./trade-form/ImportTrades";
-import { TradeFormManager } from "./trade-form/TradeFormManager";
 import { useTradeManagement } from "@/hooks/useTradeManagement";
-import { supabase } from "@/lib/supabase";
+import { useDateFilter } from "@/hooks/useDateFilter";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, ArrowRight } from "lucide-react";
-import { format, isValid } from "date-fns";
-import { cn } from "@/lib/utils";
+import { TradeEntryForm } from "./trade-form/TradeEntryForm";
+import { RecentTradesSection } from "./trade-form/RecentTradesSection";
+import { useTradeDelete } from "./trade-form/TradeDeleteHandler";
 
 export default function TradeEntry() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   
+  // Trade management hooks
   const {
     formData,
     editingId,
@@ -41,61 +33,24 @@ export default function TradeEntry() {
     setEditingId
   } = useTradeManagement();
 
-  if (isLoading) return <LoadingSpinner />;
+  // Date filtering
+  const {
+    selectedDate,
+    setSelectedDate,
+    filteredTrades,
+    clearDateFilter
+  } = useDateFilter(trades);
 
-  // Filter trades based on selected date or show recent 10
-  const filteredTrades = selectedDate && isValid(selectedDate) ? trades.filter(trade => {
-    // Convert DD-MM-YYYY to Date object for comparison
-    if (!trade.entry_date) return false;
-    const [day, month, year] = trade.entry_date.split('-').map(Number);
-    const tradeDate = new Date(year, month - 1, day);
-    return tradeDate.toDateString() === selectedDate.toDateString();
-  }) : trades.slice(0, 10); // Show 10 most recent trades if no date selected
+  // Trade deletion
+  const { handleDelete } = useTradeDelete({ 
+    onEditingCancelled: () => {
+      resetForm();
+      setEditingId(null);
+    },
+    editingId
+  });
 
-  const handleDelete = async (id: string) => {
-    try {
-      const { error } = await supabase.from('trades').delete().eq('id', id);
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      // Clear form if the deleted trade was being edited
-      if (editingId === id) {
-        resetForm();
-      }
-
-      // Invalidate the trades query to refresh data
-      queryClient.invalidateQueries({
-        queryKey: ['trades']
-      });
-      toast({
-        title: "Success",
-        description: "Trade deleted successfully!"
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete trade",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const clearDateFilter = () => {
-    setSelectedDate(undefined);
-    toast({
-      title: "Filter Cleared",
-      description: "Showing 10 most recent trades"
-    });
-  };
-
-  const navigateToHistoryTab = () => {
-    const historyTabTrigger = document.querySelector('[value="history"]') as HTMLElement;
-    if (historyTabTrigger) {
-      historyTabTrigger.click();
-    }
-  };
-
+  // Cancel editing
   const cancelEditing = () => {
     resetForm();
     setEditingId(null);
@@ -105,74 +60,49 @@ export default function TradeEntry() {
     });
   };
 
+  // Navigate to history tab
+  const navigateToHistoryTab = () => {
+    const historyTabTrigger = document.querySelector('[value="history"]') as HTMLElement;
+    if (historyTabTrigger) {
+      historyTabTrigger.click();
+    }
+  };
+
+  if (isLoading) return <LoadingSpinner />;
+
   return (
     <ErrorBoundary>
       <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
-        <TradeFormManager 
-          formData={formData} 
-          handleChange={handleChange} 
-          handleSelectChange={handleSelectChange} 
-          onSubmit={handleSubmit} 
+        {/* Trade Entry Form */}
+        <TradeEntryForm
+          formData={formData}
           editingId={editingId}
-          isSubmitting={isSubmitting} 
-          onCancelEditing={cancelEditing}
+          isSubmitting={isSubmitting}
+          handleChange={handleChange}
+          handleSelectChange={handleSelectChange}
+          handleSubmit={handleSubmit}
+          cancelEditing={cancelEditing}
         />
 
+        {/* Recent Trades Section */}
         {trades.length > 0 && (
-          <div className="space-y-4 mt-8">
-            <div className="flex items-center justify-between gap-2 px-[30px]">
-              <div className="flex items-center gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-[240px] justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}>
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "dd-MM-yyyy") : "Filter by date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar 
-                      mode="single" 
-                      selected={selectedDate} 
-                      onSelect={setSelectedDate} 
-                      initialFocus 
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                {selectedDate && (
-                  <Button 
-                    type="button" 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={clearDateFilter}
-                  >
-                    Clear
-                  </Button>
-                )}
-              </div>
-              
-              <Button 
-                variant="ghost" 
-                onClick={navigateToHistoryTab} 
-                className="flex items-center gap-1 text-primary"
-              >
-                View All Entries
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <TradeHistory 
-              trades={filteredTrades} 
-              onEdit={handleEdit} 
-              onDelete={handleDelete} 
-              onViewDetails={handleViewDetails} 
-              showEditButton={true} 
-            />
-          </div>
+          <RecentTradesSection
+            trades={trades}
+            filteredTrades={filteredTrades}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            clearDateFilter={clearDateFilter}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onViewDetails={handleViewDetails}
+            navigateToHistoryTab={navigateToHistoryTab}
+          />
         )}
 
+        {/* Import/Export Section */}
         <ImportTrades />
 
+        {/* Trade Details Dialog */}
         {selectedTrade && (
           <TradeDetailsDialog 
             trade={selectedTrade} 
