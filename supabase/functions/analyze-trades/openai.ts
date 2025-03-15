@@ -33,13 +33,24 @@ export async function getAnalysisFromOpenAI(prompt) {
       }),
     });
 
-    const responseText = await response.text();
-    
     if (!response.ok) {
-      console.error(`OpenAI API error (${response.status}):`, responseText);
-      throw new Error(`OpenAI API error: ${response.status} - ${responseText.substring(0, 200)}`);
+      const errorText = await response.text();
+      console.error(`OpenAI API error (${response.status}):`, errorText);
+      
+      // Try to parse the error response for more details
+      let errorDetails = "Unknown API error";
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorDetails = errorJson.error?.message || errorJson.error?.type || errorText.substring(0, 200);
+      } catch (e) {
+        errorDetails = errorText.substring(0, 200);
+      }
+      
+      throw new Error(`OpenAI API error: ${response.status} - ${errorDetails}`);
     }
 
+    const responseText = await response.text();
+    
     let data;
     try {
       data = JSON.parse(responseText);

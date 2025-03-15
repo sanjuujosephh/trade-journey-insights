@@ -83,9 +83,9 @@ export function useTradeAnalysis() {
       if (error) {
         console.error('Supabase function error:', error);
         
-        // Special handling for 403 errors (likely credit related)
-        if (error.message && error.message.includes('403')) {
-          throw new Error('You may not have enough credits for this analysis. Please check your credit balance and try again.');
+        // Special handling for 403 errors (credit/auth related)
+        if (error.message && (error.message.includes('403') || error.message.includes('Forbidden'))) {
+          throw new Error('Access denied. You may not have enough credits, or there might be an authentication issue. Please try refreshing the page and logging in again.');
         }
         
         throw new Error(error.message || 'Failed to analyze trades');
