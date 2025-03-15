@@ -193,14 +193,12 @@ export function useUserCredits() {
           return { success: false, message: 'Failed to create credits record' };
         }
       } else {
-        // Update existing credits
+        // Update existing credits - FIX: Don't use RPC directly here
+        // Just update with addition operation
         const { error: updateError } = await supabase
           .from('user_credits')
           .update({
-            purchased_credits: supabase.rpc('add_credits', { 
-              user_id: userId, 
-              credits_to_add: amount 
-            }),
+            purchased_credits: (credits?.purchased_credits || 0) + amount,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', userId);

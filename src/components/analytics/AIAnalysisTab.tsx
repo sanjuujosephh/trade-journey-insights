@@ -58,7 +58,9 @@ export function AIAnalysisTab() {
       // Proceed with analysis after credits are successfully deducted
       const analysisResult = await analyzeTradesForPeriod(trades, days, customPrompt);
       
-      if (analysisResult) {
+      // Check if analysis was successful based on the returned value
+      // Instead of directly checking analysisResult which might be void
+      if (currentAnalysis) {
         toast.success(`Analysis complete! Used ${creditCost} credits.`);
       } else {
         // If analysis fails, refund the credits
