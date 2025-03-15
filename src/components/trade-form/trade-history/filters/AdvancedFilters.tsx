@@ -39,8 +39,8 @@ export function AdvancedFilters({
   return (
     <div className="flex flex-wrap gap-2">
       <Select value={directionFilter} onValueChange={setDirectionFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Direction" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Direction" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Direction</SelectItem>
@@ -50,8 +50,8 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={optionTypeFilter} onValueChange={setOptionTypeFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Option Type" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Option" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Option</SelectItem>
@@ -61,8 +61,8 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={timeframeFilter} onValueChange={setTimeframeFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Timeframe" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Timeframe" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Timeframe</SelectItem>
@@ -77,8 +77,8 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={marketConditionFilter} onValueChange={setMarketConditionFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Market" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Market" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Market</SelectItem>
@@ -90,8 +90,8 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={entryEmotionFilter} onValueChange={setEntryEmotionFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Entry Emotion" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Entry Emotion" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Emotion</SelectItem>
@@ -105,8 +105,8 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={exitEmotionFilter} onValueChange={setExitEmotionFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Exit Emotion" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Exit Emotion" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Emotion</SelectItem>

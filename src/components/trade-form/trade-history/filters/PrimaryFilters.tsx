@@ -34,8 +34,8 @@ export function PrimaryFilters({
   return (
     <div className="flex flex-wrap gap-2 w-full sm:w-auto">
       <Select value={symbolFilter} onValueChange={setSymbolFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Symbol" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Symbol" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Symbol</SelectItem>
@@ -46,8 +46,8 @@ export function PrimaryFilters({
       </Select>
       
       <Select value={outcomeFilter} onValueChange={setOutcomeFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Outcome" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Outcome" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Outcome</SelectItem>
@@ -58,8 +58,8 @@ export function PrimaryFilters({
       </Select>
       
       <Select value={tradeTypeFilter} onValueChange={setTradeTypeFilter}>
-        <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
-          <SelectValue placeholder="Type" />
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Any Type" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Any Type</SelectItem>
