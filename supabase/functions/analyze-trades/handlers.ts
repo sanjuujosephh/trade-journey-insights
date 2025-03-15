@@ -22,11 +22,21 @@ export async function handleAnalyzeTradesRequest(req) {
 
   try {
     // Extract request data
-    const { trades, days = 1, customPrompt, userId } = await req.json();
+    const requestData = await req.json();
+    const { trades, days = 1, customPrompt, userId } = requestData;
+    
+    console.log(`Received request to analyze ${trades?.length || 0} trades over ${days} days for user ${userId || 'unknown'}`);
     
     if (!userId) {
       return new Response(
         JSON.stringify({ error: "User ID is required for credit validation", success: false }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (!trades || !Array.isArray(trades) || trades.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "No trades provided for analysis", success: false }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -36,36 +46,57 @@ export async function handleAnalyzeTradesRequest(req) {
     
     console.log(`Attempting to deduct ${creditCost} credits for user ${userId} for analysis of ${days} days`);
     
+    // Deduct credits
+    let deductResult;
     try {
       // Call the PostgreSQL function to deduct credits
-      const { data: deductResult, error: deductError } = await supabase.rpc(
+      const { data, error } = await supabase.rpc(
         'deduct_credits',
         { user_id: userId, credits_to_deduct: creditCost }
       );
       
-      if (deductError) {
-        console.error('Error deducting credits:', deductError);
+      if (error) {
+        console.error('Error deducting credits:', error);
         return new Response(
           JSON.stringify({ 
             error: "Credit deduction failed", 
-            message: deductError.message,
+            message: error.message,
             success: false 
           }),
           { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       
+      deductResult = data;
       console.log(`Successfully deducted ${creditCost} credits. Remaining credits: ${deductResult}`);
       
+    } catch (creditError) {
+      console.error('Error in credit deduction:', creditError);
+      return new Response(
+        JSON.stringify({ 
+          error: "Credit operation failed", 
+          message: creditError.message || "Unknown error during credit operation",
+          success: false 
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Process trades and generate analysis
+    try {
       // Calculate all trade statistics
       const statistics = calculateTradeStatistics(trades);
       
       // Generate the analysis prompt
       const finalPrompt = createAnalysisPrompt(statistics, trades, customPrompt);
+      
+      console.log('Prompt created, requesting analysis from OpenAI...');
 
       try {
         // Get analysis from OpenAI
         const analysis = await getAnalysisFromOpenAI(finalPrompt);
+        
+        console.log('Analysis received successfully from OpenAI');
         
         return new Response(
           JSON.stringify({ 
@@ -83,18 +114,18 @@ export async function handleAnalyzeTradesRequest(req) {
         return new Response(
           JSON.stringify({ 
             error: "OpenAI analysis failed", 
-            message: openaiError.message,
+            message: openaiError.message || "Failed to generate analysis",
             success: false 
           }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-    } catch (creditError) {
-      console.error('Error in credit deduction:', creditError);
+    } catch (processingError) {
+      console.error('Error processing trades or creating prompt:', processingError);
       return new Response(
         JSON.stringify({ 
-          error: "Credit operation failed", 
-          message: creditError.message,
+          error: "Failed to process trades", 
+          message: processingError.message || "Error processing trade data",
           success: false 
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -106,7 +137,7 @@ export async function handleAnalyzeTradesRequest(req) {
     return new Response(
       JSON.stringify({ 
         error: "Analysis failed", 
-        message: error.message,
+        message: error.message || "Unknown error occurred",
         success: false 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

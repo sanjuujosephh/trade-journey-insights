@@ -12,9 +12,10 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Received request to analyze-trades function');
     return await handleAnalyzeTradesRequest(req);
   } catch (error) {
-    console.error('Error in analyze-trades function:', error);
+    console.error('Uncaught error in analyze-trades function:', error);
     return new Response(JSON.stringify({ 
       error: error.message || 'Failed to analyze trades',
       success: false 

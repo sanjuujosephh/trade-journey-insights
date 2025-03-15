@@ -3,40 +3,50 @@
 export async function getAnalysisFromOpenAI(prompt) {
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   
-  console.log('Sending request to OpenAI...');
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openAIApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { 
-          role: 'system', 
-          content: 'You are a professional trading analyst. Provide clear, actionable insights in a concise format.'
-        },
-        { 
-          role: 'user', 
-          content: prompt 
-        }
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('OpenAI API error:', errorText);
-    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+  if (!openAIApiKey) {
+    console.error('OpenAI API key not configured');
+    throw new Error('OpenAI API key not configured');
   }
-
-  const data = await response.json();
-  console.log('Received response from OpenAI');
   
-  if (!data.choices?.[0]?.message?.content) {
-    throw new Error('Invalid response from OpenAI');
-  }
+  console.log('Sending request to OpenAI...');
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are a professional trading analyst. Provide clear, actionable insights in a concise format.'
+          },
+          { 
+            role: 'user', 
+            content: prompt 
+          }
+        ],
+      }),
+    });
 
-  return data.choices[0].message.content;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI API error:', errorText);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Received response from OpenAI');
+    
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI');
+    }
+
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error('OpenAI API request failed:', error);
+    throw error; // Re-throw to be handled by the calling function
+  }
 }
