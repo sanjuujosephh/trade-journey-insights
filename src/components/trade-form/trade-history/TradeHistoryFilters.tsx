@@ -81,7 +81,7 @@ export function TradeHistoryFilters({
     <div className="mb-4 space-y-4">
       {/* Search and Filter UI */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div className="relative w-full sm:w-auto flex-1">
+        <div className="relative w-full sm:w-3/5 md:w-2/5">
           <Input
             placeholder="Search by symbol or notes..."
             value={searchTerm}
@@ -104,7 +104,7 @@ export function TradeHistoryFilters({
         {/* Primary Filters */}
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Select value={symbolFilter} onValueChange={setSymbolFilter}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
               <SelectValue placeholder="Symbol" />
             </SelectTrigger>
             <SelectContent>
@@ -116,7 +116,7 @@ export function TradeHistoryFilters({
           </Select>
           
           <Select value={outcomeFilter} onValueChange={setOutcomeFilter}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
               <SelectValue placeholder="Outcome" />
             </SelectTrigger>
             <SelectContent>
@@ -128,7 +128,7 @@ export function TradeHistoryFilters({
           </Select>
           
           <Select value={tradeTypeFilter} onValueChange={setTradeTypeFilter}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
@@ -155,7 +155,7 @@ export function TradeHistoryFilters({
       {/* Advanced Filters */}
       <div className="flex flex-wrap gap-2">
         <Select value={directionFilter} onValueChange={setDirectionFilter}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
             <SelectValue placeholder="Direction" />
           </SelectTrigger>
           <SelectContent>
@@ -166,7 +166,7 @@ export function TradeHistoryFilters({
         </Select>
         
         <Select value={optionTypeFilter} onValueChange={setOptionTypeFilter}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
             <SelectValue placeholder="Option Type" />
           </SelectTrigger>
           <SelectContent>
@@ -177,7 +177,7 @@ export function TradeHistoryFilters({
         </Select>
         
         <Select value={timeframeFilter} onValueChange={setTimeframeFilter}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
             <SelectValue placeholder="Timeframe" />
           </SelectTrigger>
           <SelectContent>
@@ -193,7 +193,7 @@ export function TradeHistoryFilters({
         </Select>
         
         <Select value={marketConditionFilter} onValueChange={setMarketConditionFilter}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
             <SelectValue placeholder="Market" />
           </SelectTrigger>
           <SelectContent>
@@ -206,7 +206,7 @@ export function TradeHistoryFilters({
         </Select>
         
         <Select value={entryEmotionFilter} onValueChange={setEntryEmotionFilter}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
             <SelectValue placeholder="Entry Emotion" />
           </SelectTrigger>
           <SelectContent>
@@ -221,7 +221,7 @@ export function TradeHistoryFilters({
         </Select>
         
         <Select value={exitEmotionFilter} onValueChange={setExitEmotionFilter}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[130px]" style={{ paddingLeft: "8px" }}>
             <SelectValue placeholder="Exit Emotion" />
           </SelectTrigger>
           <SelectContent>
