@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnalysisButtons } from './AnalysisButtons';
 import { AnalysisResult } from './AnalysisResult';
 import { CreditsDisplay } from './CreditsDisplay';
@@ -33,6 +33,11 @@ export function AIAnalysisTab() {
     analyzeTradesForPeriod
   } = useTradeAnalysis();
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
+  
+  // Force refetch credits when component mounts
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const handleAnalyze = async (days: number, customPrompt?: string) => {
     try {
@@ -91,6 +96,8 @@ export function AIAnalysisTab() {
     } catch (error) {
       console.error('Analysis failed:', error);
       toast.error('Failed to analyze trades. Please try again later.');
+      // Ensure credits are refetched in case of error
+      await refetch();
     }
   };
   
@@ -100,7 +107,12 @@ export function AIAnalysisTab() {
   
   return <div className="space-y-6">
       <div className="w-full">
-        <CreditsDisplay credits={credits} isLoading={isLoadingCredits} onPurchaseClick={handlePurchaseClick} />
+        <CreditsDisplay 
+          credits={credits} 
+          isLoading={isLoadingCredits} 
+          onPurchaseClick={handlePurchaseClick} 
+          onRefresh={() => refetch()}
+        />
       </div>
       
       <AnalysisButtons 
@@ -117,6 +129,15 @@ export function AIAnalysisTab() {
         <CreditTransactionsPanel transactions={transactions} />
       )}
 
-      <PurchaseCreditsDialog open={isPurchaseDialogOpen} onOpenChange={setIsPurchaseDialogOpen} />
+      <PurchaseCreditsDialog 
+        open={isPurchaseDialogOpen} 
+        onOpenChange={(isOpen) => {
+          setIsPurchaseDialogOpen(isOpen);
+          if (!isOpen) {
+            // Refresh credits when the dialog closes
+            refetch();
+          }
+        }} 
+      />
     </div>;
 }

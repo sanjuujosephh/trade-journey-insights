@@ -1,5 +1,5 @@
 
-import { CalendarClock, CreditCard, InfoIcon } from "lucide-react";
+import { CalendarClock, CreditCard, InfoIcon, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -14,9 +14,15 @@ interface CreditsDisplayProps {
   credits: UserCredits | null;
   isLoading: boolean;
   onPurchaseClick: () => void;
+  onRefresh?: () => void;
 }
 
-export function CreditsDisplay({ credits, isLoading, onPurchaseClick }: CreditsDisplayProps) {
+export function CreditsDisplay({ 
+  credits, 
+  isLoading, 
+  onPurchaseClick, 
+  onRefresh 
+}: CreditsDisplayProps) {
   if (isLoading) {
     return (
       <div className="animate-pulse bg-gray-200 h-12 rounded-md w-full"></div>
@@ -47,6 +53,17 @@ export function CreditsDisplay({ credits, isLoading, onPurchaseClick }: CreditsD
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          {onRefresh && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-6 w-6 p-0" 
+              onClick={onRefresh}
+              title="Refresh credit balance"
+            >
+              <RefreshCcw className="h-3.5 w-3.5" />
+            </Button>
+          )}
         </div>
         
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
