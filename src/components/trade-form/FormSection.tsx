@@ -7,7 +7,7 @@ interface FormSectionProps {
 
 export function FormSection({ children }: FormSectionProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       {children}
     </div>
   );

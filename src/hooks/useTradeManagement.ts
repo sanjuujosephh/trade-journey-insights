@@ -2,10 +2,12 @@
 import { useTradeForm } from "./useTradeForm";
 import { useTradeOperations } from "./useTradeOperations";
 import { useTradeSubmission } from "./useTradeSubmission";
-import { useTradeActions } from "./useTradeActions";
 import { Trade } from "@/types/trade";
+import { useToast } from "./use-toast";
 
 export function useTradeManagement() {
+  const { toast } = useToast();
+  
   // Form state management
   const {
     formData,
@@ -44,9 +46,9 @@ export function useTradeManagement() {
 
   // Load trade data into form for editing
   const handleEdit = (trade: Trade) => {
-    // Set up form data for editing
+    // Set up form data for editing - ensure all fields are properly populated
     setFormData({
-      symbol: trade.symbol,
+      symbol: trade.symbol || "",
       entry_price: trade.entry_price?.toString() || "",
       exit_price: trade.exit_price?.toString() || "",
       quantity: trade.quantity?.toString() || "",
@@ -91,6 +93,13 @@ export function useTradeManagement() {
       top: 0,
       behavior: "smooth",
     });
+    
+    // Notify user that edit mode is active
+    toast({
+      title: "Editing Trade",
+      description: `Editing ${trade.symbol} trade from ${trade.entry_date}`,
+      duration: 3000,
+    });
   };
 
   // View details handler
@@ -128,6 +137,7 @@ export function useTradeManagement() {
     handleSubmit,
     handleEdit,
     handleViewDetails,
-    closeDialog
+    closeDialog,
+    resetForm, // Added resetForm to exports
   };
 }

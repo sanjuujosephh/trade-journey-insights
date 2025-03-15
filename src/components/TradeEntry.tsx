@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, ArrowRight } from "lucide-react";
+import { CalendarIcon, ArrowRight, XCircle } from "lucide-react";
 import { format, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +36,9 @@ export default function TradeEntry() {
     handleSelectChange,
     handleSubmit,
     handleEdit,
-    handleViewDetails
+    handleViewDetails,
+    resetForm,
+    setEditingId
   } = useTradeManagement();
 
   if (isLoading) return <LoadingSpinner />;
@@ -59,9 +61,7 @@ export default function TradeEntry() {
 
       // Clear form if the deleted trade was being edited
       if (editingId === id) {
-        // Reset form data
-        const resetButton = document.querySelector('[type="reset"]') as HTMLButtonElement;
-        if (resetButton) resetButton.click();
+        resetForm();
       }
 
       // Invalidate the trades query to refresh data
@@ -96,9 +96,32 @@ export default function TradeEntry() {
     }
   };
 
+  const cancelEditing = () => {
+    resetForm();
+    setEditingId(null);
+    toast({
+      title: "Editing Cancelled",
+      description: "Changes have been discarded"
+    });
+  };
+
   return (
     <ErrorBoundary>
       <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
+        {editingId && (
+          <div className="flex justify-end mb-2">
+            <Button 
+              onClick={cancelEditing} 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <XCircle className="w-4 h-4 mr-1" />
+              Cancel Editing
+            </Button>
+          </div>
+        )}
+        
         <TradeFormManager 
           formData={formData} 
           handleChange={handleChange} 
