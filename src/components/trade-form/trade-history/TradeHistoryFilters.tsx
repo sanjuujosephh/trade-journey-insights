@@ -1,6 +1,5 @@
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
 import { 
@@ -72,7 +71,7 @@ export function TradeHistoryFilters({
               <SelectValue placeholder="Symbol" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any Symbol</SelectItem>
+              <SelectItem value="all">Any Symbol</SelectItem>
               {uniqueSymbols.map(symbol => (
                 <SelectItem key={symbol} value={symbol}>{symbol}</SelectItem>
               ))}
@@ -84,7 +83,7 @@ export function TradeHistoryFilters({
               <SelectValue placeholder="Outcome" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any Outcome</SelectItem>
+              <SelectItem value="all">Any Outcome</SelectItem>
               <SelectItem value="profit">Profit</SelectItem>
               <SelectItem value="loss">Loss</SelectItem>
               <SelectItem value="breakeven">Breakeven</SelectItem>
@@ -96,14 +95,14 @@ export function TradeHistoryFilters({
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any Type</SelectItem>
+              <SelectItem value="all">Any Type</SelectItem>
               <SelectItem value="options">Options</SelectItem>
               <SelectItem value="futures">Futures</SelectItem>
               <SelectItem value="equity">Equity</SelectItem>
             </SelectContent>
           </Select>
           
-          {(outcomeFilter || symbolFilter || tradeTypeFilter || searchTerm) && (
+          {(outcomeFilter !== "all" || symbolFilter !== "all" || tradeTypeFilter !== "all" || searchTerm) && (
             <Button 
               variant="outline" 
               size="sm"

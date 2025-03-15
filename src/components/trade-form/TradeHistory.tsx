@@ -17,9 +17,9 @@ interface TradeHistoryProps {
 export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEditButton = false }: TradeHistoryProps) {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [outcomeFilter, setOutcomeFilter] = useState<string>("");
-  const [symbolFilter, setSymbolFilter] = useState<string>("");
-  const [tradeTypeFilter, setTradeTypeFilter] = useState<string>("");
+  const [outcomeFilter, setOutcomeFilter] = useState<string>("all");
+  const [symbolFilter, setSymbolFilter] = useState<string>("all");
+  const [tradeTypeFilter, setTradeTypeFilter] = useState<string>("all");
 
   // Get unique symbols for filter dropdown
   const uniqueSymbols = useMemo(() => {
@@ -41,7 +41,7 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
       
       // Outcome filtering
       let matchesOutcome = true;
-      if (outcomeFilter) {
+      if (outcomeFilter !== "all") {
         if (outcomeFilter === "profit") {
           matchesOutcome = pnl !== null && pnl > 0;
         } else if (outcomeFilter === "loss") {
@@ -52,10 +52,10 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
       }
       
       // Symbol filtering
-      const matchesSymbol = !symbolFilter || trade.symbol === symbolFilter;
+      const matchesSymbol = symbolFilter === "all" || trade.symbol === symbolFilter;
       
       // Trade type filtering
-      const matchesTradeType = !tradeTypeFilter || trade.trade_type === tradeTypeFilter;
+      const matchesTradeType = tradeTypeFilter === "all" || trade.trade_type === tradeTypeFilter;
       
       return matchesSearch && matchesOutcome && matchesSymbol && matchesTradeType;
     });
@@ -78,9 +78,9 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
 
   const resetFilters = () => {
     setSearchTerm("");
-    setOutcomeFilter("");
-    setSymbolFilter("");
-    setTradeTypeFilter("");
+    setOutcomeFilter("all");
+    setSymbolFilter("all");
+    setTradeTypeFilter("all");
     toast({
       title: "Filters Reset",
       description: "All filters have been cleared"
