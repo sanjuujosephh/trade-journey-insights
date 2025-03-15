@@ -4,6 +4,7 @@ import { Trade } from "@/types/trade";
 import { useState, useMemo } from "react";
 import { TradeHistoryTable } from "./trade-history/TradeHistoryTable";
 import { useToast } from "@/hooks/use-toast";
+import { TradeHistoryFilters } from "./trade-history/TradeHistoryFilters";
 
 interface TradeHistoryProps {
   trades: Trade[];
@@ -149,12 +150,9 @@ export function TradeHistory({
     });
   };
 
-  // Import TradeHistoryFilters only if showFilters is true
-  const TradeHistoryFilters = showFilters ? require("./trade-history/TradeHistoryFilters").TradeHistoryFilters : null;
-
   return (
     <Card className="p-6 glass">
-      {showFilters && TradeHistoryFilters && (
+      {showFilters && (
         <TradeHistoryFilters 
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
