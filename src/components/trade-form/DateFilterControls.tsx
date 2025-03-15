@@ -57,6 +57,8 @@ export function DateFilterControls({
         )}
       </div>
       
+      <h2 className="text-xl font-semibold">Recent Trades</h2>
+      
       <Button 
         variant="ghost" 
         onClick={navigateToHistoryTab} 
