@@ -19,8 +19,6 @@ export function AIAnalysisTab() {
     credits,
     transactions,
     isLoading: isLoadingCredits,
-    useCredits,
-    purchaseCredits,
     refetch
   } = useUserCredits();
   const {
@@ -59,53 +57,26 @@ export function AIAnalysisTab() {
       
       console.log('Starting analysis with credit cost:', creditCost);
       
-      // First deduct the credits to ensure they're available
-      const creditResult = await useCredits.mutateAsync({
-        amount: -creditCost, // Negative amount for deduction
-        description: `Analysis of ${days} days of trades`,
-        transaction_type: 'deduction'
-      });
+      // The credit deduction is now handled by the edge function
+      // We just need to pass the userId to the analyzeTradesForPeriod function
+      const analysisSuccess = await analyzeTradesForPeriod(trades, days, customPrompt, userId);
       
-      if (!creditResult.success) {
-        toast.error('Failed to use credits: ' + creditResult.message);
-        return;
-      }
-      
-      // Immediately refetch credits to update UI
-      await refetch();
-      console.log('Credits deducted, balance updated');
-      
-      // Proceed with analysis after credits are successfully deducted
-      const analysisSuccess = await analyzeTradesForPeriod(trades, days, customPrompt);
-      
-      // Refetch credits again to ensure the UI is up-to-date
+      // Refetch credits to update UI after analysis
       await refetch();
       
-      // If analysis was not successful (empty result), refund the credits
       if (!analysisSuccess) {
-        console.log('Analysis failed, refunding credits...');
+        console.log('Analysis failed');
         
-        const refundResult = await useCredits.mutateAsync({
-          amount: creditCost, // Positive amount for refund
-          description: `Refund for failed analysis of ${days} days of trades`,
-          transaction_type: 'refund'
-        });
-        
-        if (refundResult.success) {
-          toast.info('Credits have been refunded due to failed analysis.');
-        } else {
-          toast.error('Failed to refund credits: ' + refundResult.message);
-        }
-        
-        // Refetch credits to update UI after refund
-        await refetch();
-        console.log('Credits refunded, balance updated');
+        // Credits are not deducted if analysis fails, due to edge function handling
+        toast.error('Analysis failed. Please try again later.');
       } else {
-        // Analysis was successful
+        // Analysis was successful, credits already deducted by edge function
         toast.success(`Analysis complete! Used ${creditCost} credits.`);
-        // Refetch one more time to be sure UI is updated
-        await refetch();
       }
+      
+      // Final refetch to ensure UI is up-to-date
+      await refetch();
+      
     } catch (error) {
       console.error('Analysis failed:', error);
       toast.error('Failed to analyze trades. Please try again later.');

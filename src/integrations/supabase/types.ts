@@ -397,6 +397,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      deduct_credits: {
+        Args: {
+          user_id: string
+          credits_to_deduct: number
+        }
+        Returns: number
+      }
       get_daily_leaderboard: {
         Args: {
           limit_count?: number

@@ -13,12 +13,23 @@ export function useTradeAnalysis() {
   const analyzeTradesForPeriod = async (
     trades: Trade[],
     days: number,
-    customPrompt?: string
+    customPrompt?: string,
+    userId?: string
   ): Promise<boolean> => {
     if (trades.length === 0) {
       toast({
         title: "No trades to analyze",
         description: "Please add some trades first.",
+        variant: "destructive",
+      });
+      setCurrentAnalysis('');
+      return false;
+    }
+
+    if (!userId) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to analyze trades.",
         variant: "destructive",
       });
       setCurrentAnalysis('');
@@ -52,19 +63,41 @@ export function useTradeAnalysis() {
       }
 
       console.log(`Analyzing ${filteredTrades.length} trades for the last ${days} days`);
+      console.log(`User ID for credit deduction: ${userId}`);
 
-      // Call the Supabase Edge Function
+      // Calculate credit cost
+      const creditCost = days === 1 ? 1 : days === 7 ? 3 : 5;
+      console.log(`Credit cost for this analysis: ${creditCost}`);
+
+      // Call the Supabase Edge Function with userId for credit deduction
       const { data, error } = await supabase.functions.invoke('analyze-trades', {
         body: {
           trades: filteredTrades,
           days,
-          customPrompt
+          customPrompt,
+          userId
         }
       });
 
       if (error) {
         console.error('Supabase function error:', error);
         throw new Error(error.message);
+      }
+
+      // Check if there was a credit-related issue
+      if (data && !data.success) {
+        console.error('Analysis failed:', data.message || 'Unknown error');
+        toast({
+          title: "Analysis failed",
+          description: data.message || "Failed to analyze trades. Please try again.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      // Log credit usage
+      if (data && data.creditsUsed) {
+        console.log(`Used ${data.creditsUsed} credits. Remaining: ${data.remainingCredits}`);
       }
 
       // Set the analysis text
@@ -79,7 +112,7 @@ export function useTradeAnalysis() {
       if (isSuccessful) {
         toast({
           title: "Analysis complete",
-          description: `Successfully analyzed ${filteredTrades.length} trades.`,
+          description: `Successfully analyzed ${filteredTrades.length} trades. Used ${creditCost} credits.`,
         });
         console.log('Analysis successful');
       } else {

@@ -32,7 +32,8 @@ export function useCreditQueries(userId: string | null) {
     },
     enabled: !!userId,
     refetchOnWindowFocus: true,
-    staleTime: 1000 // Consider data stale after 1 second for more frequent updates
+    staleTime: 0, // Always consider data stale for immediate refetches
+    cacheTime: 5000 // Only cache for 5 seconds
   });
   
   // Fetch credit transactions
@@ -55,7 +56,8 @@ export function useCreditQueries(userId: string | null) {
       return data as CreditTransaction[];
     },
     enabled: !!userId,
-    staleTime: 1000 // Reduced stale time for more frequent updates
+    staleTime: 0, // Always consider data stale for immediate refetches
+    cacheTime: 5000 // Only cache for 5 seconds
   });
 
   return {
