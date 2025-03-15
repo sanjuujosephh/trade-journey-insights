@@ -22,11 +22,8 @@ export function TradeFormActions({ isEditing, isSubmitting = false }: TradeFormA
           </>
         ) : (
           <>
-            {isEditing ? (
-              <SaveIcon className="mr-2 h-4 w-4" />
-            ) : (
-              <>{isEditing ? "Update Trade" : "Log New Entry"}</>
-            )}
+            <SaveIcon className="mr-2 h-4 w-4" />
+            {isEditing ? "Update Trade" : "Save Trade"}
           </>
         )}
       </Button>

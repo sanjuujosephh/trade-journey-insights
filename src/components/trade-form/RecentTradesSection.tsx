@@ -29,7 +29,9 @@ export function RecentTradesSection({
   if (trades.length === 0) return null;
 
   return (
-    <div className="space-y-4 mt-8">
+    <div className="space-y-4 mt-12 pt-8 border-t border-gray-200">
+      <h2 className="text-xl font-semibold mb-4">Recent Trades</h2>
+      
       <DateFilterControls
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
