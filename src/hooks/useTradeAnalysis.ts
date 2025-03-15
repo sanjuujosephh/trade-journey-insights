@@ -74,7 +74,7 @@ export function useTradeAnalysis() {
       setCurrentAnalysis(analysisText);
       
       // Consider analysis successful if it has meaningful content (more than just whitespace)
-      const isSuccessful = analysisText.trim().length > 100;
+      const isSuccessful = analysisText.trim().length > 50;
       
       if (isSuccessful) {
         toast({

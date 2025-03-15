@@ -48,6 +48,9 @@ export function AIAnalysisTab() {
       // Credit cost based on days
       const creditCost = days === 1 ? 1 : days === 7 ? 3 : 5;
       
+      // Ensure we have the latest credit data
+      await refetch();
+      
       if (!credits || credits.subscription_credits + credits.purchased_credits < creditCost) {
         toast.error(`You need ${creditCost} credits to analyze ${days} days of trades. You have ${(credits?.subscription_credits || 0) + (credits?.purchased_credits || 0)} credits.`);
         setIsPurchaseDialogOpen(true);
@@ -118,8 +121,13 @@ export function AIAnalysisTab() {
   // Refresh credits manually
   const forceRefreshCredits = async () => {
     console.log('Manual credit refresh requested');
-    await refetch();
-    toast.success('Credit information refreshed');
+    try {
+      await refetch();
+      toast.success('Credit information refreshed');
+    } catch (error) {
+      console.error('Error refreshing credits:', error);
+      toast.error('Failed to refresh credit information');
+    }
   };
   
   return <div className="space-y-6">

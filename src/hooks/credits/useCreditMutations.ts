@@ -18,16 +18,22 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
       
       // Ensure we have the latest credits data
       await refetch();
-      
-      if (!credits) {
-        return { success: false, message: 'No credits information available' };
+      const { data: latestCredits, error: refreshError } = await supabase
+        .from('user_credits')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+        
+      if (refreshError || !latestCredits) {
+        console.error('Error getting latest credits:', refreshError);
+        return { success: false, message: 'Could not get latest credit information' };
       }
       
       // Calculate the new credit values
       const absAmount = Math.abs(amount);
-      let newSubscriptionCredits = credits.subscription_credits;
-      let newPurchasedCredits = credits.purchased_credits;
-      let newTotalCreditsUsed = credits.total_credits_used;
+      let newSubscriptionCredits = latestCredits.subscription_credits;
+      let newPurchasedCredits = latestCredits.purchased_credits;
+      let newTotalCreditsUsed = latestCredits.total_credits_used;
       
       // If it's a deduction (negative amount), deduct from subscription credits first
       if (amount < 0) {
@@ -49,8 +55,11 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
       
       console.log('Updating credits:', {
         userId,
-        oldValues: { subscriptionCredits: credits.subscription_credits, purchasedCredits: credits.purchased_credits },
-        newValues: { newSubscriptionCredits, newPurchasedCredits }
+        oldValues: { 
+          subscriptionCredits: latestCredits.subscription_credits, 
+          purchasedCredits: latestCredits.purchased_credits 
+        },
+        newValues: { newSubscriptionCredits, newPurchasedCredits, newTotalCreditsUsed }
       });
       
       // Insert transaction
@@ -84,9 +93,12 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
         return { success: false, message: 'Failed to update credits' };
       }
       
-      // Invalidate queries to refresh the data
+      // Force invalidation of queries
       queryClient.invalidateQueries({ queryKey: ['user-credits'] });
       queryClient.invalidateQueries({ queryKey: ['credit-transactions'] });
+      
+      // Manual refetch to ensure updated data
+      setTimeout(() => refetch(), 300);
       
       return { success: true, message: 'Credits updated successfully' };
     }
@@ -104,11 +116,11 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
       // Check if the user has a credits record
       const { data: existingCredits, error: checkError } = await supabase
         .from('user_credits')
-        .select('id')
+        .select('*')
         .eq('user_id', userId)
-        .maybeSingle();
+        .single();
         
-      if (checkError) {
+      if (checkError && checkError.code !== 'PGRST116') {
         console.error('Error checking existing credits:', checkError);
         return { success: false, message: 'Failed to check existing credits' };
       }
@@ -133,7 +145,7 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
         const { error: updateError } = await supabase
           .from('user_credits')
           .update({
-            purchased_credits: (credits?.purchased_credits || 0) + amount,
+            purchased_credits: existingCredits.purchased_credits + amount,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', userId);
@@ -159,9 +171,12 @@ export function useCreditMutations(userId: string | null, credits: UserCredits |
         return { success: false, message: 'Failed to record purchase transaction' };
       }
       
-      // Invalidate queries to refresh the data
+      // Force invalidation of queries
       queryClient.invalidateQueries({ queryKey: ['user-credits'] });
       queryClient.invalidateQueries({ queryKey: ['credit-transactions'] });
+      
+      // Force refetch to ensure we have updated data
+      setTimeout(() => refetch(), 300);
       
       toast.success(`Successfully purchased ${amount} credits!`);
       

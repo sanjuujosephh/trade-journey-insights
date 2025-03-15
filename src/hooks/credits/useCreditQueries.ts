@@ -24,7 +24,7 @@ export function useCreditQueries(userId: string | null) {
         
       if (error) {
         console.error('Error fetching user credits:', error);
-        return null;
+        throw error; // Throw error instead of silently returning null
       }
       
       console.log('User credits data:', data);
@@ -32,7 +32,7 @@ export function useCreditQueries(userId: string | null) {
     },
     enabled: !!userId,
     refetchOnWindowFocus: true,
-    staleTime: 30000 // Consider data stale after 30 seconds
+    staleTime: 1000 // Consider data stale after 1 second for more frequent updates
   });
   
   // Fetch credit transactions
@@ -49,12 +49,13 @@ export function useCreditQueries(userId: string | null) {
         
       if (error) {
         console.error('Error fetching credit transactions:', error);
-        return [];
+        throw error; // Throw error instead of silently returning empty array
       }
       
       return data as CreditTransaction[];
     },
-    enabled: !!userId
+    enabled: !!userId,
+    staleTime: 1000 // Reduced stale time for more frequent updates
   });
 
   return {
