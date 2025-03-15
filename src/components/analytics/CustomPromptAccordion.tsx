@@ -1,18 +1,11 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Edit, Save, X } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PromptVariableValues } from "./PromptVariableValues";
 import { Trade } from "@/types/trade";
-
 interface CustomPromptAccordionProps {
   customPrompt?: string;
   setCustomPrompt?: (prompt: string) => void;
@@ -24,7 +17,6 @@ interface CustomPromptAccordionProps {
   onUsePrompt?: (prompt: string) => void;
   trades?: Trade[];
 }
-
 export function CustomPromptAccordion({
   customPrompt = "",
   setCustomPrompt = () => {},
@@ -55,100 +47,7 @@ Provide specific insights on:
 
 Trades data: {{tradesData}}`);
   };
-
-  return (
-    <Accordion type="single" collapsible className="my-4">
-      <AccordionItem value="custom-prompt">
-        <AccordionTrigger className="text-sm">
-          Customize AI Analysis Prompt
-        </AccordionTrigger>
-        <AccordionContent>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <p className="text-xs text-muted-foreground">
-                Use variables: &#123;&#123;totalTrades&#125;&#125;, &#123;&#123;winRate&#125;&#125;, &#123;&#123;strategyPerformance&#125;&#125;, &#123;&#123;tradesData&#125;&#125;
-              </p>
-              {isEditingPrompt ? (
-                <div className="flex space-x-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => setIsEditingPrompt(false)}
-                  >
-                    <Save className="h-4 w-4 mr-1" />
-                    Save
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={resetCustomPrompt}
-                  >
-                    <X className="h-4 w-4 mr-1" />
-                    Reset
-                  </Button>
-                </div>
-              ) : (
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={() => setIsEditingPrompt(true)}
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-              )}
-            </div>
-            
-            {trades && trades.length > 0 && (
-              <PromptVariableValues trades={trades} />
-            )}
-            
-            {isEditingPrompt ? (
-              <Textarea
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                className="min-h-[150px] font-mono text-xs"
-                placeholder="Enter your custom prompt here..."
-              />
-            ) : (
-              <Card className="p-2 bg-muted/50">
-                <pre className="text-xs overflow-auto whitespace-pre-wrap">
-                  {customPrompt}
-                </pre>
-              </Card>
-            )}
-            
-            {savedPrompts && savedPrompts.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-sm font-medium mb-2">Saved Prompts</h4>
-                <div className="space-y-2">
-                  {savedPrompts.map((prompt, index) => (
-                    <div key={index} className="flex items-center justify-between bg-background p-2 rounded border">
-                      <p className="text-xs truncate max-w-[240px]">{prompt.substring(0, 50)}...</p>
-                      <div className="flex space-x-2">
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => onUsePrompt(prompt)}
-                        >
-                          Use
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => onRemovePrompt(index)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  );
+  return <Accordion type="single" collapsible className="my-4">
+      
+    </Accordion>;
 }
