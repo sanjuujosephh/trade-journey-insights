@@ -79,8 +79,15 @@ export function useTradeAnalysis() {
         }
       });
 
+      // Check for network/invocation errors
       if (error) {
         console.error('Supabase function error:', error);
+        
+        // Special handling for 403 errors (likely credit related)
+        if (error.message && error.message.includes('403')) {
+          throw new Error('You may not have enough credits for this analysis. Please check your credit balance and try again.');
+        }
+        
         throw new Error(error.message || 'Failed to analyze trades');
       }
 

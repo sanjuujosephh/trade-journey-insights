@@ -5,18 +5,22 @@ import { createAnalysisPrompt } from "./prompt.ts";
 import { getAnalysisFromOpenAI } from "./openai.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.31.0";
 
-// Initialize Supabase client
+// Initialize Supabase client with SERVICE_ROLE key for admin privileges
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function handleAnalyzeTradesRequest(req) {
-  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  // Ensure CORS headers are added to all responses
+  const headers = { ...corsHeaders, 'Content-Type': 'application/json' };
 
+  // Check for required env variables
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   if (!openAIApiKey) {
+    console.error('OpenAI API key is not configured');
     return new Response(
       JSON.stringify({ error: 'OpenAI API key is not configured', success: false }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers }
     );
   }
 
@@ -28,16 +32,18 @@ export async function handleAnalyzeTradesRequest(req) {
     console.log(`Received request to analyze ${trades?.length || 0} trades over ${days} days for user ${userId || 'unknown'}`);
     
     if (!userId) {
+      console.error('Missing user ID in request');
       return new Response(
         JSON.stringify({ error: "User ID is required for credit validation", success: false }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers }
       );
     }
     
     if (!trades || !Array.isArray(trades) || trades.length === 0) {
+      console.error('No trades provided for analysis');
       return new Response(
         JSON.stringify({ error: "No trades provided for analysis", success: false }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers }
       );
     }
     
@@ -46,9 +52,42 @@ export async function handleAnalyzeTradesRequest(req) {
     
     console.log(`Attempting to deduct ${creditCost} credits for user ${userId} for analysis of ${days} days`);
     
-    // Deduct credits
+    // Deduct credits using service role for full permissions
     let deductResult;
     try {
+      // Verify user exists and has sufficient credits before attempting deduction
+      const { data: userData, error: userError } = await supabase
+        .from('user_credits')
+        .select('subscription_credits, purchased_credits')
+        .eq('user_id', userId)
+        .single();
+      
+      if (userError) {
+        console.error('Error fetching user credits:', userError);
+        return new Response(
+          JSON.stringify({ 
+            error: "Failed to verify user credits", 
+            message: userError.message,
+            success: false 
+          }),
+          { status: 403, headers }
+        );
+      }
+      
+      const totalAvailableCredits = (userData.subscription_credits || 0) + (userData.purchased_credits || 0);
+      
+      if (totalAvailableCredits < creditCost) {
+        console.error(`Insufficient credits. Required: ${creditCost}, Available: ${totalAvailableCredits}`);
+        return new Response(
+          JSON.stringify({ 
+            error: "Insufficient credits", 
+            message: `You need ${creditCost} credits for this analysis. You have ${totalAvailableCredits} credits available.`,
+            success: false 
+          }),
+          { status: 403, headers }
+        );
+      }
+      
       // Call the PostgreSQL function to deduct credits
       const { data, error } = await supabase.rpc(
         'deduct_credits',
@@ -63,7 +102,7 @@ export async function handleAnalyzeTradesRequest(req) {
             message: error.message,
             success: false 
           }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 403, headers }
         );
       }
       
@@ -78,7 +117,7 @@ export async function handleAnalyzeTradesRequest(req) {
           message: creditError.message || "Unknown error during credit operation",
           success: false 
         }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers }
       );
     }
     
@@ -105,7 +144,7 @@ export async function handleAnalyzeTradesRequest(req) {
             creditsUsed: creditCost,
             remainingCredits: deductResult 
           }), 
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers }
         );
       } catch (openaiError) {
         console.error('OpenAI API error:', openaiError);
@@ -117,7 +156,7 @@ export async function handleAnalyzeTradesRequest(req) {
             message: openaiError.message || "Failed to generate analysis",
             success: false 
           }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers }
         );
       }
     } catch (processingError) {
@@ -128,7 +167,7 @@ export async function handleAnalyzeTradesRequest(req) {
           message: processingError.message || "Error processing trade data",
           success: false 
         }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers }
       );
     }
   } catch (error) {
@@ -140,7 +179,7 @@ export async function handleAnalyzeTradesRequest(req) {
         message: error.message || "Unknown error occurred",
         success: false 
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers }
     );
   }
 }

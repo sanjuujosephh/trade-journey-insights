@@ -28,20 +28,32 @@ export async function getAnalysisFromOpenAI(prompt) {
             content: prompt 
           }
         ],
+        temperature: 0.7,
+        max_tokens: 1500
       }),
     });
 
+    const responseText = await response.text();
+    
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+      console.error(`OpenAI API error (${response.status}):`, responseText);
+      throw new Error(`OpenAI API error: ${response.status} - ${responseText.substring(0, 200)}`);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Failed to parse OpenAI response:', e);
+      console.error('Response text:', responseText.substring(0, 500));
+      throw new Error('Invalid JSON response from OpenAI');
+    }
+    
     console.log('Received response from OpenAI');
     
     if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid response from OpenAI');
+      console.error('Unexpected OpenAI response format:', JSON.stringify(data).substring(0, 200));
+      throw new Error('Invalid response format from OpenAI');
     }
 
     return data.choices[0].message.content;
