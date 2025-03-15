@@ -24,6 +24,7 @@ export function AIAnalysisTab() {
     transactions,
     isLoading: isLoadingCredits,
     useCredits,
+    purchaseCredits,
     refetch
   } = useUserCredits();
   const {
@@ -56,23 +57,36 @@ export function AIAnalysisTab() {
         return;
       }
       
-      // Proceed with analysis after credits are successfully deducted
-      const analysisResult = await analyzeTradesForPeriod(trades, days, customPrompt);
+      // Immediately refetch credits to update UI
+      await refetch();
       
-      // Check if analysis was successful - we check the currentAnalysis directly, not the return value
-      if (!currentAnalysis || currentAnalysis.trim() === '') {
-        // Only if analysis fails, refund the credits
-        await useCredits.mutateAsync({
+      // Proceed with analysis after credits are successfully deducted
+      const analysisSuccess = await analyzeTradesForPeriod(trades, days, customPrompt);
+      
+      // Refetch credits again to ensure the UI is up-to-date
+      await refetch();
+      
+      // If analysis was not successful, refund the credits
+      if (!analysisSuccess) {
+        console.log('Analysis failed, refunding credits...');
+        
+        const refundResult = await useCredits.mutateAsync({
           amount: creditCost, // Positive amount for refund
           description: `Refund for failed analysis of ${days} days of trades`,
           transaction_type: 'refund'
         });
-        toast.error('Analysis failed. Credits have been refunded.');
+        
+        if (refundResult.success) {
+          toast.info('Credits have been refunded due to failed analysis.');
+        } else {
+          toast.error('Failed to refund credits: ' + refundResult.message);
+        }
+        
+        // Refetch credits to update UI after refund
+        await refetch();
       } else {
         // Analysis was successful
         toast.success(`Analysis complete! Used ${creditCost} credits.`);
-        // Make sure to refresh the credits display
-        refetch();
       }
     } catch (error) {
       console.error('Analysis failed:', error);

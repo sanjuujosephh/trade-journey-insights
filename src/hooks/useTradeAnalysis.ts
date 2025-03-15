@@ -65,15 +65,26 @@ export function useTradeAnalysis() {
       }
 
       // Set the analysis text
-      const analysisText = data.analysis || 'No analysis could be generated.';
+      const analysisText = data.analysis || '';
       setCurrentAnalysis(analysisText);
       
-      toast({
-        title: "Analysis complete",
-        description: `Successfully analyzed ${filteredTrades.length} trades.`,
-      });
+      // Return true if analysis was successful (has content)
+      const isSuccessful = analysisText.trim().length > 0;
+      
+      if (isSuccessful) {
+        toast({
+          title: "Analysis complete",
+          description: `Successfully analyzed ${filteredTrades.length} trades.`,
+        });
+      } else {
+        toast({
+          title: "Analysis returned empty result",
+          description: "The AI couldn't generate a meaningful analysis.",
+          variant: "destructive",
+        });
+      }
 
-      return analysisText.trim() !== '';
+      return isSuccessful;
 
     } catch (error) {
       console.error('Analysis error:', error);
@@ -82,6 +93,7 @@ export function useTradeAnalysis() {
         description: error instanceof Error ? error.message : "Failed to analyze trades",
         variant: "destructive",
       });
+      setCurrentAnalysis('');
       return false;
     } finally {
       setIsAnalyzing(false);
