@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Wand2 } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import { CustomPromptDialog } from "./CustomPromptDialog";
 import { useState } from "react";
 import { Trade } from "@/types/trade";
@@ -9,10 +9,9 @@ interface AnalysisButtonsProps {
   isAnalyzing: boolean;
   trades: Trade[];
   onAnalyze: (days: number, customPrompt?: string) => void;
-  onCustomizeClick?: () => void;
 }
 
-export function AnalysisButtons({ isAnalyzing, trades, onAnalyze, onCustomizeClick }: AnalysisButtonsProps) {
+export function AnalysisButtons({ isAnalyzing, trades, onAnalyze }: AnalysisButtonsProps) {
   const [selectedDayCount, setSelectedDayCount] = useState<number>(0);
   
   const handleSelectDayCount = (days: number) => {
@@ -82,15 +81,6 @@ export function AnalysisButtons({ isAnalyzing, trades, onAnalyze, onCustomizeCli
           trades={trades}
         />
       </div>
-
-      <Button
-        variant="outline"
-        onClick={onCustomizeClick}
-        className="ml-2"
-      >
-        <Wand2 className="mr-2 h-4 w-4" />
-        Customize AI Analysis
-      </Button>
     </div>
   );
 }
