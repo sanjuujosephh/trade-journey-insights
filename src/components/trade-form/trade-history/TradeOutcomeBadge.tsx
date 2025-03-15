@@ -21,6 +21,7 @@ export function TradeOutcomeBadge({ pnl }: TradeOutcomeBadgeProps) {
   return (
     <span
       className={`inline-block px-2 py-1 rounded-[3px] text-xs ${getOutcomeStyle(pnl)}`}
+      data-outcome={getOutcomeText(pnl).toLowerCase()}
     >
       {getOutcomeText(pnl)}
     </span>
