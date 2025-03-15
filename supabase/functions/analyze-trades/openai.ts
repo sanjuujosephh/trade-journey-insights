@@ -26,9 +26,9 @@ export async function getAnalysisFromOpenAI(prompt) {
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    console.error('OpenAI API error:', error);
-    throw new Error('Failed to get analysis from OpenAI');
+    const errorText = await response.text();
+    console.error('OpenAI API error:', errorText);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();

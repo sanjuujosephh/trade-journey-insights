@@ -63,24 +63,38 @@ export async function handleAnalyzeTradesRequest(req) {
       // Generate the analysis prompt
       const finalPrompt = createAnalysisPrompt(statistics, trades, customPrompt);
 
-      // Get analysis from OpenAI
-      const analysis = await getAnalysisFromOpenAI(finalPrompt);
-      
+      try {
+        // Get analysis from OpenAI
+        const analysis = await getAnalysisFromOpenAI(finalPrompt);
+        
+        return new Response(
+          JSON.stringify({ 
+            analysis, 
+            success: true,
+            creditsUsed: creditCost,
+            remainingCredits: deductResult 
+          }), 
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (openaiError) {
+        console.error('OpenAI API error:', openaiError);
+        
+        // Return error response with CORS headers
+        return new Response(
+          JSON.stringify({ 
+            error: "OpenAI analysis failed", 
+            message: openaiError.message,
+            success: false 
+          }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    } catch (creditError) {
+      console.error('Error in credit deduction:', creditError);
       return new Response(
         JSON.stringify({ 
-          analysis, 
-          success: true,
-          creditsUsed: creditCost,
-          remainingCredits: deductResult 
-        }), 
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    } catch (error) {
-      console.error('Error in credit deduction or analysis:', error);
-      return new Response(
-        JSON.stringify({ 
-          error: "Credit operation or analysis failed", 
-          message: error.message,
+          error: "Credit operation failed", 
+          message: creditError.message,
           success: false 
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

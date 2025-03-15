@@ -81,18 +81,13 @@ export function useTradeAnalysis() {
 
       if (error) {
         console.error('Supabase function error:', error);
-        throw new Error(error.message);
+        throw new Error(error.message || 'Failed to analyze trades');
       }
 
-      // Check if there was a credit-related issue
+      // Check if there was a credit-related issue or other error
       if (data && !data.success) {
-        console.error('Analysis failed:', data.message || 'Unknown error');
-        toast({
-          title: "Analysis failed",
-          description: data.message || "Failed to analyze trades. Please try again.",
-          variant: "destructive",
-        });
-        return false;
+        console.error('Analysis failed:', data.error || data.message || 'Unknown error');
+        throw new Error(data.message || data.error || "Failed to analyze trades");
       }
 
       // Log credit usage
