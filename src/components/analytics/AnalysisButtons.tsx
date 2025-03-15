@@ -1,86 +1,59 @@
 
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock } from "lucide-react";
-import { CustomPromptDialog } from "./CustomPromptDialog";
-import { useState } from "react";
-import { Trade } from "@/types/trade";
+import { Calendar, Clock, BarChart, Lightbulb, Brain } from "lucide-react";
 
 interface AnalysisButtonsProps {
-  isAnalyzing: boolean;
-  trades: Trade[];
-  onAnalyze: (days: number, customPrompt?: string) => void;
+  onAnalyzePerformance: () => Promise<void>;
+  onAnalyzeRiskProfile: () => Promise<void>;
+  onAnalyzeImprovements: () => Promise<void>;
+  onAnalyzePsychology: () => Promise<void>;
+  isLoading: boolean;
 }
 
-export function AnalysisButtons({ isAnalyzing, trades, onAnalyze }: AnalysisButtonsProps) {
-  const [selectedDayCount, setSelectedDayCount] = useState<number>(0);
-  
-  const handleSelectDayCount = (days: number) => {
-    setSelectedDayCount(days);
-    onAnalyze(days);
-  };
-  
-  const handleCustomPromptAnalysis = (customPrompt: string) => {
-    if (selectedDayCount === 0) {
-      // Default to 1 day if no day count was selected
-      setSelectedDayCount(1);
-      onAnalyze(1, customPrompt);
-    } else {
-      onAnalyze(selectedDayCount, customPrompt);
-    }
-  };
-
+export function AnalysisButtons({ 
+  onAnalyzePerformance,
+  onAnalyzeRiskProfile,
+  onAnalyzeImprovements,
+  onAnalyzePsychology,
+  isLoading 
+}: AnalysisButtonsProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <div className="flex">
-        <Button
-          variant="default"
-          className="rounded-r-none"
-          disabled={isAnalyzing}
-          onClick={() => handleSelectDayCount(1)}
-        >
-          <Clock className="mr-2 h-4 w-4" />
-          Today's Trades
-        </Button>
-        <CustomPromptDialog 
-          dayCount={1} 
-          onAnalyze={handleCustomPromptAnalysis}
-          trades={trades}
-        />
-      </div>
+      <Button
+        variant="default"
+        disabled={isLoading}
+        onClick={onAnalyzePerformance}
+      >
+        <BarChart className="mr-2 h-4 w-4" />
+        Performance Analysis
+      </Button>
 
-      <div className="flex">
-        <Button
-          variant="outline"
-          className="rounded-r-none"
-          disabled={isAnalyzing}
-          onClick={() => handleSelectDayCount(7)}
-        >
-          <Calendar className="mr-2 h-4 w-4" />
-          Last 7 Days
-        </Button>
-        <CustomPromptDialog 
-          dayCount={7} 
-          onAnalyze={handleCustomPromptAnalysis}
-          trades={trades}
-        />
-      </div>
+      <Button
+        variant="outline"
+        disabled={isLoading}
+        onClick={onAnalyzeRiskProfile}
+      >
+        <Calendar className="mr-2 h-4 w-4" />
+        Risk Profile
+      </Button>
 
-      <div className="flex">
-        <Button
-          variant="outline"
-          className="rounded-r-none"
-          disabled={isAnalyzing}
-          onClick={() => handleSelectDayCount(30)}
-        >
-          <Calendar className="mr-2 h-4 w-4" />
-          Last 30 Days
-        </Button>
-        <CustomPromptDialog 
-          dayCount={30} 
-          onAnalyze={handleCustomPromptAnalysis}
-          trades={trades}
-        />
-      </div>
+      <Button
+        variant="outline"
+        disabled={isLoading}
+        onClick={onAnalyzeImprovements}
+      >
+        <Lightbulb className="mr-2 h-4 w-4" />
+        Improvement Suggestions
+      </Button>
+
+      <Button
+        variant="outline"
+        disabled={isLoading}
+        onClick={onAnalyzePsychology}
+      >
+        <Brain className="mr-2 h-4 w-4" />
+        Trading Psychology
+      </Button>
     </div>
   );
 }
