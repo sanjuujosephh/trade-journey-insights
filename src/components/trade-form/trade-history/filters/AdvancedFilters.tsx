@@ -12,7 +12,7 @@ import {
   Clock,
   Gauge,
   Smile,
-  SmileOff
+  FrownIcon
 } from "lucide-react";
 
 interface AdvancedFiltersProps {
@@ -45,7 +45,7 @@ export function AdvancedFilters({
   setExitEmotionFilter
 }: AdvancedFiltersProps) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <>
       <Select value={directionFilter} onValueChange={setDirectionFilter}>
         <SelectTrigger className="w-[45px] justify-center p-0">
           <ArrowUpDown className="h-4 w-4" />
@@ -119,7 +119,7 @@ export function AdvancedFilters({
       
       <Select value={exitEmotionFilter} onValueChange={setExitEmotionFilter}>
         <SelectTrigger className="w-[45px] justify-center p-0">
-          <SmileOff className="h-4 w-4" />
+          <FrownIcon className="h-4 w-4" />
           <span className="sr-only">Exit Emotion Filter</span>
         </SelectTrigger>
         <SelectContent>
@@ -130,6 +130,6 @@ export function AdvancedFilters({
           <SelectItem value="frustrated">Frustrated</SelectItem>
         </SelectContent>
       </Select>
-    </div>
+    </>
   );
 }

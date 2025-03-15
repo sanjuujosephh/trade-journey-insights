@@ -85,8 +85,8 @@ export function TradeHistoryFilters({
           />
         </div>
         
-        <div className="w-full md:w-2/3 flex flex-wrap items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="w-full md:w-2/3 flex flex-wrap justify-between">
+          <div className="flex items-center flex-wrap gap-2">
             <PrimaryFilters
               symbolFilter={symbolFilter}
               setSymbolFilter={setSymbolFilter}
