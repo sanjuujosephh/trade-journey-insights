@@ -1,192 +1,248 @@
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/contexts/AuthContext";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTradeAuth } from './useTradeAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-export type UserCredits = {
+export interface UserCredits {
   id: string;
   user_id: string;
   subscription_credits: number;
   purchased_credits: number;
   total_credits_used: number;
-  last_reset_date: string;
+  last_reset_date: string | null;
   next_reset_date: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
-export type CreditTransaction = {
+export interface CreditTransaction {
   id: string;
   user_id: string;
   amount: number;
-  transaction_type: 'deduction' | 'purchase' | 'reset';
-  description: string;
-  created_at: string;
+  description: string | null;
+  transaction_type: 'purchase' | 'deduction' | 'reset' | 'refund';
+  created_at: string | null;
 }
 
 export function useUserCredits() {
-  const { user } = useAuth();
+  const { userId } = useTradeAuth();
   const queryClient = useQueryClient();
-
-  const { 
-    data: credits,
-    isLoading,
-    error
-  } = useQuery({
-    queryKey: ['user-credits', user?.id],
+  
+  // Fetch user credits
+  const { data: credits, isLoading, error, refetch } = useQuery({
+    queryKey: ['user-credits', userId],
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!userId) return null;
       
       const { data, error } = await supabase
         .from('user_credits')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .single();
-      
+        
       if (error) {
-        // If no record exists, create one with default values
-        if (error.code === 'PGRST116') {
-          const { data: newData, error: newError } = await supabase
-            .from('user_credits')
-            .insert({
-              user_id: user.id,
-              subscription_credits: 10, // Free users get 10 credits
-              purchased_credits: 0
-            })
-            .select()
-            .single();
-          
-          if (newError) throw newError;
-          return newData as UserCredits;
-        }
-        throw error;
+        console.error('Error fetching user credits:', error);
+        return null;
       }
       
       return data as UserCredits;
     },
-    enabled: !!user?.id
+    enabled: !!userId
   });
-
+  
+  // Fetch credit transactions
   const { data: transactions } = useQuery({
-    queryKey: ['credit-transactions', user?.id],
+    queryKey: ['credit-transactions', userId],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!userId) return [];
       
       const { data, error } = await supabase
         .from('credit_transactions')
         .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-      
-      if (error) throw error;
-      return data as CreditTransaction[];
-    },
-    enabled: !!user?.id
-  });
-
-  const useCredits = useMutation({
-    mutationFn: async ({ amount, description }: { amount: number, description: string }) => {
-      if (!user?.id) throw new Error('User not authenticated');
-      if (!credits) throw new Error('Credits not loaded');
-      
-      const totalAvailableCredits = (credits.subscription_credits || 0) + (credits.purchased_credits || 0);
-      
-      if (totalAvailableCredits < amount) {
-        throw new Error('Not enough credits available');
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching credit transactions:', error);
+        return [];
       }
       
-      // First, update the credits table
-      // We prioritize using subscription credits first, then purchased credits
-      let subscriptionCreditsToUse = Math.min(credits.subscription_credits, amount);
-      let purchasedCreditsToUse = amount - subscriptionCreditsToUse;
+      return data as CreditTransaction[];
+    },
+    enabled: !!userId
+  });
+  
+  // Use credits mutation
+  const useCredits = useMutation({
+    mutationFn: async (params: {
+      amount: number;
+      description: string;
+      transaction_type?: 'purchase' | 'deduction' | 'reset' | 'refund';
+    }) => {
+      if (!userId) {
+        return { success: false, message: 'User not authenticated' };
+      }
       
+      const { amount, description, transaction_type = amount < 0 ? 'deduction' : 'purchase' } = params;
+      
+      // Ensure we have the latest credits data
+      await refetch();
+      
+      if (!credits) {
+        return { success: false, message: 'No credits information available' };
+      }
+      
+      // Calculate the new credit values
+      const absAmount = Math.abs(amount);
+      let newSubscriptionCredits = credits.subscription_credits;
+      let newPurchasedCredits = credits.purchased_credits;
+      let newTotalCreditsUsed = credits.total_credits_used;
+      
+      // If it's a deduction (negative amount), deduct from subscription credits first
+      if (amount < 0) {
+        if (newSubscriptionCredits >= absAmount) {
+          newSubscriptionCredits -= absAmount;
+        } else {
+          // If subscription credits are not enough, use purchased credits for the rest
+          const remainingAmount = absAmount - newSubscriptionCredits;
+          newSubscriptionCredits = 0;
+          newPurchasedCredits -= remainingAmount;
+        }
+        
+        // Increase total used credits
+        newTotalCreditsUsed += absAmount;
+      } else {
+        // For additions (purchase, refund, reset), add to purchased credits
+        newPurchasedCredits += amount;
+      }
+      
+      // Insert transaction
+      const { error: transactionError } = await supabase
+        .from('credit_transactions')
+        .insert({
+          user_id: userId,
+          amount: amount,
+          description: description,
+          transaction_type: transaction_type
+        });
+        
+      if (transactionError) {
+        console.error('Error inserting credit transaction:', transactionError);
+        return { success: false, message: 'Failed to record transaction' };
+      }
+      
+      // Update user credits
       const { error: updateError } = await supabase
         .from('user_credits')
         .update({
-          subscription_credits: credits.subscription_credits - subscriptionCreditsToUse,
-          purchased_credits: credits.purchased_credits - purchasedCreditsToUse,
-          total_credits_used: (credits.total_credits_used || 0) + amount,
+          subscription_credits: newSubscriptionCredits,
+          purchased_credits: newPurchasedCredits,
+          total_credits_used: newTotalCreditsUsed,
           updated_at: new Date().toISOString()
         })
-        .eq('id', credits.id);
+        .eq('user_id', userId);
+        
+      if (updateError) {
+        console.error('Error updating user credits:', updateError);
+        return { success: false, message: 'Failed to update credits' };
+      }
       
-      if (updateError) throw updateError;
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['user-credits'] });
+      queryClient.invalidateQueries({ queryKey: ['credit-transactions'] });
       
-      // Then, log the transaction
-      const { error: txError } = await supabase
-        .from('credit_transactions')
-        .insert({
-          user_id: user.id,
-          amount: -amount, // Negative for deductions
-          transaction_type: 'deduction',
-          description
-        });
-      
-      if (txError) throw txError;
-      
-      return { success: true, creditsRemaining: totalAvailableCredits - amount };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-credits', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['credit-transactions', user?.id] });
-    },
-    onError: (error) => {
-      toast.error(error.message || 'Failed to use credits');
+      return { success: true, message: 'Credits updated successfully' };
     }
   });
-
+  
+  // Purchase credits mutation
   const purchaseCredits = useMutation({
-    mutationFn: async ({ amount }: { amount: number }) => {
-      if (!user?.id) throw new Error('User not authenticated');
-      if (!credits) throw new Error('Credits not loaded');
+    mutationFn: async (params: { amount: number }) => {
+      if (!userId) {
+        return { success: false, message: 'User not authenticated' };
+      }
       
-      // Update the credits
-      const { error: updateError } = await supabase
+      const { amount } = params;
+      
+      // Check if the user has a credits record
+      const { data: existingCredits, error: checkError } = await supabase
         .from('user_credits')
-        .update({
-          purchased_credits: (credits.purchased_credits || 0) + amount,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', credits.id);
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+        
+      if (checkError) {
+        console.error('Error checking existing credits:', checkError);
+        return { success: false, message: 'Failed to check existing credits' };
+      }
       
-      if (updateError) throw updateError;
+      if (!existingCredits) {
+        // Create a new user_credits record if it doesn't exist
+        const { error: insertError } = await supabase
+          .from('user_credits')
+          .insert({
+            user_id: userId,
+            subscription_credits: 0,
+            purchased_credits: amount,
+            total_credits_used: 0
+          });
+          
+        if (insertError) {
+          console.error('Error creating user credits:', insertError);
+          return { success: false, message: 'Failed to create credits record' };
+        }
+      } else {
+        // Update existing credits
+        const { error: updateError } = await supabase
+          .from('user_credits')
+          .update({
+            purchased_credits: supabase.rpc('add_credits', { 
+              user_id: userId, 
+              credits_to_add: amount 
+            }),
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId);
+          
+        if (updateError) {
+          console.error('Error updating purchased credits:', updateError);
+          return { success: false, message: 'Failed to update purchased credits' };
+        }
+      }
       
-      // Log the transaction
-      const { error: txError } = await supabase
+      // Insert transaction record
+      const { error: transactionError } = await supabase
         .from('credit_transactions')
         .insert({
-          user_id: user.id,
-          amount,
-          transaction_type: 'purchase',
-          description: `Purchased ${amount} credits`
+          user_id: userId,
+          amount: amount,
+          description: `Purchased ${amount} credits`,
+          transaction_type: 'purchase'
         });
+        
+      if (transactionError) {
+        console.error('Error inserting purchase transaction:', transactionError);
+        return { success: false, message: 'Failed to record purchase transaction' };
+      }
       
-      if (txError) throw txError;
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['user-credits'] });
+      queryClient.invalidateQueries({ queryKey: ['credit-transactions'] });
       
-      return { success: true };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-credits', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['credit-transactions', user?.id] });
-      toast.success('Credits purchased successfully!');
-    },
-    onError: (error) => {
-      toast.error(error.message || 'Failed to purchase credits');
+      toast.success(`Successfully purchased ${amount} credits!`);
+      
+      return { success: true, message: 'Credits purchased successfully' };
     }
   });
-
-  // Calculate totals
-  const totalCredits = credits 
-    ? (credits.subscription_credits || 0) + (credits.purchased_credits || 0) 
-    : 0;
-
+  
   return {
     credits,
     transactions,
-    totalCredits,
     isLoading,
     error,
     useCredits,
-    purchaseCredits
+    purchaseCredits,
+    refetch
   };
 }

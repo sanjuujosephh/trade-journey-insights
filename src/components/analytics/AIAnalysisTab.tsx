@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AnalysisButtons } from './AnalysisButtons';
 import { AnalysisResult } from './AnalysisResult';
 import { CreditsDisplay } from './CreditsDisplay';
@@ -33,28 +33,45 @@ export function AIAnalysisTab() {
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
 
   const handleAnalyze = async (days: number, customPrompt?: string) => {
-    // Credit cost based on days
-    const creditCost = days === 1 ? 1 : days === 7 ? 3 : 5;
-    
-    if (!credits || credits.subscription_credits + credits.purchased_credits < creditCost) {
-      toast.error(`You need ${creditCost} credits to analyze ${days} days of trades. You have ${(credits?.subscription_credits || 0) + (credits?.purchased_credits || 0)} credits.`);
-      setIsPurchaseDialogOpen(true);
-      return;
-    }
-    
     try {
-      await analyzeTradesForPeriod(trades, days, customPrompt);
+      // Credit cost based on days
+      const creditCost = days === 1 ? 1 : days === 7 ? 3 : 5;
       
-      // Use credits after successful analysis
-      await useCredits.mutateAsync({
-        amount: creditCost,
-        description: `Analysis of ${days} days of trades`
+      if (!credits || credits.subscription_credits + credits.purchased_credits < creditCost) {
+        toast.error(`You need ${creditCost} credits to analyze ${days} days of trades. You have ${(credits?.subscription_credits || 0) + (credits?.purchased_credits || 0)} credits.`);
+        setIsPurchaseDialogOpen(true);
+        return;
+      }
+      
+      // First deduct the credits to ensure they're available
+      const creditResult = await useCredits.mutateAsync({
+        amount: -creditCost, // Negative amount for deduction
+        description: `Analysis of ${days} days of trades`,
+        transaction_type: 'deduction'
       });
       
-      toast.success(`Analysis complete! Used ${creditCost} credits.`);
+      if (!creditResult.success) {
+        toast.error('Failed to use credits: ' + creditResult.message);
+        return;
+      }
+      
+      // Proceed with analysis after credits are successfully deducted
+      const analysisResult = await analyzeTradesForPeriod(trades, days, customPrompt);
+      
+      if (analysisResult) {
+        toast.success(`Analysis complete! Used ${creditCost} credits.`);
+      } else {
+        // If analysis fails, refund the credits
+        await useCredits.mutateAsync({
+          amount: creditCost, // Positive amount for refund
+          description: `Refund for failed analysis of ${days} days of trades`,
+          transaction_type: 'refund'
+        });
+        toast.error('Analysis failed. Credits have been refunded.');
+      }
     } catch (error) {
       console.error('Analysis failed:', error);
-      toast.error('Failed to analyze trades');
+      toast.error('Failed to analyze trades. Please try again later.');
     }
   };
   
