@@ -3,8 +3,8 @@ import { useTradeAuth } from './useTradeAuth';
 import { useCreditQueries } from './credits/useCreditQueries';
 import { useCreditMutations } from './credits/useCreditMutations';
 
-// Re-export the types
-export { UserCredits, CreditTransaction } from './credits/types';
+// Re-export the types using 'export type' syntax for isolatedModules compatibility
+export type { UserCredits, CreditTransaction } from './credits/types';
 
 export function useUserCredits() {
   const { userId } = useTradeAuth();
