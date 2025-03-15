@@ -24,6 +24,15 @@ export async function handleAnalyzeTradesRequest(req) {
     );
   }
 
+  // Check if service role key is set
+  if (!supabaseServiceKey) {
+    console.error('SUPABASE_SERVICE_ROLE_KEY is not configured');
+    return new Response(
+      JSON.stringify({ error: 'Database authentication key is missing', success: false }),
+      { status: 500, headers }
+    );
+  }
+
   try {
     // Extract request data
     const requestData = await req.json();
@@ -91,7 +100,10 @@ export async function handleAnalyzeTradesRequest(req) {
       // Call the PostgreSQL function to deduct credits
       const { data, error } = await supabase.rpc(
         'deduct_credits',
-        { user_id: userId, credits_to_deduct: creditCost }
+        { 
+          user_id: userId, 
+          credits_to_deduct: creditCost 
+        }
       );
       
       if (error) {
