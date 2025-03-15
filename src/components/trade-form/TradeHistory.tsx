@@ -20,6 +20,12 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
   const [outcomeFilter, setOutcomeFilter] = useState<string>("all");
   const [symbolFilter, setSymbolFilter] = useState<string>("all");
   const [tradeTypeFilter, setTradeTypeFilter] = useState<string>("all");
+  const [directionFilter, setDirectionFilter] = useState<string>("all");
+  const [optionTypeFilter, setOptionTypeFilter] = useState<string>("all");
+  const [timeframeFilter, setTimeframeFilter] = useState<string>("all");
+  const [marketConditionFilter, setMarketConditionFilter] = useState<string>("all");
+  const [entryEmotionFilter, setEntryEmotionFilter] = useState<string>("all");
+  const [exitEmotionFilter, setExitEmotionFilter] = useState<string>("all");
 
   // Get unique symbols for filter dropdown
   const uniqueSymbols = useMemo(() => {
@@ -57,9 +63,48 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
       // Trade type filtering
       const matchesTradeType = tradeTypeFilter === "all" || trade.trade_type === tradeTypeFilter;
       
-      return matchesSearch && matchesOutcome && matchesSymbol && matchesTradeType;
+      // Direction filtering
+      const matchesDirection = directionFilter === "all" || trade.trade_direction === directionFilter;
+      
+      // Option type filtering
+      const matchesOptionType = optionTypeFilter === "all" || trade.option_type === optionTypeFilter;
+      
+      // Timeframe filtering
+      const matchesTimeframe = timeframeFilter === "all" || trade.timeframe === timeframeFilter;
+      
+      // Market condition filtering
+      const matchesMarketCondition = marketConditionFilter === "all" || trade.market_condition === marketConditionFilter;
+      
+      // Entry emotion filtering
+      const matchesEntryEmotion = entryEmotionFilter === "all" || trade.entry_emotion === entryEmotionFilter;
+      
+      // Exit emotion filtering
+      const matchesExitEmotion = exitEmotionFilter === "all" || trade.exit_emotion === exitEmotionFilter;
+      
+      return matchesSearch && 
+             matchesOutcome && 
+             matchesSymbol && 
+             matchesTradeType && 
+             matchesDirection && 
+             matchesOptionType && 
+             matchesTimeframe && 
+             matchesMarketCondition && 
+             matchesEntryEmotion && 
+             matchesExitEmotion;
     });
-  }, [trades, searchTerm, outcomeFilter, symbolFilter, tradeTypeFilter]);
+  }, [
+    trades, 
+    searchTerm, 
+    outcomeFilter, 
+    symbolFilter, 
+    tradeTypeFilter, 
+    directionFilter, 
+    optionTypeFilter, 
+    timeframeFilter, 
+    marketConditionFilter, 
+    entryEmotionFilter, 
+    exitEmotionFilter
+  ]);
 
   const sortedTrades = useMemo(() => {
     return [...filteredTrades].sort((a, b) => {
@@ -81,6 +126,12 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
     setOutcomeFilter("all");
     setSymbolFilter("all");
     setTradeTypeFilter("all");
+    setDirectionFilter("all");
+    setOptionTypeFilter("all");
+    setTimeframeFilter("all");
+    setMarketConditionFilter("all");
+    setEntryEmotionFilter("all");
+    setExitEmotionFilter("all");
     toast({
       title: "Filters Reset",
       description: "All filters have been cleared"
@@ -92,6 +143,12 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
     outcomeFilter, 
     symbolFilter, 
     tradeTypeFilter,
+    directionFilter,
+    optionTypeFilter,
+    timeframeFilter,
+    marketConditionFilter,
+    entryEmotionFilter,
+    exitEmotionFilter,
     filteredCount: filteredTrades.length,
     totalCount: trades.length
   });
@@ -107,6 +164,18 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
         setSymbolFilter={setSymbolFilter}
         tradeTypeFilter={tradeTypeFilter}
         setTradeTypeFilter={setTradeTypeFilter}
+        directionFilter={directionFilter}
+        setDirectionFilter={setDirectionFilter}
+        optionTypeFilter={optionTypeFilter}
+        setOptionTypeFilter={setOptionTypeFilter}
+        timeframeFilter={timeframeFilter}
+        setTimeframeFilter={setTimeframeFilter}
+        marketConditionFilter={marketConditionFilter}
+        setMarketConditionFilter={setMarketConditionFilter}
+        entryEmotionFilter={entryEmotionFilter}
+        setEntryEmotionFilter={setEntryEmotionFilter}
+        exitEmotionFilter={exitEmotionFilter}
+        setExitEmotionFilter={setExitEmotionFilter}
         uniqueSymbols={uniqueSymbols}
         resetFilters={resetFilters}
         tradesCount={{ filtered: sortedTrades.length, total: trades.length }}

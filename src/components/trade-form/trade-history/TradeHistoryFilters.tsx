@@ -1,7 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
+import { Search, X, Filter } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -19,6 +19,18 @@ interface TradeHistoryFiltersProps {
   setSymbolFilter: (value: string) => void;
   tradeTypeFilter: string;
   setTradeTypeFilter: (value: string) => void;
+  directionFilter: string;
+  setDirectionFilter: (value: string) => void;
+  optionTypeFilter: string;
+  setOptionTypeFilter: (value: string) => void;
+  timeframeFilter: string;
+  setTimeframeFilter: (value: string) => void;
+  marketConditionFilter: string;
+  setMarketConditionFilter: (value: string) => void;
+  entryEmotionFilter: string;
+  setEntryEmotionFilter: (value: string) => void;
+  exitEmotionFilter: string;
+  setExitEmotionFilter: (value: string) => void;
   uniqueSymbols: string[];
   resetFilters: () => void;
   tradesCount: {
@@ -36,10 +48,35 @@ export function TradeHistoryFilters({
   setSymbolFilter,
   tradeTypeFilter,
   setTradeTypeFilter,
+  directionFilter,
+  setDirectionFilter,
+  optionTypeFilter,
+  setOptionTypeFilter,
+  timeframeFilter,
+  setTimeframeFilter,
+  marketConditionFilter,
+  setMarketConditionFilter,
+  entryEmotionFilter,
+  setEntryEmotionFilter,
+  exitEmotionFilter,
+  setExitEmotionFilter,
   uniqueSymbols,
   resetFilters,
   tradesCount
 }: TradeHistoryFiltersProps) {
+  
+  const showClearFiltersButton = 
+    searchTerm || 
+    outcomeFilter !== "all" || 
+    symbolFilter !== "all" || 
+    tradeTypeFilter !== "all" ||
+    directionFilter !== "all" ||
+    optionTypeFilter !== "all" ||
+    timeframeFilter !== "all" ||
+    marketConditionFilter !== "all" ||
+    entryEmotionFilter !== "all" ||
+    exitEmotionFilter !== "all";
+  
   return (
     <div className="mb-4 space-y-4">
       {/* Search and Filter UI */}
@@ -64,7 +101,7 @@ export function TradeHistoryFilters({
           )}
         </div>
         
-        {/* Filter UI directly in the main view */}
+        {/* Primary Filters */}
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Select value={symbolFilter} onValueChange={setSymbolFilter}>
             <SelectTrigger className="w-[120px]">
@@ -102,7 +139,7 @@ export function TradeHistoryFilters({
             </SelectContent>
           </Select>
           
-          {(outcomeFilter !== "all" || symbolFilter !== "all" || tradeTypeFilter !== "all" || searchTerm) && (
+          {showClearFiltersButton && (
             <Button 
               variant="outline" 
               size="sm"
@@ -113,6 +150,88 @@ export function TradeHistoryFilters({
             </Button>
           )}
         </div>
+      </div>
+      
+      {/* Advanced Filters */}
+      <div className="flex flex-wrap gap-2">
+        <Select value={directionFilter} onValueChange={setDirectionFilter}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Direction" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Any Direction</SelectItem>
+            <SelectItem value="long">Long</SelectItem>
+            <SelectItem value="short">Short</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={optionTypeFilter} onValueChange={setOptionTypeFilter}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Option Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Any Option</SelectItem>
+            <SelectItem value="call">Call</SelectItem>
+            <SelectItem value="put">Put</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={timeframeFilter} onValueChange={setTimeframeFilter}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Timeframe" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Any Timeframe</SelectItem>
+            <SelectItem value="1min">1 Minute</SelectItem>
+            <SelectItem value="3min">3 Minutes</SelectItem>
+            <SelectItem value="5min">5 Minutes</SelectItem>
+            <SelectItem value="15min">15 Minutes</SelectItem>
+            <SelectItem value="1hr">1 Hour</SelectItem>
+            <SelectItem value="4hr">4 Hours</SelectItem>
+            <SelectItem value="1day">1 Day</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={marketConditionFilter} onValueChange={setMarketConditionFilter}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Market" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Any Market</SelectItem>
+            <SelectItem value="trending">Trending</SelectItem>
+            <SelectItem value="ranging">Ranging</SelectItem>
+            <SelectItem value="volatile">Volatile</SelectItem>
+            <SelectItem value="news_driven">News Driven</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={entryEmotionFilter} onValueChange={setEntryEmotionFilter}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Entry Emotion" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Any Emotion</SelectItem>
+            <SelectItem value="fear">Fear</SelectItem>
+            <SelectItem value="greed">Greed</SelectItem>
+            <SelectItem value="fomo">FOMO</SelectItem>
+            <SelectItem value="revenge">Revenge</SelectItem>
+            <SelectItem value="neutral">Neutral</SelectItem>
+            <SelectItem value="confident">Confident</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <Select value={exitEmotionFilter} onValueChange={setExitEmotionFilter}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Exit Emotion" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Any Emotion</SelectItem>
+            <SelectItem value="satisfied">Satisfied</SelectItem>
+            <SelectItem value="regretful">Regretful</SelectItem>
+            <SelectItem value="relieved">Relieved</SelectItem>
+            <SelectItem value="frustrated">Frustrated</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       
       {/* Results count */}
