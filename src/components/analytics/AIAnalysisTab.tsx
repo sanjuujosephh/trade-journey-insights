@@ -1,178 +1,160 @@
 
-import { useState, useEffect } from "react";
-import { useUserCredits } from "@/hooks/useUserCredits";
-import { useTradeAnalysis } from "@/hooks/useTradeAnalysis";
-import { useTradeAuth } from "@/hooks/useTradeAuth";
-import { AnalysisButtons } from "./AnalysisButtons";
-import { AnalysisResult } from "./AnalysisResult";
-import { CreditsDisplay } from "./CreditsDisplay";
-import { PurchaseCreditsDialog } from "./PurchaseCreditsDialog";
-import { toast } from "@/hooks/use-toast";
-import { CustomPromptAccordion } from "./CustomPromptAccordion";
+import { useState, useEffect } from 'react';
+import { AnalysisButtons } from './AnalysisButtons';
+import { AnalysisResult } from './AnalysisResult';
+import { CreditsDisplay } from './CreditsDisplay';
+import { PurchaseCreditsDialog } from './PurchaseCreditsDialog';
+import { useUserCredits } from '@/hooks/useUserCredits';
+import { useTradeQueries } from '@/hooks/useTradeQueries';
+import { useTradeAuth } from '@/hooks/useTradeAuth';
+import { useTradeAnalysis } from '@/hooks/useTradeAnalysis';
+import { toast } from 'sonner';
+import { Separator } from '../ui/separator';
+import { CreditTransactionsPanel } from './CreditTransactionsPanel';
 
 export function AIAnalysisTab() {
-  const [currentAnalysis, setCurrentAnalysis] = useState("");
-  const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
-  const [isRefreshingCredits, setIsRefreshingCredits] = useState(false);
-  
   const { userId } = useTradeAuth();
-  const { 
-    credits, 
-    availableCredits,
-    useCredits, 
-    refetch: refetchCredits 
+  const { trades } = useTradeQueries(userId);
+  const {
+    credits,
+    transactions,
+    isLoading: isLoadingCredits,
+    useCredits,
+    purchaseCredits,
+    refetch
   } = useUserCredits();
-  
-  const { 
-    analyzePerformance,
-    analyzeRiskProfile,
-    analyzeImprovements,
-    analyzePsychology,
-    createCustomAnalysis,
-    isLoading: isAnalysisLoading
+  const {
+    isAnalyzing,
+    currentAnalysis,
+    analyzeTradesForPeriod
   } = useTradeAnalysis();
+  const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
   
-  // Make sure to immediately fetch credits when the component mounts
-  // or when the user ID changes
+  // Force refetch credits when component mounts and when userId changes
   useEffect(() => {
     console.log('AIAnalysisTab mounted or userId changed, fetching credits');
     if (userId) {
-      refetchCredits();
+      refetch();
     }
-    console.log('Current credits in AIAnalysisTab:', credits);
-  }, [userId, refetchCredits]);
-  
-  // Refresh credits every 10 seconds
+  }, [refetch, userId]);
+
+  // Log credit information for debugging
   useEffect(() => {
-    if (!userId) return;
-    
-    const interval = setInterval(() => {
-      refetchCredits();
-    }, 10000);
-    
-    return () => clearInterval(interval);
-  }, [userId, refetchCredits]);
-  
-  const handleRefreshCredits = async () => {
-    setIsRefreshingCredits(true);
-    await refetchCredits();
-    setTimeout(() => {
-      setIsRefreshingCredits(false);
-    }, 1000);
-  };
-  
-  const handleAnalysisRequest = async (
-    analysisFunction: () => Promise<string>, 
-    description: string
-  ) => {
+    console.log('Current credits in AIAnalysisTab:', credits);
+  }, [credits]);
+
+  const handleAnalyze = async (days: number, customPrompt?: string) => {
     try {
-      // First, check if there are enough credits
-      if (availableCredits < 1) {
-        toast({
-          title: "Insufficient credits",
-          description: "You don't have enough credits for this analysis. Please purchase more.",
-          variant: "destructive"
-        });
-        setShowPurchaseDialog(true);
+      // Credit cost based on days
+      const creditCost = days === 1 ? 1 : days === 7 ? 3 : 5;
+      
+      if (!credits || credits.subscription_credits + credits.purchased_credits < creditCost) {
+        toast.error(`You need ${creditCost} credits to analyze ${days} days of trades. You have ${(credits?.subscription_credits || 0) + (credits?.purchased_credits || 0)} credits.`);
+        setIsPurchaseDialogOpen(true);
         return;
       }
       
-      // Deduct credits before analysis
-      console.log(`Deducting 1 credit for ${description}`);
-      const creditResult = await useCredits(1, `Used for ${description} analysis`);
+      console.log('Starting analysis with credit cost:', creditCost);
       
-      if (!creditResult.success) {
-        throw new Error('Failed to deduct credits');
-      }
-      
-      // Refresh credits immediately after deduction
-      await refetchCredits();
-      
-      // Clear previous analysis
-      setCurrentAnalysis("");
-      
-      // Run the analysis
-      console.log(`Running ${description} analysis`);
-      const result = await analysisFunction();
-      
-      // Set the analysis result
-      setCurrentAnalysis(result);
-      
-      // If analysis is empty or failed, refund the credit
-      if (!result || result.trim() === '') {
-        console.log('Analysis failed or returned empty result, refunding credit');
-        await useCredits(-1, `Refund for failed ${description} analysis`, 'refund');
-        
-        toast({
-          title: "Analysis failed",
-          description: "The analysis failed to generate results. Your credit has been refunded.",
-          variant: "destructive"
-        });
-      }
-      
-      // Refresh credits after analysis
-      await refetchCredits();
-      
-    } catch (error) {
-      console.error('Analysis error:', error);
-      
-      // Attempt to refund the credit
-      try {
-        await useCredits(-1, `Refund for failed ${description} analysis`, 'refund');
-        console.log('Credit refunded due to error');
-      } catch (refundError) {
-        console.error('Failed to refund credit:', refundError);
-      }
-      
-      toast({
-        title: "Analysis failed",
-        description: error instanceof Error ? error.message : "Failed to generate analysis",
-        variant: "destructive"
+      // First deduct the credits to ensure they're available
+      const creditResult = await useCredits.mutateAsync({
+        amount: -creditCost, // Negative amount for deduction
+        description: `Analysis of ${days} days of trades`,
+        transaction_type: 'deduction'
       });
       
-      // Refresh credits after error
-      await refetchCredits();
+      if (!creditResult.success) {
+        toast.error('Failed to use credits: ' + creditResult.message);
+        return;
+      }
+      
+      // Immediately refetch credits to update UI
+      await refetch();
+      console.log('Credits deducted, balance updated');
+      
+      // Proceed with analysis after credits are successfully deducted
+      const analysisSuccess = await analyzeTradesForPeriod(trades, days, customPrompt);
+      
+      // Refetch credits again to ensure the UI is up-to-date
+      await refetch();
+      
+      // If analysis was not successful (empty result), refund the credits
+      if (!analysisSuccess) {
+        console.log('Analysis failed, refunding credits...');
+        
+        const refundResult = await useCredits.mutateAsync({
+          amount: creditCost, // Positive amount for refund
+          description: `Refund for failed analysis of ${days} days of trades`,
+          transaction_type: 'refund'
+        });
+        
+        if (refundResult.success) {
+          toast.info('Credits have been refunded due to failed analysis.');
+        } else {
+          toast.error('Failed to refund credits: ' + refundResult.message);
+        }
+        
+        // Refetch credits to update UI after refund
+        await refetch();
+        console.log('Credits refunded, balance updated');
+      } else {
+        // Analysis was successful
+        toast.success(`Analysis complete! Used ${creditCost} credits.`);
+        // Refetch one more time to be sure UI is updated
+        await refetch();
+      }
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      toast.error('Failed to analyze trades. Please try again later.');
+      // Ensure credits are refetched in case of error
+      await refetch();
     }
   };
   
-  return (
-    <div className="space-y-4">
-      <CreditsDisplay 
-        credits={credits} 
-        onBuyCredits={() => setShowPurchaseDialog(true)}
-        onRefresh={handleRefreshCredits}
-        isRefreshing={isRefreshingCredits}
-      />
+  const handlePurchaseClick = () => {
+    setIsPurchaseDialogOpen(true);
+  };
+  
+  // Refresh credits manually
+  const forceRefreshCredits = async () => {
+    console.log('Manual credit refresh requested');
+    await refetch();
+    toast.success('Credit information refreshed');
+  };
+  
+  return <div className="space-y-6">
+      <div className="w-full">
+        <CreditsDisplay 
+          credits={credits} 
+          isLoading={isLoadingCredits} 
+          onPurchaseClick={handlePurchaseClick} 
+          onRefresh={forceRefreshCredits}
+        />
+      </div>
       
-      <AnalysisButtons
-        onAnalyzePerformance={() => 
-          handleAnalysisRequest(analyzePerformance, "performance")
-        }
-        onAnalyzeRiskProfile={() => 
-          handleAnalysisRequest(analyzeRiskProfile, "risk profile")
-        }
-        onAnalyzeImprovements={() => 
-          handleAnalysisRequest(analyzeImprovements, "improvements")
-        }
-        onAnalyzePsychology={() => 
-          handleAnalysisRequest(analyzePsychology, "trading psychology")
-        }
-        isLoading={isAnalysisLoading}
+      <AnalysisButtons 
+        isAnalyzing={isAnalyzing} 
+        trades={trades} 
+        onAnalyze={handleAnalyze}
       />
       
       <AnalysisResult currentAnalysis={currentAnalysis} />
       
-      <CustomPromptAccordion
-        onCustomAnalysis={(prompt) => 
-          handleAnalysisRequest(() => createCustomAnalysis(prompt), "custom analysis")
-        }
-        isLoading={isAnalysisLoading}
-      />
+      <Separator className="my-6" />
       
+      {transactions && transactions.length > 0 && (
+        <CreditTransactionsPanel transactions={transactions} />
+      )}
+
       <PurchaseCreditsDialog 
-        open={showPurchaseDialog} 
-        onOpenChange={setShowPurchaseDialog}
+        open={isPurchaseDialogOpen} 
+        onOpenChange={(isOpen) => {
+          setIsPurchaseDialogOpen(isOpen);
+          if (!isOpen) {
+            // Refresh credits when the dialog closes
+            refetch();
+          }
+        }} 
       />
-    </div>
-  );
+    </div>;
 }

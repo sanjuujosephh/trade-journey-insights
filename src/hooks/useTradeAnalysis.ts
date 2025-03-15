@@ -1,76 +1,116 @@
 
-import { useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { useTradeQueries } from "./useTradeQueries";
-import { useTradeAuth } from "./useTradeAuth";
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Trade } from '@/types/trade';
+import { useToast } from './use-toast';
+import { format, subDays } from 'date-fns';
 
 export function useTradeAnalysis() {
-  const [isLoading, setIsLoading] = useState(false);
-  const { userId } = useTradeAuth();
-  const { trades } = useTradeQueries(userId);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [currentAnalysis, setCurrentAnalysis] = useState<string>('');
+  const { toast } = useToast();
 
-  const callAnalysisFunction = async (
-    endpoint: string,
-    payload: any
-  ): Promise<string> => {
-    setIsLoading(true);
-    
+  const analyzeTradesForPeriod = async (
+    trades: Trade[],
+    days: number,
+    customPrompt?: string
+  ): Promise<boolean> => {
+    if (trades.length === 0) {
+      toast({
+        title: "No trades to analyze",
+        description: "Please add some trades first.",
+        variant: "destructive",
+      });
+      setCurrentAnalysis('');
+      return false;
+    }
+
+    setIsAnalyzing(true);
+    setCurrentAnalysis('');
+
     try {
-      const { data, error } = await supabase.functions.invoke(
-        `analyze-trades/${endpoint}`,
-        {
-          body: {
-            ...payload,
-            userId
-          }
+      // Filter trades for the specified period
+      const today = new Date();
+      const startDate = subDays(today, days);
+      
+      const filteredTrades = trades.filter(trade => {
+        if (!trade.entry_date) return false;
+        // Convert DD-MM-YYYY to a Date object
+        const [day, month, year] = trade.entry_date.split('-').map(Number);
+        const tradeDate = new Date(year, month - 1, day);
+        return tradeDate >= startDate && tradeDate <= today;
+      });
+
+      if (filteredTrades.length === 0) {
+        toast({
+          title: "No trades in selected period",
+          description: `No trades found in the last ${days} days.`,
+          variant: "destructive",
+        });
+        setIsAnalyzing(false);
+        return false;
+      }
+
+      console.log(`Analyzing ${filteredTrades.length} trades for the last ${days} days`);
+
+      // Call the Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('analyze-trades', {
+        body: {
+          trades: filteredTrades,
+          days,
+          customPrompt
         }
-      );
+      });
 
       if (error) {
-        console.error(`Error in ${endpoint} analysis:`, error);
-        throw new Error(`Analysis failed: ${error.message}`);
+        console.error('Supabase function error:', error);
+        throw new Error(error.message);
       }
 
-      if (!data || !data.analysis) {
-        console.error(`No analysis returned from ${endpoint}`);
-        throw new Error("No analysis was generated");
+      // Set the analysis text
+      const analysisText = data?.analysis || '';
+      console.log('Analysis result length:', analysisText.length);
+      
+      setCurrentAnalysis(analysisText);
+      
+      // Consider analysis successful if it has meaningful content (more than just whitespace)
+      const isSuccessful = analysisText.trim().length > 100;
+      
+      if (isSuccessful) {
+        toast({
+          title: "Analysis complete",
+          description: `Successfully analyzed ${filteredTrades.length} trades.`,
+        });
+        console.log('Analysis successful');
+      } else {
+        toast({
+          title: "Analysis returned insufficient result",
+          description: "The AI couldn't generate a meaningful analysis.",
+          variant: "destructive",
+        });
+        console.log('Analysis failed - insufficient content');
       }
 
-      return data.analysis;
+      return isSuccessful;
+
     } catch (error) {
-      console.error("Analysis error:", error);
-      throw error;
+      console.error('Analysis error:', error);
+      toast({
+        title: "Analysis failed",
+        description: error instanceof Error ? error.message : "Failed to analyze trades",
+        variant: "destructive",
+      });
+      setCurrentAnalysis('');
+      return false;
     } finally {
-      setIsLoading(false);
+      setIsAnalyzing(false);
     }
   };
 
-  const analyzePerformance = async (): Promise<string> => {
-    return callAnalysisFunction("performance", { trades });
-  };
-
-  const analyzeRiskProfile = async (): Promise<string> => {
-    return callAnalysisFunction("risk-profile", { trades });
-  };
-
-  const analyzeImprovements = async (): Promise<string> => {
-    return callAnalysisFunction("improvements", { trades });
-  };
-
-  const analyzePsychology = async (): Promise<string> => {
-    return callAnalysisFunction("psychology", { trades });
-  };
-
-  const createCustomAnalysis = async (prompt: string): Promise<string> => {
-    return callAnalysisFunction("custom", { trades, prompt });
-  };
-
   return {
-    analyzePerformance,
-    analyzeRiskProfile,
-    analyzeImprovements,
-    analyzePsychology,
-    createCustomAnalysis,
-    isLoading
+    isAnalyzing,
+    currentAnalysis,
+    analyzeTradesForPeriod,
+    setCurrentAnalysis
   };
 }

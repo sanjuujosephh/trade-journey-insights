@@ -18,8 +18,6 @@ interface CustomPromptAccordionProps {
   onRemovePrompt?: (index: number) => void;
   onUsePrompt?: (prompt: string) => void;
   trades?: Trade[];
-  isLoading?: boolean;
-  onCustomAnalysis?: (prompt: string) => Promise<void>;
 }
 
 export function CustomPromptAccordion({
@@ -31,9 +29,7 @@ export function CustomPromptAccordion({
   onSavePrompt = () => {},
   onRemovePrompt = () => {},
   onUsePrompt = () => {},
-  trades = [],
-  isLoading = false,
-  onCustomAnalysis
+  trades = []
 }: CustomPromptAccordionProps) {
   const resetCustomPrompt = () => {
     setIsEditingPrompt(false);
@@ -53,12 +49,6 @@ Provide specific insights on:
 4. Concrete recommendations for improvement
 
 Trades data: {{tradesData}}`);
-  };
-
-  const handleRunCustomAnalysis = async () => {
-    if (onCustomAnalysis && customPrompt) {
-      await onCustomAnalysis(customPrompt);
-    }
   };
 
   return (
@@ -94,17 +84,6 @@ Trades data: {{tradesData}}`);
                   <X className="mr-2 h-4 w-4" />
                   Cancel
                 </Button>
-                
-                {onCustomAnalysis && (
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={handleRunCustomAnalysis}
-                    disabled={isLoading}
-                  >
-                    Run Analysis
-                  </Button>
-                )}
                 
                 <Button
                   variant="default"
