@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
@@ -69,22 +70,17 @@ Provide specific insights on:
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="ml-1 bg-white border border-input" 
-            style={{ height: '2.6rem', width: '3rem' }}
-          >
-            <Wand2 className="h-4 w-4" />
-            <span className="sr-only">Customize {buttonLabel} Analysis</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p>Customize {buttonLabel} Analysis</p>
-        </TooltipContent>
-      </Tooltip>
+      <DialogTrigger asChild>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="ml-1 bg-white border border-input" 
+          style={{ height: '2.6rem', width: '3rem' }}
+        >
+          <Wand2 className="h-4 w-4" />
+          <span className="sr-only">Customize {buttonLabel} Analysis</span>
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>

@@ -20,7 +20,13 @@ export function AnalysisButtons({ isAnalyzing, trades, onAnalyze }: AnalysisButt
   };
   
   const handleCustomPromptAnalysis = (customPrompt: string) => {
-    onAnalyze(selectedDayCount || 1, customPrompt);
+    if (selectedDayCount === 0) {
+      // Default to 1 day if no day count was selected
+      setSelectedDayCount(1);
+      onAnalyze(1, customPrompt);
+    } else {
+      onAnalyze(selectedDayCount, customPrompt);
+    }
   };
 
   return (
