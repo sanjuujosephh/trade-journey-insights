@@ -59,7 +59,6 @@ export function TradeHistoryFilters({
   tradesCount
 }: TradeHistoryFiltersProps) {
   
-  // Ensure this is a boolean by using Boolean() or a comparison
   const showClearFiltersButton = Boolean(
     searchTerm || 
     outcomeFilter !== "all" || 
@@ -76,26 +75,37 @@ export function TradeHistoryFilters({
   return (
     <div className="mb-4 space-y-4">
       {/* Top row with search and primary filters */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="w-full lg:w-1/3">
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-1/3">
           <SearchBar 
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
         </div>
         
-        <div className="w-full lg:w-2/3">
-          <PrimaryFilters
-            symbolFilter={symbolFilter}
-            setSymbolFilter={setSymbolFilter}
-            outcomeFilter={outcomeFilter}
-            setOutcomeFilter={setOutcomeFilter}
-            tradeTypeFilter={tradeTypeFilter}
-            setTradeTypeFilter={setTradeTypeFilter}
-            uniqueSymbols={uniqueSymbols}
-            showClearFiltersButton={showClearFiltersButton}
-            resetFilters={resetFilters}
-          />
+        <div className="w-full md:w-2/3 flex items-center justify-between">
+          <div className="flex flex-wrap gap-2">
+            <PrimaryFilters
+              symbolFilter={symbolFilter}
+              setSymbolFilter={setSymbolFilter}
+              outcomeFilter={outcomeFilter}
+              setOutcomeFilter={setOutcomeFilter}
+              tradeTypeFilter={tradeTypeFilter}
+              setTradeTypeFilter={setTradeTypeFilter}
+              uniqueSymbols={uniqueSymbols}
+            />
+          </div>
+          
+          {showClearFiltersButton && (
+            <div className="mt-2 md:mt-0">
+              <button 
+                onClick={resetFilters}
+                className="px-4 py-2 rounded bg-transparent hover:bg-muted text-primary border border-primary text-sm font-medium transition-colors"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
         </div>
       </div>
       

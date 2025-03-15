@@ -39,7 +39,7 @@ export function AdvancedFilters({
   return (
     <div className="flex flex-wrap gap-2">
       <Select value={directionFilter} onValueChange={setDirectionFilter}>
-        <SelectTrigger className="w-[140px]">
+        <SelectTrigger className="w-[160px]">
           <SelectValue placeholder="Any Direction" />
         </SelectTrigger>
         <SelectContent>
@@ -50,7 +50,7 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={optionTypeFilter} onValueChange={setOptionTypeFilter}>
-        <SelectTrigger className="w-[140px]">
+        <SelectTrigger className="w-[160px]">
           <SelectValue placeholder="Any Option" />
         </SelectTrigger>
         <SelectContent>
@@ -61,7 +61,7 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={timeframeFilter} onValueChange={setTimeframeFilter}>
-        <SelectTrigger className="w-[140px]">
+        <SelectTrigger className="w-[160px]">
           <SelectValue placeholder="Any Timeframe" />
         </SelectTrigger>
         <SelectContent>
@@ -77,7 +77,7 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={marketConditionFilter} onValueChange={setMarketConditionFilter}>
-        <SelectTrigger className="w-[140px]">
+        <SelectTrigger className="w-[160px]">
           <SelectValue placeholder="Any Market" />
         </SelectTrigger>
         <SelectContent>
@@ -90,7 +90,7 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={entryEmotionFilter} onValueChange={setEntryEmotionFilter}>
-        <SelectTrigger className="w-[140px]">
+        <SelectTrigger className="w-[160px]">
           <SelectValue placeholder="Any Entry Emotion" />
         </SelectTrigger>
         <SelectContent>
@@ -105,7 +105,7 @@ export function AdvancedFilters({
       </Select>
       
       <Select value={exitEmotionFilter} onValueChange={setExitEmotionFilter}>
-        <SelectTrigger className="w-[140px]">
+        <SelectTrigger className="w-[160px]">
           <SelectValue placeholder="Any Exit Emotion" />
         </SelectTrigger>
         <SelectContent>
