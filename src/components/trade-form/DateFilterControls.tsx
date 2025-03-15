@@ -35,7 +35,7 @@ export function DateFilterControls({
           </Button>}
       </div>
       
-      <h2 className="text-xl font-semibold text-center">Recent Trades</h2>
+      
       
       <Button variant="ghost" onClick={navigateToHistoryTab} className="flex items-center gap-1 text-primary">
         View All Entries
