@@ -21,7 +21,8 @@ export function useTradeAnalysis() {
         description: "Please add some trades first.",
         variant: "destructive",
       });
-      return;
+      setCurrentAnalysis('');
+      return false;
     }
 
     setIsAnalyzing(true);
@@ -47,7 +48,7 @@ export function useTradeAnalysis() {
           variant: "destructive",
         });
         setIsAnalyzing(false);
-        return;
+        return false;
       }
 
       // Call the Supabase Edge Function
@@ -63,12 +64,16 @@ export function useTradeAnalysis() {
         throw new Error(error.message);
       }
 
-      setCurrentAnalysis(data.analysis || 'No analysis could be generated.');
+      // Set the analysis text
+      const analysisText = data.analysis || 'No analysis could be generated.';
+      setCurrentAnalysis(analysisText);
       
       toast({
         title: "Analysis complete",
         description: `Successfully analyzed ${filteredTrades.length} trades.`,
       });
+
+      return analysisText.trim() !== '';
 
     } catch (error) {
       console.error('Analysis error:', error);
@@ -77,6 +82,7 @@ export function useTradeAnalysis() {
         description: error instanceof Error ? error.message : "Failed to analyze trades",
         variant: "destructive",
       });
+      return false;
     } finally {
       setIsAnalyzing(false);
     }

@@ -23,7 +23,8 @@ export function AIAnalysisTab() {
     credits,
     transactions,
     isLoading: isLoadingCredits,
-    useCredits
+    useCredits,
+    refetch
   } = useUserCredits();
   const {
     isAnalyzing,
@@ -58,18 +59,20 @@ export function AIAnalysisTab() {
       // Proceed with analysis after credits are successfully deducted
       const analysisResult = await analyzeTradesForPeriod(trades, days, customPrompt);
       
-      // Check if analysis was successful based on the returned value
-      // Instead of directly checking analysisResult which might be void
-      if (currentAnalysis) {
-        toast.success(`Analysis complete! Used ${creditCost} credits.`);
-      } else {
-        // If analysis fails, refund the credits
+      // Check if analysis was successful - we check the currentAnalysis directly, not the return value
+      if (!currentAnalysis || currentAnalysis.trim() === '') {
+        // Only if analysis fails, refund the credits
         await useCredits.mutateAsync({
           amount: creditCost, // Positive amount for refund
           description: `Refund for failed analysis of ${days} days of trades`,
           transaction_type: 'refund'
         });
         toast.error('Analysis failed. Credits have been refunded.');
+      } else {
+        // Analysis was successful
+        toast.success(`Analysis complete! Used ${creditCost} credits.`);
+        // Make sure to refresh the credits display
+        refetch();
       }
     } catch (error) {
       console.error('Analysis failed:', error);
