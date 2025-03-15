@@ -1,3 +1,4 @@
+
 import { ErrorBoundary } from "./ErrorBoundary";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
 import { TradeHistory } from "./trade-form/TradeHistory";
@@ -15,17 +16,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, ArrowRight } from "lucide-react";
 import { format, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
+
 export default function TradeEntry() {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  
   const {
     formData,
     editingId,
     selectedTrade,
     isDialogOpen,
+    isSubmitting,
     trades,
     isLoading,
     setSelectedTrade,
@@ -36,6 +38,7 @@ export default function TradeEntry() {
     handleEdit,
     handleViewDetails
   } = useTradeManagement();
+
   if (isLoading) return <LoadingSpinner />;
 
   // Filter trades based on selected date or show recent 10
@@ -49,11 +52,16 @@ export default function TradeEntry() {
 
   const handleDelete = async (id: string) => {
     try {
-      const {
-        error
-      } = await supabase.from('trades').delete().eq('id', id);
+      const { error } = await supabase.from('trades').delete().eq('id', id);
       if (error) {
         throw new Error(error.message);
+      }
+
+      // Clear form if the deleted trade was being edited
+      if (editingId === id) {
+        // Reset form data
+        const resetButton = document.querySelector('[type="reset"]') as HTMLButtonElement;
+        if (resetButton) resetButton.click();
       }
 
       // Invalidate the trades query to refresh data
@@ -72,6 +80,7 @@ export default function TradeEntry() {
       });
     }
   };
+
   const clearDateFilter = () => {
     setSelectedDate(undefined);
     toast({
@@ -79,17 +88,28 @@ export default function TradeEntry() {
       description: "Showing 10 most recent trades"
     });
   };
+
   const navigateToHistoryTab = () => {
     const historyTabTrigger = document.querySelector('[value="history"]') as HTMLElement;
     if (historyTabTrigger) {
       historyTabTrigger.click();
     }
   };
-  return <ErrorBoundary>
-      <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
-        <TradeFormManager formData={formData} handleChange={handleChange} handleSelectChange={handleSelectChange} onSubmit={handleSubmit} editingId={editingId} />
 
-        {trades.length > 0 && <div className="space-y-4 mt-8">
+  return (
+    <ErrorBoundary>
+      <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
+        <TradeFormManager 
+          formData={formData} 
+          handleChange={handleChange} 
+          handleSelectChange={handleSelectChange} 
+          onSubmit={handleSubmit} 
+          editingId={editingId}
+          isSubmitting={isSubmitting} 
+        />
+
+        {trades.length > 0 && (
+          <div className="space-y-4 mt-8">
             <div className="flex items-center justify-between gap-2 px-[30px]">
               <div className="flex items-center gap-2">
                 <Popover>
@@ -100,30 +120,60 @@ export default function TradeEntry() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
+                    <Calendar 
+                      mode="single" 
+                      selected={selectedDate} 
+                      onSelect={setSelectedDate} 
+                      initialFocus 
+                    />
                   </PopoverContent>
                 </Popover>
 
-                {selectedDate && <Button type="button" size="sm" variant="outline" onClick={clearDateFilter}>
+                {selectedDate && (
+                  <Button 
+                    type="button" 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={clearDateFilter}
+                  >
                     Clear
-                  </Button>}
+                  </Button>
+                )}
               </div>
               
-              <Button variant="ghost" onClick={navigateToHistoryTab} className="flex items-center gap-1 text-primary">
+              <Button 
+                variant="ghost" 
+                onClick={navigateToHistoryTab} 
+                className="flex items-center gap-1 text-primary"
+              >
                 View All Entries
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
             
-            <TradeHistory trades={filteredTrades} onEdit={handleEdit} onDelete={handleDelete} onViewDetails={handleViewDetails} showEditButton={true} />
-          </div>}
+            <TradeHistory 
+              trades={filteredTrades} 
+              onEdit={handleEdit} 
+              onDelete={handleDelete} 
+              onViewDetails={handleViewDetails} 
+              showEditButton={true} 
+            />
+          </div>
+        )}
 
         <ImportTrades />
 
-        {selectedTrade && <TradeDetailsDialog trade={selectedTrade} open={isDialogOpen} onOpenChange={open => {
-        setIsDialogOpen(open);
-        if (!open) setSelectedTrade(null);
-      }} />}
+        {selectedTrade && (
+          <TradeDetailsDialog 
+            trade={selectedTrade} 
+            open={isDialogOpen} 
+            onOpenChange={open => {
+              setIsDialogOpen(open);
+              if (!open) setSelectedTrade(null);
+            }} 
+          />
+        )}
       </div>
-    </ErrorBoundary>;
+    </ErrorBoundary>
+  );
 }

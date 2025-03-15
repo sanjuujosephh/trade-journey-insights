@@ -28,6 +28,14 @@ export function TradeFormManager({
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <FormSection>
+        {isEditing && (
+          <div className="mb-4 p-2 border border-primary bg-primary/5 rounded-md">
+            <p className="text-sm text-primary font-medium">
+              Editing trade: {formData.symbol} {formData.entry_date}
+            </p>
+          </div>
+        )}
+        
         <BasicTradeInfo
           formData={formData}
           handleChange={handleChange}
