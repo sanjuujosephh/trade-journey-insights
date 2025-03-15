@@ -2,7 +2,6 @@
 import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import { useState, useMemo } from "react";
-import { TradeHistoryFilters } from "./trade-history/TradeHistoryFilters";
 import { TradeHistoryTable } from "./trade-history/TradeHistoryTable";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,9 +11,17 @@ interface TradeHistoryProps {
   onDelete: (id: string) => void;
   onViewDetails: (trade: Trade) => void;
   showEditButton?: boolean;
+  showFilters?: boolean;
 }
 
-export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEditButton = false }: TradeHistoryProps) {
+export function TradeHistory({ 
+  trades, 
+  onEdit, 
+  onDelete, 
+  onViewDetails, 
+  showEditButton = false,
+  showFilters = false 
+}: TradeHistoryProps) {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [outcomeFilter, setOutcomeFilter] = useState<string>("all");
@@ -34,6 +41,9 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
   
   // Filter trades based on search term and filters
   const filteredTrades = useMemo(() => {
+    // If filters are not shown, just return all trades
+    if (!showFilters) return trades;
+    
     return trades.filter(trade => {
       // Search term filtering (case insensitive)
       const matchesSearch = !searchTerm || 
@@ -93,7 +103,8 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
              matchesExitEmotion;
     });
   }, [
-    trades, 
+    trades,
+    showFilters,
     searchTerm, 
     outcomeFilter, 
     symbolFilter, 
@@ -138,48 +149,38 @@ export function TradeHistory({ trades, onEdit, onDelete, onViewDetails, showEdit
     });
   };
 
-  console.log("Filter values:", { 
-    searchTerm, 
-    outcomeFilter, 
-    symbolFilter, 
-    tradeTypeFilter,
-    directionFilter,
-    optionTypeFilter,
-    timeframeFilter,
-    marketConditionFilter,
-    entryEmotionFilter,
-    exitEmotionFilter,
-    filteredCount: filteredTrades.length,
-    totalCount: trades.length
-  });
+  // Import TradeHistoryFilters only if showFilters is true
+  const TradeHistoryFilters = showFilters ? require("./trade-history/TradeHistoryFilters").TradeHistoryFilters : null;
 
   return (
     <Card className="p-6 glass">
-      <TradeHistoryFilters 
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        outcomeFilter={outcomeFilter}
-        setOutcomeFilter={setOutcomeFilter}
-        symbolFilter={symbolFilter}
-        setSymbolFilter={setSymbolFilter}
-        tradeTypeFilter={tradeTypeFilter}
-        setTradeTypeFilter={setTradeTypeFilter}
-        directionFilter={directionFilter}
-        setDirectionFilter={setDirectionFilter}
-        optionTypeFilter={optionTypeFilter}
-        setOptionTypeFilter={setOptionTypeFilter}
-        timeframeFilter={timeframeFilter}
-        setTimeframeFilter={setTimeframeFilter}
-        marketConditionFilter={marketConditionFilter}
-        setMarketConditionFilter={setMarketConditionFilter}
-        entryEmotionFilter={entryEmotionFilter}
-        setEntryEmotionFilter={setEntryEmotionFilter}
-        exitEmotionFilter={exitEmotionFilter}
-        setExitEmotionFilter={setExitEmotionFilter}
-        uniqueSymbols={uniqueSymbols}
-        resetFilters={resetFilters}
-        tradesCount={{ filtered: sortedTrades.length, total: trades.length }}
-      />
+      {showFilters && TradeHistoryFilters && (
+        <TradeHistoryFilters 
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          outcomeFilter={outcomeFilter}
+          setOutcomeFilter={setOutcomeFilter}
+          symbolFilter={symbolFilter}
+          setSymbolFilter={setSymbolFilter}
+          tradeTypeFilter={tradeTypeFilter}
+          setTradeTypeFilter={setTradeTypeFilter}
+          directionFilter={directionFilter}
+          setDirectionFilter={setDirectionFilter}
+          optionTypeFilter={optionTypeFilter}
+          setOptionTypeFilter={setOptionTypeFilter}
+          timeframeFilter={timeframeFilter}
+          setTimeframeFilter={setTimeframeFilter}
+          marketConditionFilter={marketConditionFilter}
+          setMarketConditionFilter={setMarketConditionFilter}
+          entryEmotionFilter={entryEmotionFilter}
+          setEntryEmotionFilter={setEntryEmotionFilter}
+          exitEmotionFilter={exitEmotionFilter}
+          setExitEmotionFilter={setExitEmotionFilter}
+          uniqueSymbols={uniqueSymbols}
+          resetFilters={resetFilters}
+          tradesCount={{ filtered: sortedTrades.length, total: trades.length }}
+        />
+      )}
       
       <TradeHistoryTable 
         trades={sortedTrades}

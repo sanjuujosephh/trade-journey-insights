@@ -61,6 +61,7 @@ export function FOTradeTable({ trades }: FOTradeTableProps) {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onViewDetails={handleViewDetails}
+        showFilters={true}
       />
       
       {selectedTrade && (
