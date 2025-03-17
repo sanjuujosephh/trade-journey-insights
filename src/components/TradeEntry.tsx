@@ -1,4 +1,3 @@
-
 import { ErrorBoundary } from "./ErrorBoundary";
 import { TradeDetailsDialog } from "./TradeDetailsDialog";
 import { LoadingSpinner } from "./LoadingSpinner";
@@ -9,10 +8,11 @@ import { useToast } from "@/hooks/use-toast";
 import { TradeEntryForm } from "./trade-form/TradeEntryForm";
 import { RecentTradesSection } from "./trade-form/RecentTradesSection";
 import { useTradeDelete } from "./trade-form/TradeDeleteHandler";
-
 export default function TradeEntry() {
-  const { toast } = useToast();
-  
+  const {
+    toast
+  } = useToast();
+
   // Trade management hooks
   const {
     formData,
@@ -42,7 +42,9 @@ export default function TradeEntry() {
   } = useDateFilter(trades);
 
   // Trade deletion
-  const { handleDelete } = useTradeDelete({ 
+  const {
+    handleDelete
+  } = useTradeDelete({
     onEditingCancelled: () => {
       resetForm();
       setEditingId(null);
@@ -67,57 +69,27 @@ export default function TradeEntry() {
       historyTabTrigger.click();
     }
   };
-
   if (isLoading) return <LoadingSpinner />;
-
-  return (
-    <ErrorBoundary>
+  return <ErrorBoundary>
       <div className="space-y-8 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
         {/* Trade Entry Form */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <TradeEntryForm
-            formData={formData}
-            editingId={editingId}
-            isSubmitting={isSubmitting}
-            handleChange={handleChange}
-            handleSelectChange={handleSelectChange}
-            handleSubmit={handleSubmit}
-            cancelEditing={cancelEditing}
-          />
+        <div className="bg-white p-6 rounded-lg shadow-sm border-none px-[10px] py-[20px]">
+          <TradeEntryForm formData={formData} editingId={editingId} isSubmitting={isSubmitting} handleChange={handleChange} handleSelectChange={handleSelectChange} handleSubmit={handleSubmit} cancelEditing={cancelEditing} />
         </div>
 
         {/* Recent Trades Section - with more visual separation */}
-        {trades.length > 0 && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border mt-8">
-            <RecentTradesSection
-              trades={trades}
-              filteredTrades={filteredTrades}
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              clearDateFilter={clearDateFilter}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onViewDetails={handleViewDetails}
-              navigateToHistoryTab={navigateToHistoryTab}
-            />
-          </div>
-        )}
+        {trades.length > 0 && <div className="bg-white p-6 rounded-lg shadow-sm border-none mt-8 py-0">
+            <RecentTradesSection trades={trades} filteredTrades={filteredTrades} selectedDate={selectedDate} setSelectedDate={setSelectedDate} clearDateFilter={clearDateFilter} onEdit={handleEdit} onDelete={handleDelete} onViewDetails={handleViewDetails} navigateToHistoryTab={navigateToHistoryTab} />
+          </div>}
 
         {/* Import/Export Section */}
         <ImportTrades />
 
         {/* Trade Details Dialog */}
-        {selectedTrade && (
-          <TradeDetailsDialog 
-            trade={selectedTrade} 
-            open={isDialogOpen} 
-            onOpenChange={open => {
-              setIsDialogOpen(open);
-              if (!open) setSelectedTrade(null);
-            }} 
-          />
-        )}
+        {selectedTrade && <TradeDetailsDialog trade={selectedTrade} open={isDialogOpen} onOpenChange={open => {
+        setIsDialogOpen(open);
+        if (!open) setSelectedTrade(null);
+      }} />}
       </div>
-    </ErrorBoundary>
-  );
+    </ErrorBoundary>;
 }

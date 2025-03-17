@@ -24,7 +24,7 @@ export function RecentTradesSection({
   navigateToHistoryTab
 }: RecentTradesSectionProps) {
   if (trades.length === 0) return null;
-  return <div className="space-y-4 mt-12 pt-8 border-none border-gray-200 my-[71px]">
+  return <div className="space-y-4 mt-12 pt-8 border-none border-gray-200 my-[71px] px-0">
       <DateFilterControls selectedDate={selectedDate} setSelectedDate={setSelectedDate} clearDateFilter={clearDateFilter} navigateToHistoryTab={navigateToHistoryTab} />
       
       <TradeHistory trades={filteredTrades} onEdit={onEdit} onDelete={onDelete} onViewDetails={onViewDetails} showEditButton={true} />
