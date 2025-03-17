@@ -15,7 +15,7 @@ export class TradeValidationService {
     const errors: ValidationError[] = [];
     
     // Collect basic field validation errors
-    const basicErrors = validateTradeForm(formData);
+    const basicErrors = this.validateBasicFields(formData);
     errors.push(...basicErrors.map(msg => ({ message: msg })));
     
     // Validate date and time fields
@@ -23,6 +23,24 @@ export class TradeValidationService {
     errors.push(...dateTimeErrors);
     
     // Add more validation types as needed
+    
+    return errors;
+  }
+  
+  // Basic field validation
+  private static validateBasicFields(formData: FormData): string[] {
+    const errors: string[] = [];
+    
+    if (!formData.symbol) errors.push("Symbol is required");
+    if (!formData.entry_price) errors.push("Entry price is required");
+    if (formData.trade_type === "options") {
+      if (!formData.strike_price) {
+        errors.push("Strike price is required for options trades");
+      }
+      if (!formData.stop_loss) {
+        errors.push("Stop loss is required for options trades");
+      }
+    }
     
     return errors;
   }

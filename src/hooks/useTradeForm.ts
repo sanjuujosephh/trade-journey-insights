@@ -15,7 +15,6 @@ const emptyFormData: FormData = {
   notes: "",
   entry_date: "",
   entry_time: "",
-  exit_date: "",
   exit_time: "",
   chart_link: "",
   vix: "",

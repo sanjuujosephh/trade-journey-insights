@@ -23,7 +23,6 @@ export function useTradeActions() {
       entry_time: trade.entry_time || "",
       exit_time: trade.exit_time || "",
       entry_date: trade.entry_date || "",
-      exit_date: trade.exit_date || "",
       timeframe: trade.timeframe || "",
       chart_link: trade.chart_link || "",
       confidence_level: trade.confidence_level?.toString() || "",
