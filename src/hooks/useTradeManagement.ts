@@ -73,6 +73,7 @@ export function useTradeManagement() {
       market_condition: (trade.market_condition || "") as string,
       timeframe: (trade.timeframe || "") as string,
       trade_direction: (trade.trade_direction || "") as "" | "long" | "short",
+      exit_reason: (trade.exit_reason || "") as string,
       confidence_level: trade.confidence_level?.toString() || "",
       entry_emotion: (trade.entry_emotion || "") as string,
       exit_emotion: (trade.exit_emotion || "") as string,
@@ -131,6 +132,6 @@ export function useTradeManagement() {
     handleEdit,
     handleViewDetails,
     closeDialog,
-    resetForm, // Added resetForm to exports
+    resetForm,
   };
 }

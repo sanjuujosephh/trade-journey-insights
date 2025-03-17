@@ -14,12 +14,6 @@ export const validateTradeForm = (formData: FormData) => {
       errors.push("Stop loss is required for options trades");
     }
   }
-
-  // Validate risk reward ratio if provided
-  if (formData.planned_risk_reward && parseFloat(formData.planned_risk_reward) <= 0) {
-    errors.push("Risk reward ratio must be greater than 0");
-  }
   
   return errors;
 };
-

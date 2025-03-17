@@ -37,10 +37,6 @@ export function validateTradeForm(data: FormData): ValidationError {
     errors.exit_time = "Exit time must be after entry time";
   }
 
-  if (data.planned_risk_reward && parseFloat(data.planned_risk_reward) <= 0) {
-    errors.planned_risk_reward = "Risk reward ratio must be greater than 0";
-  }
-
   return errors;
 }
 
