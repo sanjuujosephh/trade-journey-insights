@@ -1,8 +1,8 @@
 
 import { Trade } from "@/types/trade";
 
-export const calculateConsistencyScore = (trades: Trade[]) => {
-  if (trades.length === 0) return "0";
+export const calculateConsistencyScore = (trades: Trade[]): number => {
+  if (trades.length === 0) return 0;
   
   let score = 100;
   
@@ -39,5 +39,5 @@ export const calculateConsistencyScore = (trades: Trade[]) => {
     score -= (tradesOutsideHours / dayTrades.length) * 20;
   });
   
-  return Math.max(0, Math.min(100, score)).toFixed(1);
+  return Math.max(0, Math.min(100, score));
 };

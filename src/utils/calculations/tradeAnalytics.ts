@@ -98,7 +98,15 @@ export function calculateTradeStatistics(trades: Trade[]): TradeStatistics {
   
   // Calculate expectancy and sharpe ratio
   const expectancy = calculateExpectancy(trades);
-  const sharpeRatio = calculateSharpeRatio(trades);
+  
+  // Fix: Extract trade returns as numbers for sharpeRatio calculation
+  const tradeReturns = trades.map(trade => {
+    if (trade.exit_price && trade.quantity) {
+      return ((Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity));
+    }
+    return 0;
+  });
+  const sharpeRatio = calculateSharpeRatio(tradeReturns);
   
   // Calculate drawdowns
   const drawdowns = calculateDrawdowns(trades);
@@ -119,8 +127,8 @@ export function calculateTradeStatistics(trades: Trade[]): TradeStatistics {
     ? durationStats.reduce((sum, stat) => sum + stat.duration, 0) / durationStats.length
     : 0;
   
-  // Calculate consistency score
-  const consistencyScore = calculateConsistencyScore(trades);
+  // Calculate consistency score - Fix: Convert string to number
+  const consistencyScore = Number(calculateConsistencyScore(trades));
   
   // Calculate total PnL and average trade PnL
   const totalPnL = totalProfit - totalLoss;
