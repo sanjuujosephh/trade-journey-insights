@@ -27,12 +27,6 @@ export function processField(fieldName: string, value: string): any {
     case 'put_iv':
     case 'pcr':
     case 'confidence_level':
-    case 'planned_risk_reward':
-    case 'actual_risk_reward':
-    case 'planned_target':
-    case 'slippage':
-    case 'post_exit_price':
-    case 'exit_efficiency':
       return parseFloat(value);
       
     case 'outcome':

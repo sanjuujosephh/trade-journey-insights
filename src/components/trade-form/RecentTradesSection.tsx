@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 import { TradeHistory } from "./TradeHistory";
 import { DateFilterControls } from "./DateFilterControls";

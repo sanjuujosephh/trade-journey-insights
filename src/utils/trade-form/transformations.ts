@@ -39,12 +39,6 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     entry_date: formData.entry_date || null,
     exit_date: formData.exit_date || null,
     ai_feedback: null,
-    planned_risk_reward: sanitizeNumber(formData.planned_risk_reward),
-    actual_risk_reward: sanitizeNumber(formData.actual_risk_reward),
-    planned_target: sanitizeNumber(formData.planned_target),
-    slippage: sanitizeNumber(formData.slippage),
-    post_exit_price: sanitizeNumber(formData.post_exit_price),
-    exit_efficiency: sanitizeNumber(formData.exit_efficiency),
     user_id: ""  // This will be set in the mutation
   };
 };

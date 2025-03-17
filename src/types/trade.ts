@@ -33,12 +33,6 @@ export interface Trade {
   entry_date: string | null;
   exit_date: string | null;
   ai_feedback: string | null;
-  planned_risk_reward: number | null;
-  actual_risk_reward: number | null;
-  planned_target: number | null;
-  slippage: number | null;
-  post_exit_price: number | null;
-  exit_efficiency: number | null;
 }
 
 export interface FormData {
@@ -51,8 +45,6 @@ export interface FormData {
   call_iv: string;
   put_iv: string;
   pcr: string;
-  planned_risk_reward: string;
-  actual_risk_reward: string;
   strategy: string;
   outcome: 'profit' | 'loss' | 'breakeven';
   notes: string;
@@ -73,8 +65,4 @@ export interface FormData {
   entry_emotion: string;
   exit_emotion: string;
   symbol: string;
-  planned_target: string;
-  slippage: string;
-  post_exit_price: string;
-  exit_efficiency: string;
 }
