@@ -19,6 +19,8 @@ export function formatToIST(date: Date): { datePart: string; timePart: string } 
 }
 
 export function parseDateString(dateString: string): Date | null {
+  if (!dateString) return null;
+  
   const parts = dateString.split('-');
   if (parts.length === 3) {
     const day = parseInt(parts[0], 10);
@@ -33,7 +35,12 @@ export function parseDateString(dateString: string): Date | null {
 }
 
 export function parseTimeString(timeString: string): { hours: number | null; minutes: number | null } {
-  const parts = timeString.split(':');
+  if (!timeString) return { hours: null, minutes: null };
+  
+  // Remove AM/PM indicators if present
+  const cleanTime = timeString.replace(/\s?[AP]M$/i, '');
+  
+  const parts = cleanTime.split(':');
   if (parts.length === 2) {
     const hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10);
@@ -75,6 +82,49 @@ export function isValidDateTime(dateStr: string, timeStr: string): boolean {
   }
   
   return true;
+}
+
+/**
+ * Validates that exit datetime is not before entry datetime
+ * when both are on the same day
+ * @param entryDate Entry date in DD-MM-YYYY format
+ * @param entryTime Entry time in HH:MM format
+ * @param exitDate Exit date in DD-MM-YYYY format
+ * @param exitTime Exit time in HH:MM format
+ * @returns true if exit datetime is valid compared to entry datetime
+ */
+export function isValidExitTime(entryDate: string, entryTime: string, exitDate: string, exitTime: string): boolean {
+  // If no exit date/time provided, it's valid (trade might be open)
+  if (!exitDate || !exitTime) return true;
+  
+  // If entry date/time not provided, we can't compare
+  if (!entryDate || !entryTime) return true;
+  
+  // Parse dates
+  const entryDateObj = parseDateString(entryDate);
+  const exitDateObj = parseDateString(exitDate);
+  
+  if (!entryDateObj || !exitDateObj) return false;
+  
+  // If dates are different, we only need to check that exit date is not before entry date
+  if (entryDate !== exitDate) {
+    return exitDateObj >= entryDateObj;
+  }
+  
+  // If dates are the same, we need to check times
+  const entryTimeParts = parseTimeString(entryTime);
+  const exitTimeParts = parseTimeString(exitTime);
+  
+  if (!entryTimeParts.hours || !entryTimeParts.minutes || 
+      !exitTimeParts.hours || !exitTimeParts.minutes) {
+    return true; // Cannot compare times, assume valid
+  }
+  
+  // Convert to minutes since midnight for easy comparison
+  const entryMinutes = entryTimeParts.hours * 60 + entryTimeParts.minutes;
+  const exitMinutes = exitTimeParts.hours * 60 + exitTimeParts.minutes;
+  
+  return exitMinutes >= entryMinutes;
 }
 
 /**

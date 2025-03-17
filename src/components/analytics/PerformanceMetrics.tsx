@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
@@ -111,6 +110,11 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
   // Calculate trade management metrics
   const tradesCorrect = (trades.filter(t => t.exit_reason !== 'manual').length / trades.length) * 100;
   const tradesIncorrect = 100 - tradesCorrect;
+
+  const stopLosses = trades.filter(trade => trade.exit_reason === "stop_loss").length;
+  const targets = trades.filter(trade => trade.exit_reason === "target_reached").length;
+  const manualExits = trades.filter(trade => trade.exit_reason === "manual").length;
+  const timeBasedExits = trades.filter(trade => trade.exit_reason === "time_based").length;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">

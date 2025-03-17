@@ -8,6 +8,10 @@ const sanitizeNumber = (value: string): number | null => {
 };
 
 export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'timestamp'> => {
+  // If exit date is empty but entry date is present, use entry date as exit date
+  // This will help with validation when both dates are the same
+  const exitDate = formData.exit_date || formData.entry_date;
+  
   return {
     entry_price: parseFloat(formData.entry_price),
     exit_price: sanitizeNumber(formData.exit_price),
@@ -37,7 +41,7 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     exit_emotion: formData.exit_emotion || null,
     symbol: formData.symbol,
     entry_date: formData.entry_date || null,
-    exit_date: formData.exit_date || null,
+    exit_date: exitDate || null,
     ai_feedback: null,
     user_id: ""  // This will be set in the mutation
   };

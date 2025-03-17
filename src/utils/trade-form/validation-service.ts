@@ -1,6 +1,6 @@
 
 import { FormData } from "@/types/trade";
-import { isValidDateTime } from "@/utils/datetime";
+import { isValidDateTime, isValidExitTime } from "@/utils/datetime";
 import { validateTradeForm } from "./validation";
 
 // Error type with structured messages for better UI integration
@@ -47,6 +47,23 @@ export class TradeValidationService {
         field: 'exit_date_time',
         message: "Please enter valid exit date and time"
       });
+    }
+    
+    // Validate that exit time is not before entry time on the same day
+    if (formData.entry_date && formData.entry_time && 
+        formData.exit_date && formData.exit_time) {
+      
+      if (!isValidExitTime(
+          formData.entry_date, 
+          formData.entry_time,
+          formData.exit_date,
+          formData.exit_time
+      )) {
+        errors.push({
+          field: 'exit_date_time',
+          message: "Exit time cannot be before entry time on the same day"
+        });
+      }
     }
     
     return errors;
