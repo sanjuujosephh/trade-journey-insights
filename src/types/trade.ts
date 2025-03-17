@@ -25,7 +25,7 @@ export interface Trade {
   market_condition: 'trending' | 'ranging' | 'volatile' | 'news_driven' | null;
   timeframe: string | null;
   trade_direction: 'long' | 'short' | null;
-  exit_reason: 'stop_loss' | 'target' | 'manual' | 'time_based' | null;
+  exit_reason: 'stop_loss' | 'target_reached' | 'manual' | 'time_based' | null;
   confidence_level: number | null;
   entry_emotion: string | null;
   exit_emotion: string | null;

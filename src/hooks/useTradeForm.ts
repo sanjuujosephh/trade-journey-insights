@@ -63,7 +63,7 @@ export function useTradeForm() {
     }));
   }, []);
   
-  // New function to fill the form with test data
+  // Function to fill the form with test data
   const fillWithTestData = useCallback(() => {
     const currentDate = new Date();
     const entryDate = currentDate.toISOString().split('T')[0];
