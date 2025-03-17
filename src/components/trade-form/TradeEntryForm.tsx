@@ -2,7 +2,6 @@
 import { FormEvent } from "react";
 import { FormData } from "@/types/trade";
 import { TradeFormManager } from "./TradeFormManager";
-import { useToast } from "@/hooks/use-toast";
 
 interface TradeEntryFormProps {
   formData: FormData;

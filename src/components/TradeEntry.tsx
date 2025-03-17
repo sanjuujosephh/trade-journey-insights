@@ -72,31 +72,35 @@ export default function TradeEntry() {
 
   return (
     <ErrorBoundary>
-      <div className="space-y-6 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
+      <div className="space-y-8 animate-fade-in h-full overflow-y-auto scrollbar-none pb-6">
         {/* Trade Entry Form */}
-        <TradeEntryForm
-          formData={formData}
-          editingId={editingId}
-          isSubmitting={isSubmitting}
-          handleChange={handleChange}
-          handleSelectChange={handleSelectChange}
-          handleSubmit={handleSubmit}
-          cancelEditing={cancelEditing}
-        />
-
-        {/* Recent Trades Section */}
-        {trades.length > 0 && (
-          <RecentTradesSection
-            trades={trades}
-            filteredTrades={filteredTrades}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            clearDateFilter={clearDateFilter}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onViewDetails={handleViewDetails}
-            navigateToHistoryTab={navigateToHistoryTab}
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <TradeEntryForm
+            formData={formData}
+            editingId={editingId}
+            isSubmitting={isSubmitting}
+            handleChange={handleChange}
+            handleSelectChange={handleSelectChange}
+            handleSubmit={handleSubmit}
+            cancelEditing={cancelEditing}
           />
+        </div>
+
+        {/* Recent Trades Section - with more visual separation */}
+        {trades.length > 0 && (
+          <div className="bg-white p-6 rounded-lg shadow-sm border mt-8">
+            <RecentTradesSection
+              trades={trades}
+              filteredTrades={filteredTrades}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              clearDateFilter={clearDateFilter}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onViewDetails={handleViewDetails}
+              navigateToHistoryTab={navigateToHistoryTab}
+            />
+          </div>
         )}
 
         {/* Import/Export Section */}

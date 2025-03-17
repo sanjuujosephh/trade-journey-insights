@@ -1,3 +1,4 @@
+
 import { FormEvent } from "react";
 import { FormData } from "@/types/trade";
 import { BasicTradeInfo } from "./BasicTradeInfo";

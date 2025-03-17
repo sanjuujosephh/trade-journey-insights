@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -35,7 +36,7 @@ export function DateFilterControls({
           </Button>}
       </div>
       
-      
+      <h2 className="text-xl font-semibold">Recent Trades</h2>
       
       <Button variant="ghost" onClick={navigateToHistoryTab} className="flex items-center gap-1 text-primary">
         View All Entries

@@ -1,52 +1,39 @@
 
-import { useState } from "react";
-import { Trade } from "@/types/trade";
-import { isValid } from "date-fns";
-import { useToast } from "./use-toast";
+import { useState, useMemo } from 'react';
+import { Trade } from '@/types/trade';
 
 export function useDateFilter(trades: Trade[]) {
-  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
-  // Filter trades based on selected date or show recent 10
-  const filteredTrades = selectedDate && isValid(selectedDate) 
-    ? trades.filter(trade => {
-        // Convert DD-MM-YYYY to Date object for comparison
-        if (!trade.entry_date) return false;
-        const [day, month, year] = trade.entry_date.split('-').map(Number);
-        const tradeDate = new Date(year, month - 1, day);
-        return tradeDate.toDateString() === selectedDate.toDateString();
-      }).sort((a, b) => {
-        // Sort by date (newest first) and then by time (newest first)
-        if (a.entry_date === b.entry_date) {
-          return (b.entry_time || "") > (a.entry_time || "") ? 1 : -1;
-        }
-        const [dayA, monthA, yearA] = (a.entry_date || "").split('-').map(Number);
-        const [dayB, monthB, yearB] = (b.entry_date || "").split('-').map(Number);
-        const dateA = new Date(yearA, monthA - 1, dayA);
-        const dateB = new Date(yearB, monthB - 1, dayB);
-        return dateB.getTime() - dateA.getTime();
-      })
-    : trades
-        .slice(0, 10) // Show 10 most recent trades if no date selected
-        .sort((a, b) => {
-          // Sort by date (newest first) and then by time (newest first)
-          if (a.entry_date === b.entry_date) {
-            return (b.entry_time || "") > (a.entry_time || "") ? 1 : -1;
-          }
-          const [dayA, monthA, yearA] = (a.entry_date || "").split('-').map(Number);
-          const [dayB, monthB, yearB] = (b.entry_date || "").split('-').map(Number);
-          const dateA = new Date(yearA, monthA - 1, dayA);
-          const dateB = new Date(yearB, monthB - 1, dayB);
-          return dateB.getTime() - dateA.getTime();
-        });
+  // Filter trades based on selected date
+  const filteredTrades = useMemo(() => {
+    // Sort trades by entry date and time (newest first)
+    const sortedTrades = [...trades].sort((a, b) => {
+      // First compare by entry_date (newest first)
+      const dateComparison = (b.entry_date || '').localeCompare(a.entry_date || '');
+      if (dateComparison !== 0) return dateComparison;
+      
+      // If same date, compare by entry_time (newest first)
+      return (b.entry_time || '').localeCompare(a.entry_time || '');
+    });
+    
+    // If no date selected, return all trades (sorted)
+    if (!selectedDate) return sortedTrades;
+    
+    // Format the selected date to match entry_date format (DD-MM-YYYY)
+    const formattedDate = selectedDate.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).replace(/\//g, '-');
+    
+    // Filter trades by the formatted date
+    return sortedTrades.filter(trade => trade.entry_date === formattedDate);
+  }, [trades, selectedDate]);
 
+  // Clear date filter
   const clearDateFilter = () => {
     setSelectedDate(undefined);
-    toast({
-      title: "Filter Cleared",
-      description: "Showing 10 most recent trades"
-    });
   };
 
   return {
