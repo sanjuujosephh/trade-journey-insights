@@ -21,6 +21,7 @@ export function useTradeManagement() {
     handleChange,
     handleSelectChange,
     resetForm,
+    fillWithTestData,
   } = useTradeForm();
 
   // Trade data operations
@@ -133,5 +134,6 @@ export function useTradeManagement() {
     handleViewDetails,
     closeDialog,
     resetForm,
+    fillWithTestData,
   };
 }
