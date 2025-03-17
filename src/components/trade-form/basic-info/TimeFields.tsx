@@ -9,10 +9,10 @@ export function TimeFields({
   formData,
   handleChange
 }: TimeFieldsProps) {
-  const handleDateChange = (field: 'entry_date' | 'exit_date') => (date: string) => {
+  const handleDateChange = (date: string) => {
     handleChange({
       target: {
-        name: field,
+        name: 'entry_date',
         value: date
       }
     } as React.ChangeEvent<HTMLInputElement>);
@@ -29,24 +29,17 @@ export function TimeFields({
   };
   
   return <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="mb-4">
         <DateTimeField 
-          label="Entry Date" 
+          label="Trade Date" 
           date={formData.entry_date || ''} 
           time="" 
-          onDateChange={handleDateChange('entry_date')} 
+          onDateChange={handleDateChange} 
           onTimeChange={() => {}} 
           hideTime 
           required 
         />
-        <DateTimeField 
-          label="Exit Date" 
-          date={formData.exit_date || ''} 
-          time="" 
-          onDateChange={handleDateChange('exit_date')} 
-          onTimeChange={() => {}} 
-          hideTime 
-        />
+        <div className="text-xs text-muted-foreground mt-1">Date format: DD-MM-YYYY</div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -67,8 +60,7 @@ export function TimeFields({
           onTimeChange={handleTimeChange('exit')} 
           hideDate 
         />
+        <div className="text-xs text-muted-foreground col-span-2">Time format: HH:MM (e.g., 10:30 or 14:45)</div>
       </div>
-      
-      <div className="text-xs text-muted-foreground">⚠︎ Time format: HH:MM (e.g., 10:30 or 14:45) and date format: DD-MM-YYYY</div>
     </div>;
 }

@@ -59,7 +59,6 @@ export function useTradeManagement() {
       notes: trade.notes || "",
       entry_date: trade.entry_date || "",
       entry_time: trade.entry_time || "",
-      exit_date: trade.exit_date || "",
       exit_time: trade.exit_time || "",
       chart_link: trade.chart_link || "",
       vix: trade.vix?.toString() || "",

@@ -31,7 +31,6 @@ export interface Trade {
   exit_emotion: string | null;
   symbol: string;
   entry_date: string | null;
-  exit_date: string | null;
   ai_feedback: string | null;
 }
 
@@ -52,7 +51,6 @@ export interface FormData {
   entry_time: string;
   exit_time: string;
   entry_date: string;
-  exit_date: string;
   timeframe: string;
   chart_link: string;
   confidence_level: string;

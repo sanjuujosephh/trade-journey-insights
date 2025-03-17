@@ -14,6 +14,10 @@ export function EntryExitDetails({ trade }: EntryExitDetailsProps) {
         <h4 className="text-sm font-medium mb-4">Entry Details</h4>
         <div className="space-y-3">
           <div>
+            <span className="text-sm text-muted-foreground">Date:</span>
+            <p className="font-medium">{trade.entry_date || 'N/A'}</p>
+          </div>
+          <div>
             <span className="text-sm text-muted-foreground">Price:</span>
             <p className="font-medium">₹{trade.entry_price}</p>
           </div>

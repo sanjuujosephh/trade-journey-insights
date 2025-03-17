@@ -29,7 +29,6 @@ export function useUpdateTrade(userId: string | null) {
         notes: tradeData.notes || '',
         entry_date: tradeData.entry_date || '',
         entry_time: tradeData.entry_time || '',
-        exit_date: tradeData.exit_date || '',
         exit_time: tradeData.exit_time || '',
         chart_link: tradeData.chart_link || '',
         vix: tradeData.vix?.toString() || '',
@@ -55,7 +54,6 @@ export function useUpdateTrade(userId: string | null) {
         ...transformedData,
         entry_date: tradeData.entry_date,
         entry_time: tradeData.entry_time,
-        exit_date: tradeData.exit_date,
         exit_time: tradeData.exit_time
       };
 
