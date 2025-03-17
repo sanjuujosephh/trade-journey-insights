@@ -4,7 +4,6 @@ import { usePayment } from "./hooks/usePayment";
 import { PreviewDialog } from "./PreviewDialog";
 import { TradingStrategiesSection } from "./sections/TradingStrategiesSection";
 import { TradingIndicatorsSection } from "./sections/TradingIndicatorsSection";
-import { ProductsSection } from "./sections/ProductsSection";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Info } from "lucide-react";
@@ -25,20 +24,6 @@ export function StrategiesTab() {
     
     try {
       await handlePayment(null, true);
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Could not process payment request");
-    }
-  };
-  
-  const handleBuy = async (item: any) => {
-    if (!isPaymentConfigured) {
-      toast.error("Payment system is not available. Please try again later.");
-      return;
-    }
-    
-    try {
-      await handlePayment(item);
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Could not process payment request");
@@ -72,14 +57,6 @@ export function StrategiesTab() {
 
         <TradingIndicatorsSection
           onUnlockAll={handleUnlockAll}
-        />
-
-        <ProductsSection
-          onPreview={(item) => {
-            setSelectedItem(item);
-            setIsPreviewOpen(true);
-          }}
-          onBuy={handleBuy}
         />
       </div>
 

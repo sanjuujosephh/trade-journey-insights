@@ -30,8 +30,7 @@ export default function TradeEntry() {
     handleEdit,
     handleViewDetails,
     resetForm,
-    setEditingId,
-    fillWithTestData
+    setEditingId
   } = useTradeManagement();
 
   // Date filtering
@@ -86,7 +85,6 @@ export default function TradeEntry() {
             handleSelectChange={handleSelectChange}
             handleSubmit={handleSubmit}
             cancelEditing={cancelEditing}
-            fillWithTestData={fillWithTestData}
           />
         </div>
 
