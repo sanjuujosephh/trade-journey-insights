@@ -1,10 +1,12 @@
 
 import { DateTimeField } from "./DateTimeField";
 import { parseTimeString } from "@/utils/datetime";
+
 interface TimeFieldsProps {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
 export function TimeFields({
   formData,
   handleChange
@@ -28,39 +30,47 @@ export function TimeFields({
     } as React.ChangeEvent<HTMLInputElement>);
   };
   
-  return <div className="space-y-4">
-      <div className="mb-4">
-        <DateTimeField 
-          label="Trade Date" 
-          date={formData.entry_date || ''} 
-          time="" 
-          onDateChange={handleDateChange} 
-          onTimeChange={() => {}} 
-          hideTime 
-          required 
-        />
-        <div className="text-xs text-muted-foreground mt-1">Date format: DD-MM-YYYY</div>
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <DateTimeField 
+            label="Trade Date" 
+            date={formData.entry_date || ''} 
+            time="" 
+            onDateChange={handleDateChange} 
+            onTimeChange={() => {}} 
+            hideTime 
+            required 
+          />
+          <div className="text-xs text-muted-foreground mt-1">DD-MM-YYYY</div>
+        </div>
+        
+        <div>
+          <DateTimeField 
+            label="Entry Time" 
+            date="" 
+            time={formData.entry_time || ''} 
+            onDateChange={() => {}} 
+            onTimeChange={handleTimeChange('entry')} 
+            hideDate 
+            required 
+          />
+          <div className="text-xs text-muted-foreground mt-1">HH:MM (24-hour)</div>
+        </div>
+        
+        <div>
+          <DateTimeField 
+            label="Exit Time" 
+            date="" 
+            time={formData.exit_time || ''} 
+            onDateChange={() => {}} 
+            onTimeChange={handleTimeChange('exit')} 
+            hideDate 
+          />
+          <div className="text-xs text-muted-foreground mt-1">HH:MM (24-hour)</div>
+        </div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <DateTimeField 
-          label="Entry Time" 
-          date="" 
-          time={formData.entry_time || ''} 
-          onDateChange={() => {}} 
-          onTimeChange={handleTimeChange('entry')} 
-          hideDate 
-          required 
-        />
-        <DateTimeField 
-          label="Exit Time" 
-          date="" 
-          time={formData.exit_time || ''} 
-          onDateChange={() => {}} 
-          onTimeChange={handleTimeChange('exit')} 
-          hideDate 
-        />
-        <div className="text-xs text-muted-foreground col-span-2">Time format: HH:MM (e.g., 10:30 or 14:45)</div>
-      </div>
-    </div>;
+    </div>
+  );
 }
