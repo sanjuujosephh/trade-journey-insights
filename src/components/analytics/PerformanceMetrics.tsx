@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
@@ -62,7 +63,7 @@ export function PerformanceMetrics({ trades }: PerformanceMetricsProps) {
   const losingTrades = trades.filter(t => calculatePnL(t) < 0);
 
   // AI-assisted metrics (using exit reason and deviation details)
-  const tradesFollowedPlan = (trades.filter(t => t.exit_reason === 'target' || t.exit_reason === 'stop_loss').length / trades.length) * 100;
+  const tradesFollowedPlan = (trades.filter(t => t.exit_reason === 'target_reached' || t.exit_reason === 'stop_loss').length / trades.length) * 100;
   const winnersWithDeviation = winningTrades.length > 0 ?
     (winningTrades.filter(t => t.exit_reason === 'manual').length / winningTrades.length) * 100 : 0;
 

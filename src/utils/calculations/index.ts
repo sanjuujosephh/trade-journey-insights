@@ -8,3 +8,4 @@ export { calculateStreaks } from './streaks';
 export { calculateTradeDurationStats } from './duration';
 export { calculateConsistencyScore } from './consistency';
 export { calculateStats } from './stats';
+export { calculateTradeStatistics } from './tradeAnalytics';

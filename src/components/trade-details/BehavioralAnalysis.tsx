@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 
 interface BehavioralAnalysisProps {
@@ -6,7 +7,7 @@ interface BehavioralAnalysisProps {
 
 export function BehavioralAnalysis({ trade }: BehavioralAnalysisProps) {
   // Safely determine if plan was followed based on exit reason
-  const followedPlan = trade.exit_reason === 'target' || trade.exit_reason === 'stop_loss';
+  const followedPlan = trade.exit_reason === 'target_reached' || trade.exit_reason === 'stop_loss';
   const isTarget = trade.exit_reason === "target_reached";
   const isImpulsive = trade.exit_reason === 'manual';
 
