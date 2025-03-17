@@ -26,33 +26,31 @@ export function PromptVariableValues({ trades }: PromptVariableValuesProps) {
   const stats = calculateTradeStatistics(trades);
   
   // Format sample data for display
-  const strategyPerformanceSample = Object.entries(stats.strategyPerformance)
+  const strategyPerformanceSample = Object.entries(stats.strategyPerformance || {})
     .slice(0, 2)
     .map(([strategy, stratStats]) => {
-      const typedStats = stratStats as { wins: number; losses: number; totalPnL: number };
-      return `${strategy}: ${typedStats.wins} wins, ${typedStats.losses} losses, P&L: ${typedStats.totalPnL.toFixed(2)}`;
+      return `${strategy}: ${stratStats.wins} wins, ${stratStats.losses} losses, P&L: ${stratStats.totalPnL.toFixed(2)}`;
     }).join('\n');
   
-  const marketConditionSample = Object.entries(stats.marketConditionPerformance)
+  const marketConditionSample = Object.entries(stats.marketConditionPerformance || {})
     .slice(0, 2)
     .map(([condition, condStats]) => {
-      const typedStats = condStats as { wins: number; losses: number };
-      return `${condition}: ${typedStats.wins} wins, ${typedStats.losses} losses`;
+      return `${condition}: ${condStats.wins} wins, ${condStats.losses} losses`;
     }).join('\n');
   
   // Create variable-value pairs
   const variableValues = [
     { variable: "{{totalTrades}}", value: stats.totalTrades.toString() },
-    { variable: "{{winRate}}", value: `${stats.winRate}%` },
+    { variable: "{{winRate}}", value: `${(stats.winRate * 100).toFixed(1)}%` },
     { variable: "{{totalPnL}}", value: stats.totalPnL.toFixed(2) },
     { variable: "{{avgTradePnL}}", value: stats.avgTradePnL.toFixed(2) },
-    { variable: "{{profitFactor}}", value: stats.profitFactor.toString() },
+    { variable: "{{profitFactor}}", value: stats.profitFactor.toFixed(2) },
     { variable: "{{strategyPerformance}}", value: strategyPerformanceSample + "\n..." },
     { variable: "{{marketConditionPerformance}}", value: marketConditionSample + "\n..." },
     { variable: "{{emotionAnalysis}}", value: "Confident: 3 wins, 1 loss\nFearful: 1 win, 2 losses\n..." },
     { variable: "{{timeAnalysis}}", value: "9:00-10:00: 2 wins, 1 loss, P&L: 230.50\n..." },
     { variable: "{{positionSizing}}", value: "small: 4 trades, Win Rate: 75.0%, P&L: 150.25\n..." },
-    { variable: "{{riskMetrics}}", value: `Stop loss usage: ${stats.riskMetrics.stopLossUsage.toFixed(1)}%\nTake profit usage: ${stats.riskMetrics.targetUsage.toFixed(1)}%\n...` },
+    { variable: "{{riskMetrics}}", value: `Stop loss usage: ${stats.riskMetrics?.stopLossUsage.toFixed(1)}%\nTake profit usage: ${stats.riskMetrics?.targetUsage.toFixed(1)}%\n...` },
     { variable: "{{tradesData}}", value: JSON.stringify(trades.slice(0, 1)).substring(0, 50) + "..." },
   ];
 

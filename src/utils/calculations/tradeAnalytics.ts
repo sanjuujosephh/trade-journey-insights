@@ -22,6 +22,15 @@ export interface TradeStatistics {
   longestLossStreak: number;
   consistencyScore: number;
   averageDuration: number;
+  totalPnL: number;
+  avgTradePnL: number;
+  strategyPerformance: Record<string, { wins: number; losses: number; totalPnL: number }>;
+  marketConditionPerformance: Record<string, { wins: number; losses: number }>;
+  riskMetrics: {
+    stopLossUsage: number;
+    targetUsage: number;
+    manualOverrides: number;
+  };
 }
 
 export function calculateTradeStatistics(trades: Trade[]): TradeStatistics {
@@ -41,6 +50,15 @@ export function calculateTradeStatistics(trades: Trade[]): TradeStatistics {
       longestLossStreak: 0,
       consistencyScore: 0,
       averageDuration: 0,
+      totalPnL: 0,
+      avgTradePnL: 0,
+      strategyPerformance: {},
+      marketConditionPerformance: {},
+      riskMetrics: {
+        stopLossUsage: 0,
+        targetUsage: 0,
+        manualOverrides: 0
+      }
     };
   }
 
@@ -82,13 +100,40 @@ export function calculateTradeStatistics(trades: Trade[]): TradeStatistics {
   const expectancy = calculateExpectancy(trades);
   const sharpeRatio = calculateSharpeRatio(trades);
   
-  // Calculate drawdowns and streaks
-  const { maxDrawdown } = calculateDrawdowns(trades);
-  const { longestWinStreak, longestLossStreak } = calculateStreaks(trades);
+  // Calculate drawdowns
+  const drawdowns = calculateDrawdowns(trades);
+  const maxDrawdown = drawdowns.length > 0 
+    ? Math.max(...drawdowns.map(d => d.drawdown))
+    : 0;
   
-  // Calculate other advanced metrics
-  const { averageDuration } = calculateTradeDurationStats(trades);
+  // Calculate streaks
+  const streaks = calculateStreaks(trades);
+  const winStreaks = streaks.filter(s => s.type === 'profit').map(s => s.length);
+  const lossStreaks = streaks.filter(s => s.type === 'loss').map(s => s.length);
+  const longestWinStreak = winStreaks.length > 0 ? Math.max(...winStreaks) : 0;
+  const longestLossStreak = lossStreaks.length > 0 ? Math.max(...lossStreaks) : 0;
+  
+  // Calculate duration stats
+  const durationStats = calculateTradeDurationStats(trades);
+  const averageDuration = durationStats.length > 0 
+    ? durationStats.reduce((sum, stat) => sum + stat.duration, 0) / durationStats.length
+    : 0;
+  
+  // Calculate consistency score
   const consistencyScore = calculateConsistencyScore(trades);
+  
+  // Calculate total PnL and average trade PnL
+  const totalPnL = totalProfit - totalLoss;
+  const avgTradePnL = trades.length > 0 ? totalPnL / trades.length : 0;
+  
+  // Analyze strategies
+  const strategyPerformance = analyzeStrategies(trades);
+  
+  // Analyze market conditions
+  const marketConditionPerformance = analyzeMarketConditions(trades);
+  
+  // Calculate risk metrics
+  const riskMetrics = calculateRiskMetrics(trades);
   
   return {
     totalTrades: trades.length,
@@ -105,5 +150,74 @@ export function calculateTradeStatistics(trades: Trade[]): TradeStatistics {
     longestLossStreak,
     consistencyScore,
     averageDuration,
+    totalPnL,
+    avgTradePnL,
+    strategyPerformance,
+    marketConditionPerformance,
+    riskMetrics
+  };
+}
+
+// Analyze strategies
+function analyzeStrategies(trades: Trade[]) {
+  const result: Record<string, { wins: number; losses: number; totalPnL: number }> = {};
+  
+  trades.forEach((trade) => {
+    const strategy = trade.strategy || "unknown";
+    
+    if (!result[strategy]) {
+      result[strategy] = { wins: 0, losses: 0, totalPnL: 0 };
+    }
+    
+    // Increment wins or losses
+    if (trade.outcome === 'profit') {
+      result[strategy].wins++;
+    } else {
+      result[strategy].losses++;
+    }
+    
+    // Add P&L
+    const pnl = ((Number(trade.exit_price) - Number(trade.entry_price)) * Number(trade.quantity)) || 0;
+    result[strategy].totalPnL += pnl;
+  });
+  
+  return result;
+}
+
+// Analyze market conditions
+function analyzeMarketConditions(trades: Trade[]) {
+  const result: Record<string, { wins: number; losses: number }> = {};
+  
+  trades.forEach((trade) => {
+    const marketCondition = trade.market_condition || "unknown";
+    
+    if (!result[marketCondition]) {
+      result[marketCondition] = { wins: 0, losses: 0 };
+    }
+    
+    // Increment wins or losses
+    if (trade.outcome === 'profit') {
+      result[marketCondition].wins++;
+    } else {
+      result[marketCondition].losses++;
+    }
+  });
+  
+  return result;
+}
+
+// Calculate risk metrics
+function calculateRiskMetrics(trades: Trade[]) {
+  const totalTrades = trades.length;
+  
+  // Count trades by exit reason
+  const stopLossCount = trades.filter(t => t.exit_reason === 'stop_loss').length;
+  const targetCount = trades.filter(t => t.exit_reason === 'target_reached').length;
+  const manualCount = trades.filter(t => t.exit_reason === 'manual').length;
+  
+  return {
+    stopLossUsage: totalTrades > 0 ? (stopLossCount / totalTrades) * 100 : 0,
+    targetUsage: totalTrades > 0 ? (targetCount / totalTrades) * 100 : 0,
+    manualOverrides: totalTrades > 0 ? (manualCount / totalTrades) * 100 : 0
   };
 }
