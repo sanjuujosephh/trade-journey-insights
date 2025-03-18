@@ -35,6 +35,15 @@ export function calculateTradeStatistics(trades: Trade[]) {
 
   // Risk management metrics
   const riskMetrics = calculateRiskMetrics(trades);
+  
+  // Analyze exit reasons
+  const exitReasonAnalysis = analyzeExitReasons(trades);
+  
+  // Analyze trade emotions
+  const tradeEmotionImpact = analyzeTradeEmotionImpact(trades);
+  
+  // Analyze behavioral consistency
+  const behavioralConsistency = analyzeBehavioralConsistency(trades);
 
   return {
     totalTrades,
@@ -47,7 +56,10 @@ export function calculateTradeStatistics(trades: Trade[]) {
     emotionAnalysis,
     timeAnalysis,
     positionSizing,
-    riskMetrics
+    riskMetrics,
+    exitReasonAnalysis,
+    tradeEmotionImpact,
+    behavioralConsistency
   };
 }
 
@@ -228,7 +240,7 @@ function calculateRiskMetrics(trades: Trade[]) {
   
   // Count trades by exit reason
   const stopLossCount = trades.filter(t => t.exit_reason === 'stop_loss').length;
-  const targetCount = trades.filter(t => t.exit_reason === 'target').length;
+  const targetCount = trades.filter(t => t.exit_reason === 'target_reached').length;
   const manualCount = trades.filter(t => t.exit_reason === 'manual').length;
   
   return {
@@ -236,4 +248,164 @@ function calculateRiskMetrics(trades: Trade[]) {
     targetUsage: totalTrades > 0 ? (targetCount / totalTrades) * 100 : 0,
     manualOverrides: totalTrades > 0 ? (manualCount / totalTrades) * 100 : 0
   };
+}
+
+// New function to analyze exit reasons
+function analyzeExitReasons(trades: Trade[]) {
+  const result: Record<string, { count: number; avgPnL: number; successRate: number }> = {};
+  
+  // Group by exit reason
+  trades.forEach((trade) => {
+    const exitReason = trade.exit_reason || 'unknown';
+    
+    if (!result[exitReason]) {
+      result[exitReason] = { 
+        count: 0, 
+        avgPnL: 0,
+        successRate: 0
+      };
+    }
+    
+    result[exitReason].count++;
+    result[exitReason].avgPnL += calculateTradePnL(trade);
+  });
+  
+  // Calculate averages and success rates
+  Object.keys(result).forEach((exitReason) => {
+    const data = result[exitReason];
+    
+    // Calculate average PnL
+    data.avgPnL = data.count > 0 ? data.avgPnL / data.count : 0;
+    
+    // Calculate success rate (trades that made money)
+    const successfulTrades = trades
+      .filter(t => (t.exit_reason || 'unknown') === exitReason)
+      .filter(t => calculateTradePnL(t) > 0)
+      .length;
+      
+    data.successRate = data.count > 0 ? (successfulTrades / data.count) * 100 : 0;
+  });
+  
+  return result;
+}
+
+// New function to analyze emotional impact on trades
+function analyzeTradeEmotionImpact(trades: Trade[]) {
+  // Entry emotion -> Exit emotion combinations
+  const emotionPairs: Record<string, { count: number; avgPnL: number; successRate: number }> = {};
+  
+  trades.forEach((trade) => {
+    if (!trade.entry_emotion || !trade.exit_emotion) return;
+    
+    const emotionPair = `${trade.entry_emotion}->${trade.exit_emotion}`;
+    
+    if (!emotionPairs[emotionPair]) {
+      emotionPairs[emotionPair] = {
+        count: 0,
+        avgPnL: 0,
+        successRate: 0
+      };
+    }
+    
+    emotionPairs[emotionPair].count++;
+    emotionPairs[emotionPair].avgPnL += calculateTradePnL(trade);
+  });
+  
+  // Calculate averages and success rates
+  Object.keys(emotionPairs).forEach((pair) => {
+    const data = emotionPairs[pair];
+    
+    // Calculate average PnL
+    data.avgPnL = data.count > 0 ? data.avgPnL / data.count : 0;
+    
+    // Calculate success rate
+    const [entryEmotion, exitEmotion] = pair.split('->');
+    const successfulTrades = trades
+      .filter(t => t.entry_emotion === entryEmotion && t.exit_emotion === exitEmotion)
+      .filter(t => calculateTradePnL(t) > 0)
+      .length;
+      
+    data.successRate = data.count > 0 ? (successfulTrades / data.count) * 100 : 0;
+  });
+  
+  return emotionPairs;
+}
+
+// New function to analyze behavioral consistency
+function analyzeBehavioralConsistency(trades: Trade[]) {
+  // Sorted trades by date
+  const sortedTrades = [...trades].sort((a, b) => {
+    if (!a.entry_date || !b.entry_date) return 0;
+    // Convert DD-MM-YYYY to sortable date format
+    const aDateParts = a.entry_date.split('-').map(Number);
+    const bDateParts = b.entry_date.split('-').map(Number);
+    
+    // Create date objects (year, month-1, day)
+    const aDate = new Date(aDateParts[2], aDateParts[1]-1, aDateParts[0]);
+    const bDate = new Date(bDateParts[2], bDateParts[1]-1, bDateParts[0]);
+    
+    return aDate.getTime() - bDate.getTime();
+  });
+  
+  // Strategy consistency
+  const strategyChanges = countStrategyChanges(sortedTrades);
+  
+  // Overtrading detection
+  const dailyTradeCounts = getDailyTradeCounts(sortedTrades);
+  const overtradingDays = Object.values(dailyTradeCounts).filter(count => count > 3).length;
+  
+  // Plan adherence (target/stop loss hits vs. manual exits)
+  const planAdherence = calculatePlanAdherence(trades);
+  
+  return {
+    strategyChanges,
+    overtradingDays,
+    planAdherence
+  };
+}
+
+// Helper for counting strategy changes
+function countStrategyChanges(sortedTrades: Trade[]) {
+  let changes = 0;
+  let lastStrategy = '';
+  
+  sortedTrades.forEach((trade) => {
+    const currentStrategy = trade.strategy || 'unknown';
+    if (lastStrategy && currentStrategy !== lastStrategy) {
+      changes++;
+    }
+    lastStrategy = currentStrategy;
+  });
+  
+  return changes;
+}
+
+// Helper for counting daily trades
+function getDailyTradeCounts(sortedTrades: Trade[]) {
+  const dailyCounts: Record<string, number> = {};
+  
+  sortedTrades.forEach((trade) => {
+    if (!trade.entry_date) return;
+    
+    if (!dailyCounts[trade.entry_date]) {
+      dailyCounts[trade.entry_date] = 0;
+    }
+    
+    dailyCounts[trade.entry_date]++;
+  });
+  
+  return dailyCounts;
+}
+
+// Helper for calculating plan adherence
+function calculatePlanAdherence(trades: Trade[]) {
+  const totalTrades = trades.length;
+  if (totalTrades === 0) return 0;
+  
+  // Count trades that followed a plan (using targets or stops)
+  const plannedExits = trades.filter(t => 
+    t.exit_reason === 'target_reached' || t.exit_reason === 'stop_loss'
+  ).length;
+  
+  return (plannedExits / totalTrades) * 100;
 }

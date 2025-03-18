@@ -76,6 +76,9 @@ export function useTradeManagement() {
       confidence_level: trade.confidence_level?.toString() || "",
       entry_emotion: (trade.entry_emotion || "") as string,
       exit_emotion: (trade.exit_emotion || "") as string,
+      is_impulsive: trade.is_impulsive || false,
+      plan_deviation: trade.plan_deviation || false,
+      satisfaction_score: trade.satisfaction_score?.toString() || ""
     });
     
     // Set editing ID to track that we're editing an existing trade
