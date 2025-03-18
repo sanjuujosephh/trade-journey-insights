@@ -108,8 +108,8 @@ export function BehavioralTrends({ trades }: BehavioralTrendsProps) {
                     return dataPoint ? `${dataPoint.fullDate} (${dataPoint.trades} trades)` : label;
                   }}
                   formatter={(value, name) => {
-                    if (name === 'avgStress') return [`${value.toFixed(1)}/10`, 'Avg Stress'];
-                    if (name === 'winRate') return [`${value.toFixed(1)}%`, 'Win Rate'];
+                    if (name === 'avgStress') return [`${Number(value).toFixed(1)}/10`, 'Avg Stress'];
+                    if (name === 'winRate') return [`${Number(value).toFixed(1)}%`, 'Win Rate'];
                     return [value, name];
                   }}
                 />
@@ -151,8 +151,8 @@ export function BehavioralTrends({ trades }: BehavioralTrendsProps) {
                     return dataPoint ? `${dataPoint.fullDate} (${dataPoint.trades} trades)` : label;
                   }}
                   formatter={(value, name) => {
-                    if (name === 'impulsivePercent') return [`${value.toFixed(1)}%`, 'Impulsive %'];
-                    if (name === 'avgPnL') return [`₹${value.toFixed(2)}`, 'Avg P&L'];
+                    if (name === 'impulsivePercent') return [`${Number(value).toFixed(1)}%`, 'Impulsive %'];
+                    if (name === 'avgPnL') return [`₹${Number(value).toFixed(2)}`, 'Avg P&L'];
                     return [value, name];
                   }}
                 />
@@ -192,7 +192,7 @@ export function BehavioralTrends({ trades }: BehavioralTrendsProps) {
                     const dataPoint = trendsData.find(item => item.date === label);
                     return dataPoint ? `${dataPoint.fullDate} (${dataPoint.trades} trades)` : label;
                   }}
-                  formatter={(value, name) => [`${value.toFixed(1)}/10`, 'Avg Confidence']}
+                  formatter={(value, name) => [`${Number(value).toFixed(1)}/10`, 'Avg Confidence']}
                 />
                 <Legend />
                 <Line
