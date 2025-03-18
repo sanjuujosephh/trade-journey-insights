@@ -10,7 +10,9 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Cell
+  Cell,
+  PieChart,
+  Pie
 } from "recharts";
 
 interface EmotionPerformanceComparisonProps {
@@ -87,7 +89,7 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [`${Number(value).toFixed(1)}%`, 'Win Rate']}
+                  formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Win Rate']}
                   labelFormatter={(label) => `${label} (${winRateData.find(d => d.name === label)?.totalTrades || 0} trades)`}
                 />
                 <Bar 
@@ -118,7 +120,7 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [`₹${Number(value).toFixed(2)}`, 'Avg P&L']}
+                  formatter={(value) => [`₹${Number(value).toFixed(2)}`, 'Avg P&L']}
                   labelFormatter={(label) => `${label} (${winRateData.find(d => d.name === label)?.totalTrades || 0} trades)`}
                 />
                 <Bar 
@@ -145,9 +147,9 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
         <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
           {winRateData.length > 0 ? (
             <>
-              <li>Best performing emotion: <span className="font-medium text-foreground">{winRateData[0].name}</span> with {winRateData[0].winRate.toFixed(1)}% win rate</li>
+              <li>Best performing emotion: <span className="font-medium text-foreground">{winRateData[0].name}</span> with {Number(winRateData[0].winRate).toFixed(1)}% win rate</li>
               {winRateData.length > 1 && (
-                <li>Worst performing emotion: <span className="font-medium text-foreground">{winRateData[winRateData.length - 1].name}</span> with {winRateData[winRateData.length - 1].winRate.toFixed(1)}% win rate</li>
+                <li>Worst performing emotion: <span className="font-medium text-foreground">{winRateData[winRateData.length - 1].name}</span> with {Number(winRateData[winRateData.length - 1].winRate).toFixed(1)}% win rate</li>
               )}
               <li>Emotions with positive average P&L: {winRateData.filter(d => d.avgPnL > 0).map(d => d.name).join(', ') || 'None'}</li>
             </>

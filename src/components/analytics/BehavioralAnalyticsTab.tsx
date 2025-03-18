@@ -1,8 +1,6 @@
 
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmotionalImpactAnalysis } from "./behavioral/EmotionalImpactAnalysis";
 import { TradeDecisionQuality } from "./behavioral/TradeDecisionQuality";
 import { StressPerformanceCorrelation } from "./behavioral/StressPerformanceCorrelation";
@@ -17,58 +15,59 @@ interface BehavioralAnalyticsTabProps {
 }
 
 export function BehavioralAnalyticsTab({ trades }: BehavioralAnalyticsTabProps) {
-  const [activeTab, setActiveTab] = useState("emotions");
-
   return (
-    <div className="space-y-6">
-      <Card>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full justify-start overflow-x-auto flex-nowrap border-b rounded-none px-4">
-            <TabsTrigger value="emotions">Emotional Impact</TabsTrigger>
-            <TabsTrigger value="decision">Decision Quality</TabsTrigger>
-            <TabsTrigger value="stress">Stress & Performance</TabsTrigger>
-            <TabsTrigger value="devotion">Discipline Analysis</TabsTrigger>
-            <TabsTrigger value="comparison">Emotion Comparison</TabsTrigger>
-            <TabsTrigger value="impulsive">Impulsive Trading</TabsTrigger>
-            <TabsTrigger value="time">Time & Emotions</TabsTrigger>
-            <TabsTrigger value="trends">Behavioral Trends</TabsTrigger>
-          </TabsList>
-          
-          <div className="p-4">
-            <TabsContent value="emotions" className="mt-0">
-              <EmotionalImpactAnalysis trades={trades} />
-            </TabsContent>
-            
-            <TabsContent value="decision" className="mt-0">
-              <TradeDecisionQuality trades={trades} />
-            </TabsContent>
-            
-            <TabsContent value="stress" className="mt-0">
-              <StressPerformanceCorrelation trades={trades} />
-            </TabsContent>
-            
-            <TabsContent value="devotion" className="mt-0">
-              <DevotionScoreAnalysis trades={trades} />
-            </TabsContent>
-            
-            <TabsContent value="comparison" className="mt-0">
-              <EmotionPerformanceComparison trades={trades} />
-            </TabsContent>
-            
-            <TabsContent value="impulsive" className="mt-0">
-              <ImpulsiveVsPlannedTrades trades={trades} />
-            </TabsContent>
-            
-            <TabsContent value="time" className="mt-0">
-              <TimeBasedEmotionAnalysis trades={trades} />
-            </TabsContent>
-            
-            <TabsContent value="trends" className="mt-0">
-              <BehavioralTrends trades={trades} />
-            </TabsContent>
-          </div>
-        </Tabs>
-      </Card>
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold mb-6">Behavioral Analysis</h2>
+      
+      <div className="space-y-8">
+        {/* 1. Emotional Impact */}
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Emotional Impact</h3>
+          <EmotionalImpactAnalysis trades={trades} />
+        </section>
+        
+        {/* 2. Decision Quality */}
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Decision Quality</h3>
+          <TradeDecisionQuality trades={trades} />
+        </section>
+        
+        {/* 3. Stress & Performance */}
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Stress & Performance</h3>
+          <StressPerformanceCorrelation trades={trades} />
+        </section>
+        
+        {/* 4. Discipline Analysis */}
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Discipline Analysis</h3>
+          <DevotionScoreAnalysis trades={trades} />
+        </section>
+        
+        {/* 5. Emotion Comparison */}
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Emotion Comparison</h3>
+          <EmotionPerformanceComparison trades={trades} />
+        </section>
+        
+        {/* 6. Impulsive Trading */}
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Impulsive Trading</h3>
+          <ImpulsiveVsPlannedTrades trades={trades} />
+        </section>
+        
+        {/* 7. Time & Emotions */}
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Time & Emotions</h3>
+          <TimeBasedEmotionAnalysis trades={trades} />
+        </section>
+        
+        {/* 8. Behavioral Trends */}
+        <section>
+          <h3 className="text-xl font-semibold mb-4">Behavioral Trends</h3>
+          <BehavioralTrends trades={trades} />
+        </section>
+      </div>
     </div>
   );
 }

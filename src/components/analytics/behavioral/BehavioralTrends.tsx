@@ -192,7 +192,7 @@ export function BehavioralTrends({ trades }: BehavioralTrendsProps) {
                     const dataPoint = trendsData.find(item => item.date === label);
                     return dataPoint ? `${dataPoint.fullDate} (${dataPoint.trades} trades)` : label;
                   }}
-                  formatter={(value, name) => [`${Number(value).toFixed(1)}/10`, 'Avg Confidence']}
+                  formatter={(value) => [`${Number(value).toFixed(1)}/10`, 'Avg Confidence']}
                 />
                 <Legend />
                 <Line
