@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import {
   BarChart,
@@ -64,14 +63,22 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
     totalTrades: stats.totalTrades
   })).sort((a, b) => b.winRate - a.winRate);
   
+  // Monochrome color palette
+  const COLORS = {
+    bar: "#333333",
+    gridLines: "#e0e0e0",
+    positiveBar: "#555555",
+    negativeBar: "#999999"
+  };
+  
   return (
-    <Card className="p-4">
+    <div className="space-y-4">
       <h3 className="text-lg font-medium mb-2">Entry Emotion vs. Performance</h3>
       <p className="text-sm text-muted-foreground mb-4">
         Comparison of how different entry emotions impact your trading win rate and average P&L.
       </p>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
         <div>
           <h4 className="text-sm font-medium mb-2">Win Rate by Emotion</h4>
           <div className="h-[400px]">
@@ -81,7 +88,7 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
                 layout="vertical"
                 margin={{ top: 20, right: 30, left: 70, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                 <XAxis type="number" domain={[0, 100]} />
                 <YAxis 
                   dataKey="name" 
@@ -94,7 +101,7 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
                 />
                 <Bar 
                   dataKey="winRate" 
-                  fill="#3b82f6" 
+                  fill={COLORS.bar} 
                   radius={[0, 4, 4, 0]} 
                   name="Win Rate (%)" 
                 />
@@ -112,7 +119,7 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
                 layout="vertical"
                 margin={{ top: 20, right: 30, left: 70, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                 <XAxis type="number" />
                 <YAxis 
                   dataKey="name" 
@@ -125,14 +132,13 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
                 />
                 <Bar 
                   dataKey="avgPnL" 
-                  fill="#10b981"
                   radius={[0, 4, 4, 0]} 
                   name="Average P&L" 
                 >
                   {winRateData.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`}
-                      fill={entry.avgPnL >= 0 ? '#10b981' : '#ef4444'}
+                      fill={entry.avgPnL >= 0 ? COLORS.positiveBar : COLORS.negativeBar}
                     />
                   ))}
                 </Bar>
@@ -142,7 +148,7 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
         </div>
       </div>
       
-      <div className="mt-4">
+      <div>
         <h4 className="text-sm font-medium mb-2">Key Insights</h4>
         <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
           {winRateData.length > 0 ? (
@@ -158,6 +164,6 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
           )}
         </ul>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import { EmotionalImpactAnalysis } from "./behavioral/EmotionalImpactAnalysis";
 import { TradeDecisionQuality } from "./behavioral/TradeDecisionQuality";
@@ -19,7 +18,7 @@ export function BehavioralAnalyticsTab({ trades }: BehavioralAnalyticsTabProps) 
     <div className="space-y-8">
       <h2 className="text-2xl font-bold mb-6">Behavioral Analysis</h2>
       
-      <div className="space-y-8">
+      <div className="space-y-12">
         {/* 1. Emotional Impact */}
         <section>
           <h3 className="text-xl font-semibold mb-4">Emotional Impact</h3>
