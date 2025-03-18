@@ -53,12 +53,12 @@ export function AnalysisButtons({ isAnalyzing, trades, onAnalyze }: AnalysisButt
   const monthTrades = countValidTradesForPeriod(30);
 
   return (
-    <Card className="p-6">
+    <Card className="p-6 shadow-sm bg-gradient-to-br from-background to-background/80">
       <div className="flex flex-col space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Brain className="mr-2 h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">AI Trade Analysis</h3>
+            <h3 className="text-lg font-semibold">Analysis Options</h3>
           </div>
           
           <Tooltip>

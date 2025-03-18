@@ -58,9 +58,9 @@ Trades data: {{tradesData}}`);
   };
 
   return (
-    <div className="my-4">
+    <div>
       <h3 className="font-medium mb-4">Customize AI Analysis</h3>
-      <div className="space-y-4 pb-4">
+      <div className="space-y-4">
         {isEditing ? (
           <div className="space-y-4">
             <PromptVariableValues trades={trades} />
@@ -129,7 +129,7 @@ Trades data: {{tradesData}}`);
                 
                 <div className="grid gap-2">
                   {savedPrompts.map((prompt, index) => (
-                    <div key={index} className="p-3 text-sm border rounded-md">
+                    <div key={index} className="p-3 text-sm border rounded-md bg-background">
                       <div className="mb-2 truncate">{prompt.substring(0, 100)}...</div>
                       <div className="flex justify-end space-x-2">
                         <Button
