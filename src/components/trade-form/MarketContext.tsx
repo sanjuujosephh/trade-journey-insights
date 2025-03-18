@@ -1,5 +1,6 @@
 
 import { Card } from "@/components/ui/card";
+import { FormData } from "@/types/trade";
 import { OptionPricePosition } from "./behavioral/OptionPricePosition";
 import { MarketConditionSelect } from "./market-context/MarketConditionSelect";
 import { StrategySelect } from "./market-context/StrategySelect";
@@ -7,11 +8,12 @@ import { TimeframeSelect } from "./market-context/TimeframeSelect";
 import { EmotionSelects } from "./market-context/EmotionSelects";
 import { ExitReasonSelect } from "./market-context/ExitReasonSelect";
 import { TradeNotes } from "./market-context/TradeNotes";
+import { BehavioralMetrics } from "./behavioral/BehavioralMetrics";
 
-interface MarketContextProps {
-  formData: any;
+export interface MarketContextProps {
+  formData: FormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
+  handleSelectChange: (name: string, value: string | boolean) => void;
 }
 
 export function MarketContext({
@@ -41,13 +43,24 @@ export function MarketContext({
       </div>
 
       <div className="space-y-2">
-        <EmotionSelects entryEmotion={formData.entry_emotion} exitEmotion={formData.exit_emotion} onEntryEmotionChange={value => handleSelectChange("entry_emotion", value)} onExitEmotionChange={value => handleSelectChange("exit_emotion", value)} />
+        <EmotionSelects 
+          entryEmotion={formData.entry_emotion} 
+          exitEmotion={formData.exit_emotion} 
+          onEntryEmotionChange={value => handleSelectChange("entry_emotion", value)} 
+          onExitEmotionChange={value => handleSelectChange("exit_emotion", value)} 
+        />
         <div className="text-xs text-muted-foreground">Your psychological state during trade entry and exit</div>
       </div>
 
       <div className="space-y-2">
         <ExitReasonSelect value={formData.exit_reason} onValueChange={value => handleSelectChange("exit_reason", value)} />
         <div className="text-xs text-muted-foreground">Primary reason for exiting the trade</div>
+      </div>
+
+      {/* New Behavioral Metrics section */}
+      <div className="space-y-2">
+        <BehavioralMetrics formData={formData} handleChange={handleChange} handleSelectChange={handleSelectChange} />
+        <div className="text-xs text-muted-foreground">Your mental state and decision-making process for the trade</div>
       </div>
 
       <div className="space-y-2">

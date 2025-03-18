@@ -32,6 +32,12 @@ const emptyFormData: FormData = {
   confidence_level: "",
   entry_emotion: "",
   exit_emotion: "",
+  // New behavioral fields
+  is_impulsive: false,
+  plan_deviation: false,
+  satisfaction_score: "",
+  stress_level: "",
+  time_pressure: "",
 };
 
 export function useTradeForm() {

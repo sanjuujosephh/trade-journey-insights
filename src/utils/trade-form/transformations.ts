@@ -38,6 +38,11 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     symbol: formData.symbol,
     entry_date: formData.entry_date || null,
     ai_feedback: null,
+    is_impulsive: formData.is_impulsive || null,
+    plan_deviation: formData.plan_deviation || null,
+    satisfaction_score: sanitizeNumber(formData.satisfaction_score),
+    stress_level: sanitizeNumber(formData.stress_level),
+    time_pressure: formData.time_pressure || null,
     user_id: ""  // This will be set in the mutation
   };
 };

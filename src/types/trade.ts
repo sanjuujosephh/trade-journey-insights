@@ -32,6 +32,12 @@ export interface Trade {
   symbol: string;
   entry_date: string | null;
   ai_feedback: string | null;
+  // New behavioral fields
+  is_impulsive: boolean | null;
+  plan_deviation: boolean | null;
+  satisfaction_score: number | null;
+  stress_level: number | null;
+  time_pressure: 'high' | 'medium' | 'low' | null;
 }
 
 export interface FormData {
@@ -63,4 +69,10 @@ export interface FormData {
   entry_emotion: string;
   exit_emotion: string;
   symbol: string;
+  // New behavioral fields
+  is_impulsive: boolean;
+  plan_deviation: boolean;
+  satisfaction_score: string;
+  stress_level: string;
+  time_pressure: 'high' | 'medium' | 'low' | '';
 }
