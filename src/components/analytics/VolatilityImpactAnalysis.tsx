@@ -82,10 +82,15 @@ export function VolatilityImpactAnalysis({ trades }: VolatilityImpactAnalysisPro
                   />
                   <Tooltip 
                     cursor={{ strokeDasharray: '3 3' }}
-                    formatter={(value, name) => [
-                      name === 'pnl' ? `₹${typeof value === 'number' ? value.toFixed(2) : value}` : value,
-                      name === 'pnl' ? 'P&L' : 'VIX'
-                    ]}
+                    formatter={(value, name) => {
+                      if (typeof value === 'number') {
+                        return [
+                          name === 'pnl' ? `₹${value.toFixed(2)}` : value,
+                          name === 'pnl' ? 'P&L' : 'VIX'
+                        ];
+                      }
+                      return [value, name];
+                    }}
                     labelFormatter={(value) => `VIX: ${value}`}
                   />
                   <Legend />
@@ -142,10 +147,15 @@ export function VolatilityImpactAnalysis({ trades }: VolatilityImpactAnalysisPro
                   />
                   <Tooltip 
                     cursor={{ strokeDasharray: '3 3' }}
-                    formatter={(value, name) => [
-                      name === 'pnl' ? `₹${typeof value === 'number' ? value.toFixed(2) : value}` : value,
-                      name === 'pnl' ? 'P&L' : 'PCR'
-                    ]}
+                    formatter={(value, name) => {
+                      if (typeof value === 'number') {
+                        return [
+                          name === 'pnl' ? `₹${value.toFixed(2)}` : value,
+                          name === 'pnl' ? 'P&L' : 'PCR'
+                        ];
+                      }
+                      return [value, name];
+                    }}
                     labelFormatter={(value) => `PCR: ${value}`}
                   />
                   <Legend />

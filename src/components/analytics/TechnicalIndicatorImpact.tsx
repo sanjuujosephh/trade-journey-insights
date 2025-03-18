@@ -105,10 +105,15 @@ export function TechnicalIndicatorImpact({ trades }: TechnicalIndicatorImpactPro
                   <XAxis dataKey="name" />
                   <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
                   <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                  <Tooltip formatter={(value, name) => [
-                    name === 'winRate' ? `${typeof value === 'number' ? value.toFixed(1) : value}%` : `₹${typeof value === 'number' ? value.toFixed(2) : value}`,
-                    name === 'winRate' ? 'Win Rate' : 'Avg P&L'
-                  ]} />
+                  <Tooltip formatter={(value, name) => {
+                    if (typeof value === 'number') {
+                      return [
+                        name === 'winRate' ? `${value.toFixed(1)}%` : `₹${value.toFixed(2)}`,
+                        name === 'winRate' ? 'Win Rate' : 'Avg P&L'
+                      ];
+                    }
+                    return [value, name];
+                  }} />
                   <Legend />
                   <Bar yAxisId="left" dataKey="winRate" name="Win Rate (%)" fill="#8884d8" />
                   <Bar yAxisId="right" dataKey="avgPnL" name="Avg P&L (₹)" fill="#82ca9d" />
@@ -132,10 +137,15 @@ export function TechnicalIndicatorImpact({ trades }: TechnicalIndicatorImpactPro
                   <XAxis dataKey="name" />
                   <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
                   <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                  <Tooltip formatter={(value, name) => [
-                    name === 'winRate' ? `${typeof value === 'number' ? value.toFixed(1) : value}%` : `₹${typeof value === 'number' ? value.toFixed(2) : value}`,
-                    name === 'winRate' ? 'Win Rate' : 'Avg P&L'
-                  ]} />
+                  <Tooltip formatter={(value, name) => {
+                    if (typeof value === 'number') {
+                      return [
+                        name === 'winRate' ? `${value.toFixed(1)}%` : `₹${value.toFixed(2)}`,
+                        name === 'winRate' ? 'Win Rate' : 'Avg P&L'
+                      ];
+                    }
+                    return [value, name];
+                  }} />
                   <Legend />
                   <Bar yAxisId="left" dataKey="winRate" name="Win Rate (%)" fill="#8884d8" />
                   <Bar yAxisId="right" dataKey="avgPnL" name="Avg P&L (₹)" fill="#82ca9d" />
