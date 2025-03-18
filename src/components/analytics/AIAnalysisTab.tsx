@@ -8,10 +8,10 @@ import { CustomPromptAccordion } from "./CustomPromptAccordion";
 import { CreditsDisplay } from "./CreditsDisplay";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTradeAnalysis } from "@/hooks/useTradeAnalysis";
-import { useCredits } from "@/hooks/useCredits";
 import { PurchaseCreditsDialog } from "./PurchaseCreditsDialog";
 import { Loader2 } from "lucide-react";
 import { useUserCredits } from "@/hooks/useUserCredits";
+import { useTradeOperations } from "@/hooks/useTradeOperations";
 
 export function AIAnalysisTab() {
   const [customPrompt, setCustomPrompt] = useState<string>("");
@@ -19,6 +19,7 @@ export function AIAnalysisTab() {
   const { user } = useAuth();
   const { isAnalyzing, currentAnalysis, analyzeTradesForPeriod, setCurrentAnalysis } = useTradeAnalysis();
   const { credits, isLoading: isLoadingCredits } = useUserCredits();
+  const { trades } = useTradeOperations();
 
   // Updated function to match the expected signature in DashboardTabs.tsx
   const handleAnalyzeTradesWithAI = (options: { days?: number, customPrompt?: string }) => {
@@ -31,9 +32,7 @@ export function AIAnalysisTab() {
       setCustomPrompt(options.customPrompt);
     }
     
-    // Get the trades from somewhere - we would normally have this data passed or available in a context
-    // For now, we'll pass an empty array as a fallback
-    const trades = []; // This should come from a trade context or props
+    // Pass the trades to the analysis function
     analyzeTradesForPeriod(trades, days, promptText, user.id);
   };
 
@@ -82,6 +81,7 @@ export function AIAnalysisTab() {
           <AnalysisButtons 
             onAnalyze={handleAnalyzeTradesWithAI}
             isAnalyzing={isAnalyzing}
+            trades={trades}
           />
           
           <CustomPromptAccordion 
@@ -97,6 +97,7 @@ export function AIAnalysisTab() {
         <AnalysisResult 
           currentAnalysis={currentAnalysis} 
           isAnalyzing={isAnalyzing}
+          onClear={() => setCurrentAnalysis('')}
         />
       )}
       
