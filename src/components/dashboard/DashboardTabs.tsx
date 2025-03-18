@@ -15,6 +15,8 @@ import { StrategiesTab } from "@/components/strategies/StrategiesTab";
 import { AIAnalysisTab } from "@/components/analytics/AIAnalysisTab";
 import { Trade } from "@/types/trade";
 import { cn } from "@/lib/utils";
+import { PerformanceAnalyticsTab } from "@/components/analytics/PerformanceAnalyticsTab";
+import { BehavioralAnalyticsTab } from "@/components/analytics/BehavioralAnalyticsTab";
 
 interface DashboardTabsProps {
   trades: Trade[];
@@ -83,10 +85,8 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="performance" className="mt-0 h-full shadow-none">
-            <div className="p-1 sm:p-2 md:p-6 space-y-6">
-              <PerformanceMetrics trades={trades} />
-              <TradeFlowChart trades={trades} />
-              <TimePerformanceHeatmap trades={trades} />
+            <div className="p-1 sm:p-2 md:p-6">
+              <PerformanceAnalyticsTab trades={trades} />
             </div>
           </TabsContent>
 
@@ -97,9 +97,8 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="analysis" className="mt-0 h-full shadow-none">
-            <div className="p-1 sm:p-2 md:p-6 space-y-6">
-              <IntradayRiskMetrics trades={trades} />
-              <TimePerformanceHeatmap trades={trades} />
+            <div className="p-1 sm:p-2 md:p-6">
+              <BehavioralAnalyticsTab trades={trades} />
             </div>
           </TabsContent>
 

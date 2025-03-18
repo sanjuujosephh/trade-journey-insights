@@ -10,9 +10,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-  ZAxis
+  ZAxis,
+  Cell
 } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 interface VixTradeCorrelationProps {
   trades: Trade[];
@@ -44,54 +44,47 @@ export function VixTradeCorrelation({ trades }: VixTradeCorrelationProps) {
         This chart shows the relationship between market volatility (VIX) and your trade performance.
       </p>
       <div className="h-[400px]">
-        <ChartContainer
-          config={{
-            profit: { color: "#10b981" },
-            loss: { color: "#ef4444" }
-          }}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart
-              margin={{
-                top: 20,
-                right: 20,
-                bottom: 20,
-                left: 20,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="vix" 
-                name="VIX" 
-                label={{ value: 'VIX Value', position: 'insideBottom', offset: -10 }}
-                domain={['dataMin - 1', 'dataMax + 1']}
-              />
-              <YAxis 
-                dataKey="pnl" 
-                name="P&L" 
-                label={{ value: 'P&L', angle: -90, position: 'insideLeft' }}
-              />
-              <ZAxis dataKey="size" range={[25, 200]} />
-              <Tooltip 
-                content={<ChartTooltipContent />}
-                cursor={{ strokeDasharray: '3 3' }}
-              />
-              <Legend />
-              <Scatter 
-                name="Profitable Trades" 
-                data={profitTrades} 
-                fill="#10b981" 
-                shape="circle" 
-              />
-              <Scatter 
-                name="Losing Trades" 
-                data={lossTrades} 
-                fill="#ef4444" 
-                shape="circle" 
-              />
-            </ScatterChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart
+            margin={{
+              top: 20,
+              right: 20,
+              bottom: 20,
+              left: 20,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="vix" 
+              name="VIX" 
+              label={{ value: 'VIX Value', position: 'insideBottom', offset: -10 }}
+              domain={['dataMin - 1', 'dataMax + 1']}
+            />
+            <YAxis 
+              dataKey="pnl" 
+              name="P&L" 
+              label={{ value: 'P&L', angle: -90, position: 'insideLeft' }}
+            />
+            <ZAxis dataKey="size" range={[25, 200]} />
+            <Tooltip 
+              formatter={(value) => [`${Number(value).toFixed(2)}`, '']}
+              cursor={{ strokeDasharray: '3 3' }}
+            />
+            <Legend />
+            <Scatter 
+              name="Profitable Trades" 
+              data={profitTrades} 
+              fill="#10b981" 
+              shape="circle" 
+            />
+            <Scatter 
+              name="Losing Trades" 
+              data={lossTrades} 
+              fill="#ef4444" 
+              shape="circle" 
+            />
+          </ScatterChart>
+        </ResponsiveContainer>
       </div>
     </Card>
   );

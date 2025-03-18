@@ -87,7 +87,7 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [`${value.toFixed(1)}%`, 'Win Rate']}
+                  formatter={(value: number) => [`${Number(value).toFixed(1)}%`, 'Win Rate']}
                   labelFormatter={(label) => `${label} (${winRateData.find(d => d.name === label)?.totalTrades || 0} trades)`}
                 />
                 <Bar 
@@ -118,7 +118,7 @@ export function EmotionPerformanceComparison({ trades }: EmotionPerformanceCompa
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [`₹${value.toFixed(2)}`, 'Avg P&L']}
+                  formatter={(value: number) => [`₹${Number(value).toFixed(2)}`, 'Avg P&L']}
                   labelFormatter={(label) => `${label} (${winRateData.find(d => d.name === label)?.totalTrades || 0} trades)`}
                 />
                 <Bar 
