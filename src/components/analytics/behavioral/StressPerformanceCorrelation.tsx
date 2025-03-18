@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import {
   ScatterChart,
@@ -125,9 +124,18 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
       count: stats.count
     }));
   
+  // Monochrome color palette
+  const COLORS = {
+    bar: "#333333",
+    gridLines: "#e0e0e0",
+    profitScatter: "#555555",
+    lossScatter: "#999999",
+    barSecondary: "#777777"
+  };
+  
   return (
     <div className="space-y-6">
-      <Card className="p-4">
+      <div>
         <h3 className="text-lg font-medium mb-4">Stress Level Impact Analysis</h3>
         
         {tradesWithStressData.length < 3 ? (
@@ -144,7 +152,7 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
                     data={stressData}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                     <XAxis dataKey="stressLevel" label={{ value: 'Stress Level', position: 'bottom' }} />
                     <YAxis 
                       domain={[0, 100]} 
@@ -156,7 +164,7 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
                         'Win Rate'
                       ]} 
                     />
-                    <Bar dataKey="winRate" name="Win Rate %" fill="#8884d8" />
+                    <Bar dataKey="winRate" name="Win Rate %" fill={COLORS.bar} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -169,7 +177,7 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
                   <ScatterChart
                     margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
                   >
-                    <CartesianGrid />
+                    <CartesianGrid stroke={COLORS.gridLines} />
                     <XAxis 
                       type="number" 
                       dataKey="stressLevel" 
@@ -193,12 +201,12 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
                     <Scatter 
                       name="Profitable Trades" 
                       data={scatterData.filter(d => d.outcome === 'profit')} 
-                      fill="#82ca9d" 
+                      fill={COLORS.profitScatter} 
                     />
                     <Scatter 
                       name="Loss Trades" 
                       data={scatterData.filter(d => d.outcome === 'loss')} 
-                      fill="#ff7373" 
+                      fill={COLORS.lossScatter} 
                     />
                   </ScatterChart>
                 </ResponsiveContainer>
@@ -206,9 +214,9 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
             </div>
           </div>
         )}
-      </Card>
+      </div>
       
-      <Card className="p-4">
+      <div>
         <h3 className="text-lg font-medium mb-4">Time Pressure Impact Analysis</h3>
         
         {timePressureData.length <= 1 ? (
@@ -223,10 +231,10 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
                   data={timePressureData}
                   margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                   <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+                  <YAxis yAxisId="left" orientation="left" stroke={COLORS.bar} domain={[0, 100]} />
+                  <YAxis yAxisId="right" orientation="right" stroke={COLORS.barSecondary} />
                   <Tooltip 
                     formatter={(value, name) => {
                       if (typeof value === 'number') {
@@ -239,8 +247,8 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
                     }}
                   />
                   <Legend />
-                  <Bar yAxisId="left" dataKey="winRate" name="Win Rate (%)" fill="#8884d8" />
-                  <Bar yAxisId="right" dataKey="avgPnL" name="Avg P&L (₹)" fill="#82ca9d" />
+                  <Bar yAxisId="left" dataKey="winRate" name="Win Rate (%)" fill={COLORS.bar} />
+                  <Bar yAxisId="right" dataKey="avgPnL" name="Avg P&L (₹)" fill={COLORS.barSecondary} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -269,7 +277,7 @@ export function StressPerformanceCorrelation({ trades }: StressPerformanceCorrel
             </div>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

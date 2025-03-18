@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import {
   ScatterChart,
@@ -95,8 +94,17 @@ export function TimeBasedEmotionAnalysis({ trades }: TimeBasedEmotionAnalysisPro
     percentPositive: stats.total > 0 ? (stats.positive / stats.total) * 100 : 0
   })).sort((a, b) => a.hour - b.hour);
   
+  // Monochrome colors
+  const COLORS = {
+    profitPositive: "#333333", // dark gray for positive emotion & profit
+    profitNegative: "#555555", // medium gray for negative emotion & profit
+    lossPositive: "#777777",   // medium-light gray for positive emotion & loss
+    lossNegative: "#999999",   // light gray for negative emotion & loss
+    gridLines: "#e0e0e0"       // very light gray for grid lines
+  };
+  
   return (
-    <Card className="p-4">
+    <div className="space-y-4">
       <h3 className="text-lg font-medium mb-2">Time-Based Emotional Analysis</h3>
       <p className="text-sm text-muted-foreground mb-4">
         Explore how your emotions change throughout the trading day and their impact on your trading performance.
@@ -110,7 +118,7 @@ export function TimeBasedEmotionAnalysis({ trades }: TimeBasedEmotionAnalysisPro
               <ScatterChart
                 margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                 <XAxis 
                   dataKey="hour" 
                   type="number" 
@@ -144,12 +152,12 @@ export function TimeBasedEmotionAnalysis({ trades }: TimeBasedEmotionAnalysisPro
                 >
                   {emotionData.map((entry, index) => {
                     // Color based on outcome and emotion
-                    let color = '#8884d8'; // Default purple
+                    let color = COLORS.profitPositive; // Default
                     
                     if (entry?.outcome === 'profit') {
-                      color = entry.emotionValue >= 7 ? '#10b981' : '#60a5fa'; // Green for positive emotion wins, blue for negative emotion wins
+                      color = entry.emotionValue >= 7 ? COLORS.profitPositive : COLORS.profitNegative;
                     } else {
-                      color = entry?.emotionValue >= 7 ? '#f59e0b' : '#ef4444'; // Orange for positive emotion losses, red for negative emotion losses
+                      color = entry?.emotionValue >= 7 ? COLORS.lossPositive : COLORS.lossNegative;
                     }
                     
                     return <Cell key={`cell-${index}`} fill={color} />;
@@ -170,7 +178,7 @@ export function TimeBasedEmotionAnalysis({ trades }: TimeBasedEmotionAnalysisPro
                     <span className="font-medium w-16">{data.hour}:00</span>
                     <div className="flex-1 h-5 bg-gray-200 rounded-full overflow-hidden ml-2">
                       <div 
-                        className="h-full bg-blue-500 transition-all"
+                        className="h-full bg-gray-600 transition-all"
                         style={{ width: `${data.percentPositive}%` }}
                       />
                     </div>
@@ -215,6 +223,6 @@ export function TimeBasedEmotionAnalysis({ trades }: TimeBasedEmotionAnalysisPro
           )}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

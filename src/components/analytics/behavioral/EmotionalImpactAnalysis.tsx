@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import {
   BarChart,
@@ -112,19 +111,12 @@ export function EmotionalImpactAnalysis({ trades }: EmotionalImpactAnalysisProps
     }))
     .sort((a, b) => b.trades - a.trades);
   
-  // Colors for emotions
-  const EMOTION_COLORS: Record<string, string> = {
-    "Confident": "#4CAF50",
-    "Fearful": "#F44336",
-    "Neutral": "#2196F3",
-    "Anxious": "#FF9800",
-    "Greedy": "#E91E63",
-    "Excited": "#9C27B0",
-    "Satisfied": "#4CAF50",
-    "Frustrated": "#F44336",
-    "Relieved": "#03A9F4",
-    "Regretful": "#FF5722",
-    "Not Recorded": "#9E9E9E"
+  // Monochrome color palette
+  const COLORS = {
+    bar: "#333333",
+    barSecondary: "#777777",
+    gridLines: "#e0e0e0",
+    pieColors: ["#333333", "#444444", "#555555", "#666666", "#777777", "#888888", "#999999", "#aaaaaa", "#cccccc"]
   };
   
   // Entry emotion distribution data for pie chart
@@ -141,7 +133,7 @@ export function EmotionalImpactAnalysis({ trades }: EmotionalImpactAnalysisProps
     entryEmotionData.reduce((prev, current) => (current.winRate < prev.winRate) ? current : prev) : null;
   
   return (
-    <Card className="p-4">
+    <div className="space-y-8">
       <h3 className="text-lg font-medium mb-4">Emotional Impact Analysis</h3>
       
       <div className="space-y-8">
@@ -170,7 +162,7 @@ export function EmotionalImpactAnalysis({ trades }: EmotionalImpactAnalysisProps
                       {entryDistribution.map((entry, index) => (
                         <Cell 
                           key={`cell-${index}`} 
-                          fill={EMOTION_COLORS[entry.name] || `#${Math.floor(Math.random()*16777215).toString(16)}`} 
+                          fill={COLORS.pieColors[index % COLORS.pieColors.length]} 
                         />
                       ))}
                     </Pie>
@@ -191,12 +183,12 @@ export function EmotionalImpactAnalysis({ trades }: EmotionalImpactAnalysisProps
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={entryEmotionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                     <XAxis dataKey="name" />
                     <YAxis domain={[0, 100]} />
                     <Tooltip formatter={(value) => [`${typeof value === 'number' ? value.toFixed(1) : value}%`, 'Win Rate']} />
                     <Legend />
-                    <Bar dataKey="winRate" name="Win Rate %" fill="#8884d8" />
+                    <Bar dataKey="winRate" name="Win Rate %" fill={COLORS.bar} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -245,23 +237,23 @@ export function EmotionalImpactAnalysis({ trades }: EmotionalImpactAnalysisProps
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={exitEmotionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                   <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+                  <YAxis yAxisId="left" orientation="left" stroke={COLORS.bar} domain={[0, 100]} />
+                  <YAxis yAxisId="right" orientation="right" stroke={COLORS.barSecondary} />
                   <Tooltip formatter={(value, name) => [
                     name === 'winRate' ? `${typeof value === 'number' ? value.toFixed(1) : value}%` : `₹${typeof value === 'number' ? value.toFixed(2) : value}`,
                     name === 'winRate' ? 'Win Rate' : 'Avg P&L'
                   ]} />
                   <Legend />
-                  <Bar yAxisId="left" dataKey="winRate" name="Win Rate %" fill="#8884d8" />
-                  <Bar yAxisId="right" dataKey="avgPnL" name="Avg P&L (₹)" fill="#82ca9d" />
+                  <Bar yAxisId="left" dataKey="winRate" name="Win Rate %" fill={COLORS.bar} />
+                  <Bar yAxisId="right" dataKey="avgPnL" name="Avg P&L (₹)" fill={COLORS.barSecondary} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import {
   LineChart,
@@ -109,9 +108,17 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
     },
   ];
   
+  // Monochrome color palette
+  const COLORS = {
+    line: "#333333",
+    gridLines: "#e0e0e0",
+    radar: "#555555",
+    radarFill: "rgba(85, 85, 85, 0.6)"
+  };
+  
   return (
     <div className="space-y-6">
-      <Card className="p-4">
+      <div>
         <h3 className="text-lg font-medium mb-4">Discipline Score Analysis</h3>
         
         {tradeScores.length === 0 ? (
@@ -128,7 +135,7 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
                     data={tradeScores.slice(-20)} // Show last 20 trades for clarity
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                     <XAxis dataKey="date" />
                     <YAxis domain={[0, 10]} />
                     <Tooltip 
@@ -142,7 +149,7 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
                       type="monotone" 
                       dataKey="score" 
                       name="Discipline Score" 
-                      stroke="#8884d8" 
+                      stroke={COLORS.line} 
                       activeDot={{ r: 8 }} 
                     />
                   </LineChart>
@@ -155,15 +162,14 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                    <PolarGrid />
+                    <PolarGrid stroke={COLORS.gridLines} />
                     <PolarAngleAxis dataKey="subject" />
                     <PolarRadiusAxis angle={30} domain={[0, 10]} />
                     <Radar
                       name="Trader"
                       dataKey="A"
-                      stroke="#8884d8"
-                      fill="#8884d8"
-                      fillOpacity={0.6}
+                      stroke={COLORS.radar}
+                      fill={COLORS.radarFill}
                     />
                     <Tooltip formatter={(value) => [
                       `${typeof value === 'number' ? value.toFixed(1) : value}/10`, 
@@ -175,9 +181,9 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
             </div>
           </div>
         )}
-      </Card>
+      </div>
       
-      <Card className="p-4">
+      <div>
         <h3 className="text-lg font-medium mb-4">Discipline Metrics</h3>
         
         {tradeScores.length === 0 ? (
@@ -187,7 +193,7 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="p-3">
+              <div className="border p-3 rounded-md">
                 <div className="text-sm font-medium">Overall Discipline Score</div>
                 <div className="mt-1 text-2xl font-bold">
                   {disciplineData.avgScore.toFixed(1)}/10
@@ -195,9 +201,9 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
                 <div className="text-xs text-muted-foreground">
                   Based on plan adherence, planning, and satisfaction
                 </div>
-              </Card>
+              </div>
               
-              <Card className="p-3">
+              <div className="border p-3 rounded-md">
                 <div className="text-sm font-medium">Plan Adherence</div>
                 <div className="mt-1 text-2xl font-bold">
                   {disciplineData.planAdherence.toFixed(1)}%
@@ -205,9 +211,9 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
                 <div className="text-xs text-muted-foreground">
                   Percentage of trades following your plan
                 </div>
-              </Card>
+              </div>
               
-              <Card className="p-3">
+              <div className="border p-3 rounded-md">
                 <div className="text-sm font-medium">Planned Trades</div>
                 <div className="mt-1 text-2xl font-bold">
                   {disciplineData.plannedTrades.toFixed(1)}%
@@ -215,9 +221,9 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
                 <div className="text-xs text-muted-foreground">
                   Percentage of non-impulsive trades
                 </div>
-              </Card>
+              </div>
               
-              <Card className="p-3">
+              <div className="border p-3 rounded-md">
                 <div className="text-sm font-medium">Avg. Satisfaction</div>
                 <div className="mt-1 text-2xl font-bold">
                   {disciplineData.avgSatisfaction.toFixed(1)}/10
@@ -225,7 +231,7 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
                 <div className="text-xs text-muted-foreground">
                   Average satisfaction with trade outcomes
                 </div>
-              </Card>
+              </div>
             </div>
             
             <div className="bg-muted/20 p-3 rounded-md text-sm">
@@ -275,7 +281,7 @@ export function DevotionScoreAnalysis({ trades }: DevotionScoreAnalysisProps) {
             </div>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

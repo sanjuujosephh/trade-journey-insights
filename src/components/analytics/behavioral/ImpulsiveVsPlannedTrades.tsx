@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import {
   PieChart,
@@ -29,12 +28,12 @@ export function ImpulsiveVsPlannedTrades({ trades }: ImpulsiveVsPlannedTradesPro
   // If no trades have impulsive data, show a message
   if (tradesWithImpulsiveData.length === 0) {
     return (
-      <Card className="p-4">
+      <div>
         <h3 className="text-lg font-medium mb-2">Impulsive vs Planned Trades</h3>
         <p className="text-sm text-muted-foreground">
           No data available for impulsive vs planned trades. Start recording whether your trades are impulsive to see analysis here.
         </p>
-      </Card>
+      </div>
     );
   }
   
@@ -72,7 +71,7 @@ export function ImpulsiveVsPlannedTrades({ trades }: ImpulsiveVsPlannedTradesPro
     { name: 'Planned', value: plannedTrades.length }
   ];
   
-  const COLORS = ['#ef4444', '#3b82f6'];
+  const COLORS = ['#333333', '#777777'];
   
   // Prepare comparison data
   const comparisonData = [
@@ -81,19 +80,19 @@ export function ImpulsiveVsPlannedTrades({ trades }: ImpulsiveVsPlannedTradesPro
       trades: impulsiveTrades.length,
       winRate: impulsiveWinRate.toFixed(1) + '%',
       avgPnL: '₹' + impulsiveAvgPnL.toFixed(2),
-      color: '#ef4444'
+      color: '#333333'
     },
     { 
       type: 'Planned',
       trades: plannedTrades.length,
       winRate: plannedWinRate.toFixed(1) + '%',
       avgPnL: '₹' + plannedAvgPnL.toFixed(2),
-      color: '#3b82f6'
+      color: '#777777'
     }
   ];
   
   return (
-    <Card className="p-4">
+    <div className="space-y-4">
       <h3 className="text-lg font-medium mb-2">Impulsive vs Planned Trades</h3>
       <p className="text-sm text-muted-foreground mb-4">
         Analysis of your impulsive vs planned trading decisions and their impact on performance.
@@ -183,6 +182,6 @@ export function ImpulsiveVsPlannedTrades({ trades }: ImpulsiveVsPlannedTradesPro
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import {
   BarChart,
@@ -14,206 +13,110 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { calculateTradePnL } from "@/utils/calculations/pnl";
 
 interface TradeDecisionQualityProps {
   trades: Trade[];
 }
 
 export function TradeDecisionQuality({ trades }: TradeDecisionQualityProps) {
-  // Analyze impulsive vs. planned trades
-  const impulsiveTradesStats = {
-    wins: 0,
-    losses: 0,
-    totalPnL: 0,
-    count: 0,
-  };
-
-  const plannedTradesStats = {
-    wins: 0,
-    losses: 0,
-    totalPnL: 0,
-    count: 0,
-  };
-
-  // Count trades with plan deviation
-  const planDeviationStats = {
-    wins: 0,
-    losses: 0,
-    totalPnL: 0,
-    count: 0,
-  };
-
-  const planAdherenceStats = {
-    wins: 0,
-    losses: 0,
-    totalPnL: 0,
-    count: 0,
-  };
-
-  trades.forEach(trade => {
-    const pnl = calculateTradePnL(trade);
-    const isWin = trade.outcome === 'profit';
+  // Filter trades with plan_deviation data
+  const tradesWithPlanData = trades.filter(
+    trade => trade.plan_deviation !== null && trade.plan_deviation !== undefined
+  );
+  
+  // Count of trades that followed plan vs deviated
+  const followedPlan = tradesWithPlanData.filter(trade => trade.plan_deviation === false).length;
+  const deviatedFromPlan = tradesWithPlanData.filter(trade => trade.plan_deviation === true).length;
+  
+  // Calculate win rates
+  const followedPlanWins = tradesWithPlanData
+    .filter(trade => trade.plan_deviation === false && trade.outcome === 'profit')
+    .length;
     
-    // Analyze impulsive trades
-    if (trade.is_impulsive) {
-      impulsiveTradesStats.count++;
-      impulsiveTradesStats.totalPnL += pnl;
-      if (isWin) impulsiveTradesStats.wins++;
-      else impulsiveTradesStats.losses++;
-    } else {
-      plannedTradesStats.count++;
-      plannedTradesStats.totalPnL += pnl;
-      if (isWin) plannedTradesStats.wins++;
-      else plannedTradesStats.losses++;
-    }
-    
-    // Analyze plan deviation
-    if (trade.plan_deviation) {
-      planDeviationStats.count++;
-      planDeviationStats.totalPnL += pnl;
-      if (isWin) planDeviationStats.wins++;
-      else planDeviationStats.losses++;
-    } else {
-      planAdherenceStats.count++;
-      planAdherenceStats.totalPnL += pnl;
-      if (isWin) planAdherenceStats.wins++;
-      else planAdherenceStats.losses++;
-    }
-  });
-
+  const deviatedWins = tradesWithPlanData
+    .filter(trade => trade.plan_deviation === true && trade.outcome === 'profit')
+    .length;
+  
+  const followedPlanWinRate = followedPlan > 0 ? (followedPlanWins / followedPlan) * 100 : 0;
+  const deviatedWinRate = deviatedFromPlan > 0 ? (deviatedWins / deviatedFromPlan) * 100 : 0;
+  
   // Prepare data for charts
-  const impulseVsPlannedData = [
-    {
-      name: "Impulsive Trades",
-      winRate: impulsiveTradesStats.count > 0 
-        ? (impulsiveTradesStats.wins / impulsiveTradesStats.count) * 100
-        : 0,
-      avgPnL: impulsiveTradesStats.count > 0
-        ? impulsiveTradesStats.totalPnL / impulsiveTradesStats.count
-        : 0,
-      count: impulsiveTradesStats.count
-    },
-    {
-      name: "Planned Trades",
-      winRate: plannedTradesStats.count > 0
-        ? (plannedTradesStats.wins / plannedTradesStats.count) * 100
-        : 0,
-      avgPnL: plannedTradesStats.count > 0
-        ? plannedTradesStats.totalPnL / plannedTradesStats.count
-        : 0,
-      count: plannedTradesStats.count
-    }
+  const planAdherenceData = [
+    { name: 'Followed Plan', value: followedPlan },
+    { name: 'Deviated from Plan', value: deviatedFromPlan }
   ];
-
-  const deviationVsAdherenceData = [
-    {
-      name: "Deviated from Plan",
-      winRate: planDeviationStats.count > 0
-        ? (planDeviationStats.wins / planDeviationStats.count) * 100
-        : 0,
-      avgPnL: planDeviationStats.count > 0
-        ? planDeviationStats.totalPnL / planDeviationStats.count
-        : 0,
-      count: planDeviationStats.count
-    },
-    {
-      name: "Followed Plan",
-      winRate: planAdherenceStats.count > 0
-        ? (planAdherenceStats.wins / planAdherenceStats.count) * 100
-        : 0,
-      avgPnL: planAdherenceStats.count > 0
-        ? planAdherenceStats.totalPnL / planAdherenceStats.count
-        : 0,
-      count: planAdherenceStats.count
-    }
+  
+  const winRateData = [
+    { name: 'Followed Plan', value: followedPlanWinRate },
+    { name: 'Deviated from Plan', value: deviatedWinRate }
   ];
-
-  // Pie chart data and colors
-  const pieData = [
-    { name: "Impulsive", value: impulsiveTradesStats.count },
-    { name: "Planned", value: plannedTradesStats.count }
-  ].filter(item => item.value > 0);
-
-  const pieColors = ["#FFA500", "#00C49F"];
-
-  // Distribution of satisfaction by trade outcome
-  const satisfactionByOutcome = new Map<string, number[]>();
   
-  trades.forEach(trade => {
-    if (trade.satisfaction_score === null || trade.satisfaction_score === undefined) return;
+  // Calcluate PnL data
+  const followedPlanPnL = tradesWithPlanData
+    .filter(trade => trade.plan_deviation === false)
+    .reduce((sum, trade) => {
+      const pnl = ((trade.exit_price || 0) - (trade.entry_price || 0)) * 
+        (trade.quantity || 1) * (trade.trade_direction === 'short' ? -1 : 1);
+      return sum + pnl;
+    }, 0);
     
-    const outcome = trade.outcome || "unknown";
-    if (!satisfactionByOutcome.has(outcome)) {
-      satisfactionByOutcome.set(outcome, []);
-    }
-    
-    satisfactionByOutcome.get(outcome)!.push(Number(trade.satisfaction_score));
-  });
+  const deviatedPnL = tradesWithPlanData
+    .filter(trade => trade.plan_deviation === true)
+    .reduce((sum, trade) => {
+      const pnl = ((trade.exit_price || 0) - (trade.entry_price || 0)) * 
+        (trade.quantity || 1) * (trade.trade_direction === 'short' ? -1 : 1);
+      return sum + pnl;
+    }, 0);
   
-  // Calculate average satisfaction by outcome
-  const satisfactionData = Array.from(satisfactionByOutcome.entries()).map(([outcome, scores]) => ({
-    name: outcome === "profit" ? "Profitable Trades" : "Loss Trades",
-    avgSatisfaction: scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0,
-    count: scores.length
-  }));
-
+  const avgFollowedPnL = followedPlan > 0 ? followedPlanPnL / followedPlan : 0;
+  const avgDeviatedPnL = deviatedFromPlan > 0 ? deviatedPnL / deviatedFromPlan : 0;
+  
+  const pnlData = [
+    { name: 'Followed Plan', value: avgFollowedPnL },
+    { name: 'Deviated from Plan', value: avgDeviatedPnL }
+  ];
+  
+  // Monochrome color palette
+  const COLORS = {
+    primary: "#333333",
+    secondary: "#777777",
+    pieColors: ["#333333", "#999999"],
+    gridLines: "#e0e0e0"
+  };
+  
   return (
     <div className="space-y-6">
-      <Card className="p-4">
-        <h3 className="text-lg font-medium mb-4">Impulse vs. Planned Trade Analysis</h3>
-        
-        {impulsiveTradesStats.count === 0 && plannedTradesStats.count === 0 ? (
-          <div className="flex items-center justify-center h-32 text-muted-foreground">
-            No impulse vs. planned trade data available
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <h3 className="text-lg font-medium mb-4">Trade Decision Quality Analysis</h3>
+      
+      {tradesWithPlanData.length === 0 ? (
+        <div className="flex items-center justify-center h-32 text-muted-foreground">
+          No plan adherence data available
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <h4 className="text-md font-medium mb-2">Plan Adherence</h4>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={impulseVsPlannedData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                  <Tooltip 
-                    formatter={(value, name) => {
-                      if (typeof value === 'number') {
-                        return [
-                          name === 'winRate' ? `${value.toFixed(1)}%` : `₹${value.toFixed(2)}`,
-                          name === 'winRate' ? 'Win Rate' : 'Avg P&L'
-                        ];
-                      }
-                      return [value, name];
-                    }}
-                  />
-                  <Legend />
-                  <Bar yAxisId="left" dataKey="winRate" name="Win Rate (%)" fill="#8884d8" />
-                  <Bar yAxisId="right" dataKey="avgPnL" name="Avg P&L (₹)" fill="#82ca9d" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            
-            <div className="h-64">
-              <h4 className="text-md font-medium mb-2">Trade Distribution</h4>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={pieData}
+                    data={planAdherenceData}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
+                    labelLine={true}
                     outerRadius={80}
+                    fill="#8884d8"
                     dataKey="value"
+                    nameKey="name"
                     label={({ name, percent }) => 
                       `${name}: ${typeof percent === 'number' ? (percent * 100).toFixed(0) : '0'}%`
                     }
                   >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                    {planAdherenceData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={COLORS.pieColors[index]} 
+                      />
                     ))}
                   </Pie>
                   <Tooltip formatter={(value) => [`${value} trades`, 'Count']} />
@@ -221,145 +124,76 @@ export function TradeDecisionQuality({ trades }: TradeDecisionQualityProps) {
               </ResponsiveContainer>
             </div>
           </div>
-        )}
-      </Card>
-      
-      <Card className="p-4">
-        <h3 className="text-lg font-medium mb-4">Plan Adherence Analysis</h3>
-        
-        {planDeviationStats.count === 0 && planAdherenceStats.count === 0 ? (
-          <div className="flex items-center justify-center h-32 text-muted-foreground">
-            No plan adherence data available
-          </div>
-        ) : (
-          <div className="space-y-6">
+          
+          <div>
+            <h4 className="text-md font-medium mb-2">Win Rate by Plan Adherence</h4>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={deviationVsAdherenceData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  data={winRateData}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
                   <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                  <Tooltip 
-                    formatter={(value, name) => {
-                      if (typeof value === 'number') {
-                        return [
-                          name === 'winRate' ? `${value.toFixed(1)}%` : `₹${value.toFixed(2)}`,
-                          name === 'winRate' ? 'Win Rate' : 'Avg P&L'
-                        ];
-                      }
-                      return [value, name];
-                    }}
-                  />
-                  <Legend />
-                  <Bar yAxisId="left" dataKey="winRate" name="Win Rate (%)" fill="#8884d8" />
-                  <Bar yAxisId="right" dataKey="avgPnL" name="Avg P&L (₹)" fill="#82ca9d" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            
-            <div className="bg-muted/20 p-3 rounded-md text-sm">
-              <p className="font-medium mb-1">Decision Quality Insights:</p>
-              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                <li>
-                  Planned trades have a 
-                  {plannedTradesStats.count > 0 && impulsiveTradesStats.count > 0 
-                    ? ` ${Math.abs(
-                        ((plannedTradesStats.wins / plannedTradesStats.count) * 100) - 
-                        ((impulsiveTradesStats.wins / impulsiveTradesStats.count) * 100)
-                      ).toFixed(1)}% ${
-                        (plannedTradesStats.wins / plannedTradesStats.count) > 
-                        (impulsiveTradesStats.wins / impulsiveTradesStats.count) 
-                          ? 'higher' 
-                          : 'lower'
-                      } win rate`
-                    : ' different win rate'
-                  } compared to impulsive trades
-                </li>
-                <li>
-                  Following your trading plan results in 
-                  {planAdherenceStats.count > 0 && planDeviationStats.count > 0
-                    ? ` ${Math.abs(
-                        (planAdherenceStats.totalPnL / planAdherenceStats.count) - 
-                        (planDeviationStats.totalPnL / planDeviationStats.count)
-                      ).toFixed(2)} ₹ ${
-                        (planAdherenceStats.totalPnL / planAdherenceStats.count) > 
-                        (planDeviationStats.totalPnL / planDeviationStats.count)
-                          ? 'higher'
-                          : 'lower'
-                      } average P&L`
-                    : ' different average P&L'
-                  } compared to deviating from it
-                </li>
-                <li>
-                  {
-                    planAdherenceStats.count > 0 && planDeviationStats.count > 0 &&
-                    (planAdherenceStats.wins / planAdherenceStats.count) > 
-                    (planDeviationStats.wins / planDeviationStats.count)
-                      ? 'Your trade plan is working well - continue to follow it for better results'
-                      : 'Your trade plan might need revision as deviations are performing better'
-                  }
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
-      </Card>
-      
-      <Card className="p-4">
-        <h3 className="text-lg font-medium mb-4">Satisfaction Analysis</h3>
-        
-        {satisfactionData.length === 0 ? (
-          <div className="flex items-center justify-center h-32 text-muted-foreground">
-            No satisfaction score data available
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={satisfactionData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis domain={[0, 10]} label={{ value: 'Avg. Satisfaction (1-10)', angle: -90, position: 'left' }} />
+                  <YAxis domain={[0, 100]} />
                   <Tooltip formatter={(value) => [
-                    `${typeof value === 'number' ? value.toFixed(1) : value}`, 
-                    'Avg. Satisfaction'
+                    `${typeof value === 'number' ? Number(value).toFixed(1) : value}%`, 
+                    'Win Rate'
                   ]} />
-                  <Legend />
-                  <Bar dataKey="avgSatisfaction" name="Avg. Satisfaction" fill="#8884d8" />
+                  <Bar dataKey="value" name="Win Rate %" fill={COLORS.primary} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            
-            <div className="bg-muted/20 p-3 rounded-md text-sm">
-              <p className="font-medium mb-1">Satisfaction Insights:</p>
-              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                {satisfactionData.map((item, index) => (
-                  <li key={index}>
-                    Average satisfaction for {item.name.toLowerCase()}: {item.avgSatisfaction.toFixed(1)}/10 
-                    (from {item.count} trades)
-                  </li>
-                ))}
-                {satisfactionData.length > 1 && (
-                  <li className="mt-2 font-medium">
-                    {
-                      Math.abs(satisfactionData[0].avgSatisfaction - satisfactionData[1].avgSatisfaction) > 3
-                        ? "There's a significant gap between your satisfaction levels for wins vs. losses."
-                        : "Your satisfaction levels are relatively consistent regardless of outcome."
-                    }
-                  </li>
-                )}
-              </ul>
+          </div>
+          
+          <div>
+            <h4 className="text-md font-medium mb-2">Average P&L by Plan Adherence</h4>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={pnlData}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [
+                    `₹${typeof value === 'number' ? Number(value).toFixed(2) : value}`, 
+                    'Avg P&L'
+                  ]} />
+                  <Bar dataKey="value" name="Avg P&L" fill={COLORS.secondary} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
-        )}
-      </Card>
+        </div>
+      )}
+      
+      {tradesWithPlanData.length > 0 && (
+        <div className="bg-muted/20 p-3 rounded-md text-sm">
+          <p className="font-medium mb-1">Decision Quality Insights:</p>
+          <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+            <li>
+              Plan adherence rate: {tradesWithPlanData.length > 0 
+                ? (followedPlan / tradesWithPlanData.length * 100).toFixed(1) 
+                : 0}%
+            </li>
+            <li>
+              {followedPlanWinRate > deviatedWinRate 
+                ? 'Following your plan leads to a higher win rate'
+                : 'Surprisingly, deviating from your plan has a higher win rate (this is unusual and worth examining)'}
+            </li>
+            <li>
+              {avgFollowedPnL > avgDeviatedPnL
+                ? 'Following your plan generates better average P&L'
+                : 'Deviating from your plan shows higher average P&L (consider if your plan needs adjusting)'}
+            </li>
+            <li>
+              Consistency in following trading plans is typically associated with long-term success
+            </li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

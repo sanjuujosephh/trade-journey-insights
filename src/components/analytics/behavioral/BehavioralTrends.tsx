@@ -1,5 +1,4 @@
 
-import { Card } from "@/components/ui/card";
 import { Trade } from "@/types/trade";
 import {
   LineChart,
@@ -10,290 +9,255 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  ReferenceLine
 } from "recharts";
-import { parseISO, format, addDays, subDays } from "date-fns";
+import { calculateTradePnL } from "@/utils/calculations/pnl";
 
 interface BehavioralTrendsProps {
   trades: Trade[];
 }
 
 export function BehavioralTrends({ trades }: BehavioralTrendsProps) {
-  // Sort trades by date
-  const sortedTrades = [...trades].sort((a, b) => {
-    if (!a.entry_date || !b.entry_date) return 0;
+  // Filter trades with dates and sort them chronologically
+  const sortedTrades = [...trades]
+    .filter(trade => trade.entry_date)
+    .sort((a, b) => {
+      if (!a.entry_date || !b.entry_date) return 0;
+      const [aDay, aMonth, aYear] = a.entry_date.split('-').map(Number);
+      const [bDay, bMonth, bYear] = b.entry_date.split('-').map(Number);
+      return new Date(aYear, aMonth - 1, aDay).getTime() - new Date(bYear, bMonth - 1, bDay).getTime();
+    });
+
+  // Calculate discipline scores for each trade
+  const tradeScores = sortedTrades.map(trade => {
+    // Calculate a simplified discipline score
+    let score = 0;
     
-    const [aDay, aMonth, aYear] = a.entry_date.split('-').map(Number);
-    const [bDay, bMonth, bYear] = b.entry_date.split('-').map(Number);
+    // Plan adherence
+    if (trade.plan_deviation === false) score += 2;
+    else if (trade.plan_deviation === true) score -= 2;
     
-    const dateA = new Date(aYear, aMonth - 1, aDay);
-    const dateB = new Date(bYear, bMonth - 1, bDay);
+    // Impulsiveness
+    if (trade.is_impulsive === false) score += 2;
+    else if (trade.is_impulsive === true) score -= 2;
     
-    return dateA.getTime() - dateB.getTime();
-  });
-  
-  // Group trades by date
-  const tradesByDate = sortedTrades.reduce((acc, trade) => {
-    if (!trade.entry_date) return acc;
+    // Trade outcome
+    if (trade.outcome === 'profit') score += 1;
+    else if (trade.outcome === 'loss') score -= 1;
     
-    if (!acc[trade.entry_date]) {
-      acc[trade.entry_date] = [];
+    // Satisfaction score
+    if (trade.satisfaction_score !== null && trade.satisfaction_score !== undefined) {
+      score += (Number(trade.satisfaction_score) - 5) / 2;
     }
     
-    acc[trade.entry_date].push(trade);
-    return acc;
-  }, {} as Record<string, Trade[]>);
-  
-  // Calculate metrics for each date
-  const trendsData = Object.entries(tradesByDate).map(([date, dayTrades]) => {
-    // Parse date components
-    const [day, month, year] = date.split('-').map(Number);
-    const dateObj = new Date(year, month - 1, day);
-    
-    // Calculate average stress level for the day
-    const avgStress = dayTrades.reduce((sum, trade) => sum + (trade.stress_level || 5), 0) / dayTrades.length;
-    
-    // Calculate percentage of impulsive trades
-    const impulsiveCount = dayTrades.filter(trade => trade.is_impulsive === true).length;
-    const impulsivePercent = (impulsiveCount / dayTrades.length) * 100;
-    
-    // Calculate win rate for the day
-    const winCount = dayTrades.filter(trade => trade.outcome === 'profit').length;
-    const winRate = (winCount / dayTrades.length) * 100;
-    
-    // Calculate average confidence level
-    const avgConfidence = dayTrades.reduce((sum, trade) => sum + (trade.confidence_level || 5), 0) / dayTrades.length;
-    
-    // Calculate average P&L for the day
-    const totalPnL = dayTrades.reduce((sum, trade) => {
-      const pnl = trade.exit_price && trade.entry_price ? 
-        (trade.exit_price - trade.entry_price) * (trade.quantity || 1) * 
-        (trade.trade_direction === 'short' ? -1 : 1) : 0;
-      return sum + pnl;
-    }, 0);
-    const avgPnL = totalPnL / dayTrades.length;
+    // Extract date for the chart
+    let dateLabel = 'Unknown';
+    if (trade.entry_date) {
+      const [day, month] = trade.entry_date.split('-');
+      dateLabel = `${day}/${month}`;
+    }
     
     return {
-      date: format(dateObj, 'MM/dd'),
-      fullDate: format(dateObj, 'dd MMM yyyy'),
-      avgStress,
-      impulsivePercent,
-      winRate,
-      avgConfidence,
-      avgPnL,
-      trades: dayTrades.length
+      date: dateLabel,
+      score,
+      pnl: calculateTradePnL(trade),
+      emotions: trade.entry_emotion || 'Unknown'
     };
   });
   
+  // Calculate weekly aggregates
+  const weeklyData = [];
+  const weeksMap = new Map();
+  
+  sortedTrades.forEach(trade => {
+    if (!trade.entry_date) return;
+    
+    const [day, month, year] = trade.entry_date.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    
+    // Get the week start date (Monday)
+    const weekStart = new Date(date);
+    const dayOfWeek = date.getDay() || 7; // Convert Sunday (0) to 7
+    weekStart.setDate(date.getDate() - dayOfWeek + 1);
+    
+    const weekKey = `${weekStart.getFullYear()}-${weekStart.getMonth() + 1}-${weekStart.getDate()}`;
+    
+    if (!weeksMap.has(weekKey)) {
+      weeksMap.set(weekKey, {
+        weekStart: `${weekStart.getDate()}/${weekStart.getMonth() + 1}`,
+        trades: 0,
+        impulsive: 0,
+        plannedDeviations: 0,
+        avgSatisfaction: 0,
+        totalSatisfaction: 0,
+        pnl: 0
+      });
+    }
+    
+    const weekData = weeksMap.get(weekKey);
+    weekData.trades += 1;
+    if (trade.is_impulsive === true) weekData.impulsive += 1;
+    if (trade.plan_deviation === true) weekData.plannedDeviations += 1;
+    if (trade.satisfaction_score !== null && trade.satisfaction_score !== undefined) {
+      weekData.totalSatisfaction += Number(trade.satisfaction_score);
+    }
+    weekData.pnl += calculateTradePnL(trade);
+  });
+  
+  // Calculate averages and sort by week
+  Array.from(weeksMap.entries()).forEach(([key, data]) => {
+    data.avgSatisfaction = data.totalSatisfaction / data.trades || 0;
+    data.impulsiveRate = (data.impulsive / data.trades) * 100;
+    data.deviationRate = (data.plannedDeviations / data.trades) * 100;
+    weeklyData.push(data);
+  });
+  
+  weeklyData.sort((a, b) => {
+    const [aDay, aMonth] = a.weekStart.split('/').map(Number);
+    const [bDay, bMonth] = b.weekStart.split('/').map(Number);
+    if (aMonth !== bMonth) return aMonth - bMonth;
+    return aDay - bDay;
+  });
+  
+  // Monochrome color palette
+  const COLORS = {
+    primary: "#333333",
+    secondary: "#777777",
+    tertiary: "#999999",
+    gridLines: "#e0e0e0"
+  };
+  
   return (
-    <Card className="p-4">
-      <h3 className="text-lg font-medium mb-2">Behavioral Trends Over Time</h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        Track how your trading behavior and performance change over time.
-      </p>
+    <div className="space-y-6">
+      <h3 className="text-lg font-medium mb-4">Behavioral Trends Over Time</h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h4 className="text-sm font-medium mb-2">Stress Level vs. Win Rate</h4>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendsData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis yAxisId="left" domain={[0, 10]} />
-                <YAxis yAxisId="right" orientation="right" domain={[0, 100]} />
-                <Tooltip
-                  labelFormatter={(label) => {
-                    const dataPoint = trendsData.find(item => item.date === label);
-                    return dataPoint ? `${dataPoint.fullDate} (${dataPoint.trades} trades)` : label;
-                  }}
-                  formatter={(value, name) => {
-                    if (name === 'avgStress') return [`${Number(value).toFixed(1)}/10`, 'Avg Stress'];
-                    if (name === 'winRate') return [`${Number(value).toFixed(1)}%`, 'Win Rate'];
-                    return [value, name];
-                  }}
-                />
-                <Legend />
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="avgStress"
-                  name="Avg Stress Level"
-                  stroke="#ef4444"
-                  activeDot={{ r: 8 }}
-                />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="winRate"
-                  name="Win Rate"
-                  stroke="#10b981"
-                  activeDot={{ r: 8 }}
-                />
-                <ReferenceLine yAxisId="left" y={5} stroke="#6b7280" strokeDasharray="3 3" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+      {tradeScores.length < 5 ? (
+        <div className="flex items-center justify-center h-32 text-muted-foreground">
+          Not enough data available for behavioral trends (need at least 5 trades)
         </div>
-        
-        <div>
-          <h4 className="text-sm font-medium mb-2">Impulsive Decisions vs. P&L</h4>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendsData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis yAxisId="left" domain={[0, 100]} />
-                <YAxis yAxisId="right" orientation="right" />
-                <Tooltip
-                  labelFormatter={(label) => {
-                    const dataPoint = trendsData.find(item => item.date === label);
-                    return dataPoint ? `${dataPoint.fullDate} (${dataPoint.trades} trades)` : label;
-                  }}
-                  formatter={(value, name) => {
-                    if (name === 'impulsivePercent') return [`${Number(value).toFixed(1)}%`, 'Impulsive %'];
-                    if (name === 'avgPnL') return [`₹${Number(value).toFixed(2)}`, 'Avg P&L'];
-                    return [value, name];
-                  }}
-                />
-                <Legend />
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="impulsivePercent"
-                  name="Impulsive Decisions %"
-                  stroke="#f59e0b"
-                  activeDot={{ r: 8 }}
-                />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="avgPnL"
-                  name="Avg P&L"
-                  stroke="#3b82f6"
-                  activeDot={{ r: 8 }}
-                />
-                <ReferenceLine yAxisId="right" y={0} stroke="#6b7280" />
-              </LineChart>
-            </ResponsiveContainer>
+      ) : (
+        <div className="space-y-8">
+          <div>
+            <h4 className="text-md font-medium mb-2">Discipline Score Trend</h4>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={tradeScores}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value) => [
+                      typeof value === 'number' ? 
+                        Number(value).toFixed(2) : 
+                        value, 
+                      ''
+                    ]} 
+                  />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="score" 
+                    name="Discipline Score" 
+                    stroke={COLORS.primary} 
+                    activeDot={{ r: 8 }} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="pnl" 
+                    name="P&L" 
+                    stroke={COLORS.secondary} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </div>
-        
-        <div className="md:col-span-2">
-          <h4 className="text-sm font-medium mb-2">Confidence Level Trend</h4>
-          <div className="h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendsData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis domain={[0, 10]} />
-                <Tooltip
-                  labelFormatter={(label) => {
-                    const dataPoint = trendsData.find(item => item.date === label);
-                    return dataPoint ? `${dataPoint.fullDate} (${dataPoint.trades} trades)` : label;
-                  }}
-                  formatter={(value) => [`${Number(value).toFixed(1)}/10`, 'Avg Confidence']}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="avgConfidence"
-                  name="Avg Confidence Level"
-                  stroke="#8884d8"
-                  activeDot={{ r: 8 }}
-                />
-                <ReferenceLine y={5} stroke="#6b7280" strokeDasharray="3 3" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-      
-      {trendsData.length > 0 && (
-        <div className="mt-6">
-          <h4 className="text-sm font-medium mb-2">Behavioral Insights</h4>
-          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-            {(() => {
-              // Calculate correlations
-              const stressWinCorrelation = calculateCorrelation(
-                trendsData.map(d => d.avgStress),
-                trendsData.map(d => d.winRate)
-              );
-              
-              const impulsivePnLCorrelation = calculateCorrelation(
-                trendsData.map(d => d.impulsivePercent),
-                trendsData.map(d => d.avgPnL)
-              );
-              
-              const confidenceWinCorrelation = calculateCorrelation(
-                trendsData.map(d => d.avgConfidence),
-                trendsData.map(d => d.winRate)
-              );
-              
-              return (
+          
+          {weeklyData.length >= 2 && (
+            <div>
+              <h4 className="text-md font-medium mb-2">Weekly Behavioral Metrics</h4>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart 
+                    data={weeklyData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke={COLORS.gridLines} />
+                    <XAxis dataKey="weekStart" />
+                    <YAxis yAxisId="left" />
+                    <YAxis yAxisId="right" orientation="right" />
+                    <Tooltip 
+                      formatter={(value) => [
+                        typeof value === 'number' ? 
+                          (value % 1 === 0 ? value : Number(value).toFixed(2)) : 
+                          value, 
+                        ''
+                      ]} 
+                    />
+                    <Legend />
+                    <Line 
+                      yAxisId="left"
+                      type="monotone" 
+                      dataKey="impulsiveRate" 
+                      name="Impulsive Trades (%)" 
+                      stroke={COLORS.primary} 
+                    />
+                    <Line 
+                      yAxisId="left"
+                      type="monotone" 
+                      dataKey="deviationRate" 
+                      name="Plan Deviations (%)" 
+                      stroke={COLORS.secondary} 
+                    />
+                    <Line 
+                      yAxisId="right"
+                      type="monotone" 
+                      dataKey="avgSatisfaction" 
+                      name="Satisfaction (1-10)" 
+                      stroke={COLORS.tertiary}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+          
+          <div className="bg-muted/20 p-3 rounded-md text-sm">
+            <p className="font-medium mb-1">Behavioral Trends Insights:</p>
+            <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+              {weeklyData.length >= 2 && (
                 <>
                   <li>
-                    Stress and win rate are {Math.abs(stressWinCorrelation) < 0.3 ? 'weakly' : 
-                      Math.abs(stressWinCorrelation) < 0.7 ? 'moderately' : 'strongly'} {stressWinCorrelation < 0 ? 'negatively' : 'positively'} correlated
-                    {stressWinCorrelation < -0.3 && '. Lower stress levels may improve your performance'}
-                    {stressWinCorrelation > 0.3 && '. You seem to perform better under some stress'}
+                    {
+                      weeklyData[weeklyData.length - 1].impulsiveRate < weeklyData[0].impulsiveRate
+                        ? 'Your impulsive trading is decreasing over time, which is positive.'
+                        : 'Your impulsive trading rate has increased. Consider implementing more structured decision-making.'
+                    }
                   </li>
                   <li>
-                    Impulsive decisions and P&L are {Math.abs(impulsivePnLCorrelation) < 0.3 ? 'weakly' : 
-                      Math.abs(impulsivePnLCorrelation) < 0.7 ? 'moderately' : 'strongly'} {impulsivePnLCorrelation < 0 ? 'negatively' : 'positively'} correlated
-                    {impulsivePnLCorrelation < -0.3 && '. Planned trades tend to be more profitable for you'}
-                    {impulsivePnLCorrelation > 0.3 && '. Your intuitive trades seem to perform well'}
-                  </li>
-                  <li>
-                    Confidence and win rate are {Math.abs(confidenceWinCorrelation) < 0.3 ? 'weakly' : 
-                      Math.abs(confidenceWinCorrelation) < 0.7 ? 'moderately' : 'strongly'} {confidenceWinCorrelation < 0 ? 'negatively' : 'positively'} correlated
-                    {confidenceWinCorrelation > 0.3 && '. Your confidence seems to be a good predictor of success'}
-                    {confidenceWinCorrelation < -0.3 && '. Be cautious when feeling overconfident'}
+                    {
+                      weeklyData[weeklyData.length - 1].deviationRate < weeklyData[0].deviationRate
+                        ? 'You\'re becoming more consistent with following your trading plans.'
+                        : 'Plan deviations are increasing. Review why you\'re deviating from your plans.'
+                    }
                   </li>
                 </>
-              );
-            })()}
-          </ul>
+              )}
+              <li>
+                {
+                  tradeScores.length >= 10 && tradeScores.slice(-5).every(t => t.score > 0)
+                    ? 'Your recent behavioral discipline is positive.'
+                    : tradeScores.length >= 10 && tradeScores.slice(-5).every(t => t.score < 0)
+                    ? 'Your recent behavioral discipline needs improvement.'
+                    : 'Your behavioral discipline is inconsistent. Focus on developing stable trading habits.'
+                }
+              </li>
+              <li>Behavioral consistency is a key factor in achieving long-term trading success.</li>
+            </ul>
+          </div>
         </div>
       )}
-    </Card>
+    </div>
   );
-}
-
-// Helper function to calculate correlation coefficient
-function calculateCorrelation(x: number[], y: number[]): number {
-  if (x.length !== y.length || x.length < 2) return 0;
-  
-  const n = x.length;
-  
-  // Calculate means
-  const mean_x = x.reduce((sum, val) => sum + val, 0) / n;
-  const mean_y = y.reduce((sum, val) => sum + val, 0) / n;
-  
-  // Calculate variances and covariance
-  let variance_x = 0;
-  let variance_y = 0;
-  let covariance = 0;
-  
-  for (let i = 0; i < n; i++) {
-    const diff_x = x[i] - mean_x;
-    const diff_y = y[i] - mean_y;
-    
-    variance_x += diff_x ** 2;
-    variance_y += diff_y ** 2;
-    covariance += diff_x * diff_y;
-  }
-  
-  variance_x /= n;
-  variance_y /= n;
-  covariance /= n;
-  
-  // Calculate correlation
-  const std_x = Math.sqrt(variance_x);
-  const std_y = Math.sqrt(variance_y);
-  
-  // Avoid division by zero
-  if (std_x === 0 || std_y === 0) return 0;
-  
-  return covariance / (std_x * std_y);
 }
