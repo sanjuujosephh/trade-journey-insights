@@ -37,9 +37,6 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     exit_emotion: formData.exit_emotion || null,
     symbol: formData.symbol,
     entry_date: formData.entry_date || null,
-    is_impulsive: formData.is_impulsive || false,
-    plan_deviation: formData.plan_deviation || false,
-    satisfaction_score: sanitizeNumber(formData.satisfaction_score),
     ai_feedback: null,
     user_id: ""  // This will be set in the mutation
   };

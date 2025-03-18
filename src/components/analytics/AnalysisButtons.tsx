@@ -1,116 +1,86 @@
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Trade } from '@/types/trade';
-import { CustomPromptAccordion } from './CustomPromptAccordion';
-import { CustomPromptDialog } from './CustomPromptDialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarIcon, TrendingUp, Brain, Lightbulb } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock } from "lucide-react";
+import { CustomPromptDialog } from "./CustomPromptDialog";
+import { useState } from "react";
+import { Trade } from "@/types/trade";
 
 interface AnalysisButtonsProps {
-  trades: Trade[];
   isAnalyzing: boolean;
+  trades: Trade[];
   onAnalyze: (days: number, customPrompt?: string) => void;
 }
 
-export function AnalysisButtons({
-  trades,
-  isAnalyzing,
-  onAnalyze
-}: AnalysisButtonsProps) {
-  const [customPrompt, setCustomPrompt] = useState<string>('');
-  const [isCustomPromptDialogOpen, setIsCustomPromptDialogOpen] = useState(false);
-  const [selectedAnalysisType, setSelectedAnalysisType] = useState<number | null>(null);
-
-  const handleAnalyze = (days: number) => {
-    setSelectedAnalysisType(days);
-    
-    if (customPrompt) {
-      onAnalyze(days, customPrompt);
+export function AnalysisButtons({ isAnalyzing, trades, onAnalyze }: AnalysisButtonsProps) {
+  const [selectedDayCount, setSelectedDayCount] = useState<number>(0);
+  
+  const handleSelectDayCount = (days: number) => {
+    setSelectedDayCount(days);
+    onAnalyze(days);
+  };
+  
+  const handleCustomPromptAnalysis = (customPrompt: string) => {
+    if (selectedDayCount === 0) {
+      // Default to 1 day if no day count was selected
+      setSelectedDayCount(1);
+      onAnalyze(1, customPrompt);
     } else {
-      onAnalyze(days);
+      onAnalyze(selectedDayCount, customPrompt);
     }
   };
 
-  const handlePromptSubmit = (prompt: string) => {
-    setCustomPrompt(prompt);
-  };
-
-  const handleOpenCustomPromptDialog = () => {
-    setIsCustomPromptDialogOpen(true);
-  };
-
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Trade Analysis</CardTitle>
-          <CardDescription>
-            Generate AI insights from your trading data
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <CustomPromptAccordion onPromptSubmit={handlePromptSubmit} />
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button
-                variant={selectedAnalysisType === 1 ? "default" : "outline"}
-                disabled={isAnalyzing || trades.length === 0}
-                onClick={() => handleAnalyze(1)}
-                className="flex flex-col items-center justify-center h-20 space-y-1"
-              >
-                <CalendarIcon className="h-5 w-5" />
-                <span>Daily Analysis</span>
-                <span className="text-xs text-muted-foreground">(1 Credit)</span>
-              </Button>
-              
-              <Button
-                variant={selectedAnalysisType === 7 ? "default" : "outline"}
-                disabled={isAnalyzing || trades.length === 0}
-                onClick={() => handleAnalyze(7)}
-                className="flex flex-col items-center justify-center h-20 space-y-1"
-              >
-                <TrendingUp className="h-5 w-5" />
-                <span>Weekly Analysis</span>
-                <span className="text-xs text-muted-foreground">(3 Credits)</span>
-              </Button>
-              
-              <Button
-                variant={selectedAnalysisType === 30 ? "default" : "outline"} 
-                disabled={isAnalyzing || trades.length === 0}
-                onClick={() => handleAnalyze(30)}
-                className="flex flex-col items-center justify-center h-20 space-y-1"
-              >
-                <Brain className="h-5 w-5" />
-                <span>Monthly Analysis</span>
-                <span className="text-xs text-muted-foreground">(5 Credits)</span>
-              </Button>
-            </div>
-            
-            <Button
-              variant="secondary"
-              className="w-full mt-2"
-              onClick={handleOpenCustomPromptDialog}
-              disabled={isAnalyzing}
-            >
-              <Lightbulb className="h-4 w-4 mr-2" />
-              Advanced Analysis Options
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-            
-      <CustomPromptDialog
-        open={isCustomPromptDialogOpen}
-        onOpenChange={setIsCustomPromptDialogOpen}
-        onPromptSubmit={(prompt, type) => {
-          setCustomPrompt(prompt);
-          if (type) {
-            handleAnalyze(type);
-          }
-        }}
-      />
-    </>
+    <div className="flex flex-wrap gap-2">
+      <div className="flex">
+        <Button
+          variant="default"
+          className="rounded-r-none"
+          disabled={isAnalyzing}
+          onClick={() => handleSelectDayCount(1)}
+        >
+          <Clock className="mr-2 h-4 w-4" />
+          Today's Trades
+        </Button>
+        <CustomPromptDialog 
+          dayCount={1} 
+          onAnalyze={handleCustomPromptAnalysis}
+          trades={trades}
+        />
+      </div>
+
+      <div className="flex">
+        <Button
+          variant="outline"
+          className="rounded-r-none"
+          disabled={isAnalyzing}
+          onClick={() => handleSelectDayCount(7)}
+        >
+          <Calendar className="mr-2 h-4 w-4" />
+          Last 7 Days
+        </Button>
+        <CustomPromptDialog 
+          dayCount={7} 
+          onAnalyze={handleCustomPromptAnalysis}
+          trades={trades}
+        />
+      </div>
+
+      <div className="flex">
+        <Button
+          variant="outline"
+          className="rounded-r-none"
+          disabled={isAnalyzing}
+          onClick={() => handleSelectDayCount(30)}
+        >
+          <Calendar className="mr-2 h-4 w-4" />
+          Last 30 Days
+        </Button>
+        <CustomPromptDialog 
+          dayCount={30} 
+          onAnalyze={handleCustomPromptAnalysis}
+          trades={trades}
+        />
+      </div>
+    </div>
   );
 }

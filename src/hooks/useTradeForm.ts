@@ -32,9 +32,6 @@ const emptyFormData: FormData = {
   confidence_level: "",
   entry_emotion: "",
   exit_emotion: "",
-  is_impulsive: false,
-  plan_deviation: false,
-  satisfaction_score: ""
 };
 
 export function useTradeForm() {

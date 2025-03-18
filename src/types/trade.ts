@@ -32,12 +32,6 @@ export interface Trade {
   symbol: string;
   entry_date: string | null;
   ai_feedback: string | null;
-  emotional_score?: number | null;
-  overall_emotional_state?: string | null;
-  confidence_level_score?: number | null;
-  is_impulsive?: boolean | null;
-  plan_deviation?: boolean | null;
-  satisfaction_score?: number | null;
 }
 
 export interface FormData {
@@ -69,7 +63,4 @@ export interface FormData {
   entry_emotion: string;
   exit_emotion: string;
   symbol: string;
-  is_impulsive: boolean;
-  plan_deviation: boolean;
-  satisfaction_score: string;
 }
