@@ -165,7 +165,7 @@ export function EmotionalImpactAnalysis({ trades }: EmotionalImpactAnalysisProps
                       fill="#8884d8"
                       dataKey="value"
                       nameKey="name"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name}: ${typeof percent === 'number' ? (percent * 100).toFixed(0) : '0'}%`}
                     >
                       {entryDistribution.map((entry, index) => (
                         <Cell 
@@ -194,7 +194,7 @@ export function EmotionalImpactAnalysis({ trades }: EmotionalImpactAnalysisProps
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip formatter={(value) => [`${value.toFixed(1)}%`, 'Win Rate']} />
+                    <Tooltip formatter={(value) => [`${typeof value === 'number' ? value.toFixed(1) : value}%`, 'Win Rate']} />
                     <Legend />
                     <Bar dataKey="winRate" name="Win Rate %" fill="#8884d8" />
                   </BarChart>
@@ -250,7 +250,7 @@ export function EmotionalImpactAnalysis({ trades }: EmotionalImpactAnalysisProps
                   <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
                   <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
                   <Tooltip formatter={(value, name) => [
-                    name === 'winRate' ? `${value.toFixed(1)}%` : `₹${value.toFixed(2)}`,
+                    name === 'winRate' ? `${typeof value === 'number' ? value.toFixed(1) : value}%` : `₹${typeof value === 'number' ? value.toFixed(2) : value}`,
                     name === 'winRate' ? 'Win Rate' : 'Avg P&L'
                   ]} />
                   <Legend />

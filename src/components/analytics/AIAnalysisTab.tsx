@@ -37,7 +37,7 @@ export function AIAnalysisTab() {
     }
   }, [refetch, userId]);
 
-  const handleAnalyze = async (days: number, customPrompt?: string) => {
+  const handleAnalyze = async (options: { days?: number, customPrompt?: string }) => {
     try {
       if (!userId) {
         toast.error('You must be logged in to analyze trades');
@@ -45,6 +45,7 @@ export function AIAnalysisTab() {
       }
       
       // Credit cost based on days
+      const days = options.days || 7;
       const creditCost = days === 1 ? 1 : days === 7 ? 3 : 5;
       
       // Ensure we have the latest credit data
@@ -60,7 +61,7 @@ export function AIAnalysisTab() {
       
       console.log(`Attempting to analyze ${trades.length} trades over ${days} days`);
       
-      const success = await analyzeTradesForPeriod(trades, days, customPrompt, userId);
+      const success = await analyzeTradesForPeriod(trades, days, options.customPrompt, userId);
       
       // Refetch credits regardless of outcome to update UI
       await refetch();

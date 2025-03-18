@@ -106,7 +106,7 @@ export function TechnicalIndicatorImpact({ trades }: TechnicalIndicatorImpactPro
                   <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
                   <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
                   <Tooltip formatter={(value, name) => [
-                    name === 'winRate' ? `${value.toFixed(1)}%` : `₹${value.toFixed(2)}`,
+                    name === 'winRate' ? `${typeof value === 'number' ? value.toFixed(1) : value}%` : `₹${typeof value === 'number' ? value.toFixed(2) : value}`,
                     name === 'winRate' ? 'Win Rate' : 'Avg P&L'
                   ]} />
                   <Legend />
@@ -133,7 +133,7 @@ export function TechnicalIndicatorImpact({ trades }: TechnicalIndicatorImpactPro
                   <YAxis yAxisId="left" orientation="left" stroke="#8884d8" domain={[0, 100]} />
                   <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
                   <Tooltip formatter={(value, name) => [
-                    name === 'winRate' ? `${value.toFixed(1)}%` : `₹${value.toFixed(2)}`,
+                    name === 'winRate' ? `${typeof value === 'number' ? value.toFixed(1) : value}%` : `₹${typeof value === 'number' ? value.toFixed(2) : value}`,
                     name === 'winRate' ? 'Win Rate' : 'Avg P&L'
                   ]} />
                   <Legend />

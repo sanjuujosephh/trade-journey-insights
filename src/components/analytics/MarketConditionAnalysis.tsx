@@ -98,7 +98,7 @@ export function MarketConditionAnalysis({ trades }: MarketConditionAnalysisProps
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name}: ${typeof percent === 'number' ? (percent * 100).toFixed(0) : '0'}%`}
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -120,7 +120,10 @@ export function MarketConditionAnalysis({ trades }: MarketConditionAnalysisProps
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(value) => [`${value.toFixed(1)}%`, 'Win Rate']} />
+                <Tooltip formatter={(value) => [
+                  `${typeof value === 'number' ? value.toFixed(1) : value}%`, 
+                  'Win Rate'
+                ]} />
                 <Bar dataKey="winRate" name="Win Rate" fill="#8884d8" />
               </BarChart>
             </ResponsiveContainer>

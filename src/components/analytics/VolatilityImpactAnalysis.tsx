@@ -83,7 +83,7 @@ export function VolatilityImpactAnalysis({ trades }: VolatilityImpactAnalysisPro
                   <Tooltip 
                     cursor={{ strokeDasharray: '3 3' }}
                     formatter={(value, name) => [
-                      name === 'pnl' ? `₹${value.toFixed(2)}` : value,
+                      name === 'pnl' ? `₹${typeof value === 'number' ? value.toFixed(2) : value}` : value,
                       name === 'pnl' ? 'P&L' : 'VIX'
                     ]}
                     labelFormatter={(value) => `VIX: ${value}`}
@@ -143,7 +143,7 @@ export function VolatilityImpactAnalysis({ trades }: VolatilityImpactAnalysisPro
                   <Tooltip 
                     cursor={{ strokeDasharray: '3 3' }}
                     formatter={(value, name) => [
-                      name === 'pnl' ? `₹${value.toFixed(2)}` : value,
+                      name === 'pnl' ? `₹${typeof value === 'number' ? value.toFixed(2) : value}` : value,
                       name === 'pnl' ? 'P&L' : 'PCR'
                     ]}
                     labelFormatter={(value) => `PCR: ${value}`}

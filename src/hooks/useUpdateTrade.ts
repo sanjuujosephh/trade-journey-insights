@@ -46,6 +46,12 @@ export function useUpdateTrade(userId: string | null) {
         confidence_level: tradeData.confidence_level?.toString() || '',
         entry_emotion: (tradeData.entry_emotion || '') as string,
         exit_emotion: (tradeData.exit_emotion || '') as string,
+        // Add the missing behavioral fields
+        is_impulsive: tradeData.is_impulsive || false,
+        plan_deviation: tradeData.plan_deviation || false,
+        satisfaction_score: tradeData.satisfaction_score?.toString() || '',
+        stress_level: tradeData.stress_level?.toString() || '',
+        time_pressure: (tradeData.time_pressure || '') as "" | "high" | "medium" | "low",
       };
 
       const transformedData = transformTradeData(formDataForTransform);
