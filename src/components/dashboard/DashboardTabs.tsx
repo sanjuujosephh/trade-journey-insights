@@ -12,11 +12,12 @@ import LearningCenter from "@/components/LearningCenter";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { PerformanceMetrics } from "@/components/analytics/PerformanceMetrics";
 import { StrategiesTab } from "@/components/strategies/StrategiesTab";
-import { AIAnalysisTab } from "@/components/analytics/AIAnalysisTab";
 import { Trade } from "@/types/trade";
 import { cn } from "@/lib/utils";
 import { PerformanceAnalyticsTab } from "@/components/analytics/PerformanceAnalyticsTab";
 import { BehavioralAnalyticsTab } from "@/components/analytics/BehavioralAnalyticsTab";
+import { AnalysisButtons } from "@/components/analytics/AnalysisButtons";
+import { AnalysisResult } from "@/components/analytics/AnalysisResult";
 
 interface DashboardTabsProps {
   trades: Trade[];
@@ -103,7 +104,25 @@ export function DashboardTabs({
           </TabsContent>
 
           <TabsContent value="ai-analysis" className="mt-0 h-full shadow-none">
-            <AIAnalysisTab />
+            <div className="p-4 space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">AI Trade Analysis</h2>
+                <p className="text-muted-foreground">
+                  Get AI-powered insights on your trading patterns, behavior, and performance.
+                </p>
+              </div>
+              
+              <AnalysisButtons 
+                onAnalyze={analyzeTradesWithAI}
+                isAnalyzing={isAnalyzing}
+                trades={trades}
+              />
+              
+              <AnalysisResult 
+                currentAnalysis={currentAnalysis} 
+                isAnalyzing={isAnalyzing}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="history" className="mt-0 h-full shadow-none">
