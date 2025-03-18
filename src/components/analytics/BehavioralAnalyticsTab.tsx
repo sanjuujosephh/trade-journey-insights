@@ -7,6 +7,10 @@ import { EmotionalImpactAnalysis } from "./behavioral/EmotionalImpactAnalysis";
 import { TradeDecisionQuality } from "./behavioral/TradeDecisionQuality";
 import { StressPerformanceCorrelation } from "./behavioral/StressPerformanceCorrelation";
 import { DevotionScoreAnalysis } from "./behavioral/DevotionScoreAnalysis";
+import { EmotionPerformanceComparison } from "./behavioral/EmotionPerformanceComparison";
+import { ImpulsiveVsPlannedTrades } from "./behavioral/ImpulsiveVsPlannedTrades";
+import { TimeBasedEmotionAnalysis } from "./behavioral/TimeBasedEmotionAnalysis";
+import { BehavioralTrends } from "./behavioral/BehavioralTrends";
 
 interface BehavioralAnalyticsTabProps {
   trades: Trade[];
@@ -24,6 +28,10 @@ export function BehavioralAnalyticsTab({ trades }: BehavioralAnalyticsTabProps) 
             <TabsTrigger value="decision">Decision Quality</TabsTrigger>
             <TabsTrigger value="stress">Stress & Performance</TabsTrigger>
             <TabsTrigger value="devotion">Discipline Analysis</TabsTrigger>
+            <TabsTrigger value="comparison">Emotion Comparison</TabsTrigger>
+            <TabsTrigger value="impulsive">Impulsive Trading</TabsTrigger>
+            <TabsTrigger value="time">Time & Emotions</TabsTrigger>
+            <TabsTrigger value="trends">Behavioral Trends</TabsTrigger>
           </TabsList>
           
           <div className="p-4">
@@ -41,6 +49,22 @@ export function BehavioralAnalyticsTab({ trades }: BehavioralAnalyticsTabProps) 
             
             <TabsContent value="devotion" className="mt-0">
               <DevotionScoreAnalysis trades={trades} />
+            </TabsContent>
+            
+            <TabsContent value="comparison" className="mt-0">
+              <EmotionPerformanceComparison trades={trades} />
+            </TabsContent>
+            
+            <TabsContent value="impulsive" className="mt-0">
+              <ImpulsiveVsPlannedTrades trades={trades} />
+            </TabsContent>
+            
+            <TabsContent value="time" className="mt-0">
+              <TimeBasedEmotionAnalysis trades={trades} />
+            </TabsContent>
+            
+            <TabsContent value="trends" className="mt-0">
+              <BehavioralTrends trades={trades} />
             </TabsContent>
           </div>
         </Tabs>

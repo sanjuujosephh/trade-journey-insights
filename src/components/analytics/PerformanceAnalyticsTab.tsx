@@ -9,6 +9,10 @@ import { StrategyPerformance } from "./StrategyPerformance";
 import { MarketConditionAnalysis } from "./MarketConditionAnalysis";
 import { TechnicalIndicatorImpact } from "./TechnicalIndicatorImpact";
 import { VolatilityImpactAnalysis } from "./VolatilityImpactAnalysis";
+import { StreakChart } from "./StreakChart";
+import { VixTradeCorrelation } from "./VixTradeCorrelation";
+import { TradeDirectionPerformance } from "./TradeDirectionPerformance";
+import { TradeFlowChart } from "./TradeFlowChart";
 
 interface PerformanceAnalyticsTabProps {
   trades: Trade[];
@@ -30,6 +34,9 @@ export function PerformanceAnalyticsTab({ trades }: PerformanceAnalyticsTabProps
             <TabsTrigger value="market">Market Conditions</TabsTrigger>
             <TabsTrigger value="indicators">Technical Indicators</TabsTrigger>
             <TabsTrigger value="volatility">Volatility Impact</TabsTrigger>
+            <TabsTrigger value="direction">Direction Analysis</TabsTrigger>
+            <TabsTrigger value="flow">Trade Flow</TabsTrigger>
+            <TabsTrigger value="streaks">Win/Loss Streaks</TabsTrigger>
           </TabsList>
           
           <div className="p-4">
@@ -61,6 +68,18 @@ export function PerformanceAnalyticsTab({ trades }: PerformanceAnalyticsTabProps
             
             <TabsContent value="volatility" className="mt-0">
               <VolatilityImpactAnalysis trades={trades} />
+            </TabsContent>
+            
+            <TabsContent value="direction" className="mt-0">
+              <TradeDirectionPerformance trades={trades} />
+            </TabsContent>
+            
+            <TabsContent value="flow" className="mt-0">
+              <TradeFlowChart trades={trades} />
+            </TabsContent>
+            
+            <TabsContent value="streaks" className="mt-0">
+              <StreakChart trades={trades} />
             </TabsContent>
           </div>
         </Tabs>
