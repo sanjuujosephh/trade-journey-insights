@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Edit, Save, Trash, X } from "lucide-react";
 import { PromptVariableValues } from "./PromptVariableValues";
@@ -9,8 +8,10 @@ import { Trade } from "@/types/trade";
 import { toast } from "sonner";
 
 interface CustomPromptAccordionProps {
-  customPrompt?: string;
-  setCustomPrompt?: (prompt: string) => void;
+  customPrompt: string;
+  setCustomPrompt: (prompt: string) => void;
+  onSubmit: () => void;
+  isAnalyzing: boolean;
   isEditingPrompt?: boolean;
   setIsEditingPrompt?: (isEditing: boolean) => void;
   savedPrompts?: string[];
@@ -21,8 +22,10 @@ interface CustomPromptAccordionProps {
 }
 
 export function CustomPromptAccordion({
-  customPrompt = "",
-  setCustomPrompt = () => {},
+  customPrompt,
+  setCustomPrompt,
+  onSubmit,
+  isAnalyzing,
   isEditingPrompt = false,
   setIsEditingPrompt = () => {},
   savedPrompts = [],
@@ -31,7 +34,10 @@ export function CustomPromptAccordion({
   onUsePrompt = () => {},
   trades = []
 }: CustomPromptAccordionProps) {
+  const [isEditing, setIsEditing] = useState(isEditingPrompt);
+
   const resetCustomPrompt = () => {
+    setIsEditing(false);
     setIsEditingPrompt(false);
     setCustomPrompt(`As a trading analyst, analyze these trading patterns:
 
@@ -55,7 +61,7 @@ Trades data: {{tradesData}}`);
     <div className="my-4">
       <h3 className="font-medium mb-4">Customize AI Analysis</h3>
       <div className="space-y-4 pb-4">
-        {isEditingPrompt ? (
+        {isEditing ? (
           <div className="space-y-4">
             <PromptVariableValues trades={trades} />
             
@@ -79,7 +85,10 @@ Trades data: {{tradesData}}`);
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setIsEditingPrompt(false)}
+                  onClick={() => {
+                    setIsEditing(false);
+                    setIsEditingPrompt(false);
+                  }}
                 >
                   <X className="mr-2 h-4 w-4" />
                   Cancel
@@ -90,6 +99,7 @@ Trades data: {{tradesData}}`);
                   size="sm"
                   onClick={() => {
                     onSavePrompt(customPrompt);
+                    setIsEditing(false);
                     setIsEditingPrompt(false);
                   }}
                 >
@@ -104,7 +114,10 @@ Trades data: {{tradesData}}`);
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsEditingPrompt(true)}
+              onClick={() => {
+                setIsEditing(true);
+                setIsEditingPrompt(true);
+              }}
             >
               <Edit className="mr-2 h-4 w-4" />
               Edit Custom Prompt
@@ -116,7 +129,7 @@ Trades data: {{tradesData}}`);
                 
                 <div className="grid gap-2">
                   {savedPrompts.map((prompt, index) => (
-                    <Card key={index} className="p-3 text-sm">
+                    <div key={index} className="p-3 text-sm border rounded-md">
                       <div className="mb-2 truncate">{prompt.substring(0, 100)}...</div>
                       <div className="flex justify-end space-x-2">
                         <Button
@@ -137,7 +150,7 @@ Trades data: {{tradesData}}`);
                           Use
                         </Button>
                       </div>
-                    </Card>
+                    </div>
                   ))}
                 </div>
               </div>

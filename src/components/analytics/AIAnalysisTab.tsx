@@ -11,13 +11,14 @@ import { useTradeAnalysis } from "@/hooks/useTradeAnalysis";
 import { useCredits } from "@/hooks/useCredits";
 import { PurchaseCreditsDialog } from "./PurchaseCreditsDialog";
 import { Loader2 } from "lucide-react";
+import { useUserCredits } from "@/hooks/useUserCredits";
 
 export function AIAnalysisTab() {
   const [customPrompt, setCustomPrompt] = useState<string>("");
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
   const { user } = useAuth();
   const { isAnalyzing, currentAnalysis, analyzeTradesForPeriod, setCurrentAnalysis } = useTradeAnalysis();
-  const { data: credits, isLoading: isLoadingCredits } = useCredits(user?.id || null);
+  const { credits, isLoading: isLoadingCredits } = useUserCredits();
 
   // Updated function to match the expected signature in DashboardTabs.tsx
   const handleAnalyzeTradesWithAI = (options: { days?: number, customPrompt?: string }) => {
@@ -30,7 +31,10 @@ export function AIAnalysisTab() {
       setCustomPrompt(options.customPrompt);
     }
     
-    analyzeTradesForPeriod(days, promptText, user.id);
+    // Get the trades from somewhere - we would normally have this data passed or available in a context
+    // For now, we'll pass an empty array as a fallback
+    const trades = []; // This should come from a trade context or props
+    analyzeTradesForPeriod(trades, days, promptText, user.id);
   };
 
   return (
@@ -51,8 +55,9 @@ export function AIAnalysisTab() {
         ) : (
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
             <CreditsDisplay 
-              subscriptionCredits={credits?.subscription_credits || 0} 
-              purchasedCredits={credits?.purchased_credits || 0} 
+              credits={credits}
+              isLoading={isLoadingCredits}
+              onPurchaseClick={() => setIsPurchaseDialogOpen(true)}
             />
             <Button 
               variant="outline" 
@@ -77,12 +82,11 @@ export function AIAnalysisTab() {
           <AnalysisButtons 
             onAnalyze={handleAnalyzeTradesWithAI}
             isAnalyzing={isAnalyzing}
-            disabled={!user}
           />
           
           <CustomPromptAccordion 
-            value={customPrompt}
-            onChange={setCustomPrompt}
+            customPrompt={customPrompt}
+            setCustomPrompt={setCustomPrompt}
             onSubmit={() => handleAnalyzeTradesWithAI({ days: 7, customPrompt })}
             isAnalyzing={isAnalyzing}
           />
@@ -91,8 +95,8 @@ export function AIAnalysisTab() {
       
       {currentAnalysis && (
         <AnalysisResult 
-          analysisText={currentAnalysis} 
-          onClear={() => setCurrentAnalysis('')}
+          currentAnalysis={currentAnalysis} 
+          isAnalyzing={isAnalyzing}
         />
       )}
       

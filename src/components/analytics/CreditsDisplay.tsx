@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { UserCredits } from "@/hooks/useUserCredits";
+import { UserCredits } from "@/hooks/useCredits";
 import { format } from "date-fns";
 
 interface CreditsDisplayProps {

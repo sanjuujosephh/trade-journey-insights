@@ -1,13 +1,16 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface AnalysisResultProps {
   currentAnalysis: string;
   isAnalyzing?: boolean;
+  onClear?: () => void;
 }
 
-export function AnalysisResult({ currentAnalysis, isAnalyzing = false }: AnalysisResultProps) {
+export function AnalysisResult({ currentAnalysis, isAnalyzing = false, onClear }: AnalysisResultProps) {
   // Split analysis into sections based on common patterns in GPT output
   const sections = currentAnalysis?.split(/\n(?=[A-Z][^a-z]*:)/) || [];
 
@@ -24,7 +27,15 @@ export function AnalysisResult({ currentAnalysis, isAnalyzing = false }: Analysi
 
   return (
     <div className="bg-card border rounded-lg p-6">
-      <h3 className="text-lg font-semibold mb-4">AI Analysis</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">AI Analysis</h3>
+        {onClear && (
+          <Button variant="ghost" size="sm" onClick={onClear}>
+            <X className="h-4 w-4 mr-1" />
+            Clear
+          </Button>
+        )}
+      </div>
       
       {!currentAnalysis ? (
         <div className="text-center py-8 text-muted-foreground">
