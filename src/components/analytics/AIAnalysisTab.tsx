@@ -1,10 +1,8 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AnalysisButtons } from "./AnalysisButtons";
 import { AnalysisResult } from "./AnalysisResult";
-import { CustomPromptAccordion } from "./CustomPromptAccordion";
 import { CreditsDisplay } from "./CreditsDisplay";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTradeAnalysis } from "@/hooks/useTradeAnalysis";
@@ -14,23 +12,18 @@ import { useUserCredits } from "@/hooks/useUserCredits";
 import { useTradeOperations } from "@/hooks/useTradeOperations";
 
 export function AIAnalysisTab() {
-  const [customPrompt, setCustomPrompt] = useState<string>("");
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
   const { user } = useAuth();
   const { isAnalyzing, currentAnalysis, analyzeTradesForPeriod, setCurrentAnalysis } = useTradeAnalysis();
   const { credits, isLoading: isLoadingCredits } = useUserCredits();
   const { trades } = useTradeOperations();
 
-  // Updated function to match the expected signature in DashboardTabs.tsx
+  // Function to handle analyzing trades with AI
   const handleAnalyzeTradesWithAI = (options: { days?: number, customPrompt?: string }) => {
     if (!user?.id) return;
     
     const days = options.days || 1;
-    const promptText = options.customPrompt || customPrompt;
-    
-    if (options.customPrompt) {
-      setCustomPrompt(options.customPrompt);
-    }
+    const promptText = options.customPrompt || "";
     
     // Pass the trades to the analysis function
     analyzeTradesForPeriod(trades, days, promptText, user.id);
@@ -62,32 +55,21 @@ export function AIAnalysisTab() {
         )}
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
         <AnalysisButtons 
           onAnalyze={handleAnalyzeTradesWithAI}
           isAnalyzing={isAnalyzing}
           trades={trades}
         />
         
-        <Card className="shadow-sm bg-background">
-          <div className="p-5">
-            <CustomPromptAccordion 
-              customPrompt={customPrompt}
-              setCustomPrompt={setCustomPrompt}
-              onSubmit={() => handleAnalyzeTradesWithAI({ days: 7, customPrompt })}
-              isAnalyzing={isAnalyzing}
-            />
-          </div>
-        </Card>
+        {currentAnalysis && (
+          <AnalysisResult 
+            currentAnalysis={currentAnalysis} 
+            isAnalyzing={isAnalyzing}
+            onClear={() => setCurrentAnalysis('')}
+          />
+        )}
       </div>
-      
-      {currentAnalysis && (
-        <AnalysisResult 
-          currentAnalysis={currentAnalysis} 
-          isAnalyzing={isAnalyzing}
-          onClear={() => setCurrentAnalysis('')}
-        />
-      )}
       
       <PurchaseCreditsDialog
         open={isPurchaseDialogOpen}
