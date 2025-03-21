@@ -8,6 +8,12 @@ const sanitizeNumber = (value: string): number | null => {
 };
 
 export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'timestamp'> => {
+  // Validate exit_reason to ensure it's one of the allowed values
+  let exitReason = formData.exit_reason || null;
+  if (exitReason && !['stop_loss', 'target_reached', 'manual', 'time_based'].includes(exitReason)) {
+    exitReason = null;
+  }
+
   return {
     entry_price: parseFloat(formData.entry_price),
     exit_price: sanitizeNumber(formData.exit_price),
@@ -31,7 +37,7 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     market_condition: (formData.market_condition || null) as 'trending' | 'ranging' | 'volatile' | 'news_driven' | null,
     timeframe: formData.timeframe || null,
     trade_direction: formData.trade_direction || null,
-    exit_reason: (formData.exit_reason || null) as 'stop_loss' | 'target_reached' | 'manual' | 'time_based' | null,
+    exit_reason: exitReason as 'stop_loss' | 'target_reached' | 'manual' | 'time_based' | null,
     confidence_level: sanitizeNumber(formData.confidence_level),
     entry_emotion: formData.entry_emotion || null,
     exit_emotion: formData.exit_emotion || null,

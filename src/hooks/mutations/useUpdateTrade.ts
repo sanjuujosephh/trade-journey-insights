@@ -42,7 +42,7 @@ export function useUpdateTrade(userId: string | null) {
         market_condition: (tradeData.market_condition || '') as string,
         timeframe: (tradeData.timeframe || '') as string,
         trade_direction: (tradeData.trade_direction || '') as "" | "long" | "short",
-        exit_reason: (tradeData.exit_reason || '') as string,
+        exit_reason: (tradeData.exit_reason || '') as "stop_loss" | "target_reached" | "manual" | "time_based" | "",
         confidence_level: tradeData.confidence_level?.toString() || '',
         entry_emotion: (tradeData.entry_emotion || '') as string,
         exit_emotion: (tradeData.exit_emotion || '') as string,

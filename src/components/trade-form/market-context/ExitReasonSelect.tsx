@@ -27,7 +27,7 @@ export function ExitReasonSelect({ value, onValueChange }: ExitReasonSelectProps
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="stop_loss">Stop Loss</SelectItem>
-          <SelectItem value="target_reached">Target</SelectItem>
+          <SelectItem value="target_reached">Target Reached</SelectItem>
           <SelectItem value="manual">Manual</SelectItem>
           <SelectItem value="time_based">Time Based</SelectItem>
         </SelectContent>
