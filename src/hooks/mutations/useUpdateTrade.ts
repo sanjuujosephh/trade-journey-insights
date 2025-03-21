@@ -65,21 +65,44 @@ export function useUpdateTrade(userId: string | null) {
         user_id: userId // Ensure we include the valid user_id
       };
 
-      console.log('Processed update data:', updatedTrade);
-
-      const { data, error } = await supabase
-        .from('trades')
-        .update(updatedTrade)
-        .eq('id', id)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error updating trade:', error);
-        throw error;
+      // Filter out any undefined or null exit_reason values
+      if (updatedTrade.exit_reason === null || updatedTrade.exit_reason === "") {
+        // If updating and exit_reason is null/empty, use a patch operation that won't touch exit_reason
+        const { exit_reason, ...dataWithoutExitReason } = updatedTrade;
+        
+        console.log('Processed update data (without exit_reason):', dataWithoutExitReason);
+        
+        const { data, error } = await supabase
+          .from('trades')
+          .update(dataWithoutExitReason)
+          .eq('id', id)
+          .select()
+          .single();
+        
+        if (error) {
+          console.error('Error updating trade:', error);
+          throw error;
+        }
+        
+        return data;
+      } else {
+        // If exit_reason is valid, include it in the update
+        console.log('Processed update data (with exit_reason):', updatedTrade);
+        
+        const { data, error } = await supabase
+          .from('trades')
+          .update(updatedTrade)
+          .eq('id', id)
+          .select()
+          .single();
+        
+        if (error) {
+          console.error('Error updating trade:', error);
+          throw error;
+        }
+        
+        return data;
       }
-      
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trades', userId] });
