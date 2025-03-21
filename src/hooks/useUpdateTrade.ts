@@ -56,11 +56,13 @@ export function useUpdateTrade(userId: string | null) {
 
       const transformedData = transformTradeData(formDataForTransform);
 
+      // Important: Add the user_id to the updated trade data
       const updatedTrade = {
         ...transformedData,
         entry_date: tradeData.entry_date,
         entry_time: tradeData.entry_time,
-        exit_time: tradeData.exit_time
+        exit_time: tradeData.exit_time,
+        user_id: userId // Ensure we include the valid user_id
       };
 
       console.log('Processed update data:', updatedTrade);

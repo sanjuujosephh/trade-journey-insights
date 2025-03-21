@@ -211,18 +211,23 @@ export type Database = {
           exit_reason: string | null
           exit_time: string | null
           id: string
+          is_impulsive: boolean | null
           market_condition: string | null
           notes: string | null
           option_type: string | null
           outcome: string
           overall_emotional_state: string | null
           pcr: number | null
+          plan_deviation: boolean | null
           put_iv: number | null
           quantity: number | null
+          satisfaction_score: number | null
           stop_loss: number | null
           strategy: string | null
+          stress_level: number | null
           strike_price: number | null
           symbol: string
+          time_pressure: string | null
           timeframe: string | null
           timestamp: string | null
           trade_direction: string | null
@@ -249,18 +254,23 @@ export type Database = {
           exit_reason?: string | null
           exit_time?: string | null
           id?: string
+          is_impulsive?: boolean | null
           market_condition?: string | null
           notes?: string | null
           option_type?: string | null
           outcome: string
           overall_emotional_state?: string | null
           pcr?: number | null
+          plan_deviation?: boolean | null
           put_iv?: number | null
           quantity?: number | null
+          satisfaction_score?: number | null
           stop_loss?: number | null
           strategy?: string | null
+          stress_level?: number | null
           strike_price?: number | null
           symbol: string
+          time_pressure?: string | null
           timeframe?: string | null
           timestamp?: string | null
           trade_direction?: string | null
@@ -287,18 +297,23 @@ export type Database = {
           exit_reason?: string | null
           exit_time?: string | null
           id?: string
+          is_impulsive?: boolean | null
           market_condition?: string | null
           notes?: string | null
           option_type?: string | null
           outcome?: string
           overall_emotional_state?: string | null
           pcr?: number | null
+          plan_deviation?: boolean | null
           put_iv?: number | null
           quantity?: number | null
+          satisfaction_score?: number | null
           stop_loss?: number | null
           strategy?: string | null
+          stress_level?: number | null
           strike_price?: number | null
           symbol?: string
+          time_pressure?: string | null
           timeframe?: string | null
           timestamp?: string | null
           trade_direction?: string | null

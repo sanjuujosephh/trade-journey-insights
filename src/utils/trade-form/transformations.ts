@@ -43,6 +43,6 @@ export const transformTradeData = (formData: FormData): Omit<Trade, 'id' | 'time
     satisfaction_score: sanitizeNumber(formData.satisfaction_score),
     stress_level: sanitizeNumber(formData.stress_level),
     time_pressure: formData.time_pressure || null,
-    user_id: ""  // This will be set in the mutation
+    user_id: ""  // This will be properly set in the mutation
   };
 };
