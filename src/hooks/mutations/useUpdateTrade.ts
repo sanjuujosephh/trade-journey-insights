@@ -66,7 +66,7 @@ export function useUpdateTrade(userId: string | null) {
       };
 
       // Filter out any undefined or null exit_reason values
-      if (updatedTrade.exit_reason === null || updatedTrade.exit_reason === "") {
+      if (!updatedTrade.exit_reason) {
         // If updating and exit_reason is null/empty, use a patch operation that won't touch exit_reason
         const { exit_reason, ...dataWithoutExitReason } = updatedTrade;
         
