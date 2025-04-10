@@ -2,6 +2,7 @@
 import { useRazorpayKey } from "./paymentUtils/useRazorpayKey";
 import { useSubscriptionData } from "./paymentUtils/useSubscriptionData";
 import { usePaymentProcessor } from "./paymentUtils/usePaymentProcessor";
+import { useSubscription } from "@/hooks/useSubscription";
 
 /**
  * Main hook for payment functionality
@@ -9,8 +10,12 @@ import { usePaymentProcessor } from "./paymentUtils/usePaymentProcessor";
  */
 export function usePayment() {
   const { razorpayKey, isKeyError } = useRazorpayKey();
-  const { subscription, refetchSubscription } = useSubscriptionData();
+  const { subscription: rawSubscription, refetchSubscription } = useSubscriptionData();
+  const { isSubscribed } = useSubscription();
   const { handlePayment } = usePaymentProcessor(razorpayKey, refetchSubscription);
+  
+  // Only use subscription if it's actually active and not expired
+  const subscription = isSubscribed ? rawSubscription : null;
 
   return { 
     handlePayment, 

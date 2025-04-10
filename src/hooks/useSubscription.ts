@@ -52,6 +52,7 @@ export function useSubscription() {
   });
 
   // Consider a user subscribed if they have an active subscription (including trial)
+  // AND the subscription end date is in the future
   const isSubscribed = !!subscription && 
     subscription.status === 'active' && 
     new Date(subscription.current_period_end) > new Date();

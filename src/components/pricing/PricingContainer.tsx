@@ -8,10 +8,12 @@ import { PricingPlanCard } from "./PricingPlanCard";
 import { PricingAlerts } from "./PricingAlerts";
 import { TrialRequestForm } from "./TrialRequestForm";
 import { PRICING_PLANS, PlanType } from "./constants";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export function PricingContainer() {
   const { user } = useAuth();
-  const { handlePayment, subscription, isPaymentConfigured, paymentConfigError, isTestMode } = usePayment();
+  const { handlePayment, isPaymentConfigured, paymentConfigError, isTestMode } = usePayment();
+  const { subscription, isSubscribed } = useSubscription();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscribe = async (planType: PlanType) => {
@@ -33,8 +35,9 @@ export function PricingContainer() {
     }
   };
 
-  // If user already has an active subscription, show different content
-  if (subscription) {
+  // If user has an active subscription, show different content
+  // Only show subscription info if the subscription is active and not expired
+  if (subscription && isSubscribed) {
     return <SubscriptionInfo subscription={subscription} />;
   }
 
