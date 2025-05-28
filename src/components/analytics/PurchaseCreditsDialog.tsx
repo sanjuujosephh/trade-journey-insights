@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Check, CreditCard, Loader2 } from "lucide-react";
+import { Check, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Dialog, 
@@ -10,8 +10,8 @@ import {
   DialogHeader, 
   DialogTitle 
 } from "@/components/ui/dialog";
-import { usePayment } from "@/components/strategies/hooks/usePayment";
 import { useUserCredits } from "@/hooks/useUserCredits";
+import { toast } from "sonner";
 
 interface PurchaseCreditsDialogProps {
   open: boolean;
@@ -19,37 +19,28 @@ interface PurchaseCreditsDialogProps {
 }
 
 const CREDIT_PACKAGES = [
-  { id: 'basic', credits: 100, price: 99 },
-  { id: 'popular', credits: 500, price: 399, popular: true },
-  { id: 'max', credits: 1000, price: 699 },
+  { id: 'basic', credits: 100 },
+  { id: 'popular', credits: 500, popular: true },
+  { id: 'max', credits: 1000 },
 ];
 
 export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDialogProps) {
   const [selectedPackage, setSelectedPackage] = useState(CREDIT_PACKAGES[1]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { handlePayment, isPaymentConfigured } = usePayment();
   const { purchaseCredits } = useUserCredits();
 
-  const handlePurchase = async () => {
-    if (!isPaymentConfigured) return;
-    
+  const handleGetCredits = async () => {
     setIsProcessing(true);
     
     try {
-      // First handle the payment
-      const customDescription = `${selectedPackage.credits} AI Analysis Credits`;
-      await handlePayment({
-        title: customDescription,
-        price: selectedPackage.price
-      }, false);
-      
-      // Then update the credits in the database
+      // Give credits for free since the platform is now free
       await purchaseCredits.mutateAsync({ amount: selectedPackage.credits });
       
-      // Close the dialog
+      toast.success(`${selectedPackage.credits} credits added to your account!`);
       onOpenChange(false);
     } catch (error) {
-      console.error('Error purchasing credits:', error);
+      console.error('Error adding credits:', error);
+      toast.error('Failed to add credits. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -59,9 +50,9 @@ export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Purchase Analysis Credits</DialogTitle>
+          <DialogTitle>Get Free Analysis Credits</DialogTitle>
           <DialogDescription>
-            Buy credits to analyze your trades with AI. Purchased credits never expire.
+            Get free credits to analyze your trades with AI. All credits are completely free!
           </DialogDescription>
         </DialogHeader>
 
@@ -78,7 +69,7 @@ export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDia
             >
               {pkg.popular && (
                 <div className="absolute -top-2 -right-2 bg-primary text-white text-xs font-medium py-0.5 px-2 rounded-full">
-                  Best Value
+                  Most Popular
                 </div>
               )}
               
@@ -95,16 +86,13 @@ export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDia
                 <div>
                   <div className="font-medium">{pkg.credits} Credits</div>
                   <div className="text-sm text-muted-foreground">
-                    {pkg.id === 'popular' ? 'Most popular choice' : `₹${(pkg.price / 100).toFixed(2)} per credit`}
+                    {pkg.id === 'popular' ? 'Most popular choice' : 'Free credits for AI analysis'}
                   </div>
                 </div>
               </div>
               
               <div className="text-right">
-                <div className="font-semibold">₹{pkg.price}</div>
-                {pkg.id === 'popular' && (
-                  <div className="text-xs text-green-600">Save 20%</div>
-                )}
+                <div className="font-semibold text-green-600">FREE</div>
               </div>
             </div>
           ))}
@@ -114,16 +102,13 @@ export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDia
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handlePurchase} disabled={isProcessing || !isPaymentConfigured}>
+          <Button onClick={handleGetCredits} disabled={isProcessing}>
             {isProcessing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
-              </>
+              "Adding Credits..."
             ) : (
               <>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Buy {selectedPackage.credits} Credits
+                <Gift className="mr-2 h-4 w-4" />
+                Get {selectedPackage.credits} Free Credits
               </>
             )}
           </Button>
