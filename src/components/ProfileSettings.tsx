@@ -1,80 +1,131 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { ProfileForm } from "./profile/ProfileForm";
-import { SubscriptionInfoSection } from "./profile/SubscriptionInfoSection";
-import { FeedbackSection } from "./profile/FeedbackSection";
 import { supabase } from "@/lib/supabase";
-import { useSubscription } from "@/hooks/useSubscription";
-
-type Profile = {
-  username: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  phone_number: string | null;
-  twitter_id: string | null;
-  telegram_id: string | null;
-  avatar_url: string | null;
-};
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PersonalInfoSection } from "./profile/PersonalInfoSection";
+import { AvatarSection } from "./profile/AvatarSection";
+import { SocialMediaSection } from "./profile/SocialMediaSection";
+import { SubscriptionInfoSection } from "./profile/SubscriptionInfoSection";
+import { DisclaimerStatusSection } from "./profile/DisclaimerStatusSection";
+import { FeedbackSection } from "./profile/FeedbackSection";
+import { useToast } from "@/hooks/use-toast";
 
 export function ProfileSettings() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile>({
-    username: "",
-    first_name: "",
-    last_name: "",
-    phone_number: "",
-    twitter_id: "",
-    telegram_id: "",
-    avatar_url: null,
-  });
+  const { toast } = useToast();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const { data: profileData, refetch } = useQuery({
-    queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    
+    try {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("username, first_name, last_name, phone_number, twitter_id, telegram_id, avatar_url")
-        .eq("id", user.id)
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
         .single();
 
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  // Use our useSubscription hook instead of the mock data
-  const { subscription } = useSubscription();
-
-  useEffect(() => {
-    if (profileData) {
-      setProfile(profileData);
+      if (error) {
+        console.error('Error fetching profile:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load profile data",
+          variant: "destructive",
+        });
+      } else {
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [profileData]);
+  };
 
-  // Ensure the page scrolls to the top when component loads
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const updateProfile = async (updates: any) => {
+    if (!user) return;
 
-  if (!user) return null;
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setProfile((prev: any) => ({ ...prev, ...updates }));
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <ProfileForm
-          profile={profile}
-          setProfile={setProfile}
-          refetch={refetch}
-        />
-        <div className="space-y-8">
-          <SubscriptionInfoSection subscription={subscription} />
+    <div className="container mx-auto p-6 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-6">Profile Settings</h1>
+      
+      <Tabs defaultValue="personal" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="personal">Personal</TabsTrigger>
+          <TabsTrigger value="avatar">Avatar</TabsTrigger>
+          <TabsTrigger value="social">Social</TabsTrigger>
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="feedback">Feedback</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="personal">
+          <PersonalInfoSection 
+            profile={profile} 
+            onUpdateProfile={updateProfile} 
+          />
+        </TabsContent>
+
+        <TabsContent value="avatar">
+          <AvatarSection 
+            profile={profile} 
+            onUpdateProfile={updateProfile} 
+          />
+        </TabsContent>
+
+        <TabsContent value="social">
+          <SocialMediaSection 
+            profile={profile} 
+            onUpdateProfile={updateProfile} 
+          />
+        </TabsContent>
+
+        <TabsContent value="account">
+          <div className="space-y-6">
+            <SubscriptionInfoSection />
+            <DisclaimerStatusSection />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="feedback">
           <FeedbackSection />
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

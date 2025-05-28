@@ -1,7 +1,6 @@
 
 import { AuthForm } from "@/components/auth/AuthForm";
 import { DailyLeaderboard } from "../DailyLeaderboard";
-import { PriceComparison } from "../PriceComparison";
 import { FeatureSection } from "./FeatureSection";
 import { TestimonialSection } from "./TestimonialSection";
 import { FounderStorySection } from "./FounderStorySection";
@@ -25,9 +24,6 @@ export function MainContentSection() {
           
           {/* Founder's Story Section */}
           <FounderStorySection />
-          
-          {/* Price Comparison - Moved below Our Journey section */}
-          <PriceComparison />
           
           {/* Features Section */}
           <FeatureSection />
