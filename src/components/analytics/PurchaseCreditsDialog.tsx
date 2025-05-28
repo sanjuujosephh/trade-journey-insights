@@ -9,13 +9,13 @@ import { toast } from "sonner";
 interface PurchaseCreditsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentCredits: number;
+  currentCredits?: number;
 }
 
 export function PurchaseCreditsDialog({
   open,
   onOpenChange,
-  currentCredits
+  currentCredits = 0
 }: PurchaseCreditsDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
 

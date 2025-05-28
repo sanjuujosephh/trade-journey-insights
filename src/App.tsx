@@ -47,9 +47,9 @@ function ThemeToggle() {
 }
 
 function LeaderboardIcon() {
-  const { isSubscribed } = useSubscription();
+  const { hasActiveSubscription } = useSubscription();
   
-  if (!isSubscribed) return null;
+  if (!hasActiveSubscription) return null;
   
   return (
     <Tooltip>

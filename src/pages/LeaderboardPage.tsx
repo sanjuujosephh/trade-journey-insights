@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
 export default function LeaderboardPage() {
   const {
     topTraders,
@@ -18,23 +19,22 @@ export default function LeaderboardPage() {
   } = useLeaderboardData();
   const [activeTab, setActiveTab] = useState<string>("winners");
   const navigate = useNavigate();
-  const {
-    user
-  } = useAuth();
-  const {
-    isSubscribed
-  } = useSubscription();
+  const { user } = useAuth();
+  const { hasActiveSubscription } = useSubscription();
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({});
-  if (user && !isSubscribed) {
-    navigate("/pricing");
+  
+  if (user && !hasActiveSubscription) {
+    navigate("/");
     return null;
   }
+  
   const toggleEntry = (entryId: string) => {
     setExpandedEntries(prev => ({
       ...prev,
       [entryId]: !prev[entryId]
     }));
   };
+  
   const renderTraderDetails = (entries: any[], isWinners: boolean) => {
     if (isLoading) {
       return <div className="flex justify-center items-center h-64">
@@ -120,6 +120,7 @@ export default function LeaderboardPage() {
           </Collapsible>)}
       </div>;
   };
+  
   return <div className="max-w-3xl mx-auto py-8 px-4">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">

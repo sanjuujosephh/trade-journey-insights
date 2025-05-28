@@ -49,7 +49,6 @@ export function AIAnalysisTab() {
             <CreditsDisplay 
               credits={credits}
               isLoading={isLoadingCredits}
-              onPurchaseClick={() => setIsPurchaseDialogOpen(true)}
             />
           </div>
         )}
@@ -74,6 +73,7 @@ export function AIAnalysisTab() {
       <PurchaseCreditsDialog
         open={isPurchaseDialogOpen}
         onOpenChange={setIsPurchaseDialogOpen}
+        currentCredits={credits?.purchased_credits || 0}
       />
     </div>
   );
