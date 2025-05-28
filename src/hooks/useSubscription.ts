@@ -1,17 +1,13 @@
-
-import { useAuth } from "@/contexts/AuthContext";
+// This hook is deprecated since the platform is now free
+// Keeping it for backward compatibility but returning free access
 
 export function useSubscription() {
-  const { user } = useAuth();
-
-  // Since the platform is free, everyone is considered "subscribed"
   return {
-    subscription: null,
+    hasActiveSubscription: true, // Always true since platform is free
     isLoading: false,
-    isError: false,
-    error: null,
-    isSubscribed: !!user, // User is "subscribed" if they're logged in
-    isTrial: false,
-    refetchSubscription: () => Promise.resolve()
+    subscription: null,
+    trial: null,
+    canRequestTrial: false, // No trials needed since it's free
+    refetch: () => Promise.resolve()
   };
 }

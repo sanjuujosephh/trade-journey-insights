@@ -1,44 +1,49 @@
 
-import { Button } from "@/components/ui/button";
-import { Crown } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, Heart } from "lucide-react";
 
 export function SubscriptionInfoSection() {
   return (
-    <div className="rounded-lg bg-white p-6 border">
-      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-        <Crown className="h-5 w-5 text-yellow-500" />
-        Account Status
-      </h2>
-
-      <div className="space-y-6">
-        <div>
-          <div className="text-sm text-gray-500 mb-2">Account Type</div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700 border border-green-200">
-              Free Premium Access
-            </span>
-          </div>
+    <Card className="border-green-200 bg-green-50">
+      <CardHeader>
+        <CardTitle className="text-green-700 flex items-center gap-2">
+          <Sparkles className="h-5 w-5" />
+          Platform Status
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-green-600">Current Plan:</span>
+          <Badge className="bg-green-600 hover:bg-green-700">
+            <Heart className="h-3 w-3 mr-1" />
+            Free Forever
+          </Badge>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg border border-green-200">
+          <h4 className="font-semibold text-green-700 mb-2">🎉 Great News!</h4>
+          <p className="text-green-600 text-sm">
+            Our trading journal platform is now completely free for all users. 
+            Enjoy unlimited access to all features including AI trade analysis!
+          </p>
         </div>
 
-        <div className="border-t pt-4">
-          <div className="text-center">
-            <div className="text-green-600 font-medium mb-2">
-              🎉 All Features Unlocked
-            </div>
-            <p className="text-sm text-gray-600 mb-4">
-              You have access to all premium features including unlimited trade entries, 
-              advanced analytics, AI-powered analysis, and all trading strategies.
-            </p>
-            <Button 
-              variant="default"
-              className="w-full"
-              onClick={() => window.location.href = "/"}
-            >
-              Start Trading
-            </Button>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-green-600">AI Analysis:</span>
+            <span className="font-medium text-green-700">Unlimited</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-green-600">Trade Storage:</span>
+            <span className="font-medium text-green-700">Unlimited</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-green-600">Advanced Analytics:</span>
+            <span className="font-medium text-green-700">Included</span>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -5,11 +5,8 @@ import { supabase } from '@/lib/supabase';
 export interface UserCredits {
   id: string;
   user_id: string;
-  subscription_credits: number;
   purchased_credits: number;
   total_credits_used: number;
-  last_reset_date: string | null;
-  next_reset_date: string | null;
   created_at: string | null;
   updated_at: string | null;
 }

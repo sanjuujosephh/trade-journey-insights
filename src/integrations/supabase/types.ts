@@ -57,39 +57,6 @@ export type Database = {
         }
         Relationships: []
       }
-      products: {
-        Row: {
-          created_at: string | null
-          description: string
-          id: string
-          image_url: string
-          price: number
-          title: string
-          type: Database["public"]["Enums"]["product_type"]
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description: string
-          id?: string
-          image_url: string
-          price: number
-          title: string
-          type: Database["public"]["Enums"]["product_type"]
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string
-          id?: string
-          image_url?: string
-          price?: number
-          title?: string
-          type?: Database["public"]["Enums"]["product_type"]
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -150,45 +117,6 @@ export type Database = {
           name?: string
           updated_at?: string
           value?: string
-        }
-        Relationships: []
-      }
-      subscriptions: {
-        Row: {
-          created_at: string | null
-          current_period_end: string | null
-          current_period_start: string | null
-          end_date: string | null
-          id: string
-          razorpay_customer_id: string | null
-          razorpay_subscription_id: string | null
-          status: Database["public"]["Enums"]["subscription_status"] | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          current_period_end?: string | null
-          current_period_start?: string | null
-          end_date?: string | null
-          id?: string
-          razorpay_customer_id?: string | null
-          razorpay_subscription_id?: string | null
-          status?: Database["public"]["Enums"]["subscription_status"] | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          current_period_end?: string | null
-          current_period_start?: string | null
-          end_date?: string | null
-          id?: string
-          razorpay_customer_id?: string | null
-          razorpay_subscription_id?: string | null
-          status?: Database["public"]["Enums"]["subscription_status"] | null
-          updated_at?: string | null
-          user_id?: string
         }
         Relationships: []
       }
@@ -328,10 +256,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
-          last_reset_date: string | null
-          next_reset_date: string | null
           purchased_credits: number
-          subscription_credits: number
           total_credits_used: number
           updated_at: string | null
           user_id: string
@@ -339,10 +264,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
-          last_reset_date?: string | null
-          next_reset_date?: string | null
           purchased_credits?: number
-          subscription_credits?: number
           total_credits_used?: number
           updated_at?: string | null
           user_id: string
@@ -350,10 +272,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
-          last_reset_date?: string | null
-          next_reset_date?: string | null
           purchased_credits?: number
-          subscription_credits?: number
           total_credits_used?: number
           updated_at?: string | null
           user_id?: string
@@ -418,10 +337,6 @@ export type Database = {
           profit_loss: number
           rank: number
         }[]
-      }
-      has_active_subscription: {
-        Args: { user_id: string }
-        Returns: boolean
       }
     }
     Enums: {

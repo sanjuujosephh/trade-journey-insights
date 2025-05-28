@@ -44,19 +44,6 @@ export function useUserCredits() {
     }
   }, [userId, enhancedRefetch]);
   
-  // Set up interval to refresh credits
-  useEffect(() => {
-    if (!userId) return;
-    
-    const intervalId = setInterval(() => {
-      console.log('Refreshing credits on interval');
-      queryClient.invalidateQueries({ queryKey: ['user-credits', userId] });
-      queryClient.invalidateQueries({ queryKey: ['credit-transactions', userId] });
-    }, 5000); // Refresh every 5 seconds
-    
-    return () => clearInterval(intervalId);
-  }, [userId, queryClient]);
-  
   // Use the mutations hook
   const { 
     useCredits, 
