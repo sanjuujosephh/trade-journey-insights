@@ -1,9 +1,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-// Project URL from your Supabase dashboard
 const supabaseUrl = 'https://fyiyuqpcxjwxingjgpiu.supabase.co';
-// Project anon/public key from your Supabase dashboard
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5aXl1cXBjeGp3eGluZ2pncGl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk4NzMwNDYsImV4cCI6MjA1NTQ0OTA0Nn0.oaOKB7e6oSTTYIgQHGSsM2N6L1kdVdf3_jT7MXVfSUo';
 
 if (!supabaseUrl || !supabaseKey) {

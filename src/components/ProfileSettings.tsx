@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PersonalInfoSection } from "./profile/PersonalInfoSection";
 import { AvatarSection } from "./profile/AvatarSection";
 import { SocialMediaSection } from "./profile/SocialMediaSection";
-import { SubscriptionInfoSection } from "./profile/SubscriptionInfoSection";
 import { DisclaimerStatusSection } from "./profile/DisclaimerStatusSection";
 import { FeedbackSection } from "./profile/FeedbackSection";
 import { useToast } from "@/hooks/use-toast";
@@ -17,10 +16,12 @@ export function ProfileSettings() {
   const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [hasAcceptedDisclaimer, setHasAcceptedDisclaimer] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
+      checkDisclaimerStatus();
     }
   }, [user]);
 
@@ -48,6 +49,24 @@ export function ProfileSettings() {
       console.error('Error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkDisclaimerStatus = async () => {
+    if (!user?.id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("disclaimer_acceptances")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!error && data) {
+        setHasAcceptedDisclaimer(true);
+      }
+    } catch (error) {
+      console.error("Error checking disclaimer status:", error);
     }
   };
 
@@ -86,44 +105,52 @@ export function ProfileSettings() {
       <h1 className="text-3xl font-bold mb-6">Profile Settings</h1>
       
       <Tabs defaultValue="personal" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="personal">Personal</TabsTrigger>
           <TabsTrigger value="avatar">Avatar</TabsTrigger>
           <TabsTrigger value="social">Social</TabsTrigger>
-          <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="feedback">Feedback</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal">
           <PersonalInfoSection 
-            profile={profile} 
-            onUpdateProfile={updateProfile} 
+            firstName={profile?.first_name || ""}
+            lastName={profile?.last_name || ""}
+            username={profile?.username || ""}
+            phoneNumber={profile?.phone_number || ""}
+            onChange={(field, value) => {
+              const updates = { [field]: value };
+              updateProfile(updates);
+            }}
           />
         </TabsContent>
 
         <TabsContent value="avatar">
           <AvatarSection 
-            profile={profile} 
-            onUpdateProfile={updateProfile} 
+            userId={user?.id || ""}
+            avatarUrl={profile?.avatar_url || ""}
+            username={profile?.username || ""}
+            email={user?.email || ""}
+            refetch={fetchProfile}
           />
         </TabsContent>
 
         <TabsContent value="social">
           <SocialMediaSection 
-            profile={profile} 
-            onUpdateProfile={updateProfile} 
+            twitterId={profile?.twitter_id || ""}
+            telegramId={profile?.telegram_id || ""}
+            onChange={(field, value) => {
+              const updates = { [field]: value };
+              updateProfile(updates);
+            }}
           />
         </TabsContent>
 
-        <TabsContent value="account">
-          <div className="space-y-6">
-            <SubscriptionInfoSection />
-            <DisclaimerStatusSection />
-          </div>
-        </TabsContent>
-
         <TabsContent value="feedback">
-          <FeedbackSection />
+          <div className="space-y-6">
+            <DisclaimerStatusSection hasAccepted={hasAcceptedDisclaimer} />
+            <FeedbackSection />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

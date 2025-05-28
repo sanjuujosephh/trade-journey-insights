@@ -15,61 +15,28 @@ export default function Index() {
   const [isAnalysisPanelOpen, setIsAnalysisPanelOpen] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [prevUserState, setPrevUserState] = useState<boolean>(!!user);
 
-  // Scroll to top on component mount and tab changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activeTab]);
   
-  // Handle scroll position after login
   useEffect(() => {
-    // If user exists (is logged in)
     if (user) {
-      // Force an immediate scroll to top
-      window.scrollTo({
-        top: 0,
-        behavior: 'instant' // Use instant for immediate scrolling without animation
-      });
-      
-      // Also use a timeout as a fallback to ensure it happens after render
-      const scrollTimeout = setTimeout(() => {
-        window.scrollTo({
-          top: 0,
-          behavior: 'instant'
-        });
-      }, 100); // Using a slightly longer timeout for reliability
-      
-      return () => clearTimeout(scrollTimeout);
-    }
-  }, [user?.id]); // Use user.id to ensure this only runs when the actual user changes
-  
-  // Track user login state changes
-  useEffect(() => {
-    const currentUserState = !!user;
-    
-    // If user has just logged in (from logged out to logged in)
-    if (currentUserState && !prevUserState) {
-      console.log("User logged in - scrolling to top");
-      
-      // Force scroll to top immediately
       window.scrollTo({
         top: 0,
         behavior: 'instant'
       });
       
-      // Also use a timeout approach for reliability
-      setTimeout(() => {
+      const scrollTimeout = setTimeout(() => {
         window.scrollTo({
           top: 0,
           behavior: 'instant'
         });
       }, 100);
+      
+      return () => clearTimeout(scrollTimeout);
     }
-    
-    // Update the previous user state
-    setPrevUserState(currentUserState);
-  }, [user, prevUserState]);
+  }, [user?.id]);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],

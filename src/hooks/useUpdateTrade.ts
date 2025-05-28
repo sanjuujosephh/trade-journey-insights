@@ -46,7 +46,6 @@ export function useUpdateTrade(userId: string | null) {
         confidence_level: tradeData.confidence_level?.toString() || '',
         entry_emotion: (tradeData.entry_emotion || '') as string,
         exit_emotion: (tradeData.exit_emotion || '') as string,
-        // Add the missing behavioral fields
         is_impulsive: tradeData.is_impulsive || false,
         plan_deviation: tradeData.plan_deviation || false,
         satisfaction_score: tradeData.satisfaction_score?.toString() || '',
@@ -56,18 +55,15 @@ export function useUpdateTrade(userId: string | null) {
 
       const transformedData = transformTradeData(formDataForTransform);
 
-      // Important: Add the user_id to the updated trade data
       const updatedTrade = {
         ...transformedData,
         entry_date: tradeData.entry_date,
         entry_time: tradeData.entry_time,
         exit_time: tradeData.exit_time,
-        user_id: userId // Ensure we include the valid user_id
+        user_id: userId
       };
 
-      // Filter out any undefined or null exit_reason values
       if (!updatedTrade.exit_reason) {
-        // If updating and exit_reason is null/empty, use a patch operation that won't touch exit_reason
         const { exit_reason, ...dataWithoutExitReason } = updatedTrade;
         
         console.log('Processed update data (without exit_reason):', dataWithoutExitReason);
@@ -86,7 +82,6 @@ export function useUpdateTrade(userId: string | null) {
         
         return data;
       } else {
-        // If exit_reason is valid, include it in the update
         console.log('Processed update data (with exit_reason):', updatedTrade);
         
         const { data, error } = await supabase

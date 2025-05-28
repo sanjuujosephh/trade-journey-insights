@@ -8,7 +8,6 @@ import { useToast } from "./use-toast";
 export function useTradeManagement() {
   const { toast } = useToast();
   
-  // Form state management
   const {
     formData,
     editingId,
@@ -23,7 +22,6 @@ export function useTradeManagement() {
     resetForm,
   } = useTradeForm();
 
-  // Trade data operations
   const {
     trades,
     isLoading,
@@ -31,22 +29,18 @@ export function useTradeManagement() {
     updateTrade,
   } = useTradeOperations();
 
-  // Trade submission
   const { submitTrade, isSubmitting } = useTradeSubmission({
     addTrade,
     updateTrade,
     resetForm
   });
 
-  // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submitTrade(formData, editingId);
   };
 
-  // Load trade data into form for editing
   const handleEdit = (trade: Trade) => {
-    // Set up form data for editing - ensure all fields are properly populated
     setFormData({
       symbol: trade.symbol || "",
       entry_price: trade.entry_price?.toString() || "",
@@ -76,7 +70,6 @@ export function useTradeManagement() {
       confidence_level: trade.confidence_level?.toString() || "",
       entry_emotion: (trade.entry_emotion || "") as string,
       exit_emotion: (trade.exit_emotion || "") as string,
-      // New behavioral fields
       is_impulsive: trade.is_impulsive || false,
       plan_deviation: trade.plan_deviation || false,
       satisfaction_score: trade.satisfaction_score?.toString() || "",
@@ -84,16 +77,13 @@ export function useTradeManagement() {
       time_pressure: (trade.time_pressure || "") as "" | "high" | "medium" | "low",
     });
     
-    // Set editing ID to track that we're editing an existing trade
     setEditingId(trade.id);
     
-    // Scroll to the top of the form for better UX
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
     
-    // Notify user that edit mode is active
     toast({
       title: "Editing Trade",
       description: `Editing ${trade.symbol} trade from ${trade.entry_date}`,
@@ -101,36 +91,27 @@ export function useTradeManagement() {
     });
   };
 
-  // View details handler
   const handleViewDetails = (trade: Trade) => {
     setSelectedTrade(trade);
     setIsDialogOpen(true);
   };
 
-  // Close dialog handler
   const closeDialog = () => {
     setIsDialogOpen(false);
   };
 
   return {
-    // Form state
     formData,
     editingId,
     selectedTrade,
     isDialogOpen,
     isSubmitting,
-    
-    // Data
     trades,
     isLoading,
-    
-    // State setters
     setSelectedTrade,
     setIsDialogOpen,
     setFormData,
     setEditingId,
-    
-    // Event handlers
     handleChange,
     handleSelectChange,
     handleSubmit,

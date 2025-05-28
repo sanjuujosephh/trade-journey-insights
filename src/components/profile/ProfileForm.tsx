@@ -30,12 +30,8 @@ export function ProfileForm({
   setProfile,
   refetch
 }: ProfileFormProps) {
-  const {
-    user
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [hasAcceptedDisclaimer, setHasAcceptedDisclaimer] = useState(false);
 
@@ -73,9 +69,7 @@ export function ProfileForm({
     if (!user?.id) return;
     setIsLoading(true);
     try {
-      const {
-        error
-      } = await supabase.from("profiles").update({
+      const { error } = await supabase.from("profiles").update({
         username: profile.username,
         first_name: profile.first_name,
         last_name: profile.last_name,
@@ -103,13 +97,30 @@ export function ProfileForm({
 
   if (!user) return null;
   
-  return <div className="bg-white p-6 border-none rounded-none">
-      <AvatarSection userId={user.id} avatarUrl={profile.avatar_url} username={profile.username} email={user.email} refetch={refetch} />
+  return (
+    <div className="bg-white p-6 border-none rounded-none">
+      <AvatarSection 
+        userId={user.id} 
+        avatarUrl={profile.avatar_url || ""} 
+        username={profile.username || ""} 
+        email={user.email || ""} 
+        refetch={refetch} 
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6 mt-8">
-        <PersonalInfoSection firstName={profile.first_name} lastName={profile.last_name} username={profile.username} phoneNumber={profile.phone_number} onChange={handleProfileChange} />
+        <PersonalInfoSection 
+          firstName={profile.first_name || ""} 
+          lastName={profile.last_name || ""} 
+          username={profile.username || ""} 
+          phoneNumber={profile.phone_number || ""} 
+          onChange={handleProfileChange} 
+        />
 
-        <SocialMediaSection twitterId={profile.twitter_id} telegramId={profile.telegram_id} onChange={handleProfileChange} />
+        <SocialMediaSection 
+          twitterId={profile.twitter_id || ""} 
+          telegramId={profile.telegram_id || ""} 
+          onChange={handleProfileChange} 
+        />
 
         <DisclaimerStatusSection hasAccepted={hasAcceptedDisclaimer} />
 
@@ -117,5 +128,6 @@ export function ProfileForm({
           {isLoading ? "Saving..." : "Save Changes"}
         </Button>
       </form>
-    </div>;
+    </div>
+  );
 }

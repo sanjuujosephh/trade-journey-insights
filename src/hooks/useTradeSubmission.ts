@@ -21,7 +21,6 @@ export function useTradeSubmission({
   const { validateForSubmission, showValidationError } = useTradeValidation();
 
   const submitTrade = async (formData: FormData, editingId: string | null): Promise<boolean> => {
-    // Validate form data before submission
     const { valid, errors } = validateForSubmission(formData);
     if (!valid) {
       if (errors.length > 0) {
