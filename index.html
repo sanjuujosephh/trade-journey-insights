@@ -7,6 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trading Journal</title>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      // Fix for Vite client expecting __WS_TOKEN__ in certain environments
+      // eslint-disable-next-line no-var
+      var __WS_TOKEN__ = '';
+    </script>
   </head>
   <body>
     <div id="root"></div>
