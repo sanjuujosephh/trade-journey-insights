@@ -20,90 +20,46 @@ export function useLeaderboardData() {
       
       console.log("Fetching leaderboard data from database...");
       
-      // Updated query approach that works with the existing database structure
-      // First get all completed trades from the last 24 hours
-      const { data: tradesData, error: tradesError } = await supabase
-        .from('trades')
-        .select('id, entry_price, exit_price, quantity, symbol, user_id, chart_link')
-        .filter('exit_price', 'not.is', null)
-        .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+      // Use the secure database function to get leaderboard data
+      const { data: leaderboardData, error } = await supabase
+        .rpc('get_daily_leaderboard', { limit_count: 20 });
       
-      if (tradesError) {
-        console.error('Error fetching trades data:', tradesError);
+      if (error) {
+        console.error('Error fetching leaderboard data:', error);
         setIsLoading(false);
         return;
       }
       
-      console.log(`Trades data fetched: ${tradesData?.length || 0} entries`, tradesData);
+      console.log(`Leaderboard data fetched: ${leaderboardData?.length || 0} entries`, leaderboardData);
       
-      if (!tradesData || tradesData.length === 0) {
+      if (!leaderboardData || leaderboardData.length === 0) {
         console.log("No leaderboard data available");
+        setTopTraders([]);
+        setTopLosers([]);
         setIsLoading(false);
         return;
       }
       
-      // Now fetch all the profiles in a separate query
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url');
-        
-      if (profilesError) {
-        console.error('Error fetching profiles data:', profilesError);
-        setIsLoading(false);
-        return;
-      }
+      // Separate winners and losers from the function results
+      const winners = leaderboardData
+        .filter((entry: any) => entry.profit_loss > 0)
+        .map((entry: any) => ({
+          username: entry.username,
+          avatar_url: entry.avatar_url || '',
+          profit_loss: entry.profit_loss,
+          rank: entry.rank,
+          chart_link: null // Chart links not available in this secure function
+        }));
       
-      console.log(`Profiles data fetched: ${profilesData?.length || 0} entries`, profilesData);
-      
-      // Create a lookup map for profiles by user_id
-      const profilesMap = (profilesData || []).reduce((acc, profile) => {
-        acc[profile.id] = profile;
-        return acc;
-      }, {} as Record<string, any>);
-      
-      // Process the data to calculate profit/loss per user
-      const userProfits = tradesData.reduce((acc, trade) => {
-        const userId = trade.user_id;
-        const profile = profilesMap[userId];
-        
-        // Skip if no matching profile found
-        if (!profile || !profile.username) return acc;
-        
-        const profitLoss = (trade.exit_price - trade.entry_price) * (trade.quantity || 1);
-        
-        if (!acc[userId]) {
-          acc[userId] = {
-            username: profile.username,
-            avatar_url: profile.avatar_url || '',
-            profit_loss: 0,
-            rank: 0,
-            chart_link: null
-          };
-        }
-        
-        acc[userId].profit_loss += profitLoss;
-        
-        // Keep track of a chart_link from one of their trades
-        if (trade.chart_link && !acc[userId].chart_link) {
-          acc[userId].chart_link = trade.chart_link;
-        }
-        
-        return acc;
-      }, {} as Record<string, LeaderboardEntry>);
-      
-      // Convert to array and sort
-      const usersArray = Object.values(userProfits);
-      
-      // Separate winners and losers
-      const winners = usersArray
-        .filter(entry => entry.profit_loss > 0)
-        .sort((a, b) => b.profit_loss - a.profit_loss)
-        .map((entry, index) => ({...entry, rank: index + 1}));
-      
-      const losers = usersArray
-        .filter(entry => entry.profit_loss < 0)
-        .sort((a, b) => a.profit_loss - b.profit_loss)
-        .map((entry, index) => ({...entry, rank: index + 1}));
+      const losers = leaderboardData
+        .filter((entry: any) => entry.profit_loss < 0)
+        .map((entry: any) => ({
+          username: entry.username,
+          avatar_url: entry.avatar_url || '',
+          profit_loss: entry.profit_loss,
+          rank: entry.rank,
+          chart_link: null
+        }));
       
       console.log(`Winners: ${winners.length}, Losers: ${losers.length}`);
       

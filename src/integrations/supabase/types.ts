@@ -319,27 +319,7 @@ export type Database = {
       }
     }
     Views: {
-      leaderboard_profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string | null
-          id: string | null
-          username: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string | null
-          id?: string | null
-          username?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string | null
-          id?: string | null
-          username?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       calculate_emotional_score: {
@@ -360,6 +340,14 @@ export type Database = {
           avatar_url: string
           profit_loss: number
           rank: number
+          username: string
+        }[]
+      }
+      get_leaderboard_profile_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string
+          id: string
           username: string
         }[]
       }

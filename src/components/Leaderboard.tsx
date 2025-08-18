@@ -42,54 +42,28 @@ export function Leaderboard() {
   const { data: leaderboard, isLoading } = useQuery({
     queryKey: ["leaderboard"],
     queryFn: async () => {
-      const { data: trades, error } = await supabase
-        .from("trades")
-        .select(`
-          user_id,
-          profiles (username, avatar_url),
-          exit_price,
-          entry_price,
-          quantity,
-          outcome
-        `) as { data: TradeWithProfile[] | null, error: any };
+      // Use the secure database function to get leaderboard data
+      const { data: leaderboardData, error } = await supabase
+        .rpc('get_daily_leaderboard', { limit_count: 10 });
 
-      if (!trades) return [];
+      if (error) {
+        console.error('Error fetching leaderboard:', error);
+        return [];
+      }
 
-      // Group trades by user and calculate statistics
-      const userStats = trades.reduce<Record<string, UserStats>>((acc, trade) => {
-        const userId = trade.user_id;
-        if (!acc[userId]) {
-          acc[userId] = {
-            username: trade.profiles.username || "Anonymous",
-            avatar_url: trade.profiles.avatar_url,
-            total_trades: 0,
-            winning_trades: 0,
-            profit_loss: 0,
-          };
-        }
-        
-        acc[userId].total_trades++;
-        if (trade.outcome === 'profit') {
-          acc[userId].winning_trades++;
-        }
-        
-        if (trade.exit_price && trade.entry_price && trade.quantity) {
-          acc[userId].profit_loss += (trade.exit_price - trade.entry_price) * trade.quantity;
-        }
-        
-        return acc;
-      }, {});
+      if (!leaderboardData) return [];
 
-      const leaderboardEntries: LeaderboardEntry[] = Object.values(userStats).map((stats) => ({
-        username: stats.username,
-        win_rate: (stats.winning_trades / stats.total_trades) * 100 || 0,
-        profit_loss: stats.profit_loss,
-        avatar_url: stats.avatar_url,
-      }));
+      // Transform the data to match the expected format
+      const leaderboardEntries: LeaderboardEntry[] = leaderboardData
+        .filter((entry: any) => entry.profit_loss > 0) // Only show profitable traders for this leaderboard
+        .map((entry: any) => ({
+          username: entry.username || "Anonymous",
+          win_rate: 0, // Win rate calculation not available in this function
+          profit_loss: entry.profit_loss,
+          avatar_url: entry.avatar_url,
+        }));
 
-      return leaderboardEntries
-        .sort((a, b) => b.profit_loss - a.profit_loss)
-        .slice(0, 10); // Show only top 10 performers
+      return leaderboardEntries;
     },
   });
 
