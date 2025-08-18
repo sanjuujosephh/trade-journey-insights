@@ -319,19 +319,22 @@ export type Database = {
       }
     }
     Views: {
-      public_profiles: {
+      leaderboard_profiles: {
         Row: {
           avatar_url: string | null
+          created_at: string | null
           id: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          created_at?: string | null
           id?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          created_at?: string | null
           id?: string | null
           username?: string | null
         }
@@ -357,14 +360,6 @@ export type Database = {
           avatar_url: string
           profit_loss: number
           rank: number
-          username: string
-        }[]
-      }
-      get_public_profile_data: {
-        Args: { profile_user_id: string }
-        Returns: {
-          avatar_url: string
-          id: string
           username: string
         }[]
       }
